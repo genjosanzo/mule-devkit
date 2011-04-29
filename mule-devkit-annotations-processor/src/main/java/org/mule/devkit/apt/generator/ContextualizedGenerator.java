@@ -1,11 +1,11 @@
-package org.mule.devkit.apt.code;
+package org.mule.devkit.apt.generator;
 
 import org.mule.devkit.apt.AnnotationProcessorContext;
 
-public abstract class AbstractCodeGenerator implements CodeGenerator {
+public abstract class ContextualizedGenerator implements Generator {
     private AnnotationProcessorContext context;
 
-    public AbstractCodeGenerator(AnnotationProcessorContext context) {
+    public ContextualizedGenerator(AnnotationProcessorContext context) {
         this.context = context;
     }
 

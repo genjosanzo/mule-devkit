@@ -1,6 +1,9 @@
 package org.mule.devkit.apt.util;
 
-public class ClassNameUtils {
+public final class ClassNameUtils {
+    private ClassNameUtils()
+    {}
+
     public static String getClassName(String fullyQualifiedClassName)
     {
         int lastDot = fullyQualifiedClassName.lastIndexOf('.');

@@ -32,4 +32,9 @@ public class ModuleAnnotationProcessorTest extends AbstractAnnotationProcessorTe
     public void moduleAnnotationPrivateInvalid() {
         assertCompilationReturned(Diagnostic.Kind.ERROR, 6, compileTestCase(InvalidTypeNonPublic.class));
     }
+
+    @Test
+    public void fieldAnnotationFinalInvalid() {
+        assertCompilationReturned(Diagnostic.Kind.ERROR, 9, compileTestCase(InvalidFieldFinal.class));
+    }
 }

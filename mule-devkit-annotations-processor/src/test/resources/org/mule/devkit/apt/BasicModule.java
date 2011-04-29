@@ -1,5 +1,6 @@
 package org.mule.devkit.apt;
 
+import org.mule.devkit.annotations.Configurable;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.annotations.Processor;
 
@@ -8,10 +9,17 @@ import org.mule.devkit.annotations.Processor;
  */
 @Module(name="basic")
 public class BasicModule {
+
+    @Configurable
+    private int mandatoryField;
+
+    @Configurable(optional = true)
+    private String optionalField;
+
     @Processor
-    public String add()
+    public int sum(int a, int b)
     {
-        return "";
+        return a + b;
     }
 
     public String doNotAdd()

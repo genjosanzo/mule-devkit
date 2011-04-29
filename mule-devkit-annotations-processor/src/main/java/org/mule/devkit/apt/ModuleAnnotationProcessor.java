@@ -1,9 +1,11 @@
 package org.mule.devkit.apt;
 
 import org.mule.devkit.annotations.Module;
-import org.mule.devkit.apt.code.CodeGenerator;
-import org.mule.devkit.apt.code.MetadataCodeGenerator;
-import org.mule.devkit.apt.code.NamespaceHandlerCodeGenerator;
+import org.mule.devkit.apt.generator.Generator;
+import org.mule.devkit.apt.generator.MetadataGenerator;
+import org.mule.devkit.apt.generator.spring.BeanDefinitionParserGenerator;
+import org.mule.devkit.apt.generator.spring.NamespaceHandlerGenerator;
+import org.mule.devkit.apt.generator.schema.SchemaGenerator;
 import org.mule.devkit.apt.validation.ModuleTypeValidator;
 import org.mule.devkit.apt.validation.TypeValidator;
 
@@ -36,10 +38,12 @@ public class ModuleAnnotationProcessor extends AbstractAnnotationProcessor {
     }
 
     @Override
-    public List<CodeGenerator> getCodeGenerators() {
-        List<CodeGenerator> codeGenerators = new ArrayList<CodeGenerator>();
-        codeGenerators.add(new MetadataCodeGenerator(getContext()));
-        codeGenerators.add(new NamespaceHandlerCodeGenerator(getContext()));
-        return codeGenerators;
+    public List<Generator> getCodeGenerators() {
+        List<Generator> generators = new ArrayList<Generator>();
+        generators.add(new MetadataGenerator(getContext()));
+        generators.add(new NamespaceHandlerGenerator(getContext()));
+        generators.add(new BeanDefinitionParserGenerator(getContext()));
+        generators.add(new SchemaGenerator(getContext()));
+        return generators;
     }
 }
