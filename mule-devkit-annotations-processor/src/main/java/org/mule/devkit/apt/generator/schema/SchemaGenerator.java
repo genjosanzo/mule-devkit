@@ -2,6 +2,7 @@ package org.mule.devkit.apt.generator.schema;
 
 import org.mule.devkit.annotations.Configurable;
 import org.mule.devkit.annotations.Module;
+import org.mule.devkit.annotations.Parameter;
 import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.ContextualizedGenerator;
@@ -414,73 +415,9 @@ public class SchemaGenerator extends ContextualizedGenerator {
             Attribute configRefAttr = createAttribute("name", true, STRING, "Give a name to this configuration so it can be later referenced by config-ref.");
             complexContentExtension.getAttributeOrAttributeGroup().add(configRefAttr);
 
-            for(VariableElement variable : method.getParameters())
-            {
-                complexContentExtension.getAttributeOrAttributeGroup().add(createAttribute(variable));
+            for (VariableElement variable : method.getParameters()) {
+                complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(variable));
             }
-
-
-            /*
-    <xsd:complexType name="${method.getElementName()}Type">
-        <xsd:complexContent>
-            <xsd:extension base="mule:abstractInterceptingMessageProcessorType">
-                <xsd:all>
-                    <#list method.getParameters() as parameter>
-                    <#if parameter.getType().isArray() || parameter.getType().isList()>
-                    <xsd:element name="<@uncapitalize>${parameter.getElementName()}</@uncapitalize>"<#if parameter.isOptional()> minOccurs="0"</#if>>
-                        <xsd:complexType>
-                            <xsd:sequence>
-                                <xsd:element name="<@singularize>${parameter.getElementName()}</@singularize>" minOccurs="0" maxOccurs="unbounded"
-                                             <#if parameter.getType().isList()>
-                                             type="${parameter.getType().getTypeArguments().get(0).getXmlType(false)}"/>
-                                             <#else>
-                                             type="${parameter.getType().getXmlType(false)}"/>
-                                             </#if>
-                            </xsd:sequence>
-                        </xsd:complexType>
-                    </xsd:element>
-                    <#elseif parameter.getType().isMap()>
-                    <xsd:element name="<@uncapitalize>${parameter.getElementName()}</@uncapitalize>" <#if parameter.isOptional()> minOccurs="0"</#if>>
-                        <xsd:complexType>
-                            <xsd:sequence>
-                                <xsd:element name="<@singularize>${parameter.getElementName()}</@singularize>" minOccurs="0" maxOccurs="unbounded">
-                                    <xsd:complexType>
-                                        <xsd:attribute name="key" type="${parameter.getType().getTypeArguments().get(0).getXmlType(false)}"/>
-                                        <xsd:attribute name="value" type="${parameter.getType().getTypeArguments().get(1).getXmlType(false)}"/>
-                                    </xsd:complexType>
-                                </xsd:element>
-                            </xsd:sequence>
-                        </xsd:complexType>
-                    </xsd:element>
-                    </#if>
-                    </#list>
-                </xsd:all>
-
-                <xsd:attribute name="config-ref" use="optional" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Specify which configuration to use for this invocation
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <#list method.getParameters() as parameter>
-                <#if !parameter.getType().isArray() && !parameter.getType().isList() && !parameter.getType().isMap()>
-                <xsd:attribute name="<@uncapitalize>${parameter.getElementName()}</@uncapitalize>" type="${parameter.getType().getXmlType(false)}" <#if !parameter.isOptional()>use="required" </#if><#if parameter.hasDefaultValue()>default="${parameter.getDefaultValue()}"</#if>>
-                    <#if parameter.getDescription()?has_content>
-                    <xsd:annotation>
-                        <xsd:documentation><![CDATA[
-                            ${parameter.getDescription()}
-                        ]]></xsd:documentation>
-                    </xsd:annotation>
-                    </#if>
-                </xsd:attribute>
-                </#if>
-                </#list>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-             */
 
             schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
             schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
@@ -494,12 +431,12 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
         java.util.List<VariableElement> variables = ElementFilter.fieldsIn(type.getEnclosedElements());
         for (VariableElement variable : variables) {
-            config.getAttributeOrAttributeGroup().add(createAttribute(variable));
+            config.getAttributeOrAttributeGroup().add(createConfigurableAttribute(variable));
         }
     }
 
-    private <C extends java.lang.annotation.Annotation> Attribute createAttribute(VariableElement variable, Class<C> annotation) {
-        C configurable = variable.getAnnotation(annotation);
+    private Attribute createConfigurableAttribute(VariableElement variable) {
+        Configurable configurable = variable.getAnnotation(Configurable.class);
         if (configurable == null)
             return null;
 
@@ -527,6 +464,40 @@ public class SchemaGenerator extends ContextualizedGenerator {
         }
         return attribute;
     }
+
+    private Attribute createParameterAttribute(VariableElement variable) {
+        Parameter parameter = variable.getAnnotation(Parameter.class);
+
+        String name = variable.getSimpleName().toString();
+        if (parameter != null && parameter.name().length() > 0)
+            name = parameter.name();
+
+        Attribute attribute = new Attribute();
+
+        // set whenever or not is optional
+        if (parameter != null) {
+            attribute.setUse(parameter.optional() ? USE_OPTIONAL : USE_REQUIRED);
+        } else {
+            attribute.setUse(USE_REQUIRED);
+        }
+
+
+        if (isTypeSupported(variable)) {
+            attribute.setName(name);
+            attribute.setType(typeMap.get(variable.asType().toString()));
+        } else {
+            // non-supported types will get "-ref" so beans can be injected
+            attribute.setName(name + "-ref");
+            attribute.setType(STRING);
+        }
+
+        // add default value
+        if (parameter != null && parameter.defaultValue().length() > 0) {
+            attribute.setDefault(parameter.defaultValue());
+        }
+        return attribute;
+    }
+
 
     private boolean isTypeSupported(VariableElement variableElement) {
         return typeMap.containsKey(variableElement.asType().toString());

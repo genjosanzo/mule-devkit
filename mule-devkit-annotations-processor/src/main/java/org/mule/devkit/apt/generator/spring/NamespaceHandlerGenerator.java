@@ -7,6 +7,7 @@ import com.sun.codemodel.JMod;
 import org.mule.config.spring.handlers.AbstractPojoNamespaceHandler;
 import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.apt.AnnotationProcessorContext;
+import org.mule.devkit.apt.generator.AbstractCodeGenerator;
 import org.mule.devkit.apt.generator.GenerationException;
 
 import javax.lang.model.element.ExecutableElement;
