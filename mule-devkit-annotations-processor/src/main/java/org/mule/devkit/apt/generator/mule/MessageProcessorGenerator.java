@@ -250,7 +250,7 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
         JVar dataTypeTarget = isAssignable.decl(ref(DataType.class), "target");
 
         isAssignable.assign(dataTypeSource, ref(DataTypeFactory.class).boxify().staticInvoke("create").arg(evaluatedField.invoke("getClass")));
-        isAssignable.assign(dataTypeTarget, ref(DataTypeFactory.class).boxify().staticInvoke("create").arg(ref(Class.class).boxify().staticInvoke("forName").arg(JExpr.lit(expectedType.toString()))));
+        isAssignable.assign(dataTypeTarget, ref(DataTypeFactory.class).boxify().staticInvoke("create").arg(JExpr.dotclass(ref(expectedType).boxify())));
 
         JVar transformer = isAssignable.decl(ref(Transformer.class), "t");
         JInvocation lookupTransformer = muleContext.invoke("getRegistry").invoke("lookupTransformer");

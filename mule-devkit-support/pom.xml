@@ -45,4 +45,12 @@
             </resource>
         </resources>
     </build>
+
+    <repositories>
+        <repository>
+            <id>muleforge</id>
+            <name>MuleForge Repository</name>
+            <url>http://repository.muleforge.org</url>
+        </repository>
+    </repositories>
 </project>
