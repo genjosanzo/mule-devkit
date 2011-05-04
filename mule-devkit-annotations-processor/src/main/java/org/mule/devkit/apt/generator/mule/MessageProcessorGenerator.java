@@ -244,7 +244,7 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
     }
 
     private void generateTransform(JBlock block, JVar evaluatedField, TypeMirror expectedType, JFieldVar muleContext) {
-        JInvocation isAssignableFrom = ref(expectedType).boxify().staticInvoke("isAssignableFrom").arg(evaluatedField.invoke("getClass"));
+        JInvocation isAssignableFrom = JExpr.dotclass(ref(expectedType).boxify()).invoke("isAssignableFrom").arg(evaluatedField.invoke("getClass"));
         JBlock isAssignable = block._if(JOp.not(isAssignableFrom))._then();
         JVar dataTypeSource = isAssignable.decl(ref(DataType.class), "source");
         JVar dataTypeTarget = isAssignable.decl(ref(DataType.class), "target");
