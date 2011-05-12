@@ -1,5 +1,6 @@
 package org.mule.devkit.apt.generator.spring;
 
+import com.sun.codemodel.JPackage;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.ContextualizedGenerator;
@@ -7,9 +8,8 @@ import org.mule.devkit.apt.generator.GenerationException;
 import org.mule.devkit.apt.generator.schema.FileTypeSchema;
 
 import javax.lang.model.element.TypeElement;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 public class SpringSchemaGenerator extends ContextualizedGenerator {
@@ -18,16 +18,9 @@ public class SpringSchemaGenerator extends ContextualizedGenerator {
     }
 
     public void generate(TypeElement element) throws GenerationException {
-        File metaInf = new File(getContext().getGeneratedResources(), "META-INF");
-        if( !metaInf.exists() )
-            metaInf.mkdirs();
-
-        File springSchemas = new File(metaInf, "spring.schemas");
-
         try {
-            springSchemas.createNewFile();
-
-            FileOutputStream springSchemasStream = new FileOutputStream(springSchemas);
+            JPackage metaInf = getContext().getCodeModel()._package("META-INF");
+            OutputStream springSchemasStream = getContext().getCodeWriter().openBinary(metaInf, "spring.schemas");
             OutputStreamWriter springSchemasOut = new OutputStreamWriter(springSchemasStream, "UTF-8");
 
             for (Module mod : getContext().getSchemas().keySet()) {

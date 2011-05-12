@@ -1,6 +1,7 @@
 package org.mule.devkit.apt.generator.spring;
 
 import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JPackage;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
@@ -11,6 +12,7 @@ import javax.lang.model.element.TypeElement;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 public class SpringNamespaceHandlerGenerator extends AbstractCodeGenerator {
@@ -19,16 +21,10 @@ public class SpringNamespaceHandlerGenerator extends AbstractCodeGenerator {
     }
 
     public void generate(TypeElement element) throws GenerationException {
-        File metaInf = new File(getContext().getGeneratedResources(), "META-INF");
-        if( !metaInf.exists() )
-            metaInf.mkdirs();
-
-        File springNamespaceHandlers = new File(metaInf, "spring.handlers");
 
         try {
-            springNamespaceHandlers.createNewFile();
-
-            FileOutputStream springNamespaceHandlersStream = new FileOutputStream(springNamespaceHandlers);
+            JPackage metaInf = getContext().getCodeModel()._package("META-INF");
+            OutputStream springNamespaceHandlersStream = getContext().getCodeWriter().openBinary(metaInf, "spring.handlers");
             OutputStreamWriter springNamespaceHandlersOut = new OutputStreamWriter(springNamespaceHandlersStream, "UTF-8");
 
             for (Module mod : getContext().getSchemas().keySet()) {

@@ -1,5 +1,6 @@
 package org.mule.devkit.apt;
 
+import com.sun.codemodel.CodeWriter;
 import com.sun.codemodel.JCodeModel;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.apt.generator.schema.FileTypeSchema;
@@ -13,13 +14,10 @@ public class AnnotationProcessorContext {
     private JCodeModel codeModel;
     private Elements elements;
     private Map<Module, FileTypeSchema> schemas;
-    private File generatedSources;
-    private File generatedResources;
+    private CodeWriter codeWriter;
 
-    public AnnotationProcessorContext(File generatedSources, File generatedResources) {
+    public AnnotationProcessorContext() {
         this.schemas = new HashMap<Module, FileTypeSchema>();
-        this.generatedSources = generatedSources;
-        this.generatedResources = generatedResources;
     }
 
     public JCodeModel getCodeModel() {
@@ -46,15 +44,11 @@ public class AnnotationProcessorContext {
         return this.schemas;
     }
 
-    public File getGeneratedSources() {
-        return generatedSources;
+    public CodeWriter getCodeWriter() {
+        return codeWriter;
     }
 
-    public File getGeneratedResources() {
-        return generatedResources;
-    }
-
-    public void setGeneratedResources(File generatedResources) {
-        this.generatedResources = generatedResources;
+    public void setCodeWriter(CodeWriter codeWriter) {
+        this.codeWriter = codeWriter;
     }
 }

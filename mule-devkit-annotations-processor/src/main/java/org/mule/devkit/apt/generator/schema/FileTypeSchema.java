@@ -1,25 +1,25 @@
 package org.mule.devkit.apt.generator.schema;
 
 import javax.lang.model.element.TypeElement;
-import java.io.File;
+import java.io.OutputStream;
 
 public class FileTypeSchema {
-    private File file;
+    private OutputStream os;
     private Schema schema;
     private TypeElement typeElement;
 
-    public FileTypeSchema(File file, Schema schema, TypeElement typeElement) {
-        this.file = file;
+    public FileTypeSchema(OutputStream os, Schema schema, TypeElement typeElement) {
+        this.os = os;
         this.schema = schema;
         this.typeElement = typeElement;
     }
 
-    public File getFile() {
-        return file;
+    public OutputStream getOs() {
+        return os;
     }
 
-    public void setFile(File file) {
-        this.file = file;
+    public void setOs(OutputStream os) {
+        this.os = os;
     }
 
     public Schema getSchema() {

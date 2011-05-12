@@ -1,5 +1,6 @@
 package org.mule.devkit.apt.generator.schema;
 
+import com.sun.codemodel.JPackage;
 import org.mule.devkit.annotations.Configurable;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.annotations.Parameter;
@@ -14,7 +15,8 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -385,13 +387,15 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
         registerProcessors(type);
 
-        File metaInf = new File(getContext().getGeneratedResources(), "META-INF");
-        if( !metaInf.exists() )
-            metaInf.mkdirs();
+        try {
+            JPackage metaInf = getContext().getCodeModel()._package("META-INF");
+            OutputStream schemaStream = getContext().getCodeWriter().openBinary(metaInf, "mule-" + module.name() + ".xsd");
 
-        File output = new File(metaInf, "mule-" + module.name() + ".xsd");
-        FileTypeSchema fileTypeSchema = new FileTypeSchema(output, schema, type);
-        getContext().addSchema(module, fileTypeSchema);
+            FileTypeSchema fileTypeSchema = new FileTypeSchema(schemaStream, schema, type);
+            getContext().addSchema(module, fileTypeSchema);
+        } catch (IOException ioe) {
+            throw new GenerationException(ioe);
+        }
     }
 
     private void registerProcessors(TypeElement type) {
