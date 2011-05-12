@@ -19,6 +19,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -294,6 +295,11 @@ public abstract class AbstractAnnotationProcessorMojo extends AbstractMojo
         {
             getLog().info("Source directory: " + outputDirectory + " added");
             addCompileSourceRoot(project, outputDirectory.getAbsolutePath());
+            getLog().info("Resource directory: " + outputDirectory + " added");
+
+            Resource resourceDirectory = new Resource();
+            resourceDirectory.setDirectory(outputDirectory.getAbsolutePath());
+            project.addResource(resourceDirectory);
         }
     }
 

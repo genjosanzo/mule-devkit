@@ -371,8 +371,8 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
         Module module = type.getAnnotation(Module.class);
         schema.setTargetNamespace(BASE_NAMESPACE + module.name());
-        schema.setElementFormDefault(FormChoice.UNQUALIFIED);
-        schema.setAttributeFormDefault(FormChoice.UNQUALIFIED);
+        schema.setElementFormDefault(FormChoice.QUALIFIED);
+        schema.setAttributeFormDefault(FormChoice.QUALIFIED);
 
         importXmlNamespace();
         importSpringFrameworkNamespace();
@@ -385,7 +385,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
         registerProcessors(type);
 
-        File metaInf = new File(getContext().getGeneratedSources(), "META-INF");
+        File metaInf = new File(getContext().getGeneratedResources(), "META-INF");
         if( !metaInf.exists() )
             metaInf.mkdirs();
 

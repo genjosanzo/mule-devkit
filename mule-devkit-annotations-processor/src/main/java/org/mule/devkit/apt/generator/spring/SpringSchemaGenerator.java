@@ -18,7 +18,7 @@ public class SpringSchemaGenerator extends ContextualizedGenerator {
     }
 
     public void generate(TypeElement element) throws GenerationException {
-        File metaInf = new File(getContext().getGeneratedSources(), "META-INF");
+        File metaInf = new File(getContext().getGeneratedResources(), "META-INF");
         if( !metaInf.exists() )
             metaInf.mkdirs();
 

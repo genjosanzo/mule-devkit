@@ -14,10 +14,12 @@ public class AnnotationProcessorContext {
     private Elements elements;
     private Map<Module, FileTypeSchema> schemas;
     private File generatedSources;
+    private File generatedResources;
 
-    public AnnotationProcessorContext(File generatedSources) {
+    public AnnotationProcessorContext(File generatedSources, File generatedResources) {
         this.schemas = new HashMap<Module, FileTypeSchema>();
         this.generatedSources = generatedSources;
+        this.generatedResources = generatedResources;
     }
 
     public JCodeModel getCodeModel() {
@@ -46,5 +48,13 @@ public class AnnotationProcessorContext {
 
     public File getGeneratedSources() {
         return generatedSources;
+    }
+
+    public File getGeneratedResources() {
+        return generatedResources;
+    }
+
+    public void setGeneratedResources(File generatedResources) {
+        this.generatedResources = generatedResources;
     }
 }

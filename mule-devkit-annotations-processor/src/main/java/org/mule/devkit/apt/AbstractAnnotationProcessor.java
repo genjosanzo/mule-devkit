@@ -43,7 +43,7 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
     }
 
     private void createContext() {
-        context = new AnnotationProcessorContext(generatedSources);
+        context = new AnnotationProcessorContext(generatedSources, generatedSources);
         context.setCodeModel(new JCodeModel());
         context.setElements(processingEnv.getElementUtils());
     }
@@ -84,7 +84,8 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
         }
 
         try {
-            context.getCodeModel().build(generatedSources, generatedResources);
+            FilerCodeWriter filerCodeWriter = new FilerCodeWriter(processingEnv.getFiler());
+            context.getCodeModel().build(filerCodeWriter);
         } catch (IOException e) {
             error(e.getMessage());
         }
