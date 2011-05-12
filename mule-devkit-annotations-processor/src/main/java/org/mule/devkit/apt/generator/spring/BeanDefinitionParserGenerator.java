@@ -65,7 +65,7 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
 
     private void generateGetAttributeValue(JDefinedClass beanDefinitionparser)
     {
-        JMethod getAttributeValue = beanDefinitionparser.method(JMod.PROTECTED, ref(Class.class), "getAttributeValue");
+        JMethod getAttributeValue = beanDefinitionparser.method(JMod.PROTECTED, ref(String.class), "getAttributeValue");
         JVar element = getAttributeValue.param(ref(Element.class), "element");
         JVar attributeName = getAttributeValue.param(ref(String.class), "attributeName");
 

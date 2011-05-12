@@ -54,7 +54,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <filesToInclude>target/test-classes/**/pom.xml</filesToInclude>
+                    <filesToInclude>target/integration-tests/**/pom.xml</filesToInclude>
                     <replacements>
                         <replacement>
                             <token>@project.version@</token>

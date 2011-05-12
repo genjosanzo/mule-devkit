@@ -14,6 +14,7 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -384,7 +385,13 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
         registerProcessors(type);
 
-        getContext().addSchema(module.name(), schema);
+        File metaInf = new File(getContext().getGeneratedSources(), "META-INF");
+        if( !metaInf.exists() )
+            metaInf.mkdirs();
+
+        File output = new File(metaInf, "mule-" + module.name() + ".xsd");
+        FileSchema fileSchema = new FileSchema(output, schema);
+        getContext().addSchema(module, fileSchema);
     }
 
     private void registerProcessors(TypeElement type) {

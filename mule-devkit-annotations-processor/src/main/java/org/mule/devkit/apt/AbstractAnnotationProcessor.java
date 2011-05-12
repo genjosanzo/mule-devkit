@@ -1,8 +1,10 @@
 package org.mule.devkit.apt;
 
 import com.sun.codemodel.JCodeModel;
+import org.mule.devkit.annotations.Module;
 import org.mule.devkit.apt.generator.GenerationException;
 import org.mule.devkit.apt.generator.Generator;
+import org.mule.devkit.apt.generator.schema.FileSchema;
 import org.mule.devkit.apt.generator.schema.Schema;
 import org.mule.devkit.apt.validation.ValidationException;
 import org.mule.devkit.apt.validation.TypeValidator;
@@ -41,7 +43,7 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
     }
 
     private void createContext() {
-        context = new AnnotationProcessorContext();
+        context = new AnnotationProcessorContext(generatedSources);
         context.setCodeModel(new JCodeModel());
         context.setElements(processingEnv.getElementUtils());
     }
@@ -88,15 +90,15 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
         }
 
         if (getContext().getSchemas().size() > 0) {
-            for( String name : getContext().getSchemas().keySet() )
+            for( Module mod : getContext().getSchemas().keySet() )
             {
-                Schema schema = getContext().getSchemas().get(name);
+                FileSchema fileSchema = getContext().getSchemas().get(mod);
                 try {
-                    File schemaFile = new File(generatedSources, "mule-" + name + ".xsd");
+                    //File schemaFile = new File(generatedSources, "mule-" + name + ".xsd");
                     JAXBContext jaxbContext = JAXBContext.newInstance(Schema.class);
                     Marshaller marshaller = jaxbContext.createMarshaller();
                     marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
-                    marshaller.marshal(schema, new FileOutputStream(schemaFile));
+                    marshaller.marshal(fileSchema.getSchema(), new FileOutputStream(fileSchema.getFile()));
                 } catch (JAXBException e) {
                     error(e.getCause().getMessage());
                 } catch (FileNotFoundException fnfe) {

@@ -22,4 +22,12 @@ public @interface Module {
      * The name of the module.
      */
     String name();
+
+    /**
+     * The version of the module. Defaults to 1.0.
+     */
+    String version() default DEFAULT_VERSION;
+
+    String DEFAULT_VERSION = "1.0";
+
 }

@@ -7,6 +7,7 @@ import org.mule.devkit.apt.generator.spring.BeanDefinitionParserGenerator;
 import org.mule.devkit.apt.generator.mule.MessageProcessorGenerator;
 import org.mule.devkit.apt.generator.spring.NamespaceHandlerGenerator;
 import org.mule.devkit.apt.generator.schema.SchemaGenerator;
+import org.mule.devkit.apt.generator.spring.SpringSchemaGenerator;
 import org.mule.devkit.apt.validation.ModuleTypeValidator;
 import org.mule.devkit.apt.validation.TypeValidator;
 
@@ -46,6 +47,7 @@ public class ModuleAnnotationProcessor extends AbstractAnnotationProcessor {
         generators.add(new BeanDefinitionParserGenerator(getContext()));
         generators.add(new MessageProcessorGenerator(getContext()));
         generators.add(new SchemaGenerator(getContext()));
+        generators.add(new SpringSchemaGenerator(getContext()));
         return generators;
     }
 }
