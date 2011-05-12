@@ -1,14 +1,17 @@
 package org.mule.devkit.apt.generator.schema;
 
+import javax.lang.model.element.TypeElement;
 import java.io.File;
 
-public class FileSchema {
+public class FileTypeSchema {
     private File file;
     private Schema schema;
+    private TypeElement typeElement;
 
-    public FileSchema(File file, Schema schema) {
+    public FileTypeSchema(File file, Schema schema, TypeElement typeElement) {
         this.file = file;
         this.schema = schema;
+        this.typeElement = typeElement;
     }
 
     public File getFile() {
@@ -25,5 +28,13 @@ public class FileSchema {
 
     public void setSchema(Schema schema) {
         this.schema = schema;
+    }
+
+    public TypeElement getTypeElement() {
+        return typeElement;
+    }
+
+    public void setTypeElement(TypeElement typeElement) {
+        this.typeElement = typeElement;
     }
 }

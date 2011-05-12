@@ -390,8 +390,8 @@ public class SchemaGenerator extends ContextualizedGenerator {
             metaInf.mkdirs();
 
         File output = new File(metaInf, "mule-" + module.name() + ".xsd");
-        FileSchema fileSchema = new FileSchema(output, schema);
-        getContext().addSchema(module, fileSchema);
+        FileTypeSchema fileTypeSchema = new FileTypeSchema(output, schema, type);
+        getContext().addSchema(module, fileTypeSchema);
     }
 
     private void registerProcessors(TypeElement type) {

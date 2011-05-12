@@ -24,7 +24,7 @@
                     </generate-sources>
                     <process-sources>
                     </process-sources>
-                    <!-- <generate-resources>org.mule.tools:mule-cloud-connector-maven-plugin:schema-generate
+                    <!-- <generate-resources>org.mule.tools:mule-cloud-connector-maven-plugin:typeSchema-generate
                     </generate-resources> -->
                     <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources
                     </process-resources>

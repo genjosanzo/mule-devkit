@@ -2,7 +2,7 @@ package org.mule.devkit.apt;
 
 import com.sun.codemodel.JCodeModel;
 import org.mule.devkit.annotations.Module;
-import org.mule.devkit.apt.generator.schema.FileSchema;
+import org.mule.devkit.apt.generator.schema.FileTypeSchema;
 
 import javax.lang.model.util.Elements;
 import java.io.File;
@@ -12,11 +12,11 @@ import java.util.Map;
 public class AnnotationProcessorContext {
     private JCodeModel codeModel;
     private Elements elements;
-    private Map<Module, FileSchema> schemas;
+    private Map<Module, FileTypeSchema> schemas;
     private File generatedSources;
 
     public AnnotationProcessorContext(File generatedSources) {
-        this.schemas = new HashMap<Module, FileSchema>();
+        this.schemas = new HashMap<Module, FileTypeSchema>();
         this.generatedSources = generatedSources;
     }
 
@@ -36,11 +36,11 @@ public class AnnotationProcessorContext {
         this.elements = elements;
     }
 
-    public void addSchema(Module key, FileSchema schema) {
-        this.schemas.put(key, schema);
+    public void addSchema(Module key, FileTypeSchema typeSchema) {
+        this.schemas.put(key, typeSchema);
     }
 
-    public Map<Module, FileSchema> getSchemas() {
+    public Map<Module, FileTypeSchema> getSchemas() {
         return this.schemas;
     }
 

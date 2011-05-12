@@ -4,7 +4,7 @@ import com.sun.codemodel.JCodeModel;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.apt.generator.GenerationException;
 import org.mule.devkit.apt.generator.Generator;
-import org.mule.devkit.apt.generator.schema.FileSchema;
+import org.mule.devkit.apt.generator.schema.FileTypeSchema;
 import org.mule.devkit.apt.generator.schema.Schema;
 import org.mule.devkit.apt.validation.ValidationException;
 import org.mule.devkit.apt.validation.TypeValidator;
@@ -92,13 +92,13 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
         if (getContext().getSchemas().size() > 0) {
             for( Module mod : getContext().getSchemas().keySet() )
             {
-                FileSchema fileSchema = getContext().getSchemas().get(mod);
+                FileTypeSchema fileTypeSchema = getContext().getSchemas().get(mod);
                 try {
                     //File schemaFile = new File(generatedSources, "mule-" + name + ".xsd");
                     JAXBContext jaxbContext = JAXBContext.newInstance(Schema.class);
                     Marshaller marshaller = jaxbContext.createMarshaller();
                     marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
-                    marshaller.marshal(fileSchema.getSchema(), new FileOutputStream(fileSchema.getFile()));
+                    marshaller.marshal(fileTypeSchema.getSchema(), new FileOutputStream(fileTypeSchema.getFile()));
                 } catch (JAXBException e) {
                     error(e.getCause().getMessage());
                 } catch (FileNotFoundException fnfe) {

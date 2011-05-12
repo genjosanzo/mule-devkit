@@ -18,14 +18,14 @@
 
 -->
 
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+<mule xmlns="http://www.mulesoft.org/typeSchema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:basic="http://www.mulesoft.org/schema/mule/basic"
+      xmlns:spring="http://www.springframework.org/typeSchema/beans"
+      xmlns:basic="http://www.mulesoft.org/typeSchema/mule/basic"
       xsi:schemaLocation="
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
-        http://www.mulesoft.org/schema/mule/basic http://www.mulesoft.org/schema/mule/basic/1.0/mule-basic.xsd">
+        http://www.springframework.org/typeSchema/beans http://www.springframework.org/typeSchema/beans/spring-beans-3.0.xsd
+        http://www.mulesoft.org/typeSchema/mule/core http://www.mulesoft.org/typeSchema/mule/core/3.1/mule.xsd
+        http://www.mulesoft.org/typeSchema/mule/basic http://www.mulesoft.org/typeSchema/mule/basic/1.0/mule-basic.xsd">
 
     <flow name="passthruCharFlow">
         <basic:passthru-char value="c"/>
