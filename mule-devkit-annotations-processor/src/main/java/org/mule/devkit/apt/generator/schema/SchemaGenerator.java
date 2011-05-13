@@ -334,33 +334,9 @@ public class SchemaGenerator extends ContextualizedGenerator {
     private static final QName ANYURI = new QName(XSD_NAMESPACE, "anyURI", "xs");
     private static final String USE_REQUIRED = "required";
     private static final String USE_OPTIONAL = "optional";
-    private static Map<String, QName> typeMap;
+    private Map<String, QName> typeMap;
     private Schema schema;
     private ObjectFactory objectFactory;
-
-    static {
-        typeMap = new HashMap<String, QName>();
-        typeMap.put("java.lang.String", new QName("xs:string"));
-        typeMap.put("int", new QName("integerType"));
-        typeMap.put("float", new QName("floatType"));
-        typeMap.put("long", new QName("longType"));
-        typeMap.put("byte", new QName("byteType"));
-        typeMap.put("short", new QName("integerType"));
-        typeMap.put("double", new QName("doubleType"));
-        typeMap.put("boolean", new QName("booleanType"));
-        typeMap.put("char", new QName("charType"));
-        typeMap.put("java.lang.Integer", new QName("integerType"));
-        typeMap.put("java.lang.Float", new QName("floatType"));
-        typeMap.put("java.lang.Long", new QName("longType"));
-        typeMap.put("java.lang.Byte", new QName("byteType"));
-        typeMap.put("java.lang.Short", new QName("integerType"));
-        typeMap.put("java.lang.Double", new QName("doubleType"));
-        typeMap.put("java.lang.Boolean", new QName("booleanType"));
-        typeMap.put("java.lang.Character", new QName("charType"));
-        typeMap.put("java.util.Date", new QName("dateTimeType"));
-        typeMap.put("java.net.URL", new QName("anyUriType"));
-        typeMap.put("java.net.URI", new QName("anyUriType"));
-    }
 
     public SchemaGenerator(AnnotationProcessorContext context) {
         super(context);
@@ -372,9 +348,12 @@ public class SchemaGenerator extends ContextualizedGenerator {
     public void generate(TypeElement type) throws GenerationException {
 
         Module module = type.getAnnotation(Module.class);
-        schema.setTargetNamespace(BASE_NAMESPACE + module.name());
-        schema.setElementFormDefault(FormChoice.QUALIFIED);
+        String targetNamespace = BASE_NAMESPACE + module.name();
+        schema.setTargetNamespace(targetNamespace);
+        schema.setElementFormDefault(FormChoice.UNQUALIFIED);
         schema.setAttributeFormDefault(FormChoice.QUALIFIED);
+
+        buildTypeMap(targetNamespace);
 
         importXmlNamespace();
         importSpringFrameworkNamespace();
@@ -397,7 +376,35 @@ public class SchemaGenerator extends ContextualizedGenerator {
         }
     }
 
+    private void buildTypeMap(String targetNamespace) {
+        typeMap = new HashMap<String, QName>();
+        typeMap.put("java.lang.String", new QName("xs:string"));
+        typeMap.put("int", new QName(targetNamespace, "integerType"));
+        typeMap.put("float", new QName(targetNamespace, "floatType"));
+        typeMap.put("long", new QName(targetNamespace, "longType"));
+        typeMap.put("byte", new QName(targetNamespace, "byteType"));
+        typeMap.put("short", new QName(targetNamespace, "integerType"));
+        typeMap.put("double", new QName(targetNamespace, "doubleType"));
+        typeMap.put("boolean", new QName(targetNamespace, "booleanType"));
+        typeMap.put("char", new QName(targetNamespace, "charType"));
+        typeMap.put("java.lang.Integer", new QName(targetNamespace, "integerType"));
+        typeMap.put("java.lang.Float", new QName(targetNamespace, "floatType"));
+        typeMap.put("java.lang.Long", new QName(targetNamespace, "longType"));
+        typeMap.put("java.lang.Byte", new QName(targetNamespace, "byteType"));
+        typeMap.put("java.lang.Short", new QName(targetNamespace, "integerType"));
+        typeMap.put("java.lang.Double", new QName(targetNamespace, "doubleType"));
+        typeMap.put("java.lang.Boolean", new QName(targetNamespace, "booleanType"));
+        typeMap.put("java.lang.Character", new QName(targetNamespace, "charType"));
+        typeMap.put("java.util.Date", new QName(targetNamespace, "dateTimeType"));
+        typeMap.put("java.net.URL", new QName(targetNamespace, "anyUriType"));
+        typeMap.put("java.net.URI", new QName(targetNamespace, "anyUriType"));
+    }
+
     private void registerProcessors(TypeElement type) {
+
+        Module module = type.getAnnotation(Module.class);
+        String targetNamespace = BASE_NAMESPACE + module.name();
+
         java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(type.getEnclosedElements());
         for (ExecutableElement method : methods) {
             Processor processor = method.getAnnotation(Processor.class);
@@ -410,11 +417,10 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
             Element element = new TopLevelElement();
             element.setName(name);
-            element.setType(new QName(method.getSimpleName().toString() + "Type"));
             element.setSubstitutionGroup(MULE_ABSTRACT_MESSAGE_PROCESSOR);
 
-            ComplexType complexType = new TopLevelComplexType();
-            complexType.setName(method.getSimpleName().toString() + "Type");
+            LocalComplexType complexType = new LocalComplexType();
+            element.setComplexType(complexType);
 
             ComplexContent complexContent = new ComplexContent();
             complexType.setComplexContent(complexContent);
@@ -430,7 +436,6 @@ public class SchemaGenerator extends ContextualizedGenerator {
             }
 
             schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
-            schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
         }
     }
 
@@ -555,13 +560,12 @@ public class SchemaGenerator extends ContextualizedGenerator {
     }
 
     private ExtensionType registerExtension(String name) {
-        ComplexType complexType = new TopLevelComplexType();
-        complexType.setName(name + "Type");
+        LocalComplexType complexType = new LocalComplexType();
 
         Element extension = new TopLevelElement();
         extension.setName(name);
-        extension.setType(new QName(complexType.getName()));
         extension.setSubstitutionGroup(MULE_ABSTRACT_EXTENSION);
+        extension.setComplexType(complexType);
 
         ComplexContent complexContent = new ComplexContent();
         complexType.setComplexContent(complexContent);
@@ -570,7 +574,6 @@ public class SchemaGenerator extends ContextualizedGenerator {
         complexContent.setExtension(complexContentExtension);
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(extension);
-        schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
 
         return complexContentExtension;
     }

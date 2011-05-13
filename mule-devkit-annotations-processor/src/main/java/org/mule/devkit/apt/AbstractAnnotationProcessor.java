@@ -1,10 +1,13 @@
 package org.mule.devkit.apt;
 
 import com.sun.codemodel.JCodeModel;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.apt.generator.GenerationException;
 import org.mule.devkit.apt.generator.Generator;
 import org.mule.devkit.apt.generator.schema.FileTypeSchema;
+import org.mule.devkit.apt.generator.schema.NamespaceFilter;
 import org.mule.devkit.apt.generator.schema.Schema;
 import org.mule.devkit.apt.validation.TypeValidator;
 import org.mule.devkit.apt.validation.ValidationException;
@@ -19,6 +22,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Set;
 
@@ -78,13 +82,20 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
             for (Module mod : getContext().getSchemas().keySet()) {
                 FileTypeSchema fileTypeSchema = getContext().getSchemas().get(mod);
                 try {
-                    //File schemaFile = new File(generatedSources, "mule-" + name + ".xsd");
                     JAXBContext jaxbContext = JAXBContext.newInstance(Schema.class);
                     Marshaller marshaller = jaxbContext.createMarshaller();
-                    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+                    //NamespaceFilter outFilter = new NamespaceFilter(fileTypeSchema.getSchema().getTargetNamespace(), false);
+                    //OutputFormat format = new OutputFormat();
+                    //format.setIndent(true);
+                    //format.setNewlines(true);
+                    //XMLWriter writer = new XMLWriter(fileTypeSchema.getOs(), format);
+                    //outFilter.setContentHandler(writer);
+                    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
                     marshaller.marshal(fileTypeSchema.getSchema(), fileTypeSchema.getOs());
                 } catch (JAXBException e) {
                     error(e.getCause().getMessage());
+                //} catch (UnsupportedEncodingException e) {
+                //    error(e.getCause().getMessage());
                 }
             }
         }
