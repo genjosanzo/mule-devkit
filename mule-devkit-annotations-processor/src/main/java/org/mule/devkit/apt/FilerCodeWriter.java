@@ -32,7 +32,10 @@ public final class FilerCodeWriter extends CodeWriter {
             // put non-Java files directly to the output folder
             loc = CLASS_OUTPUT;
         }
-        return filer.createResource(loc, pkg.name(), fileName).openOutputStream();
+        if( pkg != null )
+            return filer.createResource(loc, pkg.name(), fileName).openOutputStream();
+        else
+            return filer.createResource(loc, "", fileName).openOutputStream();
     }
 
     public Writer openSource(JPackage pkg, String fileName) throws IOException {

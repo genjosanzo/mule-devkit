@@ -19,8 +19,7 @@ public class SpringSchemaGenerator extends ContextualizedGenerator {
 
     public void generate(TypeElement element) throws GenerationException {
         try {
-            JPackage metaInf = getContext().getCodeModel()._package("META-INF");
-            OutputStream springSchemasStream = getContext().getCodeWriter().openBinary(metaInf, "spring.schemas");
+            OutputStream springSchemasStream = getContext().getCodeWriter().openBinary(null, "META-INF/spring.schemas");
             OutputStreamWriter springSchemasOut = new OutputStreamWriter(springSchemasStream, "UTF-8");
 
             for (Module mod : getContext().getSchemas().keySet()) {

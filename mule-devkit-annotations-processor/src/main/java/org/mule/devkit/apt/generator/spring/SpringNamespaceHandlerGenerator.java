@@ -23,8 +23,7 @@ public class SpringNamespaceHandlerGenerator extends AbstractCodeGenerator {
     public void generate(TypeElement element) throws GenerationException {
 
         try {
-            JPackage metaInf = getContext().getCodeModel()._package("META-INF");
-            OutputStream springNamespaceHandlersStream = getContext().getCodeWriter().openBinary(metaInf, "spring.handlers");
+            OutputStream springNamespaceHandlersStream = getContext().getCodeWriter().openBinary(null, "META-INF/spring.handlers");
             OutputStreamWriter springNamespaceHandlersOut = new OutputStreamWriter(springNamespaceHandlersStream, "UTF-8");
 
             for (Module mod : getContext().getSchemas().keySet()) {

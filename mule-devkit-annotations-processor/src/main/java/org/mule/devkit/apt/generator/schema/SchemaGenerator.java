@@ -388,8 +388,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
         registerProcessors(type);
 
         try {
-            JPackage metaInf = getContext().getCodeModel()._package("META-INF");
-            OutputStream schemaStream = getContext().getCodeWriter().openBinary(metaInf, "mule-" + module.name() + ".xsd");
+            OutputStream schemaStream = getContext().getCodeWriter().openBinary(null, "META-INF/mule-" + module.name() + ".xsd");
 
             FileTypeSchema fileTypeSchema = new FileTypeSchema(schemaStream, schema, type);
             getContext().addSchema(module, fileTypeSchema);
