@@ -428,7 +428,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
             complexContentExtension.setBase(MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE);
             complexContent.setExtension(complexContentExtension);
 
-            Attribute configRefAttr = createAttribute("name", true, STRING, "Give a name to this configuration so it can be later referenced by config-ref.");
+            Attribute configRefAttr = createAttribute("config-ref", true, STRING, "Specify which configuration to use for this invocation.");
             complexContentExtension.getAttributeOrAttributeGroup().add(configRefAttr);
 
             for (VariableElement variable : method.getParameters()) {
@@ -500,8 +500,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
         if (isTypeSupported(variable)) {
             attribute.setName(name);
-            //attribute.setType(typeMap.get(variable.asType().toString()));
-            attribute.setType(STRING);
+            attribute.setType(typeMap.get(variable.asType().toString()));
         } else {
             // non-supported types will get "-ref" so beans can be injected
             attribute.setName(name + "-ref");

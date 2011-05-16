@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Mule Cloud Connector Development Kit
+    Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:nc="http://www.mulesoft.org/schema/mule/nc"
+      xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+        http://www.mulesoft.org/schema/mule/nc http://www.mulesoft.org/schema/mule/nc/1.0/mule-nc.xsd">
+
+    <nc:config name="configA" append="123"/>
+    <nc:config name="configB" append="456"/>
+
+    <flow name="passthruStringFlowConfigA">
+        <nc:passthru-string config-ref="configA" value="mulesoft"/>
+    </flow>
+
+    <flow name="passthruStringFlowConfigB">
+        <nc:passthru-string config-ref="configB" value="ftw"/>
+    </flow>
+
+</mule>
