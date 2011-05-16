@@ -8,14 +8,12 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
         http://www.mulesoft.org/schema/mule/jar http://www.mulesoft.org/schema/mule/jar/1.0/mule-jar.xsd">
 
-	<spring:bean id="jarFile" class="java.util.jar.JarFile"></spring:bean>
-	
-	<spring:bean id="manifest" class="java.util.jar.Manifest"></spring:bean>	
+	<spring:bean id="manifest" class="java.util.jar.Manifest"></spring:bean>
 
-    <jar:config jarFile-ref="jarFile"/>
+    <jar:config manifest-ref="manifest"/>
 
     <flow name="setManifest">
-        <jar:set-manifest manifest-ref="manifest"/>
+        <jar:update-manifest manifest-ref="manifest"/>
     </flow>
 
 </mule>

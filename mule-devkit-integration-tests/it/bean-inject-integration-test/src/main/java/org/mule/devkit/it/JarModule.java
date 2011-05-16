@@ -28,15 +28,15 @@ import org.mule.devkit.annotations.Processor;
 public class JarModule
 {
 	@Configurable
-	private JarFile jarFile;
+	private Manifest manifest;
 	
     @Processor
-    public void setManifest(Manifest manifest)
+    public void updateManifest(Manifest manifest)
     {
     }
 
-	public void setJarFile(JarFile jarFile)
+	public void setManifest(Manifest manifest)
 	{
-		this.jarFile = jarFile;
+		this.manifest = manifest;
 	}
 }
