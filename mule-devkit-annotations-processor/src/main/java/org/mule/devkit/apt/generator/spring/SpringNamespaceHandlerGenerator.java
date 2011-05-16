@@ -29,7 +29,7 @@ public class SpringNamespaceHandlerGenerator extends AbstractCodeGenerator {
             for (Module mod : getContext().getSchemas().keySet()) {
                 FileTypeSchema fileTypeSchema = getContext().getSchemas().get(mod);
                 String namespaceHandlerName = getContext().getElements().getBinaryName(fileTypeSchema.getTypeElement()) + "NamespaceHandler";
-                springNamespaceHandlersOut.write(fileTypeSchema.getSchema().getTargetNamespace() + "=" + namespaceHandlerName + "\n");
+                springNamespaceHandlersOut.write(fileTypeSchema.getSchema().getTargetNamespace().replace("://", "\\://") + "=" + namespaceHandlerName + "\n");
             }
 
             springNamespaceHandlersOut.flush();

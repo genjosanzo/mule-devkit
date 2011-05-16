@@ -27,6 +27,8 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
         http://www.mulesoft.org/schema/mule/basic http://www.mulesoft.org/schema/mule/basic/1.0/mule-basic.xsd">
 
+    <basic:config/>
+
     <flow name="passthruCharFlow">
         <basic:passthru-char value="c"/>
     </flow>

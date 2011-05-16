@@ -217,7 +217,7 @@ public abstract class AbstractAnnotationProcessorMojo extends AbstractMojo
 
                 public void report(Diagnostic< ? extends JavaFileObject> diagnostic)
                 {
-                    getLog().info("diagnostic " + diagnostic);
+                    getLog().info(diagnostic.toString());
 
                 }
 
