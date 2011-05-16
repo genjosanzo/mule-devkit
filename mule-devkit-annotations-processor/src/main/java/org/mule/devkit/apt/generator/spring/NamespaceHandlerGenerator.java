@@ -10,6 +10,7 @@ import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
 import org.mule.devkit.apt.generator.GenerationException;
+import org.mule.devkit.apt.util.NameUtils;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -62,6 +63,6 @@ public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
         if (processor.name().length() != 0)
             elementName = processor.name();
 
-        init.body().invoke("registerMuleBeanDefinitionParser").arg(JExpr.lit(elementName)).arg(JExpr._new(beanDefinitionParser));
+        init.body().invoke("registerMuleBeanDefinitionParser").arg(JExpr.lit(NameUtils.uncamel(elementName))).arg(JExpr._new(beanDefinitionParser));
     }
 }

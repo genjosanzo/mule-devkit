@@ -7,6 +7,7 @@ import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.ContextualizedGenerator;
 import org.mule.devkit.apt.generator.GenerationException;
+import org.mule.devkit.apt.util.NameUtils;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -414,7 +415,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
                 name = processor.name();
 
             Element element = new TopLevelElement();
-            element.setName(nameNotation(name));
+            element.setName(NameUtils.uncamel(name));
             element.setSubstitutionGroup(MULE_ABSTRACT_MESSAGE_PROCESSOR);
             element.setType(new QName(targetNamespace, name + "Type"));
 
@@ -642,15 +643,5 @@ public class SchemaGenerator extends ContextualizedGenerator {
         restriction.getFacets().add(pattern);
 
         return expression;
-    }
-
-    private String nameNotation(String camelCaseName) {
-        String result = "";
-        String[] parts = camelCaseName.split("(?<!^)(?=[A-Z])");
-
-        for (int i = 0; i < parts.length; i++)
-            result += parts[i].toLowerCase() + (i < parts.length - 1 ? "-" : "");
-
-        return result;
     }
 }

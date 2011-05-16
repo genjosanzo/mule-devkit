@@ -24,6 +24,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
@@ -42,15 +43,18 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public class MessageProcessorGenerator extends AbstractCodeGenerator {
+    private List<String> typeList;
+
     public MessageProcessorGenerator(AnnotationProcessorContext context) {
         super(context);
+
+        buildTypeList();
     }
 
     private class FieldVariableElement {
@@ -121,9 +125,15 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
         // add a field for each argument of the method
         Map<String, FieldVariableElement> fields = new HashMap<String, FieldVariableElement>();
         for (VariableElement variable : executableElement.getParameters()) {
-            String fieldName = variable.getSimpleName().toString();
-            JFieldVar field = messageProcessorClass.field(JMod.PRIVATE, ref(Object.class), fieldName);
-            fields.put(variable.getSimpleName().toString(), new FieldVariableElement(field, variable));
+            if (isTypeSupported(variable)) {
+                String fieldName = variable.getSimpleName().toString();
+                JFieldVar field = messageProcessorClass.field(JMod.PRIVATE, ref(Object.class), fieldName);
+                fields.put(variable.getSimpleName().toString(), new FieldVariableElement(field, variable));
+            } else {
+                String fieldName = variable.getSimpleName().toString();
+                JFieldVar field = messageProcessorClass.field(JMod.PRIVATE, ref(variable.asType()), fieldName);
+                fields.put(variable.getSimpleName().toString(), new FieldVariableElement(field, variable));
+            }
         }
 
         // add standard fields
@@ -133,10 +143,13 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
         JFieldVar patternInfo = messageProcessorClass.field(JMod.PRIVATE, ref(TemplateParser.PatternInfo.class), "patternInfo");
 
         // add initialise
-        generateInitialiseMethod(messageProcessorClass, muleContext, expressionManager, patternInfo);
+        generateInitialiseMethod(messageProcessorClass, ref(executableElement.getEnclosingElement().asType()).boxify(), muleContext, expressionManager, patternInfo, object);
 
         // add setmulecontext
         generateSetMuleContextMethod(messageProcessorClass, muleContext);
+
+        // add setobject
+        generateSetObjectMethod(messageProcessorClass, object);
 
         // generate setters for all parameters
         for (String fieldName : fields.keySet()) {
@@ -163,6 +176,7 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
         String methodName = executableElement.getSimpleName().toString();
         JType muleEvent = ref(MuleEvent.class);
 
+
         JMethod process = messageProcessorClass.method(JMod.PUBLIC, muleEvent, "process");
         process._throws(MuleException.class);
         JVar event = process.param(muleEvent, "event");
@@ -173,27 +187,42 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
 
         LinkedList<JVar> parameters = new LinkedList<JVar>();
         for (String fieldName : fields.keySet()) {
-            JVar evaluated = callProcessor.body().decl(ref(Object.class), "evaluated" + StringUtils.capitalize(fieldName));
-            JVar transformed = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName));
-            generateExpressionEvaluator(callProcessor.body(), evaluated, fields.get(fieldName).getField(), patternInfo, expressionManager, muleMessage);
-            generateTransform(callProcessor.body(), transformed, evaluated, fields.get(fieldName).getVariableElement().asType(), muleContext);
-            parameters.addFirst(transformed);
+            if (isTypeSupported(fields.get(fieldName).getVariableElement())) {
+                JVar evaluated = callProcessor.body().decl(ref(Object.class), "evaluated" + StringUtils.capitalize(fieldName));
+                JVar transformed = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName));
+                generateExpressionEvaluator(callProcessor.body(), evaluated, fields.get(fieldName).getField(), patternInfo, expressionManager, muleMessage);
+                generateTransform(callProcessor.body(), transformed, evaluated, fields.get(fieldName).getVariableElement().asType(), muleContext);
+                parameters.addFirst(transformed);
+            } else {
+                //JVar ref = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "ref" + StringUtils.capitalize(fieldName));
+                parameters.addFirst(fields.get(fieldName).getField());
+            }
         }
 
-        generateMethodCall(callProcessor.body(), object, methodName, parameters, muleContext, event);
-        generateThrowFailedToInvoke(callProcessor._catch((JClass) ref(Exception.class)), event, methodName);
+        JType returnType = ref(executableElement.getReturnType());
+        generateMethodCall(callProcessor.body(), object, methodName, parameters, muleContext, event, returnType);
+        generateThrow("failedToInvoke", MessagingException.class, callProcessor._catch((JClass) ref(Exception.class)), event, methodName);
     }
 
-    private JVar generateMethodCall(JBlock body, JFieldVar object, String methodName, List<JVar> parameters, JFieldVar muleContext, JVar event) {
-        JVar resultPayload = body.decl(ref(Object.class), "resultPayload");
+    private JVar generateMethodCall(JBlock body, JFieldVar object, String methodName, List<JVar> parameters, JFieldVar muleContext, JVar event, JType returnType) {
+        JVar resultPayload = null;
+        if (returnType != getContext().getCodeModel().VOID) {
+            resultPayload = body.decl(ref(Object.class), "resultPayload");
+        }
         JInvocation methodCall = object.invoke(methodName);
         for (JVar parameter : parameters) {
             methodCall.arg(parameter);
         }
-        body.assign(resultPayload, methodCall);
-        body._if(resultPayload.eq(JExpr._null()))._then()._return(generateNullPayload(muleContext, event));
-        generatePayloadOverwrite(body, event, resultPayload);
-        body._return(event);
+
+        if (returnType != getContext().getCodeModel().VOID) {
+            body.assign(resultPayload, methodCall);
+            body._if(resultPayload.eq(JExpr._null()))._then()._return(generateNullPayload(muleContext, event));
+            generatePayloadOverwrite(body, event, resultPayload);
+            body._return(event);
+        } else {
+            body.add(methodCall);
+            body._return(event);
+        }
 
         return resultPayload;
     }
@@ -214,39 +243,83 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
         block.add(applyTransformers);
     }
 
-    private void generateThrowFailedToInvoke(JCatchBlock callProcessorCatch, JVar event, String methodName) {
+    private void generateThrow(String bundle, Class<?> clazz, JCatchBlock callProcessorCatch, JVar event, String methodName) {
         JVar exception = callProcessorCatch.param("e");
         JClass coreMessages = ref(CoreMessages.class).boxify();
-        JInvocation failedToInvoke = coreMessages.staticInvoke("failedToInvoke");
-        failedToInvoke.arg(JExpr.lit(methodName));
-        JInvocation messageException = JExpr._new(ref(MessagingException.class));
+        JInvocation failedToInvoke = coreMessages.staticInvoke(bundle);
+        if( methodName != null ) {
+            failedToInvoke.arg(JExpr.lit(methodName));
+        }
+        JInvocation messageException = JExpr._new(ref(clazz));
         messageException.arg(failedToInvoke);
-        messageException.arg(event);
+        if (event != null) {
+            messageException.arg(event);
+        }
         messageException.arg(exception);
         callProcessorCatch.body()._throw(messageException);
     }
 
-    private JMethod generateInitialiseMethod(JDefinedClass messageProcessorClass, JFieldVar muleContext, JFieldVar expressionManager, JFieldVar patternInfo) {
+    private JMethod generateInitialiseMethod(JDefinedClass messageProcessorClass, JClass messageProcessor, JFieldVar muleContext, JFieldVar expressionManager, JFieldVar patternInfo, JFieldVar object) {
         JMethod initialise = messageProcessorClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "initialise");
         initialise._throws(InitialisationException.class);
         initialise.body().assign(expressionManager, muleContext.invoke("getExpressionManager"));
         initialise.body().assign(patternInfo, ref(TemplateParser.class).boxify().staticInvoke("createMuleStyleParser").invoke("getStyle"));
 
+        JConditional ifNoObject = initialise.body()._if(JOp.eq(object, JExpr._null()));
+        JTryBlock tryLookUp = ifNoObject._then()._try();
+        tryLookUp.body().assign(object, muleContext.invoke("getRegistry").invoke("lookupObject").arg(JExpr.dotclass(messageProcessor)));
+        JCatchBlock catchBlock = tryLookUp._catch(ref(RegistrationException.class).boxify());
+        JVar exception = catchBlock.param("e");
+        JClass coreMessages = ref(CoreMessages.class).boxify();
+        JInvocation failedToInvoke = coreMessages.staticInvoke("initialisationFailure");
+        failedToInvoke.arg(messageProcessor.fullName());
+        JInvocation messageException = JExpr._new(ref(InitialisationException.class));
+        messageException.arg(failedToInvoke);
+        messageException.arg(exception);
+        messageException.arg(JExpr._this());
+        catchBlock.body()._throw(messageException);
+
+
+        /*
+
+        try
+        {
+            object = muleContext.getRegistry().lookupObject(${class.getName()}.class);
+        }
+        catch (RegistrationException e)
+        {
+            throw new InitialisationException(
+                CoreMessages.initialisationFailure(String.format(
+                    "Multiple instances of '%s' were found in the registry so you need to configure a specific instance",
+                    object.getClass())), this);
+        }
+
+         */
+
         return initialise;
     }
+
+    private JMethod generateSetObjectMethod(JDefinedClass messageProcessorClass, JFieldVar object) {
+        JMethod setObject = messageProcessorClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "setObject");
+        JVar objectParam = setObject.param(object.type(), "object");
+        setObject.body().assign(JExpr._this().ref(object), objectParam);
+
+        return setObject;
+    }
+
 
     private JMethod generateSetMuleContextMethod(JDefinedClass messageProcessorClass, JFieldVar muleContext) {
         JMethod setMuleContext = messageProcessorClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "setMuleContext");
         JVar muleContextParam = setMuleContext.param(ref(MuleContext.class), "context");
-        setMuleContext.body().assign(muleContext, muleContextParam);
+        setMuleContext.body().assign(JExpr._this().ref(muleContext), muleContextParam);
 
         return setMuleContext;
     }
 
     private JMethod generateSetter(JDefinedClass messageProcessorClass, JFieldVar field) {
         JMethod setter = messageProcessorClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "set" + StringUtils.capitalize(field.name()));
-        JVar value = setter.param(ref(Object.class), "value");
-        setter.body().assign(field, value);
+        JVar value = setter.param(field.type(), "value");
+        setter.body().assign(JExpr._this().ref(field), value);
 
         return setter;
     }
@@ -288,6 +361,34 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
 
         JBlock notAssignable = ifIsAssignableFrom._else();
         notAssignable.assign(transformedField, JExpr.cast(ref(expectedType).boxify(), evaluatedField));
+    }
+
+    private boolean isTypeSupported(VariableElement variableElement) {
+        return typeList.contains(variableElement.asType().toString());
+    }
+
+    private void buildTypeList() {
+        typeList = new ArrayList<String>();
+        typeList.add("java.lang.String");
+        typeList.add("int");
+        typeList.add("float");
+        typeList.add("long");
+        typeList.add("byte");
+        typeList.add("short");
+        typeList.add("double");
+        typeList.add("boolean");
+        typeList.add("char");
+        typeList.add("java.lang.Integer");
+        typeList.add("java.lang.Float");
+        typeList.add("java.lang.Long");
+        typeList.add("java.lang.Byte");
+        typeList.add("java.lang.Short");
+        typeList.add("java.lang.Double");
+        typeList.add("java.lang.Boolean");
+        typeList.add("java.lang.Character");
+        typeList.add("java.util.Date");
+        typeList.add("java.net.URL");
+        typeList.add("java.net.URI");
     }
 
 }

@@ -74,7 +74,7 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
         JInvocation isEmpty = ref(StringUtils.class).boxify().staticInvoke("isEmpty");
         isEmpty.arg(getAttribute);
 
-        JBlock ifIsEmpty = getAttributeValue.body()._if(isEmpty)._then();
+        JBlock ifIsEmpty = getAttributeValue.body()._if(isEmpty.not())._then();
         ifIsEmpty._return(getAttribute);
 
         getAttributeValue.body()._return(JExpr._null());
@@ -110,7 +110,10 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
         JConditional isConfigRefEmpty = parseChild.body()._if(JOp.not(generateIsEmptyConfigRef(element)));
         JInvocation addPropertyReference = beanDefinitionBuilder.invoke("addPropertyReference");
         addPropertyReference.arg("object");
-        addPropertyReference.arg(generateGetAttributeConfigRef());
+        JInvocation getAttributeAlias = generateGetAttributeConfigRef();
+        JInvocation getAttribute = element.invoke("getAttribute");
+        getAttribute.arg(getAttributeAlias);
+        addPropertyReference.arg(getAttribute);
         isConfigRefEmpty._then().add(addPropertyReference);
     }
 
@@ -156,37 +159,4 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
         postProcess.arg(assembler);
         postProcess.arg(element);
     }
-
-    /*
-    @Override
-    protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
-    {
-        if (!StringUtils.isEmpty(element.getAttribute(getTargetPropertyConfiguration().getAttributeAlias(
-            "config-ref"))))
-        {
-            builder.addPropertyReference("object",
-                element.getAttribute(getTargetPropertyConfiguration().getAttributeAlias("config-ref")));
-        }
-
-        <#list method.getParameters() as parameter>
-        <#if !parameter.getType().isArray() && !parameter.getType().isList() && !parameter.getType().isMap()>
-        builder.addPropertyValue("${parameter.getName()}", getAttributeValue(element, "${parameter.getName()}"));
-        </#if>
-        </#list>
-
-        BeanAssembler assembler = getBeanAssembler(element, builder);
-        postProcess(getParserContext(), assembler, element);
-    }
-
-    private String getAttributeValue(Element element, String attributeName)
-    {
-        if (!StringUtils.isEmpty(element.getAttribute(attributeName)))
-        {
-            return element.getAttribute(attributeName);
-        }
-
-        return null;
-    }
-
-     */
 }
