@@ -7,16 +7,23 @@ import org.xml.sax.helpers.XMLFilterImpl;
 public class NamespaceFilter extends XMLFilterImpl {
 
     private String usedNamespaceUri;
+    private String prefix;
     private boolean addNamespace;
 
     //State variable
     private boolean addedNamespace = false;
 
-    public NamespaceFilter(String namespaceUri,
+    public NamespaceFilter(String prefix, String namespaceUri,
                            boolean addNamespace) {
         super();
 
-        this.usedNamespaceUri = namespaceUri;
+        if (addNamespace) {
+            this.prefix = prefix;
+            this.usedNamespaceUri = namespaceUri;
+        } else {
+            this.prefix = "";
+            this.usedNamespaceUri = "";
+        }
         this.addNamespace = addNamespace;
     }
 
@@ -48,15 +55,11 @@ public class NamespaceFilter extends XMLFilterImpl {
     public void startPrefixMapping(String prefix, String url)
             throws SAXException {
 
-
+        super.startPrefixMapping(prefix, url);
         if (addNamespace) {
             this.startControlledPrefixMapping();
         } else {
-            if (prefix.length() == 0) {
-                super.startPrefixMapping(prefix, this.usedNamespaceUri);
-            } else {
-                super.startPrefixMapping(prefix, url);
-            }
+            //Remove the namespace, i.e. don´t call startPrefixMapping for parent!
         }
 
     }
@@ -65,7 +68,7 @@ public class NamespaceFilter extends XMLFilterImpl {
 
         if (this.addNamespace && !this.addedNamespace) {
             //We should add namespace since it is set and has not yet been done.
-            super.startPrefixMapping("", this.usedNamespaceUri);
+            super.startPrefixMapping(this.prefix, this.usedNamespaceUri);
 
             //Make sure we dont do it twice
             this.addedNamespace = true;

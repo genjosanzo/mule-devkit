@@ -1,6 +1,5 @@
 package org.mule.devkit.apt.generator.schema;
 
-import com.sun.codemodel.JPackage;
 import org.mule.devkit.annotations.Configurable;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.annotations.Parameter;
@@ -343,6 +342,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
         schema = new Schema();
         objectFactory = new ObjectFactory();
+        String[] pepe = new String[]{};
     }
 
     public void generate(TypeElement type) throws GenerationException {
@@ -350,8 +350,8 @@ public class SchemaGenerator extends ContextualizedGenerator {
         Module module = type.getAnnotation(Module.class);
         String targetNamespace = BASE_NAMESPACE + module.name();
         schema.setTargetNamespace(targetNamespace);
-        schema.setElementFormDefault(FormChoice.UNQUALIFIED);
-        schema.setAttributeFormDefault(FormChoice.QUALIFIED);
+        schema.setElementFormDefault(FormChoice.QUALIFIED);
+        schema.setAttributeFormDefault(FormChoice.UNQUALIFIED);
 
         buildTypeMap(targetNamespace);
 
@@ -361,9 +361,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
         importMuleSchemaDocNamespace();
 
         registerTypes();
-
         registerConfigElement(type);
-
         registerProcessors(type);
 
         try {
@@ -378,7 +376,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
     private void buildTypeMap(String targetNamespace) {
         typeMap = new HashMap<String, QName>();
-        typeMap.put("java.lang.String", new QName("xs:string"));
+        typeMap.put("java.lang.String", new QName(XSD_NAMESPACE, "string", "xs"));
         typeMap.put("int", new QName(targetNamespace, "integerType"));
         typeMap.put("float", new QName(targetNamespace, "floatType"));
         typeMap.put("long", new QName(targetNamespace, "longType"));
@@ -416,11 +414,13 @@ public class SchemaGenerator extends ContextualizedGenerator {
                 name = processor.name();
 
             Element element = new TopLevelElement();
-            element.setName(name);
+            element.setName(nameNotation(name));
             element.setSubstitutionGroup(MULE_ABSTRACT_MESSAGE_PROCESSOR);
+            element.setType(new QName(targetNamespace, name + "Type"));
 
-            LocalComplexType complexType = new LocalComplexType();
-            element.setComplexType(complexType);
+            TopLevelComplexType complexType = new TopLevelComplexType();
+            //element.setComplexType(complexType);
+            complexType.setName(name + "Type");
 
             ComplexContent complexContent = new ComplexContent();
             complexType.setComplexContent(complexContent);
@@ -436,6 +436,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
             }
 
             schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
+            schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
         }
     }
 
@@ -499,7 +500,8 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
         if (isTypeSupported(variable)) {
             attribute.setName(name);
-            attribute.setType(typeMap.get(variable.asType().toString()));
+            //attribute.setType(typeMap.get(variable.asType().toString()));
+            attribute.setType(STRING);
         } else {
             // non-supported types will get "-ref" so beans can be injected
             attribute.setName(name + "-ref");
@@ -641,5 +643,15 @@ public class SchemaGenerator extends ContextualizedGenerator {
         restriction.getFacets().add(pattern);
 
         return expression;
+    }
+
+    private String nameNotation(String camelCaseName) {
+        String result = "";
+        String[] parts = camelCaseName.split("(?<!^)(?=[A-Z])");
+
+        for (int i = 0; i < parts.length; i++)
+            result += parts[i].toLowerCase() + (i < parts.length - 1 ? "-" : "");
+
+        return result;
     }
 }

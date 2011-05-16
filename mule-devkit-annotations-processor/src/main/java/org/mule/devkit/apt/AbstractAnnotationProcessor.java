@@ -85,17 +85,19 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
                     JAXBContext jaxbContext = JAXBContext.newInstance(Schema.class);
                     Marshaller marshaller = jaxbContext.createMarshaller();
                     //NamespaceFilter outFilter = new NamespaceFilter(fileTypeSchema.getSchema().getTargetNamespace(), false);
-                    //OutputFormat format = new OutputFormat();
-                    //format.setIndent(true);
-                    //format.setNewlines(true);
-                    //XMLWriter writer = new XMLWriter(fileTypeSchema.getOs(), format);
-                    //outFilter.setContentHandler(writer);
-                    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-                    marshaller.marshal(fileTypeSchema.getSchema(), fileTypeSchema.getOs());
+                    NamespaceFilter outFilter = new NamespaceFilter("mule", "http://www.mulesoft.org/schema/mule/core", true);
+                    OutputFormat format = new OutputFormat();
+                    format.setIndent(true);
+                    format.setNewlines(true);
+                    XMLWriter writer = new XMLWriter(fileTypeSchema.getOs(), format);
+                    outFilter.setContentHandler(writer);
+                    //marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+                    //marshaller.marshal(fileTypeSchema.getSchema(), fileTypeSchema.getOs());
+                    marshaller.marshal(fileTypeSchema.getSchema(), outFilter);
                 } catch (JAXBException e) {
                     error(e.getCause().getMessage());
-                //} catch (UnsupportedEncodingException e) {
-                //    error(e.getCause().getMessage());
+                } catch (UnsupportedEncodingException e) {
+                    error(e.getCause().getMessage());
                 }
             }
         }

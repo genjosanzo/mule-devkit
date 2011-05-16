@@ -51,9 +51,4 @@
         <basic:passthru-long value="3456443463342345734"/>
     </flow>
 
-    <flow name="transformerFlow">
-        <basic:string-to-char-transformer/>
-    </flow>
-
-
 </mule>

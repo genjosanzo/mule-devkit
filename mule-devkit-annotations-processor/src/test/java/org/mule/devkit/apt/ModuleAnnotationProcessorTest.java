@@ -13,12 +13,10 @@ public class ModuleAnnotationProcessorTest extends AbstractAnnotationProcessorTe
         return Arrays.<Processor> asList(new ModuleAnnotationProcessor());
     }
 
-    /*
     @Test
     public void successfulCompilation() {
         assertCompilationSuccessful(compileTestCase(BasicModule.class));
     }
-    */
 
     @Test
     public void moduleAnnotationAtInterfaceInvalid() {
