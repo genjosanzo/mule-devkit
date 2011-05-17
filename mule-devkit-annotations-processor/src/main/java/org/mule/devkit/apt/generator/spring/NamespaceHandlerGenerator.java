@@ -14,8 +14,12 @@ import org.mule.devkit.apt.util.NameUtils;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
+import javax.xml.bind.annotation.XmlType;
 import java.util.List;
 
 public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
@@ -64,5 +68,22 @@ public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
             elementName = processor.name();
 
         init.body().invoke("registerMuleBeanDefinitionParser").arg(JExpr.lit(NameUtils.uncamel(elementName))).arg(JExpr._new(beanDefinitionParser));
+
+        for (VariableElement variable : executableElement.getParameters()) {
+            TypeMirror variableType = variable.asType();
+            if (variableType.getKind() == TypeKind.DECLARED) {
+                DeclaredType declaredType = (DeclaredType) variableType;
+                XmlType xmlType = declaredType.asElement().getAnnotation(XmlType.class);
+
+                if( xmlType != null )
+                {
+                    JInvocation newAnyXmlChildDefinitionParser = JExpr._new(getAnyXmlChildDefinitionParserClass(executableElement));
+                    newAnyXmlChildDefinitionParser.arg(JExpr.lit(variable.getSimpleName().toString()));
+                    newAnyXmlChildDefinitionParser.arg(JExpr.dotclass(beanDefinitionParser));
+
+                    init.body().invoke("registerMuleBeanDefinitionParser").arg(JExpr.lit(variable.getSimpleName().toString())).arg(newAnyXmlChildDefinitionParser);
+                }
+            }
+        }
     }
 }

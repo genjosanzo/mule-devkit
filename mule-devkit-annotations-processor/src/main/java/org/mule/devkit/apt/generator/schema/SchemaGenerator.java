@@ -12,11 +12,16 @@ import org.mule.devkit.apt.util.NameUtils;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -420,7 +425,6 @@ public class SchemaGenerator extends ContextualizedGenerator {
             element.setType(new QName(targetNamespace, name + "Type"));
 
             TopLevelComplexType complexType = new TopLevelComplexType();
-            //element.setComplexType(complexType);
             complexType.setName(name + "Type");
 
             ComplexContent complexContent = new ComplexContent();
@@ -432,13 +436,47 @@ public class SchemaGenerator extends ContextualizedGenerator {
             Attribute configRefAttr = createAttribute("config-ref", true, STRING, "Specify which configuration to use for this invocation.");
             complexContentExtension.getAttributeOrAttributeGroup().add(configRefAttr);
 
+            All all = new All();
+            complexContentExtension.setAll(all);
+
             for (VariableElement variable : method.getParameters()) {
-                complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(variable));
+                TypeMirror variableType = variable.asType();
+                if (variableType.getKind() == TypeKind.DECLARED) {
+                    DeclaredType declaredType = (DeclaredType) variableType;
+                    XmlType xmlType = declaredType.asElement().getAnnotation(XmlType.class);
+
+                    if (xmlType == null) {
+                        complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(variable));
+                    } else {
+                        TopLevelElement xmlElement = new TopLevelElement();
+                        xmlElement.setName(variable.getSimpleName().toString());
+                        xmlElement.setType(new QName(targetNamespace, "XmlType"));
+
+                        all.getParticle().add(objectFactory.createElement(xmlElement));
+                    }
+                } else {
+                    complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(variable));
+                }
+
             }
 
             schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
             schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
         }
+    }
+
+    private ComplexType createAnyXmlType() {
+        ComplexType xmlComplexType = new TopLevelComplexType();
+        xmlComplexType.setName("XmlType");
+        Any any = new Any();
+        any.setProcessContents("lax");
+        any.setMinOccurs(new BigInteger("0"));
+        any.setMaxOccurs("unbounded");
+        ExplicitGroup all = new ExplicitGroup();
+        all.getParticle().add(any);
+        xmlComplexType.setSequence(all);
+
+        return xmlComplexType;
     }
 
     private void registerConfigElement(TypeElement type) {
@@ -515,7 +553,6 @@ public class SchemaGenerator extends ContextualizedGenerator {
         return attribute;
     }
 
-
     private boolean isTypeSupported(VariableElement variableElement) {
         return typeMap.containsKey(variableElement.asType().toString());
     }
@@ -591,6 +628,13 @@ public class SchemaGenerator extends ContextualizedGenerator {
         registerType("booleanType", BOOLEAN);
         registerType("anyUriType", ANYURI);
         registerType("charType", STRING, 1, 1);
+
+        registerAnyXmlType();
+    }
+
+    private void registerAnyXmlType() {
+        ComplexType xmlComplexType = createAnyXmlType();
+        schema.getSimpleTypeOrComplexTypeOrGroup().add(xmlComplexType);
     }
 
     private void registerType(String name, QName base) {

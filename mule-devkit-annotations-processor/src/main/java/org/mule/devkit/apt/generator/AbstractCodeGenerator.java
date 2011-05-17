@@ -3,8 +3,12 @@ package org.mule.devkit.apt.generator;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JExpr;
+import com.sun.codemodel.JMethod;
+import com.sun.codemodel.JMod;
 import com.sun.codemodel.JPackage;
 import com.sun.codemodel.JType;
+import com.sun.codemodel.JVar;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
@@ -12,6 +16,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.util.ClassNameUtils;
+import org.w3c.dom.Element;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -98,6 +103,24 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
         return messageProcessor;
     }
 
+    protected String getAnyXmlChildDefinitionParserClassNameFor(ExecutableElement executableElement) {
+        TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
+        String packageName = ClassNameUtils.getPackageName(getContext().getElements().getBinaryName(parentClass).toString());
+        String className = "AnyXmlChildDefinitionParser";
+
+        return packageName + "." + className;
+
+    }
+
+
+    protected JDefinedClass getAnyXmlChildDefinitionParserClass(ExecutableElement executableElement) {
+        String anyXmlChildDefinitionParserClassName = getAnyXmlChildDefinitionParserClassNameFor(executableElement);
+        JDefinedClass anyXmlChildDefinitionParser = getOrCreateClass(anyXmlChildDefinitionParserClassName, ChildDefinitionParser.class);
+
+        return anyXmlChildDefinitionParser;
+    }
+
+
     protected JType ref(Class<?> clazz) {
         return getContext().getCodeModel().ref(clazz);
     }
@@ -114,5 +137,10 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
         return jtype;
     }
 
+    protected void generateGetBeanClass(JDefinedClass beanDefinitionparser, JClass messageProcessorClass) {
+        JMethod getBeanClass = beanDefinitionparser.method(JMod.PROTECTED, ref(Class.class), "getBeanClass");
+        JVar element = getBeanClass.param(ref(Element.class), "element");
+        getBeanClass.body()._return(JExpr.dotclass(messageProcessorClass));
 
+    }
 }

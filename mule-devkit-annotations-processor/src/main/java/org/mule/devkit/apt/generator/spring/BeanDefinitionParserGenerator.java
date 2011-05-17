@@ -1,6 +1,7 @@
 package org.mule.devkit.apt.generator.spring;
 
 import com.sun.codemodel.JBlock;
+import com.sun.codemodel.JClass;
 import com.sun.codemodel.JConditional;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
@@ -17,18 +18,23 @@ import org.mule.devkit.apt.generator.AbstractCodeGenerator;
 import org.mule.devkit.apt.generator.GenerationException;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
-import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
+    private List<String> typeList;
+
     public BeanDefinitionParserGenerator(AnnotationProcessorContext context) {
         super(context);
+
+        buildTypeList();
     }
 
     public void generate(TypeElement type) throws GenerationException {
@@ -43,8 +49,7 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
         }
     }
 
-    private void generateBeanDefinitionParser(ExecutableElement executableElement)
-    {
+    private void generateBeanDefinitionParser(ExecutableElement executableElement) {
         // get class
         JDefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
         JDefinedClass messageProcessorClass = getMessageProcessorClass(executableElement);
@@ -61,10 +66,10 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
 
         // add getAttributeValue
         generateGetAttributeValue(beanDefinitionparser);
+
     }
 
-    private void generateGetAttributeValue(JDefinedClass beanDefinitionparser)
-    {
+    private void generateGetAttributeValue(JDefinedClass beanDefinitionparser) {
         JMethod getAttributeValue = beanDefinitionparser.method(JMod.PROTECTED, ref(String.class), "getAttributeValue");
         JVar element = getAttributeValue.param(ref(Element.class), "element");
         JVar attributeName = getAttributeValue.param(ref(String.class), "attributeName");
@@ -81,16 +86,7 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
     }
 
 
-    private void generateGetBeanClass(JDefinedClass beanDefinitionparser, JDefinedClass messageProcessorClass)
-    {
-        JMethod getBeanClass = beanDefinitionparser.method(JMod.PROTECTED, ref(Class.class), "getBeanClass");
-        JVar element = getBeanClass.param(ref(Element.class), "element");
-        getBeanClass.body()._return(JExpr.dotclass(messageProcessorClass));
-
-    }
-
-    private void generateParseChild(JDefinedClass beanDefinitionparser, ExecutableElement executableElement)
-    {
+    private void generateParseChild(JDefinedClass beanDefinitionparser, ExecutableElement executableElement) {
         JMethod parseChild = beanDefinitionparser.method(JMod.PROTECTED, getContext().getCodeModel().VOID, "parseChild");
         JVar element = parseChild.param(ref(Element.class), "element");
         JVar parserContext = parseChild.param(ref(ParserContext.class), "parserContext");
@@ -99,7 +95,10 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
         generateSetObjectIfConfigRefNotEmpty(parseChild, element, beanDefinitionBuilder);
 
         for (VariableElement variable : executableElement.getParameters()) {
-            parseChild.body().add(generateAddPropertyValue(element, beanDefinitionBuilder, variable));
+
+            if (isTypeSupported(variable)) {
+                parseChild.body().add(generateAddPropertyValue(element, beanDefinitionBuilder, variable));
+            }
         }
 
         JVar assembler = generateBeanAssembler(parseChild, element, beanDefinitionBuilder);
@@ -144,6 +143,18 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
         return addPropertyValue;
     }
 
+    private JInvocation generateAddPropertyRefValue(JVar element, JVar beanDefinitionBuilder, VariableElement variable) {
+        JInvocation getAttributeValue = JExpr.invoke("getAttributeValue");
+        getAttributeValue.arg(element);
+        getAttributeValue.arg(JExpr.lit(variable.getSimpleName().toString() + "-ref"));
+        JInvocation addPropertyValue = beanDefinitionBuilder.invoke("addPropertyValue");
+        addPropertyValue.arg(JExpr.lit(variable.getSimpleName().toString()));
+        addPropertyValue.arg(getAttributeValue);
+
+        return addPropertyValue;
+    }
+
+
     private JVar generateBeanAssembler(JMethod parseChild, JVar element, JVar beanDefinitionBuilder) {
         JVar assembler = parseChild.body().decl(ref(BeanAssembler.class), "assembler");
         JInvocation getBeanAssembler = JExpr.invoke("getBeanAssembler");
@@ -159,4 +170,33 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
         postProcess.arg(assembler);
         postProcess.arg(element);
     }
+
+    private boolean isTypeSupported(VariableElement variableElement) {
+        return typeList.contains(variableElement.asType().toString());
+    }
+
+    private void buildTypeList() {
+        typeList = new ArrayList<String>();
+        typeList.add("java.lang.String");
+        typeList.add("int");
+        typeList.add("float");
+        typeList.add("long");
+        typeList.add("byte");
+        typeList.add("short");
+        typeList.add("double");
+        typeList.add("boolean");
+        typeList.add("char");
+        typeList.add("java.lang.Integer");
+        typeList.add("java.lang.Float");
+        typeList.add("java.lang.Long");
+        typeList.add("java.lang.Byte");
+        typeList.add("java.lang.Short");
+        typeList.add("java.lang.Double");
+        typeList.add("java.lang.Boolean");
+        typeList.add("java.lang.Character");
+        typeList.add("java.util.Date");
+        typeList.add("java.net.URL");
+        typeList.add("java.net.URI");
+    }
+
 }
