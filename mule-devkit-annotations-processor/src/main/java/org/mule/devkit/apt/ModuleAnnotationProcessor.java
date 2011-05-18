@@ -3,6 +3,7 @@ package org.mule.devkit.apt;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.apt.generator.Generator;
 import org.mule.devkit.apt.generator.MetadataGenerator;
+import org.mule.devkit.apt.generator.mule.JaxbTransformerGenerator;
 import org.mule.devkit.apt.generator.mule.MessageProcessorGenerator;
 import org.mule.devkit.apt.generator.schema.SchemaGenerator;
 import org.mule.devkit.apt.generator.spring.AnyXmlChildDefinitionParserGenerator;
@@ -52,6 +53,7 @@ public class ModuleAnnotationProcessor extends AbstractAnnotationProcessor {
         generators.add(new SchemaGenerator(getContext()));
         generators.add(new SpringSchemaGenerator(getContext()));
         generators.add(new SpringNamespaceHandlerGenerator(getContext()));
+        generators.add(new JaxbTransformerGenerator(getContext()));
         return generators;
     }
 }

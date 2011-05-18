@@ -280,23 +280,6 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
         messageException.arg(JExpr._this());
         catchBlock.body()._throw(messageException);
 
-
-        /*
-
-        try
-        {
-            object = muleContext.getRegistry().lookupObject(${class.getName()}.class);
-        }
-        catch (RegistrationException e)
-        {
-            throw new InitialisationException(
-                CoreMessages.initialisationFailure(String.format(
-                    "Multiple instances of '%s' were found in the registry so you need to configure a specific instance",
-                    object.getClass())), this);
-        }
-
-         */
-
         return initialise;
     }
 
