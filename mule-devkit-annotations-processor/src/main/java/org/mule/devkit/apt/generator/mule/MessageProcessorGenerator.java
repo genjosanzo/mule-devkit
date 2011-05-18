@@ -32,6 +32,7 @@ import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
 import org.mule.devkit.apt.generator.GenerationException;
+import org.mule.devkit.apt.util.CodeModelUtils;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
@@ -125,7 +126,7 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
         // add a field for each argument of the method
         Map<String, FieldVariableElement> fields = new HashMap<String, FieldVariableElement>();
         for (VariableElement variable : executableElement.getParameters()) {
-            if (isTypeSupported(variable)) {
+            if (isTypeSupported(variable) || CodeModelUtils.isXmlType(variable) ) {
                 String fieldName = variable.getSimpleName().toString();
                 JFieldVar field = messageProcessorClass.field(JMod.PRIVATE, ref(Object.class), fieldName);
                 fields.put(variable.getSimpleName().toString(), new FieldVariableElement(field, variable));
@@ -187,7 +188,7 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
 
         LinkedList<JVar> parameters = new LinkedList<JVar>();
         for (String fieldName : fields.keySet()) {
-            if (isTypeSupported(fields.get(fieldName).getVariableElement())) {
+            if (isTypeSupported(fields.get(fieldName).getVariableElement()) || CodeModelUtils.isXmlType(fields.get(fieldName).getVariableElement())) {
                 JVar evaluated = callProcessor.body().decl(ref(Object.class), "evaluated" + StringUtils.capitalize(fieldName));
                 JVar transformed = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName));
                 generateExpressionEvaluator(callProcessor.body(), evaluated, fields.get(fieldName).getField(), patternInfo, expressionManager, muleMessage);
@@ -247,7 +248,7 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
         JVar exception = callProcessorCatch.param("e");
         JClass coreMessages = ref(CoreMessages.class).boxify();
         JInvocation failedToInvoke = coreMessages.staticInvoke(bundle);
-        if( methodName != null ) {
+        if (methodName != null) {
             failedToInvoke.arg(JExpr.lit(methodName));
         }
         JInvocation messageException = JExpr._new(ref(clazz));
