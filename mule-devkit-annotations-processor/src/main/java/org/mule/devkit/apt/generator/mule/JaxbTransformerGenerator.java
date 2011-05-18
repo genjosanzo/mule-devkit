@@ -61,40 +61,44 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
                     JFieldVar jaxbContext = jaxbTransformerClass.field(JMod.PRIVATE | JMod.STATIC, ref(JAXBContext.class), "JAXB_CONTEXT", JExpr.invoke(loadJaxbContext).arg(JExpr.dotclass(ref(variable.asType()).boxify())));
 
                     //generate constructor
-                    generateConstructor(jaxbTransformerClass, variable);
+                    generateConstructor(jaxbTransformerClass, executableElement, variable);
 
                     // doTransform
-                    JMethod doTransform = jaxbTransformerClass.method(JMod.PROTECTED, ref(Object.class), "doTransform");
-                    doTransform._throws(TransformerException.class);
-                    JVar src = doTransform.param(ref(Object.class), "src");
-                    JVar encoding = doTransform.param(ref(String.class), "encoding");
-
-                    JVar result = doTransform.body().decl(ref(variable.asType()).boxify(), "result", JExpr._null());
-
-                    JTryBlock tryBlock = doTransform.body()._try();
-                    JVar unmarshaller = tryBlock.body().decl(ref(Unmarshaller.class), "unmarshaller");
-                    tryBlock.body().assign(unmarshaller, jaxbContext.invoke("createUnmarshaller"));
-                    JVar inputStream = tryBlock.body().decl(ref(InputStream.class).boxify(), "is", JExpr._new(ref(ByteArrayInputStream.class).boxify()).arg(
-                            JExpr.invoke(JExpr.cast(ref(String.class),src), "getBytes").arg(encoding)
-                    ));
-
-                    tryBlock.body().assign(result, JExpr.cast(ref(variable.asType()).boxify(), unmarshaller.invoke("unmarshal").arg(inputStream)));
-
-                    JCatchBlock unsupportedEncodingCatch = tryBlock._catch(ref(UnsupportedEncodingException.class).boxify());
-                    JVar unsupportedEncoding = unsupportedEncodingCatch.param("unsupportedEncoding");
-
-                    generateThrowTransformFailedException(unsupportedEncodingCatch, unsupportedEncoding, variable);
-
-                    JCatchBlock jaxbExceptionCatch = tryBlock._catch(ref(JAXBException.class).boxify());
-                    JVar jaxbException = jaxbExceptionCatch.param("jaxbException");
-
-                    generateThrowTransformFailedException(jaxbExceptionCatch, jaxbException, variable);
-
-                    doTransform.body()._return(result);
+                    generateDoTransform(jaxbTransformerClass, jaxbContext, variable);
                 }
             }
         }
 
+    }
+
+    private void generateDoTransform(JDefinedClass jaxbTransformerClass, JFieldVar jaxbContext, VariableElement variable) {
+        JMethod doTransform = jaxbTransformerClass.method(JMod.PROTECTED, ref(Object.class), "doTransform");
+        doTransform._throws(TransformerException.class);
+        JVar src = doTransform.param(ref(Object.class), "src");
+        JVar encoding = doTransform.param(ref(String.class), "encoding");
+
+        JVar result = doTransform.body().decl(ref(variable.asType()).boxify(), "result", JExpr._null());
+
+        JTryBlock tryBlock = doTransform.body()._try();
+        JVar unmarshaller = tryBlock.body().decl(ref(Unmarshaller.class), "unmarshaller");
+        tryBlock.body().assign(unmarshaller, jaxbContext.invoke("createUnmarshaller"));
+        JVar inputStream = tryBlock.body().decl(ref(InputStream.class).boxify(), "is", JExpr._new(ref(ByteArrayInputStream.class).boxify()).arg(
+                JExpr.invoke(JExpr.cast(ref(String.class),src), "getBytes").arg(encoding)
+        ));
+
+        tryBlock.body().assign(result, JExpr.cast(ref(variable.asType()).boxify(), unmarshaller.invoke("unmarshal").arg(inputStream)));
+
+        JCatchBlock unsupportedEncodingCatch = tryBlock._catch(ref(UnsupportedEncodingException.class).boxify());
+        JVar unsupportedEncoding = unsupportedEncodingCatch.param("unsupportedEncoding");
+
+        generateThrowTransformFailedException(unsupportedEncodingCatch, unsupportedEncoding, variable);
+
+        JCatchBlock jaxbExceptionCatch = tryBlock._catch(ref(JAXBException.class).boxify());
+        JVar jaxbException = jaxbExceptionCatch.param("jaxbException");
+
+        generateThrowTransformFailedException(jaxbExceptionCatch, jaxbException, variable);
+
+        doTransform.body()._return(result);
     }
 
     private void generateThrowTransformFailedException(JCatchBlock catchBlock, JVar exception, VariableElement variable) {
@@ -125,7 +129,7 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
         return loadJaxbContext;
     }
 
-    private void generateConstructor(JDefinedClass jaxbTransformerClass, VariableElement variable) {
+    private void generateConstructor(JDefinedClass jaxbTransformerClass, ExecutableElement executableElement, VariableElement variable) {
         // generate constructor
         JMethod constructor = jaxbTransformerClass.constructor(JMod.PUBLIC);
 
@@ -134,6 +138,8 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
 
         // register destination data type
         registerDestinationType(constructor, variable);
+
+        constructor.body().invoke("setName").arg(getJaxbTransformerNameFor(executableElement, variable));
     }
 
     private void registerDestinationType(JMethod constructor, VariableElement variable) {
