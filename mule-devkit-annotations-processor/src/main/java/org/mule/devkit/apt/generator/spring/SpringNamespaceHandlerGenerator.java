@@ -1,7 +1,5 @@
 package org.mule.devkit.apt.generator.spring;
 
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JPackage;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
@@ -9,8 +7,6 @@ import org.mule.devkit.apt.generator.GenerationException;
 import org.mule.devkit.apt.generator.schema.FileTypeSchema;
 
 import javax.lang.model.element.TypeElement;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -36,5 +32,6 @@ public class SpringNamespaceHandlerGenerator extends AbstractCodeGenerator {
             springNamespaceHandlersOut.close();
         } catch (IOException ioe) {
             throw new GenerationException(ioe);
-        }    }
+        }
+    }
 }

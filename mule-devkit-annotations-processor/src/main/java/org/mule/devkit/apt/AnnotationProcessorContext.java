@@ -2,12 +2,14 @@ package org.mule.devkit.apt;
 
 import com.sun.codemodel.CodeWriter;
 import com.sun.codemodel.JCodeModel;
+import com.sun.codemodel.JDefinedClass;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.apt.generator.schema.FileTypeSchema;
 
 import javax.lang.model.util.Elements;
-import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AnnotationProcessorContext {
@@ -15,9 +17,11 @@ public class AnnotationProcessorContext {
     private Elements elements;
     private Map<Module, FileTypeSchema> schemas;
     private CodeWriter codeWriter;
+    private List<JDefinedClass> classesToRegisterAtBoot;
 
     public AnnotationProcessorContext() {
         this.schemas = new HashMap<Module, FileTypeSchema>();
+        this.classesToRegisterAtBoot = new ArrayList<JDefinedClass>();
     }
 
     public JCodeModel getCodeModel() {
@@ -50,5 +54,13 @@ public class AnnotationProcessorContext {
 
     public void setCodeWriter(CodeWriter codeWriter) {
         this.codeWriter = codeWriter;
+    }
+
+    public List<JDefinedClass> getClassesToRegisterAtBoot() {
+        return classesToRegisterAtBoot;
+    }
+
+    public void registerClassAtBoot(JDefinedClass clazz) {
+        this.classesToRegisterAtBoot.add(clazz);
     }
 }

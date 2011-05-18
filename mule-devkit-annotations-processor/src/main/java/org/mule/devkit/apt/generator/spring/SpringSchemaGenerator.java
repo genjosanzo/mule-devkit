@@ -1,6 +1,5 @@
 package org.mule.devkit.apt.generator.spring;
 
-import com.sun.codemodel.JPackage;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.ContextualizedGenerator;
