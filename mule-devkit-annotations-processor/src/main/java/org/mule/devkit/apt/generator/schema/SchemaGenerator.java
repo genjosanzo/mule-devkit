@@ -7,17 +7,14 @@ import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.ContextualizedGenerator;
 import org.mule.devkit.apt.generator.GenerationException;
+import org.mule.devkit.apt.util.CodeModelUtils;
 import org.mule.devkit.apt.util.NameUtils;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -440,24 +437,15 @@ public class SchemaGenerator extends ContextualizedGenerator {
             complexContentExtension.setAll(all);
 
             for (VariableElement variable : method.getParameters()) {
-                TypeMirror variableType = variable.asType();
-                if (variableType.getKind() == TypeKind.DECLARED) {
-                    DeclaredType declaredType = (DeclaredType) variableType;
-                    XmlType xmlType = declaredType.asElement().getAnnotation(XmlType.class);
+                if (CodeModelUtils.isXmlType(variable)) {
+                    TopLevelElement xmlElement = new TopLevelElement();
+                    xmlElement.setName(variable.getSimpleName().toString());
+                    xmlElement.setType(new QName(targetNamespace, "XmlType"));
 
-                    if (xmlType == null) {
-                        complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(variable));
-                    } else {
-                        TopLevelElement xmlElement = new TopLevelElement();
-                        xmlElement.setName(variable.getSimpleName().toString());
-                        xmlElement.setType(new QName(targetNamespace, "XmlType"));
-
-                        all.getParticle().add(objectFactory.createElement(xmlElement));
-                    }
+                    all.getParticle().add(objectFactory.createElement(xmlElement));
                 } else {
                     complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(variable));
                 }
-
             }
 
             schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
