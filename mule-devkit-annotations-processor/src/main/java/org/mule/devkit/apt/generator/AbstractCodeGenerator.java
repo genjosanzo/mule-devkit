@@ -4,6 +4,7 @@ import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
+import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JPackage;
@@ -137,10 +138,10 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
         return jtype;
     }
 
-    protected void generateGetBeanClass(JDefinedClass beanDefinitionparser, JClass messageProcessorClass) {
+    protected void generateGetBeanClass(JDefinedClass beanDefinitionparser, JExpression expr) {
         JMethod getBeanClass = beanDefinitionparser.method(JMod.PROTECTED, ref(Class.class), "getBeanClass");
         JVar element = getBeanClass.param(ref(Element.class), "element");
-        getBeanClass.body()._return(JExpr.dotclass(messageProcessorClass));
+        getBeanClass.body()._return(expr);
 
     }
 }

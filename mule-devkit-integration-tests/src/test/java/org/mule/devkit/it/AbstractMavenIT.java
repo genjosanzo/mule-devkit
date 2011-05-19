@@ -34,9 +34,10 @@ public abstract class AbstractMavenIT
     @Test
     public void buildExecutable() throws VerificationException
     {
-        Verifier verifier = new Verifier(getRoot().getAbsolutePath());
+        Verifier verifier = new Verifier(getRoot().getAbsolutePath(), null, true, false);
         verifier.setAutoclean(false);
         verifier.setMavenDebug(true);
+        verifier.setDebug(true);
 
         verifier.executeGoal("package");
 

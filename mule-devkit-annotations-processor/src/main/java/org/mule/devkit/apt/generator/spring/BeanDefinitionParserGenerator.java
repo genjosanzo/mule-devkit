@@ -59,7 +59,7 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
         constructor.body().invoke("super").arg(JExpr.lit("messageProcessor")).arg(JExpr.dotclass(messageProcessorClass));
 
         // add getBeanClass
-        generateGetBeanClass(beanDefinitionparser, messageProcessorClass);
+        generateGetBeanClass(beanDefinitionparser, JExpr.dotclass(messageProcessorClass));
 
         // add parseChild
         generateParseChild(beanDefinitionparser, executableElement);

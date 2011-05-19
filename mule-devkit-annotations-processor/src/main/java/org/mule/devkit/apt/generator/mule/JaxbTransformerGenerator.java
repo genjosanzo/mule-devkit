@@ -7,9 +7,11 @@ import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
+import com.sun.codemodel.JOp;
 import com.sun.codemodel.JTryBlock;
 import com.sun.codemodel.JVar;
 import org.apache.commons.lang.StringUtils;
+import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.annotations.Processor;
@@ -54,6 +56,9 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
                     // get class
                     JDefinedClass jaxbTransformerClass = getJaxbTransformerClass(executableElement, variable);
 
+                    // declare weight
+                    JFieldVar weighting = jaxbTransformerClass.field(JMod.PRIVATE, getContext().getCodeModel().INT, "weighting", JOp.plus(ref(DiscoverableTransformer.class).boxify().staticRef("DEFAULT_PRIORITY_WEIGHTING"), JExpr.lit(1)));
+
                     // load JAXB context
                     JMethod loadJaxbContext = generateLoadJaxbContext(jaxbTransformerClass);
 
@@ -65,10 +70,27 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
 
                     // doTransform
                     generateDoTransform(jaxbTransformerClass, jaxbContext, variable);
+
+                    // set and get weight
+                    generateGetPriorityWeighting(jaxbTransformerClass, weighting);
+                    generateSetPriorityWeighting(jaxbTransformerClass, weighting);
+
+                    getContext().registerClassAtBoot(jaxbTransformerClass);
                 }
             }
         }
 
+    }
+
+    private void generateSetPriorityWeighting(JDefinedClass jaxbTransformerClass, JFieldVar weighting) {
+        JMethod setPriorityWeighting = jaxbTransformerClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "setPriorityWeighting");
+        JVar localWeighting = setPriorityWeighting.param(getContext().getCodeModel().INT, "weighting");
+        setPriorityWeighting.body().assign(JExpr._this().ref(weighting), localWeighting);
+    }
+
+    private void generateGetPriorityWeighting(JDefinedClass jaxbTransformerClass, JFieldVar weighting) {
+        JMethod getPriorityWeighting = jaxbTransformerClass.method(JMod.PUBLIC, getContext().getCodeModel().INT, "getPriorityWeighting");
+        getPriorityWeighting.body()._return(weighting);
     }
 
     private void generateDoTransform(JDefinedClass jaxbTransformerClass, JFieldVar jaxbContext, VariableElement variable) {
@@ -83,7 +105,7 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
         JVar unmarshaller = tryBlock.body().decl(ref(Unmarshaller.class), "unmarshaller");
         tryBlock.body().assign(unmarshaller, jaxbContext.invoke("createUnmarshaller"));
         JVar inputStream = tryBlock.body().decl(ref(InputStream.class).boxify(), "is", JExpr._new(ref(ByteArrayInputStream.class).boxify()).arg(
-                JExpr.invoke(JExpr.cast(ref(String.class),src), "getBytes").arg(encoding)
+                JExpr.invoke(JExpr.cast(ref(String.class), src), "getBytes").arg(encoding)
         ));
 
         tryBlock.body().assign(result, JExpr.cast(ref(variable.asType()).boxify(), unmarshaller.invoke("unmarshal").arg(inputStream)));
@@ -167,6 +189,7 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
     private JDefinedClass getJaxbTransformerClass(ExecutableElement executableElement, VariableElement variable) {
         String jaxbTransformerClassName = getJaxbTransformerNameFor(executableElement, variable);
         JDefinedClass jaxbTransformer = getOrCreateClass(jaxbTransformerClassName, AbstractTransformer.class);
+        jaxbTransformer._implements(DiscoverableTransformer.class);
 
         return jaxbTransformer;
     }

@@ -58,6 +58,7 @@ public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
 
     private void registerBeanDefinitionParser(JMethod init, ExecutableElement executableElement) {
         JDefinedClass beanDefinitionParser = getBeanDefinitionParserClass(executableElement);
+        JDefinedClass messageProcessor = getMessageProcessorClass(executableElement);
 
         Processor processor = executableElement.getAnnotation(Processor.class);
         String elementName = executableElement.getSimpleName().toString();
@@ -70,7 +71,7 @@ public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
             if (CodeModelUtils.isXmlType(variable)) {
                 JInvocation newAnyXmlChildDefinitionParser = JExpr._new(getAnyXmlChildDefinitionParserClass(executableElement));
                 newAnyXmlChildDefinitionParser.arg(JExpr.lit(variable.getSimpleName().toString()));
-                newAnyXmlChildDefinitionParser.arg(JExpr.dotclass(beanDefinitionParser));
+                newAnyXmlChildDefinitionParser.arg(JExpr.dotclass(messageProcessor));
 
                 init.body().invoke("registerMuleBeanDefinitionParser").arg(JExpr.lit(variable.getSimpleName().toString())).arg(newAnyXmlChildDefinitionParser);
             }
