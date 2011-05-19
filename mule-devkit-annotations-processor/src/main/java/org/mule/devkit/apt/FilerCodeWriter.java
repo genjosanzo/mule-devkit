@@ -24,18 +24,10 @@ public final class FilerCodeWriter extends CodeWriter {
     public OutputStream openBinary(JPackage pkg, String fileName) throws IOException {
         JavaFileManager.Location loc;
 
-        if (fileName.endsWith(".java")) {
-            // APT doesn't do the proper Unicode escaping on Java source files,
-            // so we can't rely on Filer.createSourceFile.
-            loc = SOURCE_OUTPUT;
-        } else {
-            // put non-Java files directly to the output folder
-            loc = CLASS_OUTPUT;
-        }
-        if( pkg != null )
-            return filer.createResource(loc, pkg.name(), fileName).openOutputStream();
+        if (pkg != null)
+            return filer.createResource(SOURCE_OUTPUT, pkg.name(), fileName).openOutputStream();
         else
-            return filer.createResource(loc, "", fileName).openOutputStream();
+            return filer.createResource(SOURCE_OUTPUT, "", fileName).openOutputStream();
     }
 
     public Writer openSource(JPackage pkg, String fileName) throws IOException {

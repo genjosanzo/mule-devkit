@@ -32,6 +32,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -108,7 +109,12 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
                 JExpr.invoke(JExpr.cast(ref(String.class), src), "getBytes").arg(encoding)
         ));
 
-        tryBlock.body().assign(result, JExpr.cast(ref(variable.asType()).boxify(), unmarshaller.invoke("unmarshal").arg(inputStream)));
+        JVar streamSource = tryBlock.body().decl(ref(StreamSource.class), "ss", JExpr._new(ref(StreamSource.class)).arg(inputStream));
+        JInvocation unmarshal = unmarshaller.invoke("unmarshal");
+        unmarshal.arg(streamSource);
+        unmarshal.arg(JExpr.dotclass(ref(variable.asType()).boxify()));
+
+        tryBlock.body().assign(result, unmarshal.invoke("getValue"));
 
         JCatchBlock unsupportedEncodingCatch = tryBlock._catch(ref(UnsupportedEncodingException.class).boxify());
         JVar unsupportedEncoding = unsupportedEncodingCatch.param("unsupportedEncoding");

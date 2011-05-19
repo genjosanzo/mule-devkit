@@ -13,6 +13,6 @@ public class RssModuleTest extends AbstractModuleTest
 
     public void testJAXB() throws Exception
     {
-        runFlow("feedCountFlow", "5");
+        runFlow("feedCountFlow", 1);
     }
 }

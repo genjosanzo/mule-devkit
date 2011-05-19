@@ -4,6 +4,7 @@ import com.sun.codemodel.JCatchBlock;
 import com.sun.codemodel.JConditional;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
+import com.sun.codemodel.JForLoop;
 import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -91,8 +93,27 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractCodeGenerator 
 
         JConditional ifBlock = parseInternal.body()._if(JOp.eq(ref(Node.class).boxify().staticRef("ELEMENT_NODE"), element.invoke("getNodeType")));
 
-        JTryBlock tryBlock = ifBlock._then()._try();
-        JVar domSource = tryBlock.body().decl(ref(DOMSource.class).boxify(), "domSource", JExpr._new(ref(DOMSource.class).boxify()).arg(element.invoke("getFirstChild")));
+        JVar nodeList = ifBlock._then().decl(ref(NodeList.class), "childs", element.invoke("getChildNodes"));
+        JVar i = ifBlock._then().decl(getContext().getCodeModel().INT, "i");
+        JForLoop forLoop = ifBlock._then()._for();
+        forLoop.init(i, JExpr.lit(0));
+        forLoop.test(JOp.lt(i, nodeList.invoke("getLength")));
+        forLoop.update(JOp.incr(i));
+        JVar child = forLoop.body().decl(ref(Node.class), "child", nodeList.invoke("item").arg(i));
+
+        JConditional ifBlock2 = forLoop.body()._if(JOp.eq(ref(Node.class).boxify().staticRef("ELEMENT_NODE"), child.invoke("getNodeType")));
+
+        /*
+                NodeList childs = element.getChildNodes();
+                for (int i = 0; i < childs.getLength(); i++) {
+                    Node child = childs.item(i);
+
+                    if (Node.ELEMENT_NODE == child.getNodeType()) {
+
+         */
+
+        JTryBlock tryBlock = ifBlock2._then()._try();
+        JVar domSource = tryBlock.body().decl(ref(DOMSource.class).boxify(), "domSource", JExpr._new(ref(DOMSource.class).boxify()).arg(child));
         JVar stringWriter = tryBlock.body().decl(ref(StringWriter.class).boxify(), "stringWriter", JExpr._new(ref(StringWriter.class).boxify()));
         JVar streamResult = tryBlock.body().decl(ref(StreamResult.class).boxify(), "result", JExpr._new(ref(StreamResult.class).boxify()).arg(stringWriter));
         JVar tf = tryBlock.body().decl(ref(TransformerFactory.class).boxify(), "tf", ref(TransformerFactory.class).boxify().staticInvoke("newInstance"));
