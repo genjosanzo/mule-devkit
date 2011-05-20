@@ -464,6 +464,9 @@ public class SchemaGenerator extends ContextualizedGenerator {
         all.getParticle().add(any);
         xmlComplexType.setSequence(all);
 
+        Attribute ref = createAttribute("ref", true, STRING, "The reference object for this parameter");
+        xmlComplexType.getAttributeOrAttributeGroup().add(ref);
+
         return xmlComplexType;
     }
 

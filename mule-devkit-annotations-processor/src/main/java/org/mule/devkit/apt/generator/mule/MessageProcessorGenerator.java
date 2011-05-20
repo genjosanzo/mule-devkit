@@ -193,10 +193,10 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
                 JVar transformed = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName));
                 generateExpressionEvaluator(callProcessor.body(), evaluated, fields.get(fieldName).getField(), patternInfo, expressionManager, muleMessage);
                 generateTransform(callProcessor.body(), transformed, evaluated, fields.get(fieldName).getVariableElement().asType(), muleContext);
-                parameters.addFirst(transformed);
+                parameters.addLast(transformed);
             } else {
                 //JVar ref = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "ref" + StringUtils.capitalize(fieldName));
-                parameters.addFirst(fields.get(fieldName).getField());
+                parameters.addLast(fields.get(fieldName).getField());
             }
         }
 
