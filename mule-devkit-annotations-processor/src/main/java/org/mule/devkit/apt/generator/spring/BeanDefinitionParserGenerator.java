@@ -76,7 +76,7 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
 
         JInvocation getAttribute = element.invoke("getAttribute").arg(attributeName);
 
-        JInvocation isEmpty = ref(StringUtils.class).boxify().staticInvoke("isEmpty");
+        JInvocation isEmpty = ref(StringUtils.class).staticInvoke("isEmpty");
         isEmpty.arg(getAttribute);
 
         JBlock ifIsEmpty = getAttributeValue.body()._if(isEmpty.not())._then();
@@ -120,7 +120,7 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
         JInvocation getAttributeAlias = generateGetAttributeConfigRef();
         JInvocation getAttribute = element.invoke("getAttribute");
         getAttribute.arg(getAttributeAlias);
-        JInvocation isEmpty = ref(StringUtils.class).boxify().staticInvoke("isEmpty");
+        JInvocation isEmpty = ref(StringUtils.class).staticInvoke("isEmpty");
         isEmpty.arg(getAttribute);
         return isEmpty;
     }

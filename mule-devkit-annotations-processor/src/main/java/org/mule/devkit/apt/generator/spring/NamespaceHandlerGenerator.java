@@ -6,7 +6,9 @@ import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import org.mule.config.spring.handlers.AbstractPojoNamespaceHandler;
+import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.devkit.annotations.Processor;
+import org.mule.devkit.annotations.Transformer;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
 import org.mule.devkit.apt.generator.GenerationException;
@@ -35,6 +37,7 @@ public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
 
         generateRegisterPojo(init, type.asType());
         registerBeanDefinitionParserForEachProcessor(type, init);
+        registerBeanDefinitionParserForEachTransformer(type, init);
     }
 
     private void generateRegisterPojo(JMethod init, TypeMirror pojo) {
@@ -54,6 +57,20 @@ public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
 
             registerBeanDefinitionParser(init, executableElement);
         }
+    }
+
+    private void registerBeanDefinitionParserForEachTransformer(TypeElement type, JMethod init) {
+        List<ExecutableElement> executableElements = ElementFilter.methodsIn(type.getEnclosedElements());
+        for (ExecutableElement executableElement : executableElements) {
+            Transformer transformer = executableElement.getAnnotation(Transformer.class);
+
+            if (transformer == null)
+                continue;
+
+            JInvocation registerMuleBeanDefinitionParser = init.body().invoke("registerMuleBeanDefinitionParser");
+            registerMuleBeanDefinitionParser.arg(JExpr.lit(NameUtils.uncamel(executableElement.getSimpleName().toString())));
+            registerMuleBeanDefinitionParser.arg(JExpr._new(ref(MessageProcessorDefinitionParser.class)).arg(ref(getTransformerNameFor(executableElement)).boxify().dotclass()));
+       }
     }
 
     private void registerBeanDefinitionParser(JMethod init, ExecutableElement executableElement) {

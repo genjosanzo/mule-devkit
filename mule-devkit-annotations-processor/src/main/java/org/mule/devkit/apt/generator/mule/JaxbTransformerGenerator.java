@@ -58,7 +58,7 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
                     JDefinedClass jaxbTransformerClass = getJaxbTransformerClass(executableElement, variable);
 
                     // declare weight
-                    JFieldVar weighting = jaxbTransformerClass.field(JMod.PRIVATE, getContext().getCodeModel().INT, "weighting", JOp.plus(ref(DiscoverableTransformer.class).boxify().staticRef("DEFAULT_PRIORITY_WEIGHTING"), JExpr.lit(1)));
+                    JFieldVar weighting = jaxbTransformerClass.field(JMod.PRIVATE, getContext().getCodeModel().INT, "weighting", JOp.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), JExpr.lit(1)));
 
                     // load JAXB context
                     JMethod loadJaxbContext = generateLoadJaxbContext(jaxbTransformerClass);
@@ -105,7 +105,7 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
         JTryBlock tryBlock = doTransform.body()._try();
         JVar unmarshaller = tryBlock.body().decl(ref(Unmarshaller.class), "unmarshaller");
         tryBlock.body().assign(unmarshaller, jaxbContext.invoke("createUnmarshaller"));
-        JVar inputStream = tryBlock.body().decl(ref(InputStream.class).boxify(), "is", JExpr._new(ref(ByteArrayInputStream.class).boxify()).arg(
+        JVar inputStream = tryBlock.body().decl(ref(InputStream.class), "is", JExpr._new(ref(ByteArrayInputStream.class)).arg(
                 JExpr.invoke(JExpr.cast(ref(String.class), src), "getBytes").arg(encoding)
         ));
 
@@ -116,12 +116,12 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
 
         tryBlock.body().assign(result, unmarshal.invoke("getValue"));
 
-        JCatchBlock unsupportedEncodingCatch = tryBlock._catch(ref(UnsupportedEncodingException.class).boxify());
+        JCatchBlock unsupportedEncodingCatch = tryBlock._catch(ref(UnsupportedEncodingException.class));
         JVar unsupportedEncoding = unsupportedEncodingCatch.param("unsupportedEncoding");
 
         generateThrowTransformFailedException(unsupportedEncodingCatch, unsupportedEncoding, variable);
 
-        JCatchBlock jaxbExceptionCatch = tryBlock._catch(ref(JAXBException.class).boxify());
+        JCatchBlock jaxbExceptionCatch = tryBlock._catch(ref(JAXBException.class));
         JVar jaxbException = jaxbExceptionCatch.param("jaxbException");
 
         generateThrowTransformFailedException(jaxbExceptionCatch, jaxbException, variable);
@@ -130,11 +130,11 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
     }
 
     private void generateThrowTransformFailedException(JCatchBlock catchBlock, JVar exception, VariableElement variable) {
-        JInvocation transformFailedInvoke = ref(CoreMessages.class).boxify().staticInvoke("transformFailed");
+        JInvocation transformFailedInvoke = ref(CoreMessages.class).staticInvoke("transformFailed");
         transformFailedInvoke.arg("String");
         transformFailedInvoke.arg(JExpr.lit(ref(variable.asType()).boxify().fullName()));
 
-        JInvocation transformerException = JExpr._new(ref(TransformerException.class).boxify());
+        JInvocation transformerException = JExpr._new(ref(TransformerException.class));
         transformerException.arg(transformFailedInvoke);
         transformerException.arg(JExpr._this());
         transformerException.arg(exception);
@@ -147,8 +147,8 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
         JVar innerJaxbContext = loadJaxbContext.body().decl(ref(JAXBContext.class), "context");
 
         JTryBlock tryBlock = loadJaxbContext.body()._try();
-        tryBlock.body().assign(innerJaxbContext, ref(JAXBContext.class).boxify().staticInvoke("newInstance").arg(clazz));
-        JCatchBlock catchBlock = tryBlock._catch(ref(JAXBException.class).boxify());
+        tryBlock.body().assign(innerJaxbContext, ref(JAXBContext.class).staticInvoke("newInstance").arg(clazz));
+        JCatchBlock catchBlock = tryBlock._catch(ref(JAXBException.class));
         JVar e = catchBlock.param("e");
         catchBlock.body()._throw(JExpr._new(ref(RuntimeException.class)).arg(e));
 
@@ -177,7 +177,7 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
 
     private void registerSourceType(JMethod constructor) {
         JInvocation registerSourceType = constructor.body().invoke("registerSourceType");
-        registerSourceType.arg(ref(DataTypeFactory.class).boxify().staticRef("STRING"));
+        registerSourceType.arg(ref(DataTypeFactory.class).staticRef("STRING"));
     }
 
     private String getJaxbTransformerNameFor(ExecutableElement executableElement, VariableElement variable) {

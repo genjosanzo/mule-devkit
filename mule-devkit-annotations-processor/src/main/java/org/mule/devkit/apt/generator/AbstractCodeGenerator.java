@@ -3,7 +3,6 @@ package org.mule.devkit.apt.generator;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
@@ -21,6 +20,7 @@ import org.w3c.dom.Element;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import java.util.Arrays;
@@ -121,18 +121,28 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
         return anyXmlChildDefinitionParser;
     }
 
+    protected JClass ref(Class<?> clazz)
+    {
+        JClass ret = null;
+        try {
+            ret = getContext().getCodeModel().ref(clazz).boxify();
+        } catch (MirroredTypeException mte) {
+            ret = ref(mte.getTypeMirror()).boxify();
+        }
 
-    protected JType ref(Class<?> clazz) {
-        return getContext().getCodeModel().ref(clazz);
+        return ret;
     }
 
     protected JType ref(TypeMirror typeMirror) {
-        String type = typeMirror.toString();
+        return ref(typeMirror.toString());
+    }
+
+    protected JType ref(String typeMirror) {
         JType jtype = null;
         try {
-            jtype = getContext().getCodeModel().parseType(type);
+            jtype = getContext().getCodeModel().parseType(typeMirror);
         } catch (ClassNotFoundException e) {
-            jtype = getContext().getCodeModel().ref(type);
+            jtype = getContext().getCodeModel().ref(typeMirror);
         }
 
         return jtype;
@@ -144,4 +154,14 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
         getBeanClass.body()._return(expr);
 
     }
+
+    protected String getTransformerNameFor(ExecutableElement executableElement) {
+        TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
+        String packageName = ClassNameUtils.getPackageName(getContext().getElements().getBinaryName(parentClass).toString());
+        String className = StringUtils.capitalize(executableElement.getSimpleName().toString()) + "Transformer";
+
+        return packageName + "." + className;
+    }
+
+
 }

@@ -13,6 +13,6 @@ public class TransformerModuleTest extends AbstractModuleTest
 
     public void testString() throws Exception
     {
-        runFlow("transform", 'm');
+        runFlowWithPayload("transform", 'm', "mulesoft");
     }
 }

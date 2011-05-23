@@ -4,6 +4,7 @@ import org.mule.devkit.annotations.Configurable;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.annotations.Parameter;
 import org.mule.devkit.annotations.Processor;
+import org.mule.devkit.annotations.Transformer;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.ContextualizedGenerator;
 import org.mule.devkit.apt.generator.GenerationException;
@@ -324,6 +325,8 @@ public class SchemaGenerator extends ContextualizedGenerator {
     private static final QName MULE_ABSTRACT_EXTENSION_TYPE = new QName(MULE_NAMESPACE, "abstractExtensionType", "mule");
     private static final QName MULE_ABSTRACT_MESSAGE_PROCESSOR = new QName(MULE_NAMESPACE, "abstract-message-processor", "mule");
     private static final QName MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE = new QName(MULE_NAMESPACE, "abstractInterceptingMessageProcessorType", "mule");
+    private static final QName MULE_ABSTRACT_TRANSFORMER = new QName(MULE_NAMESPACE, "abstract-transformer", "mule");
+    private static final QName MULE_ABSTRACT_TRANSFORMER_TYPE = new QName(MULE_NAMESPACE, "abstractTransformerType", "mule");
     private static final QName STRING = new QName(XSD_NAMESPACE, "string", "xs");
     private static final QName DECIMAL = new QName(XSD_NAMESPACE, "decimal", "xs");
     private static final QName FLOAT = new QName(XSD_NAMESPACE, "float", "xs");
@@ -366,6 +369,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
         registerTypes();
         registerConfigElement(type);
         registerProcessors(type);
+        registerTransformers(type);
 
         try {
             OutputStream schemaStream = getContext().getCodeWriter().openBinary(null, "META-INF/mule-" + module.name() + ".xsd");
@@ -399,6 +403,19 @@ public class SchemaGenerator extends ContextualizedGenerator {
         typeMap.put("java.util.Date", new QName(targetNamespace, "dateTimeType"));
         typeMap.put("java.net.URL", new QName(targetNamespace, "anyUriType"));
         typeMap.put("java.net.URI", new QName(targetNamespace, "anyUriType"));
+    }
+
+    private void registerTransformers(TypeElement type)
+    {
+        java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(type.getEnclosedElements());
+        for (ExecutableElement method : methods) {
+            Transformer transformer = method.getAnnotation(Transformer.class);
+            if (transformer == null)
+                continue;
+
+            Element transformerElement = registerTransformer(NameUtils.uncamel(method.getSimpleName().toString()));
+            schema.getSimpleTypeOrComplexTypeOrGroup().add(transformerElement);
+        }
     }
 
     private void registerProcessors(TypeElement type) {
@@ -587,6 +604,16 @@ public class SchemaGenerator extends ContextualizedGenerator {
         nameAnnotation.getAppinfoOrDocumentation().add(nameDocumentation);
 
         return attr;
+    }
+
+    private Element registerTransformer(String name)
+    {
+        Element transformer = new TopLevelElement();
+        transformer.setName(name);
+        transformer.setSubstitutionGroup(MULE_ABSTRACT_TRANSFORMER);
+        transformer.setType(MULE_ABSTRACT_TRANSFORMER_TYPE);
+
+        return transformer;
     }
 
     private ExtensionType registerExtension(String name) {

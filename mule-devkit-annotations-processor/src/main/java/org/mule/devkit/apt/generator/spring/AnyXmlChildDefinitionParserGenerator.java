@@ -65,7 +65,7 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractCodeGenerator 
         generateConstructor(anyXmlChildDefinitionParser);
 
         // getBeanClass
-        generateGetBeanClass(anyXmlChildDefinitionParser, ref(String.class).boxify().dotclass());
+        generateGetBeanClass(anyXmlChildDefinitionParser, ref(String.class).dotclass());
 
         // processProperty
         generateProcessProperty(anyXmlChildDefinitionParser);
@@ -91,7 +91,7 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractCodeGenerator 
         setAttribute.arg(ref(Boolean.class).boxify().staticRef("TRUE"));
         parseInternal.body().add(setAttribute);
 
-        JConditional ifBlock = parseInternal.body()._if(JOp.eq(ref(Node.class).boxify().staticRef("ELEMENT_NODE"), element.invoke("getNodeType")));
+        JConditional ifBlock = parseInternal.body()._if(JOp.eq(ref(Node.class).staticRef("ELEMENT_NODE"), element.invoke("getNodeType")));
 
         JVar nodeList = ifBlock._then().decl(ref(NodeList.class), "childs", element.invoke("getChildNodes"));
         JVar i = ifBlock._then().decl(getContext().getCodeModel().INT, "i");
@@ -101,23 +101,14 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractCodeGenerator 
         forLoop.update(JOp.incr(i));
         JVar child = forLoop.body().decl(ref(Node.class), "child", nodeList.invoke("item").arg(i));
 
-        JConditional ifBlock2 = forLoop.body()._if(JOp.eq(ref(Node.class).boxify().staticRef("ELEMENT_NODE"), child.invoke("getNodeType")));
-
-        /*
-                NodeList childs = element.getChildNodes();
-                for (int i = 0; i < childs.getLength(); i++) {
-                    Node child = childs.item(i);
-
-                    if (Node.ELEMENT_NODE == child.getNodeType()) {
-
-         */
+        JConditional ifBlock2 = forLoop.body()._if(JOp.eq(ref(Node.class).staticRef("ELEMENT_NODE"), child.invoke("getNodeType")));
 
         JTryBlock tryBlock = ifBlock2._then()._try();
-        JVar domSource = tryBlock.body().decl(ref(DOMSource.class).boxify(), "domSource", JExpr._new(ref(DOMSource.class).boxify()).arg(child));
-        JVar stringWriter = tryBlock.body().decl(ref(StringWriter.class).boxify(), "stringWriter", JExpr._new(ref(StringWriter.class).boxify()));
-        JVar streamResult = tryBlock.body().decl(ref(StreamResult.class).boxify(), "result", JExpr._new(ref(StreamResult.class).boxify()).arg(stringWriter));
-        JVar tf = tryBlock.body().decl(ref(TransformerFactory.class).boxify(), "tf", ref(TransformerFactory.class).boxify().staticInvoke("newInstance"));
-        JVar transformer = tryBlock.body().decl(ref(Transformer.class).boxify(), "transformer", tf.invoke("newTransformer"));
+        JVar domSource = tryBlock.body().decl(ref(DOMSource.class), "domSource", JExpr._new(ref(DOMSource.class)).arg(child));
+        JVar stringWriter = tryBlock.body().decl(ref(StringWriter.class), "stringWriter", JExpr._new(ref(StringWriter.class)));
+        JVar streamResult = tryBlock.body().decl(ref(StreamResult.class), "result", JExpr._new(ref(StreamResult.class)).arg(stringWriter));
+        JVar tf = tryBlock.body().decl(ref(TransformerFactory.class), "tf", ref(TransformerFactory.class).staticInvoke("newInstance"));
+        JVar transformer = tryBlock.body().decl(ref(Transformer.class), "transformer", tf.invoke("newTransformer"));
         JInvocation transform = transformer.invoke("transform");
         transform.arg(domSource);
         transform.arg(streamResult);
@@ -140,7 +131,7 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractCodeGenerator 
     private void generateReThrow(JTryBlock tryBlock, Class<?> clazz) {
         JCatchBlock catchBlock = tryBlock._catch(ref(clazz).boxify());
         JVar e = catchBlock.param("e");
-        catchBlock.body()._throw(JExpr._new(ref(UnhandledException.class).boxify()).arg(e));
+        catchBlock.body()._throw(JExpr._new(ref(UnhandledException.class)).arg(e));
     }
 
     private void generateConstructor(JDefinedClass anyXmlChildDefinitionParser) {

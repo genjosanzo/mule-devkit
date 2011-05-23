@@ -12,6 +12,7 @@ import com.sun.codemodel.JMod;
 import com.sun.codemodel.JOp;
 import com.sun.codemodel.JTryBlock;
 import com.sun.codemodel.JVar;
+import com.sun.tools.javac.code.Attribute;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
@@ -29,11 +30,16 @@ import org.mule.devkit.apt.util.ClassNameUtils;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.MirroredTypeException;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class TransformerGenerator extends AbstractCodeGenerator {
     public TransformerGenerator(AnnotationProcessorContext context) {
@@ -56,7 +62,7 @@ public class TransformerGenerator extends AbstractCodeGenerator {
             JFieldVar muleContext = transformerClass.field(JMod.PRIVATE, ref(MuleContext.class), "muleContext");
 
             // declare weight
-            JFieldVar weighting = transformerClass.field(JMod.PRIVATE, getContext().getCodeModel().INT, "weighting", JOp.plus(ref(DiscoverableTransformer.class).boxify().staticRef("DEFAULT_PRIORITY_WEIGHTING"), JExpr.lit(transformer.priorityWeighting())));
+            JFieldVar weighting = transformerClass.field(JMod.PRIVATE, getContext().getCodeModel().INT, "weighting", JOp.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), JExpr.lit(transformer.priorityWeighting())));
 
             //generate constructor
             generateConstructor(transformerClass, executableElement);
@@ -108,7 +114,7 @@ public class TransformerGenerator extends AbstractCodeGenerator {
         invoke.arg(src);
         tryBlock.body().assign(result, invoke);
 
-        JCatchBlock exceptionCatch = tryBlock._catch(ref(Exception.class).boxify());
+        JCatchBlock exceptionCatch = tryBlock._catch(ref(Exception.class));
         JVar exception = exceptionCatch.param("exception");
 
         generateThrowTransformFailedException(exceptionCatch, exception, src, ref(executableElement.getReturnType()).boxify());
@@ -117,11 +123,11 @@ public class TransformerGenerator extends AbstractCodeGenerator {
     }
 
     private void generateThrowTransformFailedException(JCatchBlock catchBlock, JVar exception, JVar src, JClass target) {
-        JInvocation transformFailedInvoke = ref(CoreMessages.class).boxify().staticInvoke("transformFailed");
+        JInvocation transformFailedInvoke = ref(CoreMessages.class).staticInvoke("transformFailed");
         transformFailedInvoke.arg(src.invoke("getClass").invoke("getName"));
         transformFailedInvoke.arg(JExpr.lit(target.fullName()));
 
-        JInvocation transformerException = JExpr._new(ref(TransformerException.class).boxify());
+        JInvocation transformerException = JExpr._new(ref(TransformerException.class));
         transformerException.arg(transformFailedInvoke);
         transformerException.arg(JExpr._this());
         transformerException.arg(exception);
@@ -147,20 +153,27 @@ public class TransformerGenerator extends AbstractCodeGenerator {
     }
 
     private void registerSourceTypes(JMethod constructor, ExecutableElement executableElement) {
-        Transformer transformer = executableElement.getAnnotation(Transformer.class);
-
-        for (int i = 0; i < transformer.sourceTypes().length; i++) {
-            JInvocation registerSourceType = constructor.body().invoke("registerSourceType");
-            registerSourceType.arg(ref(DataTypeFactory.class).boxify().staticInvoke("create").arg(JExpr.dotclass(ref(transformer.sourceTypes()[i]).boxify())));
+        final String transformerAnnotationName = Transformer.class.getName();
+        List<? extends AnnotationValue> sourceTypes = null;
+        List<? extends AnnotationMirror> annotationMirrors = executableElement.getAnnotationMirrors();
+        for (AnnotationMirror annotationMirror : annotationMirrors) {
+            if (transformerAnnotationName.equals(annotationMirror.getAnnotationType().toString())) {
+                for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
+                    if( "sourceTypes".equals(
+                            entry.getKey().getSimpleName().toString() ) )
+                    {
+                        sourceTypes = (List<? extends AnnotationValue>)entry.getValue().getValue();
+                        break;
+                    }
+                }
+            }
         }
-    }
 
-    private String getTransformerNameFor(ExecutableElement executableElement) {
-        TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
-        String packageName = ClassNameUtils.getPackageName(getContext().getElements().getBinaryName(parentClass).toString());
-        String className = StringUtils.capitalize(executableElement.getSimpleName().toString()) + "Transformer";
-
-        return packageName + "." + className;
+        for( AnnotationValue sourceType : sourceTypes )
+        {
+            JInvocation registerSourceType = constructor.body().invoke("registerSourceType");
+            registerSourceType.arg(ref(DataTypeFactory.class).staticInvoke("create").arg(ref((TypeMirror)sourceType.getValue()).boxify().dotclass()));
+        }
     }
 
     private JDefinedClass getTransformerClass(ExecutableElement executableElement) {
@@ -197,9 +210,9 @@ public class TransformerGenerator extends AbstractCodeGenerator {
         JConditional ifNoObject = initialise.body()._if(JOp.eq(object, JExpr._null()));
         JTryBlock tryLookUp = ifNoObject._then()._try();
         tryLookUp.body().assign(object, muleContext.invoke("getRegistry").invoke("lookupObject").arg(JExpr.dotclass(messageProcessor)));
-        JCatchBlock catchBlock = tryLookUp._catch(ref(RegistrationException.class).boxify());
+        JCatchBlock catchBlock = tryLookUp._catch(ref(RegistrationException.class));
         JVar exception = catchBlock.param("e");
-        JClass coreMessages = ref(CoreMessages.class).boxify();
+        JClass coreMessages = ref(CoreMessages.class);
         JInvocation failedToInvoke = coreMessages.staticInvoke("initialisationFailure");
         failedToInvoke.arg(messageProcessor.fullName());
         JInvocation messageException = JExpr._new(ref(InitialisationException.class));

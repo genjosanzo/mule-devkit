@@ -164,7 +164,7 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
     private JInvocation generateNullPayload(JFieldVar muleContext, JVar event) {
         JInvocation defaultMuleEvent = JExpr._new(ref(DefaultMuleEvent.class));
         JInvocation defaultMuleMessage = JExpr._new(ref(DefaultMuleMessage.class));
-        JInvocation nullPayload = ref(NullPayload.class).boxify().staticInvoke("getInstance");
+        JInvocation nullPayload = ref(NullPayload.class).staticInvoke("getInstance");
         defaultMuleMessage.arg(nullPayload);
         defaultMuleMessage.arg(muleContext);
         defaultMuleEvent.arg(defaultMuleMessage);
@@ -236,8 +236,8 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
         newOverwritePayloadCallback.arg(resultPayload);
         newTransformerTemplate.arg(newOverwritePayloadCallback);
 
-        JVar transformerList = block.decl(ref(List.class).boxify().narrow(Transformer.class), "transformerList");
-        block.assign(transformerList, JExpr._new(ref(ArrayList.class).boxify().narrow(Transformer.class)));
+        JVar transformerList = block.decl(ref(List.class).narrow(Transformer.class), "transformerList");
+        block.assign(transformerList, JExpr._new(ref(ArrayList.class).narrow(Transformer.class)));
         block.add(transformerList.invoke("add").arg(newTransformerTemplate));
 
         applyTransformers.arg(transformerList);
@@ -246,7 +246,7 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
 
     private void generateThrow(String bundle, Class<?> clazz, JCatchBlock callProcessorCatch, JVar event, String methodName) {
         JVar exception = callProcessorCatch.param("e");
-        JClass coreMessages = ref(CoreMessages.class).boxify();
+        JClass coreMessages = ref(CoreMessages.class);
         JInvocation failedToInvoke = coreMessages.staticInvoke(bundle);
         if (methodName != null) {
             failedToInvoke.arg(JExpr.lit(methodName));
@@ -264,14 +264,14 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
         JMethod initialise = messageProcessorClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "initialise");
         initialise._throws(InitialisationException.class);
         initialise.body().assign(expressionManager, muleContext.invoke("getExpressionManager"));
-        initialise.body().assign(patternInfo, ref(TemplateParser.class).boxify().staticInvoke("createMuleStyleParser").invoke("getStyle"));
+        initialise.body().assign(patternInfo, ref(TemplateParser.class).staticInvoke("createMuleStyleParser").invoke("getStyle"));
 
         JConditional ifNoObject = initialise.body()._if(JOp.eq(object, JExpr._null()));
         JTryBlock tryLookUp = ifNoObject._then()._try();
         tryLookUp.body().assign(object, muleContext.invoke("getRegistry").invoke("lookupObject").arg(JExpr.dotclass(messageProcessor)));
-        JCatchBlock catchBlock = tryLookUp._catch(ref(RegistrationException.class).boxify());
+        JCatchBlock catchBlock = tryLookUp._catch(ref(RegistrationException.class));
         JVar exception = catchBlock.param("e");
-        JClass coreMessages = ref(CoreMessages.class).boxify();
+        JClass coreMessages = ref(CoreMessages.class);
         JInvocation failedToInvoke = coreMessages.staticInvoke("initialisationFailure");
         failedToInvoke.arg(messageProcessor.fullName());
         JInvocation messageException = JExpr._new(ref(InitialisationException.class));
@@ -333,8 +333,8 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
         JVar dataTypeSource = isAssignable.decl(ref(DataType.class), "source");
         JVar dataTypeTarget = isAssignable.decl(ref(DataType.class), "target");
 
-        isAssignable.assign(dataTypeSource, ref(DataTypeFactory.class).boxify().staticInvoke("create").arg(evaluatedField.invoke("getClass")));
-        isAssignable.assign(dataTypeTarget, ref(DataTypeFactory.class).boxify().staticInvoke("create").arg(JExpr.dotclass(ref(expectedType).boxify())));
+        isAssignable.assign(dataTypeSource, ref(DataTypeFactory.class).staticInvoke("create").arg(evaluatedField.invoke("getClass")));
+        isAssignable.assign(dataTypeTarget, ref(DataTypeFactory.class).staticInvoke("create").arg(JExpr.dotclass(ref(expectedType).boxify())));
 
         JVar transformer = isAssignable.decl(ref(Transformer.class), "t");
         JInvocation lookupTransformer = muleContext.invoke("getRegistry").invoke("lookupTransformer");

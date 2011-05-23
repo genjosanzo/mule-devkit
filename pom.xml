@@ -24,7 +24,7 @@
     <modules>
         <module>mule-devkit-annotations</module>	
         <module>mule-devkit-annotations-processor</module>
-        <module>mule-devkit-support</module>
+        <!-- <module>mule-devkit-support</module> -->
         <module>mule-devkit-maven-plugin</module>
         <module>mule-devkit-integration-tests</module>
     </modules>
