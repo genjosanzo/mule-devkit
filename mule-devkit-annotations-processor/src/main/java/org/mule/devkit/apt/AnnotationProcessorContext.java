@@ -7,6 +7,7 @@ import org.mule.devkit.annotations.Module;
 import org.mule.devkit.apt.generator.schema.FileTypeSchema;
 
 import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.Map;
 public class AnnotationProcessorContext {
     private JCodeModel codeModel;
     private Elements elements;
+    private Types types;
     private Map<Module, FileTypeSchema> schemas;
     private CodeWriter codeWriter;
     private List<JDefinedClass> classesToRegisterAtBoot;
@@ -62,5 +64,13 @@ public class AnnotationProcessorContext {
 
     public void registerClassAtBoot(JDefinedClass clazz) {
         this.classesToRegisterAtBoot.add(clazz);
+    }
+
+    public Types getTypes() {
+        return types;
+    }
+
+    public void setTypes(Types types) {
+        this.types = types;
     }
 }

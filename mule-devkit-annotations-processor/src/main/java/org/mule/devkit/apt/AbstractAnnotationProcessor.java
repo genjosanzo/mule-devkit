@@ -34,6 +34,7 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
         context.setCodeModel(new JCodeModel());
         context.setElements(processingEnv.getElementUtils());
         context.setCodeWriter(new FilerCodeWriter(processingEnv.getFiler()));
+        context.setTypes(processingEnv.getTypeUtils());
     }
 
     protected AnnotationProcessorContext getContext() {
