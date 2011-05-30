@@ -18,6 +18,7 @@ import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
 import org.mule.devkit.apt.generator.GenerationException;
+import org.mule.devkit.apt.util.CodeModelUtils;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Attr;
@@ -27,6 +28,7 @@ import org.w3c.dom.NodeList;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -53,10 +55,14 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractCodeGenerator 
                 continue;
 
             // generate extra parser
-            JDefinedClass anyXmlChildDefinitionParser = getAnyXmlChildDefinitionParserClass(executableElement);
-            generateAnyXmlChildDefinitionParser(anyXmlChildDefinitionParser);
+            for (VariableElement variable : executableElement.getParameters()) {
+                if (CodeModelUtils.isXmlType(variable)) {
+                    JDefinedClass anyXmlChildDefinitionParser = getAnyXmlChildDefinitionParserClass(variable);
+                    generateAnyXmlChildDefinitionParser(anyXmlChildDefinitionParser);
 
-            break;
+                    break;
+                }
+            }
         }
     }
 

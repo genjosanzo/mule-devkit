@@ -16,7 +16,6 @@ import org.mule.util.StringUtils;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
@@ -188,23 +187,8 @@ public class SchemaGenerator extends ContextualizedGenerator {
                 if (CodeModelUtils.isXmlType(variable)) {
                     all.getParticle().add(objectFactory.createElement(generateXmlElement(variable.getSimpleName().toString(), targetNamespace)));
                 } else {
-                    /*
-                    <xsd:element name="<@uncapitalize>${parameter.getElementName()}</@uncapitalize>"<#if parameter.isOptional()> minOccurs="0"</#if>>
-                        <xsd:complexType>
-                            <xsd:sequence>
-                                <xsd:element name="<@singularize>${parameter.getElementName()}</@singularize>" minOccurs="0" maxOccurs="unbounded"
-                                             <#if parameter.getType().isList()>
-                                             type="${parameter.getType().getTypeArguments().get(0).getXmlType(false)}"/>
-                                             <#else>
-                                             type="${parameter.getType().getXmlType(false)}"/>
-                                             </#if>
-                            </xsd:sequence>
-                        </xsd:complexType>
-                    </xsd:element>
-
-                     */
                     if (CodeModelUtils.isArrayOrList(getContext().getTypes(), variable.asType())) {
-                        generateCollectionElement(all, variable);
+                        generateParameterCollectionElement(all, variable);
                     } else {
                         complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(variable));
                     }
@@ -215,10 +199,17 @@ public class SchemaGenerator extends ContextualizedGenerator {
         schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
     }
 
-    private void generateCollectionElement(All all, VariableElement variable) {
+    private void generateCollectionElement(All all, VariableElement variable, boolean optional) {
         TopLevelElement collectionElement = new TopLevelElement();
         all.getParticle().add(objectFactory.createElement(collectionElement));
         collectionElement.setName(variable.getSimpleName().toString());
+
+        if (optional) {
+            collectionElement.setMinOccurs(BigInteger.valueOf(0L));
+        } else {
+            collectionElement.setMinOccurs(BigInteger.valueOf(1L));
+        }
+        collectionElement.setMaxOccurs("1");
 
         LocalComplexType collectionComplexType = new LocalComplexType();
         collectionElement.setComplexType(collectionComplexType);
@@ -234,8 +225,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
         DeclaredType variableType = (DeclaredType) variable.asType();
         java.util.List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
-        if( variableTypeParameters.size() != 0 )
-        {
+        if (variableTypeParameters.size() != 0) {
             TypeMirror genericType = variableTypeParameters.get(0);
 
             if (isTypeSupported(genericType)) {
@@ -243,11 +233,25 @@ public class SchemaGenerator extends ContextualizedGenerator {
             } else {
                 collectionItemElement.setComplexType(generateRefComplexType());
             }
-        }
-        else
-        {
+        } else {
             collectionItemElement.setComplexType(generateRefComplexType());
         }
+    }
+
+    private void generateParameterCollectionElement(All all, VariableElement variable) {
+        Parameter parameter = variable.getAnnotation(Parameter.class);
+        boolean optional = true;
+
+        if (parameter != null)
+            optional = parameter.optional();
+
+        generateCollectionElement(all, variable, optional);
+    }
+
+    private void generateConfigurableCollectionElement(All all, VariableElement variable) {
+        Configurable configurable = variable.getAnnotation(Configurable.class);
+
+        generateCollectionElement(all, variable, configurable.optional());
     }
 
     private LocalComplexType generateRefComplexType() {
@@ -297,7 +301,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
         java.util.List<VariableElement> variables = ElementFilter.fieldsIn(type.getEnclosedElements());
         for (VariableElement variable : variables) {
             if (CodeModelUtils.isArrayOrList(getContext().getTypes(), variable.asType())) {
-                generateCollectionElement(all, variable);
+                generateConfigurableCollectionElement(all, variable);
             } else {
                 config.getAttributeOrAttributeGroup().add(createConfigurableAttribute(variable));
             }

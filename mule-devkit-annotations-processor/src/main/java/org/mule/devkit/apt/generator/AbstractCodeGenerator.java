@@ -20,6 +20,7 @@ import org.w3c.dom.Element;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
@@ -104,8 +105,8 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
         return messageProcessor;
     }
 
-    protected String getAnyXmlChildDefinitionParserClassNameFor(ExecutableElement executableElement) {
-        TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
+    protected String getAnyXmlChildDefinitionParserClassNameFor(VariableElement variableElement) {
+        TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(variableElement.getEnclosingElement().getEnclosingElement())).get(0);
         String packageName = ClassNameUtils.getPackageName(getContext().getElements().getBinaryName(parentClass).toString());
         String className = "AnyXmlChildDefinitionParser";
 
@@ -114,8 +115,8 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
     }
 
 
-    protected JDefinedClass getAnyXmlChildDefinitionParserClass(ExecutableElement executableElement) {
-        String anyXmlChildDefinitionParserClassName = getAnyXmlChildDefinitionParserClassNameFor(executableElement);
+    protected JDefinedClass getAnyXmlChildDefinitionParserClass(VariableElement variableElement) {
+        String anyXmlChildDefinitionParserClassName = getAnyXmlChildDefinitionParserClassNameFor(variableElement);
         JDefinedClass anyXmlChildDefinitionParser = getOrCreateClass(anyXmlChildDefinitionParserClassName, ChildDefinitionParser.class);
 
         return anyXmlChildDefinitionParser;

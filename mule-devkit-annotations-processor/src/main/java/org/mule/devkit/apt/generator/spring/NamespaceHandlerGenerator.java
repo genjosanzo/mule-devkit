@@ -1,11 +1,14 @@
 package org.mule.devkit.apt.generator.spring;
 
+import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import org.mule.config.spring.handlers.AbstractPojoNamespaceHandler;
+import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.annotations.Transformer;
@@ -13,12 +16,13 @@ import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
 import org.mule.devkit.apt.generator.GenerationException;
 import org.mule.devkit.apt.util.CodeModelUtils;
+import org.mule.devkit.apt.util.Inflection;
 import org.mule.devkit.apt.util.NameUtils;
+import org.springframework.beans.factory.config.ListFactoryBean;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import java.util.List;
 
@@ -35,16 +39,53 @@ public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
 
         JMethod init = namespaceHandlerClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "init");
 
-        generateRegisterPojo(init, type.asType());
+        registerConfig(init, type);
         registerBeanDefinitionParserForEachProcessor(type, init);
         registerBeanDefinitionParserForEachTransformer(type, init);
     }
 
-    private void generateRegisterPojo(JMethod init, TypeMirror pojo) {
+    private void registerConfig(JMethod init, TypeElement config) {
         JInvocation registerPojo = JExpr.invoke("registerPojo");
         registerPojo.arg("config");
-        registerPojo.arg(JExpr.dotclass(ref(pojo).boxify()));
+        registerPojo.arg(ref(config.asType()).boxify().dotclass());
         init.body().add(registerPojo);
+
+        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(config.getEnclosedElements());
+        for (VariableElement variable : variables) {
+            registerMuleBeanDefinitionParserFor(init, variable, ref(config.asType()).boxify());
+        }
+    }
+
+    private void registerMuleBeanDefinitionParserFor(JMethod init, VariableElement variable, JClass parentClass) {
+        if (CodeModelUtils.isXmlType(variable)) {
+            JInvocation newAnyXmlChildDefinitionParser = JExpr._new(getAnyXmlChildDefinitionParserClass(variable));
+            newAnyXmlChildDefinitionParser.arg(JExpr.lit(variable.getSimpleName().toString()));
+            newAnyXmlChildDefinitionParser.arg(JExpr.dotclass(parentClass));
+
+            init.body().invoke("registerMuleBeanDefinitionParser").arg(JExpr.lit(variable.getSimpleName().toString())).arg(newAnyXmlChildDefinitionParser);
+        } else {
+            if (CodeModelUtils.isArrayOrList(getContext().getTypes(), variable.asType())) {
+                JInvocation childDefinitionParser = JExpr._new(ref(ChildDefinitionParser.class));
+                childDefinitionParser.arg(JExpr.lit(variable.getSimpleName().toString()));
+                childDefinitionParser.arg(ref(ListFactoryBean.class).dotclass());
+
+                init.body().invoke("registerMuleBeanDefinitionParser").arg(JExpr.lit(variable.getSimpleName().toString())).arg(childDefinitionParser);
+
+                JInvocation childListEntryDefinitionParser = JExpr._new(ref(ChildListEntryDefinitionParser.class));
+                childListEntryDefinitionParser.arg("sourceList");
+
+                init.body().invoke("registerMuleBeanDefinitionParser").arg(JExpr.lit(Inflection.singularize(variable.getSimpleName().toString()))).arg(childListEntryDefinitionParser);
+
+
+                /*
+                registerMuleBeanDefinitionParser("${parameter.getName()}", new ChildDefinitionParser("${parameter.getName()}", ListFactoryBean.class));
+                registerMuleBeanDefinitionParser("<@singularize>${parameter.getName()}</@singularize>", new ChildListEntryDefinitionParser("sourceList"));
+                <#elseif parameter.getType().isMap()>
+                registerMuleBeanDefinitionParser("${parameter.getName()}", new ChildDefinitionParser("${parameter.getName()}", MapFactoryBean.class));
+                registerMuleBeanDefinitionParser("<@singularize>${parameter.getName()}</@singularize>", new ChildMapEntryDefinitionParser("sourceMap"));
+                */
+            }
+        }
     }
 
     private void registerBeanDefinitionParserForEachProcessor(TypeElement type, JMethod init) {
@@ -70,7 +111,7 @@ public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
             JInvocation registerMuleBeanDefinitionParser = init.body().invoke("registerMuleBeanDefinitionParser");
             registerMuleBeanDefinitionParser.arg(JExpr.lit(NameUtils.uncamel(executableElement.getSimpleName().toString())));
             registerMuleBeanDefinitionParser.arg(JExpr._new(ref(MessageProcessorDefinitionParser.class)).arg(ref(getTransformerNameFor(executableElement)).boxify().dotclass()));
-       }
+        }
     }
 
     private void registerBeanDefinitionParser(JMethod init, ExecutableElement executableElement) {
@@ -85,13 +126,7 @@ public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
         init.body().invoke("registerMuleBeanDefinitionParser").arg(JExpr.lit(NameUtils.uncamel(elementName))).arg(JExpr._new(beanDefinitionParser));
 
         for (VariableElement variable : executableElement.getParameters()) {
-            if (CodeModelUtils.isXmlType(variable)) {
-                JInvocation newAnyXmlChildDefinitionParser = JExpr._new(getAnyXmlChildDefinitionParserClass(executableElement));
-                newAnyXmlChildDefinitionParser.arg(JExpr.lit(variable.getSimpleName().toString()));
-                newAnyXmlChildDefinitionParser.arg(JExpr.dotclass(messageProcessor));
-
-                init.body().invoke("registerMuleBeanDefinitionParser").arg(JExpr.lit(variable.getSimpleName().toString())).arg(newAnyXmlChildDefinitionParser);
-            }
+            registerMuleBeanDefinitionParserFor(init, variable, messageProcessor);
         }
     }
 }
