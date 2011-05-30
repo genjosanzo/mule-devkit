@@ -204,31 +204,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
                      */
                     if (CodeModelUtils.isArrayOrList(getContext().getTypes(), variable.asType())) {
-                        TopLevelElement collectionElement = new TopLevelElement();
-                        all.getParticle().add(objectFactory.createElement(collectionElement));
-                        collectionElement.setName(variable.getSimpleName().toString());
-
-                        LocalComplexType collectionComplexType = new LocalComplexType();
-                        collectionElement.setComplexType(collectionComplexType);
-                        ExplicitGroup sequence = new ExplicitGroup();
-                        collectionComplexType.setSequence(sequence);
-
-                        TopLevelElement collectionItemElement = new TopLevelElement();
-                        sequence.getParticle().add(objectFactory.createElement(collectionItemElement));
-
-                        collectionItemElement.setName(Inflection.singularize(collectionElement.getName()));
-                        collectionItemElement.setMinOccurs(BigInteger.valueOf(0L));
-                        collectionItemElement.setMaxOccurs("unbounded");
-
-                        DeclaredType variableType = (DeclaredType) variable.asType();
-                        java.util.List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
-                        TypeMirror genericType = variableTypeParameters.get(0);
-
-                        if (isTypeSupported(genericType)) {
-                            collectionItemElement.setType(typeMap.get(genericType.toString()));
-                        } else {
-                            //collectionItemElement.setType(STRING);
-                        }
+                        generateCollectionElement(all, variable);
                     } else {
                         complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(variable));
                     }
@@ -237,6 +213,53 @@ public class SchemaGenerator extends ContextualizedGenerator {
         }
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
+    }
+
+    private void generateCollectionElement(All all, VariableElement variable) {
+        TopLevelElement collectionElement = new TopLevelElement();
+        all.getParticle().add(objectFactory.createElement(collectionElement));
+        collectionElement.setName(variable.getSimpleName().toString());
+
+        LocalComplexType collectionComplexType = new LocalComplexType();
+        collectionElement.setComplexType(collectionComplexType);
+        ExplicitGroup sequence = new ExplicitGroup();
+        collectionComplexType.setSequence(sequence);
+
+        TopLevelElement collectionItemElement = new TopLevelElement();
+        sequence.getParticle().add(objectFactory.createElement(collectionItemElement));
+
+        collectionItemElement.setName(Inflection.singularize(collectionElement.getName()));
+        collectionItemElement.setMinOccurs(BigInteger.valueOf(0L));
+        collectionItemElement.setMaxOccurs("unbounded");
+
+        DeclaredType variableType = (DeclaredType) variable.asType();
+        java.util.List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
+        if( variableTypeParameters.size() != 0 )
+        {
+            TypeMirror genericType = variableTypeParameters.get(0);
+
+            if (isTypeSupported(genericType)) {
+                collectionItemElement.setType(typeMap.get(genericType.toString()));
+            } else {
+                collectionItemElement.setComplexType(generateRefComplexType());
+            }
+        }
+        else
+        {
+            collectionItemElement.setComplexType(generateRefComplexType());
+        }
+    }
+
+    private LocalComplexType generateRefComplexType() {
+        LocalComplexType itemComplexType = new LocalComplexType();
+
+        Attribute refAttribute = new Attribute();
+        refAttribute.setUse(USE_REQUIRED);
+        refAttribute.setName("ref");
+        refAttribute.setType(STRING);
+
+        itemComplexType.getAttributeOrAttributeGroup().add(refAttribute);
+        return itemComplexType;
     }
 
     private TopLevelElement generateXmlElement(String elementName, String targetNamespace) {
@@ -268,9 +291,16 @@ public class SchemaGenerator extends ContextualizedGenerator {
         Attribute nameAttribute = createAttribute("name", true, STRING, "Give a name to this configuration so it can be later referenced by config-ref.");
         config.getAttributeOrAttributeGroup().add(nameAttribute);
 
+        All all = new All();
+        config.setAll(all);
+
         java.util.List<VariableElement> variables = ElementFilter.fieldsIn(type.getEnclosedElements());
         for (VariableElement variable : variables) {
-            config.getAttributeOrAttributeGroup().add(createConfigurableAttribute(variable));
+            if (CodeModelUtils.isArrayOrList(getContext().getTypes(), variable.asType())) {
+                generateCollectionElement(all, variable);
+            } else {
+                config.getAttributeOrAttributeGroup().add(createConfigurableAttribute(variable));
+            }
         }
     }
 
