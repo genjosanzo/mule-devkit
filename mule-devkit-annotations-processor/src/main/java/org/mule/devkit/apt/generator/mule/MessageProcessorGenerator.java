@@ -45,7 +45,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -126,7 +125,7 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
         // add a field for each argument of the method
         Map<String, FieldVariableElement> fields = new HashMap<String, FieldVariableElement>();
         for (VariableElement variable : executableElement.getParameters()) {
-            if (isTypeSupported(variable) || CodeModelUtils.isXmlType(variable) ) {
+            if (isTypeSupported(variable) || CodeModelUtils.isXmlType(variable)) {
                 String fieldName = variable.getSimpleName().toString();
                 JFieldVar field = messageProcessorClass.field(JMod.PRIVATE, ref(Object.class), fieldName);
                 fields.put(variable.getSimpleName().toString(), new FieldVariableElement(field, variable));
@@ -186,17 +185,18 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
 
         JTryBlock callProcessor = process.body()._try();
 
-        LinkedList<JVar> parameters = new LinkedList<JVar>();
-        for (String fieldName : fields.keySet()) {
+        List<JVar> parameters = new ArrayList<JVar>();
+        for (VariableElement variable : executableElement.getParameters()) {
+            String fieldName = variable.getSimpleName().toString();
             if (isTypeSupported(fields.get(fieldName).getVariableElement()) || CodeModelUtils.isXmlType(fields.get(fieldName).getVariableElement())) {
                 JVar evaluated = callProcessor.body().decl(ref(Object.class), "evaluated" + StringUtils.capitalize(fieldName));
                 JVar transformed = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName));
                 generateExpressionEvaluator(callProcessor.body(), evaluated, fields.get(fieldName).getField(), patternInfo, expressionManager, muleMessage);
                 generateTransform(callProcessor.body(), transformed, evaluated, fields.get(fieldName).getVariableElement().asType(), muleContext);
-                parameters.addLast(transformed);
+                parameters.add(transformed);
             } else {
                 //JVar ref = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "ref" + StringUtils.capitalize(fieldName));
-                parameters.addLast(fields.get(fieldName).getField());
+                parameters.add(fields.get(fieldName).getField());
             }
         }
 
@@ -211,8 +211,8 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
             resultPayload = body.decl(ref(Object.class), "resultPayload");
         }
         JInvocation methodCall = object.invoke(methodName);
-        for (JVar parameter : parameters) {
-            methodCall.arg(parameter);
+        for (int i = 0; i < parameters.size(); i++) {
+            methodCall.arg(parameters.get(i));
         }
 
         if (returnType != getContext().getCodeModel().VOID) {
