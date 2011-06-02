@@ -43,6 +43,20 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
         }
     }
 
+    protected JDefinedClass getOrCreateClass(String className, JClass ext) {
+        JClass generatedAnnotation = getContext().getCodeModel().ref("javax.annotation.Generated");
+
+        try {
+            JPackage pkg = getContext().getCodeModel()._package(ClassNameUtils.getPackageName(className));
+            JDefinedClass clazz = pkg._class(ClassNameUtils.getClassName(className));
+            clazz._extends(ext);
+
+            return clazz;
+        } catch (JClassAlreadyExistsException e) {
+            return e.getExistingClass();
+        }
+    }
+
     protected JDefinedClass getOrCreateClass(String className, Class<?> ext) {
         JClass generatedAnnotation = getContext().getCodeModel().ref("javax.annotation.Generated");
 
@@ -87,6 +101,20 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
 
         return packageName + "." + className;
 
+    }
+
+    protected String getLifecycleWrapperClassNameFor(TypeElement typeElement) {
+        String packageName = ClassNameUtils.getPackageName(getContext().getElements().getBinaryName(typeElement).toString());
+        String className = StringUtils.capitalize(typeElement.getSimpleName().toString()) + "LifecycleWrapper";
+
+        return packageName + "." + className;
+    }
+
+    protected JDefinedClass getLifecycleWrapperClass(TypeElement typeElement) {
+        String lifecycleWrapperClassName = getLifecycleWrapperClassNameFor(typeElement);
+        JDefinedClass lifecycleWrapper = getOrCreateClass(lifecycleWrapperClassName, ref(typeElement.asType()).boxify());
+
+        return lifecycleWrapper;
     }
 
     protected String getMessageProcessorClassNameFor(ExecutableElement executableElement) {

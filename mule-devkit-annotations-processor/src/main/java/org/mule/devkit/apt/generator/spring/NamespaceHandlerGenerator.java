@@ -6,6 +6,7 @@ import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
+import com.sun.codemodel.JType;
 import org.mule.config.spring.handlers.AbstractPojoNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
@@ -44,15 +45,15 @@ public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
         registerBeanDefinitionParserForEachTransformer(type, init);
     }
 
-    private void registerConfig(JMethod init, TypeElement config) {
+    private void registerConfig(JMethod init, TypeElement module) {
         JInvocation registerPojo = JExpr.invoke("registerPojo");
         registerPojo.arg("config");
-        registerPojo.arg(ref(config.asType()).boxify().dotclass());
+        registerPojo.arg(getLifecycleWrapperClass(module).boxify().dotclass());
         init.body().add(registerPojo);
 
-        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(config.getEnclosedElements());
+        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(module.getEnclosedElements());
         for (VariableElement variable : variables) {
-            registerMuleBeanDefinitionParserFor(init, variable, ref(config.asType()).boxify());
+            registerMuleBeanDefinitionParserFor(init, variable, ref(module.asType()).boxify());
         }
     }
 

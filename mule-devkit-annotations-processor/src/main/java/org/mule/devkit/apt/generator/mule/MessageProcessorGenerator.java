@@ -106,19 +106,19 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
         }
     }
 
-    public void generate(TypeElement type) throws GenerationException {
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(type.getEnclosedElements());
+    public void generate(TypeElement typeElement) throws GenerationException {
+        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Processor processor = executableElement.getAnnotation(Processor.class);
 
             if (processor == null)
                 continue;
 
-            generateMessageProcessor(executableElement);
+            generateMessageProcessor(typeElement, executableElement);
         }
     }
 
-    private void generateMessageProcessor(ExecutableElement executableElement) {
+    private void generateMessageProcessor(TypeElement typeElement, ExecutableElement executableElement) {
         // get class
         JDefinedClass messageProcessorClass = getMessageProcessorClass(executableElement);
 
@@ -137,13 +137,13 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
         }
 
         // add standard fields
-        JFieldVar object = messageProcessorClass.field(JMod.PRIVATE, ref(executableElement.getEnclosingElement().asType()), "object");
+        JFieldVar object = messageProcessorClass.field(JMod.PRIVATE, getLifecycleWrapperClass(typeElement), "object");
         JFieldVar muleContext = messageProcessorClass.field(JMod.PRIVATE, ref(MuleContext.class), "muleContext");
         JFieldVar expressionManager = messageProcessorClass.field(JMod.PRIVATE, ref(ExpressionManager.class), "expressionManager");
         JFieldVar patternInfo = messageProcessorClass.field(JMod.PRIVATE, ref(TemplateParser.PatternInfo.class), "patternInfo");
 
         // add initialise
-        generateInitialiseMethod(messageProcessorClass, ref(executableElement.getEnclosingElement().asType()).boxify(), muleContext, expressionManager, patternInfo, object);
+        generateInitialiseMethod(messageProcessorClass, getLifecycleWrapperClass(typeElement), muleContext, expressionManager, patternInfo, object);
 
         // add setmulecontext
         generateSetMuleContextMethod(messageProcessorClass, muleContext);
@@ -260,7 +260,7 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
         callProcessorCatch.body()._throw(messageException);
     }
 
-    private JMethod generateInitialiseMethod(JDefinedClass messageProcessorClass, JClass messageProcessor, JFieldVar muleContext, JFieldVar expressionManager, JFieldVar patternInfo, JFieldVar object) {
+    private JMethod generateInitialiseMethod(JDefinedClass messageProcessorClass, JClass lifecycleWrapperClass, JFieldVar muleContext, JFieldVar expressionManager, JFieldVar patternInfo, JFieldVar object) {
         JMethod initialise = messageProcessorClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "initialise");
         initialise._throws(InitialisationException.class);
         initialise.body().assign(expressionManager, muleContext.invoke("getExpressionManager"));
@@ -268,12 +268,12 @@ public class MessageProcessorGenerator extends AbstractCodeGenerator {
 
         JConditional ifNoObject = initialise.body()._if(JOp.eq(object, JExpr._null()));
         JTryBlock tryLookUp = ifNoObject._then()._try();
-        tryLookUp.body().assign(object, muleContext.invoke("getRegistry").invoke("lookupObject").arg(JExpr.dotclass(messageProcessor)));
+        tryLookUp.body().assign(object, muleContext.invoke("getRegistry").invoke("lookupObject").arg(JExpr.dotclass(lifecycleWrapperClass)));
         JCatchBlock catchBlock = tryLookUp._catch(ref(RegistrationException.class));
         JVar exception = catchBlock.param("e");
         JClass coreMessages = ref(CoreMessages.class);
         JInvocation failedToInvoke = coreMessages.staticInvoke("initialisationFailure");
-        failedToInvoke.arg(messageProcessor.fullName());
+        failedToInvoke.arg(lifecycleWrapperClass.fullName());
         JInvocation messageException = JExpr._new(ref(InitialisationException.class));
         messageException.arg(failedToInvoke);
         messageException.arg(exception);

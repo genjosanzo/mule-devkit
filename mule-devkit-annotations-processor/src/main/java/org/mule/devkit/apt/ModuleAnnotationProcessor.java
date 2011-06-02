@@ -1,9 +1,11 @@
 package org.mule.devkit.apt;
 
+import org.mule.api.lifecycle.Lifecycle;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.apt.generator.Generator;
 import org.mule.devkit.apt.generator.MetadataGenerator;
 import org.mule.devkit.apt.generator.mule.JaxbTransformerGenerator;
+import org.mule.devkit.apt.generator.mule.LifecycleWrapperGenerator;
 import org.mule.devkit.apt.generator.mule.MessageProcessorGenerator;
 import org.mule.devkit.apt.generator.mule.RegistryBootstrapGenerator;
 import org.mule.devkit.apt.generator.mule.TransformerGenerator;
@@ -52,6 +54,7 @@ public class ModuleAnnotationProcessor extends AbstractAnnotationProcessor {
         generators.add(new BeanDefinitionParserGenerator(getContext()));
         generators.add(new AnyXmlChildDefinitionParserGenerator(getContext()));
         generators.add(new MessageProcessorGenerator(getContext()));
+        generators.add(new LifecycleWrapperGenerator(getContext()));
         generators.add(new SchemaGenerator(getContext()));
         generators.add(new SpringSchemaGenerator(getContext()));
         generators.add(new SpringNamespaceHandlerGenerator(getContext()));
