@@ -21,7 +21,6 @@ import org.mule.devkit.annotations.lifecycle.Stop;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
 import org.mule.devkit.apt.generator.GenerationException;
-import org.mule.util.StringUtils;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -41,34 +40,37 @@ public class LifecycleWrapperGenerator extends AbstractCodeGenerator {
         if (startElement != null) {
             lifecycleWrapper._implements(Startable.class);
 
-            generateLifecycleInvocation(lifecycleWrapper, startElement, "start", MuleException.class);
+            generateLifecycleInvocation(lifecycleWrapper, startElement, "start", MuleException.class, false);
         }
 
         ExecutableElement stopElement = getStopElement(element);
         if (stopElement != null) {
             lifecycleWrapper._implements(Stoppable.class);
 
-            generateLifecycleInvocation(lifecycleWrapper, stopElement, "stop", MuleException.class);
+            generateLifecycleInvocation(lifecycleWrapper, stopElement, "stop", MuleException.class, false);
         }
 
         ExecutableElement initialiseElement = getInitialiseElement(element);
         if (initialiseElement != null) {
             lifecycleWrapper._implements(Initialisable.class);
 
-            generateLifecycleInvocation(lifecycleWrapper, initialiseElement, "initialise", InitialisationException.class);
+            generateLifecycleInvocation(lifecycleWrapper, initialiseElement, "initialise", InitialisationException.class, true);
         }
 
-        ExecutableElement disposeElement = getInitialiseElement(element);
+        ExecutableElement disposeElement = getDisposeElement(element);
         if (disposeElement != null) {
             lifecycleWrapper._implements(Disposable.class);
 
-            generateLifecycleInvocation(lifecycleWrapper, disposeElement, "dispose", null);
+            generateLifecycleInvocation(lifecycleWrapper, disposeElement, "dispose", null, false);
         }
     }
 
-    private void generateLifecycleInvocation(JDefinedClass lifecycleWrapper, ExecutableElement superExecutableElement, String name, Class<?> catchException) {
+    private void generateLifecycleInvocation(JDefinedClass lifecycleWrapper, ExecutableElement superExecutableElement, String name, Class<?> catchException, boolean addThis) {
         JMethod startMethod = lifecycleWrapper.method(JMod.PUBLIC, getContext().getCodeModel().VOID, name);
-        startMethod._throws(ref(catchException));
+
+        if (catchException != null) {
+            startMethod._throws(ref(catchException));
+        }
 
         JInvocation startInvocation = JExpr._super().invoke(superExecutableElement.getSimpleName().toString());
 
@@ -76,14 +78,20 @@ public class LifecycleWrapperGenerator extends AbstractCodeGenerator {
             JTryBlock tryBlock = startMethod.body()._try();
             tryBlock.body().add(startInvocation);
 
+            int i = 0;
             for (TypeMirror exception : superExecutableElement.getThrownTypes()) {
                 JCatchBlock catchBlock = tryBlock._catch(ref(exception).boxify());
-                JVar catchedException = catchBlock.param(StringUtils.uncapitalize(exception.toString()));
+                JVar catchedException = catchBlock.param("e" + i);
 
                 JInvocation newMuleException = JExpr._new(ref(catchException));
                 newMuleException.arg(catchedException);
 
+                if (addThis) {
+                    newMuleException.arg(JExpr._this());
+                }
+
                 catchBlock.body().add(newMuleException);
+                i++;
             }
         } else {
             startMethod.body().add(startInvocation);
