@@ -70,7 +70,7 @@ public class CloudConnectorArchetypeIT
 
         verifier = new Verifier(ROOT.getAbsolutePath() + "/" + getArtifactId());
         verifier.setAutoclean(true);
-        verifier.executeGoal("test");
+        verifier.executeGoal("package");
 
         verifier.verifyErrorFreeLog();
 

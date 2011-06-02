@@ -42,7 +42,8 @@
                     <process-test-classes>
                     </process-test-classes>
                     <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
-                    <package>org.apache.maven.plugins:maven-jar-plugin:jar</package>
+                    <package>org.mule:mule-devkit-maven-plugin:attach-schema,
+                        org.apache.maven.plugins:maven-jar-plugin:jar</package>
                     <pre-integration-test></pre-integration-test>
                     <integration-test>
                     </integration-test>
