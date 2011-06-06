@@ -16,9 +16,9 @@ import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
+import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.devkit.annotations.Source;
-import org.mule.devkit.annotations.Transformer;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
 import org.mule.devkit.apt.generator.GenerationException;
@@ -127,7 +127,7 @@ public class DummyInboundEndpointGenerator extends AbstractCodeGenerator {
             JMethod getRetryPolicyTemplate = dummyInboundEndpoint.method(JMod.PUBLIC, ref(RetryPolicyTemplate.class), "getRetryPolicyTemplate");
             getRetryPolicyTemplate.body()._return(JExpr._null());
 
-            JMethod getEndpointBuilderName = dummyInboundEndpoint.method(JMod.PUBLIC, ref(String.class), "isProtocolSupported");
+            JMethod getEndpointBuilderName = dummyInboundEndpoint.method(JMod.PUBLIC, ref(String.class), "getEndpointBuilderName");
             getEndpointBuilderName.body()._return(JExpr._null());
 
             JMethod isProtocolSupported = dummyInboundEndpoint.method(JMod.PUBLIC, getContext().getCodeModel().BOOLEAN, "isProtocolSupported");

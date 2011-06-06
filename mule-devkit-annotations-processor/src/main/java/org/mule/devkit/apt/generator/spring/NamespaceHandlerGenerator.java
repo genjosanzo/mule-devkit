@@ -6,12 +6,12 @@ import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
-import com.sun.codemodel.JType;
 import org.mule.config.spring.handlers.AbstractPojoNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.devkit.annotations.Processor;
+import org.mule.devkit.annotations.Source;
 import org.mule.devkit.annotations.Transformer;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
@@ -42,6 +42,7 @@ public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
 
         registerConfig(init, type);
         registerBeanDefinitionParserForEachProcessor(type, init);
+        registerBeanDefinitionParserForEachSource(type, init);
         registerBeanDefinitionParserForEachTransformer(type, init);
     }
 
@@ -97,7 +98,19 @@ public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
             if (processor == null)
                 continue;
 
-            registerBeanDefinitionParser(init, executableElement);
+            registerBeanDefinitionParserForProcessor(init, executableElement);
+        }
+    }
+
+    private void registerBeanDefinitionParserForEachSource(TypeElement type, JMethod init) {
+        List<ExecutableElement> executableElements = ElementFilter.methodsIn(type.getEnclosedElements());
+        for (ExecutableElement executableElement : executableElements) {
+            Source source = executableElement.getAnnotation(Source.class);
+
+            if (source == null)
+                continue;
+
+            registerBeanDefinitionParserForSource(init, executableElement);
         }
     }
 
@@ -115,7 +128,7 @@ public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
         }
     }
 
-    private void registerBeanDefinitionParser(JMethod init, ExecutableElement executableElement) {
+    private void registerBeanDefinitionParserForProcessor(JMethod init, ExecutableElement executableElement) {
         JDefinedClass beanDefinitionParser = getBeanDefinitionParserClass(executableElement);
         JDefinedClass messageProcessor = getMessageProcessorClass(executableElement);
 
@@ -128,6 +141,22 @@ public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
 
         for (VariableElement variable : executableElement.getParameters()) {
             registerMuleBeanDefinitionParserFor(init, variable, messageProcessor);
+        }
+    }
+
+    private void registerBeanDefinitionParserForSource(JMethod init, ExecutableElement executableElement) {
+        JDefinedClass beanDefinitionParser = getBeanDefinitionParserClass(executableElement);
+        JDefinedClass messageSource = getMessageSourceClass(executableElement);
+
+        Source source = executableElement.getAnnotation(Source.class);
+        String elementName = executableElement.getSimpleName().toString();
+        if (source.name().length() != 0)
+            elementName = source.name();
+
+        init.body().invoke("registerMuleBeanDefinitionParser").arg(JExpr.lit(NameUtils.uncamel(elementName))).arg(JExpr._new(beanDefinitionParser));
+
+        for (VariableElement variable : executableElement.getParameters()) {
+            registerMuleBeanDefinitionParserFor(init, variable, messageSource);
         }
     }
 }

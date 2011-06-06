@@ -10,11 +10,16 @@ import com.sun.codemodel.JPackage;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import org.apache.commons.lang.StringUtils;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.source.MessageSource;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.devkit.annotations.SourceCallback;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.util.ClassNameUtils;
 import org.w3c.dom.Element;
@@ -127,6 +132,30 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
 
     }
 
+    protected JDefinedClass getMessageSourceClass(ExecutableElement executableElement) {
+        String messageSourceClassName = getMessageSourceClassNameFor(executableElement);
+        JDefinedClass messageSourceClass = getOrCreateClass(messageSourceClassName, Arrays.asList(new Class[]{
+                MuleContextAware.class,
+                Startable.class,
+                Stoppable.class,
+                Runnable.class,
+                Initialisable.class,
+                MessageSource.class,
+                SourceCallback.class,
+                FlowConstructAware.class}));
+
+        return messageSourceClass;
+    }
+
+    protected String getMessageSourceClassNameFor(ExecutableElement executableElement) {
+        TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
+        String packageName = ClassNameUtils.getPackageName(getContext().getElements().getBinaryName(parentClass).toString());
+        String className = StringUtils.capitalize(executableElement.getSimpleName().toString()) + "MessageSource";
+
+        return packageName + "." + className;
+
+    }
+
     protected JDefinedClass getMessageProcessorClass(ExecutableElement executableElement) {
         String messageProcessorClassName = getMessageProcessorClassNameFor(executableElement);
         JDefinedClass messageProcessor = getOrCreateClass(messageProcessorClassName, Arrays.asList(new Class[]{Initialisable.class, MessageProcessor.class, MuleContextAware.class}));
@@ -161,13 +190,12 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
 
     protected JDefinedClass getDummyInboundEndpointClass(ExecutableElement executableElement) {
         String dummyInboundEndpointName = getDummyInboundEndpointClassName(executableElement);
-        JDefinedClass dummyInboundEndpoint = getOrCreateClass(dummyInboundEndpointName, ImmutableEndpoint.class);
+        JDefinedClass dummyInboundEndpoint = getOrCreateClass(dummyInboundEndpointName, Arrays.asList(new Class[]{ImmutableEndpoint.class}));
 
         return dummyInboundEndpoint;
     }
 
-    protected JClass ref(Class<?> clazz)
-    {
+    protected JClass ref(Class<?> clazz) {
         JClass ret = null;
         try {
             ret = getContext().getCodeModel().ref(clazz).boxify();

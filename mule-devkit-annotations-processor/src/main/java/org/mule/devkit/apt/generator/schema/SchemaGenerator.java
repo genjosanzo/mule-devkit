@@ -4,6 +4,8 @@ import org.mule.devkit.annotations.Configurable;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.annotations.Parameter;
 import org.mule.devkit.annotations.Processor;
+import org.mule.devkit.annotations.Source;
+import org.mule.devkit.annotations.SourceCallback;
 import org.mule.devkit.annotations.Transformer;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.ContextualizedGenerator;
@@ -44,6 +46,8 @@ public class SchemaGenerator extends ContextualizedGenerator {
     private static final QName MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE = new QName(MULE_NAMESPACE, "abstractInterceptingMessageProcessorType", "mule");
     private static final QName MULE_ABSTRACT_TRANSFORMER = new QName(MULE_NAMESPACE, "abstract-transformer", "mule");
     private static final QName MULE_ABSTRACT_TRANSFORMER_TYPE = new QName(MULE_NAMESPACE, "abstractTransformerType", "mule");
+    private static final QName MULE_ABSTRACT_INBOUND_ENDPOINT = new QName(MULE_NAMESPACE, "abstract-inbound-endpoint", "mule");
+    private static final QName MULE_ABSTRACT_INBOUND_ENDPOINT_TYPE = new QName(MULE_NAMESPACE, "abstractInboundEndpointType", "mule");
     private static final QName STRING = new QName(XSD_NAMESPACE, "string", "xs");
     private static final QName DECIMAL = new QName(XSD_NAMESPACE, "decimal", "xs");
     private static final QName FLOAT = new QName(XSD_NAMESPACE, "float", "xs");
@@ -155,6 +159,22 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
             registerProcessorType(targetNamespace, typeName, method);
         }
+
+        for (ExecutableElement method : methods) {
+            Source source = method.getAnnotation(Source.class);
+            if (source == null)
+                continue;
+
+            String name = method.getSimpleName().toString();
+            if (source.name().length() > 0)
+                name = source.name();
+            String typeName = StringUtils.capitalize(name) + "Type";
+
+            registerSourceElement(targetNamespace, name, typeName);
+
+            registerSourceType(targetNamespace, typeName, method);
+        }
+
     }
 
     private void registerProcessorElement(String targetNamespace, String name, String typeName) {
@@ -166,14 +186,31 @@ public class SchemaGenerator extends ContextualizedGenerator {
         schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
     }
 
+    private void registerSourceElement(String targetNamespace, String name, String typeName) {
+        Element element = new TopLevelElement();
+        element.setName(NameUtils.uncamel(name));
+        element.setSubstitutionGroup(MULE_ABSTRACT_INBOUND_ENDPOINT);
+        element.setType(new QName(targetNamespace, typeName));
+
+        schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
+    }
+
     private void registerProcessorType(String targetNamespace, String name, ExecutableElement element) {
+        registerExtendedType(MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE, targetNamespace, name, element);
+    }
+
+    private void registerSourceType(String targetNamespace, String name, ExecutableElement element) {
+        registerExtendedType(MULE_ABSTRACT_INBOUND_ENDPOINT_TYPE, targetNamespace, name, element);
+    }
+
+    private void registerExtendedType(QName base, String targetNamespace, String name, ExecutableElement element) {
         TopLevelComplexType complexType = new TopLevelComplexType();
         complexType.setName(name);
 
         ComplexContent complexContent = new ComplexContent();
         complexType.setComplexContent(complexContent);
         ExtensionType complexContentExtension = new ExtensionType();
-        complexContentExtension.setBase(MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE);
+        complexContentExtension.setBase(base);
         complexContent.setExtension(complexContentExtension);
 
         Attribute configRefAttr = createAttribute("config-ref", true, STRING, "Specify which configuration to use for this invocation.");
@@ -184,6 +221,9 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
         if (element.getKind() == ElementKind.METHOD) {
             for (VariableElement variable : ((ExecutableElement) element).getParameters()) {
+                if (variable.asType().toString().contains(SourceCallback.class.getName()))
+                    continue;
+
                 if (CodeModelUtils.isXmlType(variable)) {
                     all.getParticle().add(objectFactory.createElement(generateXmlElement(variable.getSimpleName().toString(), targetNamespace)));
                 } else {
