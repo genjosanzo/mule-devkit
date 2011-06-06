@@ -11,6 +11,7 @@ import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
@@ -148,6 +149,21 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
         JDefinedClass anyXmlChildDefinitionParser = getOrCreateClass(anyXmlChildDefinitionParserClassName, ChildDefinitionParser.class);
 
         return anyXmlChildDefinitionParser;
+    }
+
+    protected String getDummyInboundEndpointClassName(ExecutableElement executableElement) {
+        TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
+        String packageName = ClassNameUtils.getPackageName(getContext().getElements().getBinaryName(parentClass).toString());
+        String className = "DummyInboundEndpoint";
+
+        return packageName + "." + className;
+    }
+
+    protected JDefinedClass getDummyInboundEndpointClass(ExecutableElement executableElement) {
+        String dummyInboundEndpointName = getDummyInboundEndpointClassName(executableElement);
+        JDefinedClass dummyInboundEndpoint = getOrCreateClass(dummyInboundEndpointName, ImmutableEndpoint.class);
+
+        return dummyInboundEndpoint;
     }
 
     protected JClass ref(Class<?> clazz)
