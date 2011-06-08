@@ -16,14 +16,12 @@ import com.sun.codemodel.JVar;
 import org.apache.commons.lang.StringUtils;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.annotations.Source;
 import org.mule.devkit.annotations.SourceCallback;
 import org.mule.devkit.apt.AnnotationProcessorContext;
@@ -68,14 +66,12 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         // add standard fields
         JFieldVar object = generateFieldForPojo(messageSourceClass, typeElement);
         JFieldVar muleContext = generateFieldForMuleContext(messageSourceClass);
-        JFieldVar expressionManager = generateFieldForExpressionManager(messageSourceClass);
-        JFieldVar patternInfo = generateFieldForPatternInfo(messageSourceClass);
         JFieldVar flowConstruct = messageSourceClass.field(JMod.PRIVATE, ref(FlowConstruct.class), "flowConstruct");
         JFieldVar messageProcessor = messageSourceClass.field(JMod.PRIVATE, ref(MessageProcessor.class), "messageProcessor");
         JFieldVar thread = messageSourceClass.field(JMod.PRIVATE, ref(Thread.class), "thread");
 
         // add initialise
-        generateInitialiseMethod(messageSourceClass, getLifecycleWrapperClass(typeElement), muleContext, expressionManager, patternInfo, object);
+        generateInitialiseMethod(messageSourceClass, getLifecycleWrapperClass(typeElement), muleContext, null, null, object);
 
         // add setmulecontext
         generateSetMuleContextMethod(messageSourceClass, muleContext);
@@ -115,16 +111,14 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
         List<JExpression> parameters = new ArrayList<JExpression>();
         for (VariableElement variable : executableElement.getParameters()) {
-            if (variable.asType().toString().contains(SourceCallback.class.getName()))
-            {
+            if (variable.asType().toString().contains(SourceCallback.class.getName())) {
                 parameters.add(JExpr._this());
-            }
-            else
-            {
+            } else {
                 String fieldName = variable.getSimpleName().toString();
                 if (isTypeSupported(fields.get(fieldName).getVariableElement()) || CodeModelUtils.isXmlType(fields.get(fieldName).getVariableElement())) {
-                    JVar transformed = callSource.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName));
-                    generateTransform(callSource.body(), transformed, fields.get(fieldName).getField(), fields.get(fieldName).getVariableElement().asType(), muleContext);
+                    JVar transformed = callSource.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName), JExpr._null());
+                    JConditional notNull = callSource.body()._if(JOp.ne(fields.get(fieldName).getField(), JExpr._null()));
+                    generateTransform(notNull._then(), transformed, fields.get(fieldName).getField(), fields.get(fieldName).getVariableElement().asType(), muleContext);
                     parameters.add(transformed);
                 } else {
                     parameters.add(fields.get(fieldName).getField());
@@ -136,6 +130,8 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         for (int i = 0; i < parameters.size(); i++) {
             methodCall.arg(parameters.get(i));
         }
+
+        callSource.body().add(methodCall);
 
         //generateThrow("failedToInvoke", MessagingException.class, callSource._catch((JClass) ref(Exception.class)), JExpr.cast(ref(MuleEvent.class).boxify(), JExpr._null()), methodName);
 

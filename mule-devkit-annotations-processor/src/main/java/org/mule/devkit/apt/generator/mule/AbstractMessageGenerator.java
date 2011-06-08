@@ -115,8 +115,13 @@ public abstract class AbstractMessageGenerator extends AbstractCodeGenerator {
     protected JMethod generateInitialiseMethod(JDefinedClass messageProcessorClass, JClass lifecycleWrapperClass, JFieldVar muleContext, JFieldVar expressionManager, JFieldVar patternInfo, JFieldVar object) {
         JMethod initialise = messageProcessorClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "initialise");
         initialise._throws(InitialisationException.class);
-        initialise.body().assign(expressionManager, muleContext.invoke("getExpressionManager"));
-        initialise.body().assign(patternInfo, ref(TemplateParser.class).staticInvoke("createMuleStyleParser").invoke("getStyle"));
+
+        if (expressionManager != null) {
+            initialise.body().assign(expressionManager, muleContext.invoke("getExpressionManager"));
+        }
+        if (patternInfo != null) {
+            initialise.body().assign(patternInfo, ref(TemplateParser.class).staticInvoke("createMuleStyleParser").invoke("getStyle"));
+        }
 
         JConditional ifNoObject = initialise.body()._if(JOp.eq(object, JExpr._null()));
         JTryBlock tryLookUp = ifNoObject._then()._try();

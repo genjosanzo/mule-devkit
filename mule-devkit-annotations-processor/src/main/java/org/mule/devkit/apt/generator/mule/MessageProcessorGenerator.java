@@ -129,10 +129,15 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
             String fieldName = variable.getSimpleName().toString();
             if (isTypeSupported(fields.get(fieldName).getVariableElement()) || CodeModelUtils.isXmlType(fields.get(fieldName).getVariableElement())) {
-                JVar evaluated = callProcessor.body().decl(ref(Object.class), "evaluated" + StringUtils.capitalize(fieldName));
-                JVar transformed = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName));
-                generateExpressionEvaluator(callProcessor.body(), evaluated, fields.get(fieldName).getField(), patternInfo, expressionManager, muleMessage);
-                generateTransform(callProcessor.body(), transformed, evaluated, fields.get(fieldName).getVariableElement().asType(), muleContext);
+
+                JVar evaluated = callProcessor.body().decl(ref(Object.class), "evaluated" + StringUtils.capitalize(fieldName), JExpr._null());
+                JVar transformed = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName), JExpr._null());
+
+                JConditional notNull = callProcessor.body()._if(JOp.ne(fields.get(fieldName).getField(), JExpr._null()));
+
+                generateExpressionEvaluator(notNull._then(), evaluated, fields.get(fieldName).getField(), patternInfo, expressionManager, muleMessage);
+                generateTransform(notNull._then(), transformed, evaluated, fields.get(fieldName).getVariableElement().asType(), muleContext);
+
                 parameters.add(transformed);
             } else {
                 //JVar ref = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "ref" + StringUtils.capitalize(fieldName));
