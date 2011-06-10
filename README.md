@@ -15,6 +15,8 @@ Creating a cloud connector using the development kit is extremely easy. Just inv
 						
 Archetype Parameters:
 
+|parameter|description|
+|:--------|:----------|
 |archetypeGroupId|The group Id of the archetype. This value is ALWAYS org.mule|
 |archetypeArtifactId|The artifact Id of the archetype. This value is ALWAYS mule-devkit-archetype-cloud-connector|
 |archetypeVersion|The version of the archetype. This value can change as we release new versions of the archetype. Always use the latest non-SNAPSHOT version is possible.|
@@ -39,6 +41,8 @@ Creating a cloud connector using the development kit is extremely easy. Just inv
 						
 Archetype Parameters:
 
+|parameter|description|
+|:--------|:----------|
 |archetypeGroupId|The group Id of the archetype. This value is ALWAYS org.mule|
 |archetypeArtifactId|The artifact Id of the archetype. This value is ALWAYS mule-devkit-archetype-transformer|
 |archetypeVersion|The version of the archetype. This value can change as we release new versions of the archetype. Always use the latest non-SNAPSHOT version is possible.|
