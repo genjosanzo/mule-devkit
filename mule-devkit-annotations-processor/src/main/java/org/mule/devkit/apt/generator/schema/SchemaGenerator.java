@@ -69,13 +69,16 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
         schema = new Schema();
         objectFactory = new ObjectFactory();
-        String[] pepe = new String[]{};
     }
 
     public void generate(TypeElement type) throws GenerationException {
 
         Module module = type.getAnnotation(Module.class);
-        String targetNamespace = BASE_NAMESPACE + module.name();
+        String targetNamespace = module.namespace();
+        if (targetNamespace == null || targetNamespace.length() == 0) {
+            targetNamespace = BASE_NAMESPACE + module.name();
+        }
+
         schema.setTargetNamespace(targetNamespace);
         schema.setElementFormDefault(FormChoice.QUALIFIED);
         schema.setAttributeFormDefault(FormChoice.UNQUALIFIED);
@@ -89,13 +92,18 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
         registerTypes();
         registerConfigElement(type);
-        registerProcessors(type);
+        registerProcessors(targetNamespace, type);
         registerTransformers(type);
 
         try {
             OutputStream schemaStream = getContext().getCodeWriter().openBinary(null, "META-INF/mule-" + module.name() + ".xsd");
 
-            FileTypeSchema fileTypeSchema = new FileTypeSchema(schemaStream, schema, type);
+            String schemaLocation = module.schemaLocation();
+            if (schemaLocation == null || schemaLocation.length() == 0) {
+                schemaLocation = schema.getTargetNamespace() + "/" + module.version() + "/mule-" + module.name() + ".xsd";
+            }
+
+            FileTypeSchema fileTypeSchema = new FileTypeSchema(schemaStream, schema, schemaLocation, type);
             getContext().addSchema(module, fileTypeSchema);
         } catch (IOException ioe) {
             throw new GenerationException(ioe);
@@ -138,12 +146,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
         }
     }
 
-    private void registerProcessors(TypeElement type) {
-
-
-        Module module = type.getAnnotation(Module.class);
-        String targetNamespace = BASE_NAMESPACE + module.name();
-
+    private void registerProcessors(String targetNamespace, TypeElement type) {
         java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(type.getEnclosedElements());
         for (ExecutableElement method : methods) {
             Processor processor = method.getAnnotation(Processor.class);

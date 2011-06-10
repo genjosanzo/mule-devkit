@@ -28,6 +28,16 @@ public @interface Module {
      */
     String version() default DEFAULT_VERSION;
 
+    /**
+     * Namespace of the module
+     */
+    String namespace() default "";
+
+    /**
+     * Location URI for the schema
+     */
+    String schemaLocation() default "";
+
     String DEFAULT_VERSION = "1.0";
 
 }

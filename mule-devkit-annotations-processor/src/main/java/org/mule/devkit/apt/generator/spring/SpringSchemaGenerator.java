@@ -24,7 +24,7 @@ public class SpringSchemaGenerator extends ContextualizedGenerator {
             for (Module mod : getContext().getSchemas().keySet()) {
                 FileTypeSchema fileTypeSchema = getContext().getSchemas().get(mod);
 
-                springSchemasOut.write(fileTypeSchema.getSchema().getTargetNamespace().replace("://", "\\://") + "/" + mod.version() + "/mule-" + mod.name() + ".xsd=META-INF/mule-" + mod.name() + ".xsd\n");
+                springSchemasOut.write(fileTypeSchema.getSchemaLocation().replace("://", "\\://") + "=META-INF/mule-" + mod.name() + ".xsd\n");
             }
 
             springSchemasOut.flush();
