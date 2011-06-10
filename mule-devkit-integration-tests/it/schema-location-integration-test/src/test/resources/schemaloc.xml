@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:schemaloc="http://repository.mulesoft.org/releases/org/mule/modules/mule-module-schemaloc"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+        http://repository.mulesoft.org/releases/org/mule/modules/mule-module-schemaloc http://repository.mulesoft.org/releases/org/mule/modules/mule-module-schemaloc/1.0-SNAPSHOT/mule-schemaloc.xsd">
+
+    <schemaloc:config name="configA" append="123"/>
+    <schemaloc:config name="configB" append="456"/>
+
+    <flow name="passthruStringFlowConfigA">
+        <schemaloc:passthru-string config-ref="configA" value="mulesoft"/>
+    </flow>
+
+    <flow name="passthruStringFlowConfigB">
+        <schemaloc:passthru-string config-ref="configB" value="ftw"/>
+    </flow>
+
+</mule>
