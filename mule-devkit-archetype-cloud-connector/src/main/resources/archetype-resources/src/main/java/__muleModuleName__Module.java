@@ -24,7 +24,7 @@ public class ${muleModuleName}Module
     }
 
     @Processor
-    public String doSomething(String content)
+    public String myProcessor(String content)
     {
         /*
          * MESSAGE PROCESSOR CODE GOES HERE
