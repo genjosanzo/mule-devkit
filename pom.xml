@@ -27,6 +27,7 @@
         <!-- <module>mule-devkit-support</module> -->
         <module>mule-devkit-maven-plugin</module>
         <module>mule-devkit-archetype-cloud-connector</module>
+        <module>mule-devkit-archetype-transformer</module>
         <module>mule-devkit-integration-tests</module>
     </modules>
 

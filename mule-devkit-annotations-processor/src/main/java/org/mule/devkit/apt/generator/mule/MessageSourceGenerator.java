@@ -195,7 +195,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         messageProcess.arg(muleEvent);
         tryBlock.body().assign(responseEvent, messageProcess);
         JConditional ifResponse = tryBlock.body()._if(
-                JOp.band(JOp.ne(responseEvent, JExpr._null()),
+                JOp.cand(JOp.ne(responseEvent, JExpr._null()),
                         JOp.ne(responseEvent.invoke("getMessage"), JExpr._null()))
         );
         ifResponse._then()._return(responseEvent.invoke("getMessage").invoke("getPayload"));

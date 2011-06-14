@@ -11,11 +11,11 @@ import org.apache.maven.it.Verifier;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CloudConnectorArchetypeIT
+public class TransformerArchetypeIT
 {
 
     private static final File ROOT = new File("target/integration-tests/");
-    private static final String ARCHETYPE_PROPERTIES = "/cloud-connector-archetype.properties";
+    private static final String ARCHETYPE_PROPERTIES = "/transformer-archetype.properties";
 
     private Properties archetypeProperties;
     private Properties verifierProperties;
