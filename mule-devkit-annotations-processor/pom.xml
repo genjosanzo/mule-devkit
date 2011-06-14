@@ -89,39 +89,22 @@
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
                 <version>0.7.5</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <extension>true</extension>
-                            <!-- <schemaLanguage>xsd</schemaLanguage> -->
-                            <schemaIncludes>
-                                <value>org/mule/devkit/apt/generator/schema/xmlschema.xsd</value>
-                            </schemaIncludes>
-                            <generatePackage>org.mule.devkit.apt.generator.schema</generatePackage>
-                            <!-- <args>
-                                <arg>-Xinject-listener-code</arg>
-                            </args> -->
-                        </configuration>
-                    </execution>
-                </executions>
-                <!--
-                <dependencies>
-                    <dependency>
-                        <groupId>org.jvnet.jaxb2-commons</groupId>
-                        <artifactId>property-listener-injector</artifactId>
-                        <version>1.0</version>
-                        <exclusions>
-                            <exclusion>
-                                <groupId>com.sun.xml.bind</groupId>
-                                <artifactId>jaxb-xjc</artifactId>
-                            </exclusion>
-                        </exclusions>
-                    </dependency>
-                </dependencies>
-                -->
+                <!-- <executions>
+                   <execution>
+                       <goals>
+                           <goal>generate</goal>
+                       </goals>
+
+                   </execution>
+               </executions> -->
+                <configuration>
+                    <extension>true</extension>
+                    <schemaIncludes>
+                        <value>org/mule/devkit/apt/generator/schema/xmlschema.xsd</value>
+                    </schemaIncludes>
+                    <generateDirectory>src/main/java</generateDirectory>
+                    <generatePackage>org.mule.devkit.apt.generator.schema</generatePackage>
+                </configuration>
             </plugin>
         </plugins>
     </build>
