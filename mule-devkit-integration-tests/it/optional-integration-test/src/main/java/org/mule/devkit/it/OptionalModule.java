@@ -17,10 +17,10 @@
 
 package org.mule.devkit.it;
 
-import org.mule.devkit.annotations.Module;
-import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.annotations.Configurable;
+import org.mule.devkit.annotations.Module;
 import org.mule.devkit.annotations.Parameter;
+import org.mule.devkit.annotations.Processor;
 
 @Module(name = "optional")
 public class OptionalModule

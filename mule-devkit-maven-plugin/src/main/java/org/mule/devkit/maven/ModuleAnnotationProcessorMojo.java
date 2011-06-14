@@ -17,17 +17,15 @@
 
 package org.mule.devkit.maven;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Resource;
 import org.apache.maven.project.MavenProject;
 import org.jfrog.maven.annomojo.annotations.MojoGoal;
 import org.jfrog.maven.annomojo.annotations.MojoParameter;
 import org.jfrog.maven.annomojo.annotations.MojoPhase;
 import org.jfrog.maven.annomojo.annotations.MojoRequiresDependencyResolution;
+
+import java.io.File;
+import java.util.List;
 
 @MojoGoal("generate-sources")
 @MojoRequiresDependencyResolution(value = "compile")

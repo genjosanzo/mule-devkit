@@ -17,12 +17,11 @@
 
 package org.mule.devkit.it;
 
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
-
 import org.mule.devkit.annotations.Configurable;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.annotations.Processor;
+
+import java.util.jar.Manifest;
 
 @Module(name = "jar")
 public class JarModule

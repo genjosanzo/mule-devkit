@@ -17,20 +17,9 @@
 
 package org.mule.devkit.apt.generator.mule;
 
-import com.sun.codemodel.JCatchBlock;
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JInvocation;
-import com.sun.codemodel.JMethod;
-import com.sun.codemodel.JMod;
-import com.sun.codemodel.JTryBlock;
-import com.sun.codemodel.JVar;
+import com.sun.codemodel.*;
 import org.mule.api.MuleException;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.lifecycle.*;
 import org.mule.devkit.annotations.lifecycle.Dispose;
 import org.mule.devkit.annotations.lifecycle.Initialise;
 import org.mule.devkit.annotations.lifecycle.Start;

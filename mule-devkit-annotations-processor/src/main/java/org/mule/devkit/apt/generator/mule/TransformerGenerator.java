@@ -17,20 +17,7 @@
 
 package org.mule.devkit.apt.generator.mule;
 
-import com.sun.codemodel.JCatchBlock;
-import com.sun.codemodel.JClass;
-import com.sun.codemodel.JConditional;
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JFieldVar;
-import com.sun.codemodel.JInvocation;
-import com.sun.codemodel.JMethod;
-import com.sun.codemodel.JMod;
-import com.sun.codemodel.JOp;
-import com.sun.codemodel.JTryBlock;
-import com.sun.codemodel.JVar;
-import com.sun.tools.javac.code.Attribute;
-import org.apache.commons.lang.StringUtils;
+import com.sun.codemodel.*;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
@@ -43,7 +30,6 @@ import org.mule.devkit.annotations.Transformer;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
 import org.mule.devkit.apt.generator.GenerationException;
-import org.mule.devkit.apt.util.ClassNameUtils;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
@@ -51,10 +37,8 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -176,20 +160,18 @@ public class TransformerGenerator extends AbstractCodeGenerator {
         for (AnnotationMirror annotationMirror : annotationMirrors) {
             if (transformerAnnotationName.equals(annotationMirror.getAnnotationType().toString())) {
                 for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
-                    if( "sourceTypes".equals(
-                            entry.getKey().getSimpleName().toString() ) )
-                    {
-                        sourceTypes = (List<? extends AnnotationValue>)entry.getValue().getValue();
+                    if ("sourceTypes".equals(
+                            entry.getKey().getSimpleName().toString())) {
+                        sourceTypes = (List<? extends AnnotationValue>) entry.getValue().getValue();
                         break;
                     }
                 }
             }
         }
 
-        for( AnnotationValue sourceType : sourceTypes )
-        {
+        for (AnnotationValue sourceType : sourceTypes) {
             JInvocation registerSourceType = constructor.body().invoke("registerSourceType");
-            registerSourceType.arg(ref(DataTypeFactory.class).staticInvoke("create").arg(ref((TypeMirror)sourceType.getValue()).boxify().dotclass()));
+            registerSourceType.arg(ref(DataTypeFactory.class).staticInvoke("create").arg(ref((TypeMirror) sourceType.getValue()).boxify().dotclass()));
         }
     }
 

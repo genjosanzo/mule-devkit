@@ -17,13 +17,7 @@
 
 package org.mule.devkit.apt.generator.schema;
 
-import org.mule.devkit.annotations.Configurable;
-import org.mule.devkit.annotations.Module;
-import org.mule.devkit.annotations.Parameter;
-import org.mule.devkit.annotations.Processor;
-import org.mule.devkit.annotations.Source;
-import org.mule.devkit.annotations.SourceCallback;
-import org.mule.devkit.annotations.Transformer;
+import org.mule.devkit.annotations.*;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.ContextualizedGenerator;
 import org.mule.devkit.apt.generator.GenerationException;

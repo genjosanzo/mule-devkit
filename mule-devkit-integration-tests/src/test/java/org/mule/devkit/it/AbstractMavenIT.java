@@ -17,13 +17,13 @@
 
 package org.mule.devkit.it;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
 
 public abstract class AbstractMavenIT
 {

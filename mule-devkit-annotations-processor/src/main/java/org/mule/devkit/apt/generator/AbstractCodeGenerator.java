@@ -17,15 +17,7 @@
 
 package org.mule.devkit.apt.generator;
 
-import com.sun.codemodel.JClass;
-import com.sun.codemodel.JClassAlreadyExistsException;
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JExpression;
-import com.sun.codemodel.JMethod;
-import com.sun.codemodel.JMod;
-import com.sun.codemodel.JPackage;
-import com.sun.codemodel.JType;
-import com.sun.codemodel.JVar;
+import com.sun.codemodel.*;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;

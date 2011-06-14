@@ -17,15 +17,7 @@
 
 package org.mule.devkit.apt.generator.spring;
 
-import com.sun.codemodel.JBlock;
-import com.sun.codemodel.JConditional;
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JInvocation;
-import com.sun.codemodel.JMethod;
-import com.sun.codemodel.JMod;
-import com.sun.codemodel.JOp;
-import com.sun.codemodel.JVar;
+import com.sun.codemodel.*;
 import org.apache.commons.lang.StringUtils;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.devkit.annotations.Processor;

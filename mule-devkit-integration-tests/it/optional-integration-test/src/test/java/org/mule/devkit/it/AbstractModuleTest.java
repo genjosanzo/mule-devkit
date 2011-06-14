@@ -19,10 +19,8 @@ package org.mule.devkit.it;
 
 import org.mule.api.MuleEvent;
 import org.mule.construct.SimpleFlowConstruct;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.AbstractMuleTestCase;
-
-import junit.framework.Assert;
+import org.mule.tck.FunctionalTestCase;
 
 public abstract class AbstractModuleTest extends FunctionalTestCase
 {

@@ -17,8 +17,6 @@
 
 package org.mule.devkit.it;
 
-import java.lang.String;
-
 public class SchemaLocationModuleTest extends AbstractModuleTest
 {
 

@@ -17,13 +17,7 @@
 
 package org.mule.devkit.apt.generator.mule;
 
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JFieldVar;
-import com.sun.codemodel.JMod;
-import com.sun.codemodel.JMethod;
-import com.sun.codemodel.JVar;
-import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JInvocation;
+import com.sun.codemodel.*;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;

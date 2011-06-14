@@ -18,7 +18,6 @@
 package org.mule.devkit.apt.validation;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
 
 public class ValidationException extends Exception {
     private Element element;
