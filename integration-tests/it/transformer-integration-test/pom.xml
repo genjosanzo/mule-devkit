@@ -94,7 +94,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
-            <artifactId>mule-devkit-annotations</artifactId>
+            <artifactId>mule-devkit-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>

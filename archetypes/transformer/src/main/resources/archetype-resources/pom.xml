@@ -119,7 +119,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
-            <artifactId>mule-devkit-annotations</artifactId>
+            <artifactId>mule-devkit-api</artifactId>
             <version>${mule.devkit.version}</version>
             <scope>provided</scope>
         </dependency>
