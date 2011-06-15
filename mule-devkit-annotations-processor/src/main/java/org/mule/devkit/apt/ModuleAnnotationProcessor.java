@@ -24,7 +24,7 @@ import org.mule.devkit.apt.generator.mule.*;
 import org.mule.devkit.apt.generator.schema.SchemaGenerator;
 import org.mule.devkit.apt.generator.spring.*;
 import org.mule.devkit.apt.validation.ModuleTypeValidator;
-import org.mule.devkit.apt.validation.TypeValidator;
+import org.mule.devkit.validation.TypeValidator;
 
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;

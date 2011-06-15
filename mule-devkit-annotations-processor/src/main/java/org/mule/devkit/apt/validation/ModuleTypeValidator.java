@@ -18,6 +18,8 @@
 package org.mule.devkit.apt.validation;
 
 import org.mule.devkit.annotations.Configurable;
+import org.mule.devkit.validation.TypeValidator;
+import org.mule.devkit.validation.ValidationException;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;

@@ -26,8 +26,8 @@ import org.mule.devkit.apt.generator.Generator;
 import org.mule.devkit.apt.generator.schema.FileTypeSchema;
 import org.mule.devkit.apt.generator.schema.NamespaceFilter;
 import org.mule.devkit.apt.generator.schema.Schema;
-import org.mule.devkit.apt.validation.TypeValidator;
-import org.mule.devkit.apt.validation.ValidationException;
+import org.mule.devkit.validation.TypeValidator;
+import org.mule.devkit.validation.ValidationException;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;

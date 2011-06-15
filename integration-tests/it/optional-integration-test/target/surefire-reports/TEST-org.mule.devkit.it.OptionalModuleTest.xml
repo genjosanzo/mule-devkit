@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite failures="1" time="2.074" errors="0" skipped="0" tests="2" name="org.mule.devkit.it.OptionalModuleTest">
+  <properties>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="sun.boot.library.path" value="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Libraries"/>
+    <property name="java.vm.version" value="19.1-b02-345"/>
+    <property name="awt.nativeDoubleBuffering" value="true"/>
+    <property name="gopherProxySet" value="false"/>
+    <property name="java.vm.vendor" value="Apple Inc."/>
+    <property name="java.vendor.url" value="http://www.apple.com/"/>
+    <property name="path.separator" value=":"/>
+    <property name="guice.disable.misplaced.annotation.check" value="true"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="file.encoding.pkg" value="sun.io"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.os.patch.level" value="unknown"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="user.dir" value="/Users/Emiliano/Source/mule-devkit/mule-devkit-integration-tests/it/optional-integration-test"/>
+    <property name="java.runtime.version" value="1.6.0_24-b07-345"/>
+    <property name="java.awt.graphicsenv" value="apple.awt.CGraphicsEnvironment"/>
+    <property name="basedir" value="/Users/Emiliano/Source/mule-devkit/mule-devkit-integration-tests/it/optional-integration-test"/>
+    <property name="java.endorsed.dirs" value="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/endorsed"/>
+    <property name="os.arch" value="x86_64"/>
+    <property name="java.io.tmpdir" value="/var/folders/89/qyjh+90c44=3gr3sry1j9qf+++++fn/T/"/>
+    <property name="line.separator" value="
+"/>
+    <property name="java.vm.specification.vendor" value="Sun Microsystems Inc."/>
+    <property name="os.name" value="Mac OS X"/>
+    <property name="classworlds.conf" value="/opt/local/share/java/maven3/bin/m2.conf"/>
+    <property name="sun.jnu.encoding" value="MacRoman"/>
+    <property name="java.library.path" value="/Applications/IntelliJ IDEA 10.app/Contents/Resources/Java:/System/Library/PrivateFrameworks/JavaApplicationLauncher.framework/Resources:.:/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java"/>
+    <property name="surefire.test.class.path" value="/Users/Emiliano/Source/mule-devkit/mule-devkit-integration-tests/it/optional-integration-test/target/test-classes:/Users/Emiliano/Source/mule-devkit/mule-devkit-integration-tests/it/optional-integration-test/target/classes:/Users/Emiliano/.m2/repository/junit/junit/4.8.2/junit-4.8.2.jar:/Users/Emiliano/.m2/repository/org/mockito/mockito-all/1.8.5/mockito-all-1.8.5.jar:/Users/Emiliano/.m2/repository/org/mule/modules/mule-module-spring-config/3.1.0/mule-module-spring-config-3.1.0.jar:/Users/Emiliano/.m2/repository/org/mule/mule-core/3.1.0/mule-core-3.1.0.jar:/Users/Emiliano/.m2/repository/commons-beanutils/commons-beanutils/1.8.0/commons-beanutils-1.8.0.jar:/Users/Emiliano/.m2/repository/org/safehaus/jug/jug/2.0.0-osgi/jug-2.0.0-osgi-asl.jar:/Users/Emiliano/.m2/repository/backport-util-concurrent/backport-util-concurrent/3.1-osgi/backport-util-concurrent-3.1-osgi.jar:/Users/Emiliano/.m2/repository/commons-cli/commons-cli/1.2/commons-cli-1.2.jar:/Users/Emiliano/.m2/repository/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar:/Users/Emiliano/.m2/repository/commons-io/commons-io/1.4/commons-io-1.4.jar:/Users/Emiliano/.m2/repository/commons-lang/commons-lang/2.4/commons-lang-2.4.jar:/Users/Emiliano/.m2/repository/commons-pool/commons-pool/1.5.3/commons-pool-1.5.3.jar:/Users/Emiliano/.m2/repository/javax/activation/activation/1.1-osgi/activation-1.1-osgi.jar:/Users/Emiliano/.m2/repository/org/apache/geronimo/specs/geronimo-jta_1.0.1B_spec/1.1-osgi/geronimo-jta_1.0.1B_spec-1.1-osgi.jar:/Users/Emiliano/.m2/repository/org/apache/geronimo/specs/geronimo-j2ee-connector_1.5_spec/1.1-osgi/geronimo-j2ee-connector_1.5_spec-1.1-osgi.jar:/Users/Emiliano/.m2/repository/javax/annotation/jsr250-api/1.0/jsr250-api-1.0.jar:/Users/Emiliano/.m2/repository/org/slf4j/jcl-over-slf4j/1.6.1/jcl-over-slf4j-1.6.1.jar:/Users/Emiliano/.m2/repository/org/slf4j/slf4j-api/1.6.1/slf4j-api-1.6.1.jar:/Users/Emiliano/.m2/repository/org/slf4j/slf4j-log4j12/1.6.1/slf4j-log4j12-1.6.1.jar:/Users/Emiliano/.m2/repository/log4j/log4j/1.2.14/log4j-1.2.14.jar:/Users/Emiliano/.m2/repository/asm/asm/3.1/asm-3.1.jar:/Users/Emiliano/.m2/repository/asm/asm-commons/3.1/asm-commons-3.1.jar:/Users/Emiliano/.m2/repository/asm/asm-tree/3.1/asm-tree-3.1.jar:/Users/Emiliano/.m2/repository/org/mule/modules/mule-module-annotations/3.1.0/mule-module-annotations-3.1.0.jar:/Users/Emiliano/.m2/repository/cglib/cglib-nodep/2.2/cglib-nodep-2.2.jar:/Users/Emiliano/.m2/repository/org/springframework/spring-context/3.0.3.RELEASE/spring-context-3.0.3.RELEASE.jar:/Users/Emiliano/.m2/repository/org/springframework/spring-aop/3.0.3.RELEASE/spring-aop-3.0.3.RELEASE.jar:/Users/Emiliano/.m2/repository/org/springframework/spring-core/3.0.3.RELEASE/spring-core-3.0.3.RELEASE.jar:/Users/Emiliano/.m2/repository/org/springframework/spring-expression/3.0.3.RELEASE/spring-expression-3.0.3.RELEASE.jar:/Users/Emiliano/.m2/repository/org/springframework/spring-asm/3.0.3.RELEASE/spring-asm-3.0.3.RELEASE.jar:/Users/Emiliano/.m2/repository/dom4j/dom4j/1.6.1-osgi/dom4j-1.6.1-osgi.jar:/Users/Emiliano/.m2/repository/jaxen/jaxen/1.1.1/jaxen-1.1.1.jar:/Users/Emiliano/.m2/repository/jdom/jdom/1.0/jdom-1.0.jar:/Users/Emiliano/.m2/repository/org/mule/mule-devkit-annotations/1.0-SNAPSHOT/mule-devkit-annotations-1.0-SNAPSHOT.jar:/Users/Emiliano/.m2/repository/org/mule/tests/mule-tests-functional/3.1.0/mule-tests-functional-3.1.0.jar:/Users/Emiliano/.m2/repository/org/springframework/spring-beans/3.0.3.RELEASE/spring-beans-3.0.3.RELEASE.jar:/Users/Emiliano/.m2/repository/org/mule/mule-core/3.1.0/mule-core-3.1.0-tests.jar:"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.class.version" value="50.0"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Server Compiler"/>
+    <property name="os.version" value="10.7"/>
+    <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="user.home" value="/Users/Emiliano"/>
+    <property name="user.timezone" value="GMT-03:00"/>
+    <property name="java.awt.printerjob" value="apple.awt.CPrinterJob"/>
+    <property name="java.specification.version" value="1.6"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="user.name" value="Emiliano"/>
+    <property name="java.class.path" value="/opt/local/share/java/maven3/core/boot/plexus-classworlds-2.4.jar"/>
+    <property name="java.vm.specification.version" value="1.0"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.home" value="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home"/>
+    <property name="java.specification.vendor" value="Sun Microsystems Inc."/>
+    <property name="user.language" value="en"/>
+    <property name="awt.toolkit" value="apple.awt.CToolkit"/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.version" value="1.6.0_24"/>
+    <property name="java.ext.dirs" value="/Library/Java/Extensions:/System/Library/Java/Extensions:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/ext"/>
+    <property name="sun.boot.class.path" value="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/jsfd.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar:/System/Library/Frameworks/JavaVM.framework/Frameworks/JavaRuntimeSupport.framework/Resources/Java/JavaRuntimeSupport.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/ui.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/laf.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/sunrsasign.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/jsse.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/jce.jar:/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/charsets.jar"/>
+    <property name="java.vendor" value="Apple Inc."/>
+    <property name="maven.home" value="/opt/local/share/java/maven3"/>
+    <property name="localRepository" value="/Users/Emiliano/.m2/repository"/>
+    <property name="file.separator" value="/"/>
+    <property name="java.vendor.url.bug" value="http://bugreport.apple.com/"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="mrj.version" value="1070.1.6.0_24-345"/>
+    <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="mule.encoding" value="UTF-8"/>
+    <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="sun.cpu.isalist" value=""/>
+  </properties>
+  <testcase time="1.473" classname="org.mule.devkit.it.OptionalModuleTest" name="testOptionalParameter">
+    <failure message="expected:&lt;10&gt; but was:&lt;82&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: expected:&lt;10&gt; but was:&lt;82&gt;
+	at junit.framework.Assert.fail(Assert.java:47)
+	at junit.framework.Assert.failNotEquals(Assert.java:283)
+	at junit.framework.Assert.assertEquals(Assert.java:64)
+	at junit.framework.Assert.assertEquals(Assert.java:71)
+	at org.mule.devkit.it.AbstractModuleTest.runFlow(AbstractModuleTest.java:43)
+	at org.mule.devkit.it.OptionalModuleTest.testOptionalParameter(OptionalModuleTest.java:16)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:597)
+	at junit.framework.TestCase.runTest(TestCase.java:168)
+	at junit.framework.TestCase.runBare(TestCase.java:134)
+	at org.mule.tck.AbstractMuleTestCase.runBare(AbstractMuleTestCase.java:305)
+	at junit.framework.TestResult$1.protect(TestResult.java:110)
+	at junit.framework.TestResult.runProtected(TestResult.java:128)
+	at junit.framework.TestResult.run(TestResult.java:113)
+	at junit.framework.TestCase.run(TestCase.java:124)
+	at org.mule.tck.AbstractMuleTestCase.run(AbstractMuleTestCase.java:284)
+	at junit.framework.TestSuite.runTest(TestSuite.java:243)
+	at junit.framework.TestSuite.run(TestSuite.java:238)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:83)
+	at org.apache.maven.surefire.junit4.JUnit4TestSet.execute(JUnit4TestSet.java:35)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:146)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:97)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:597)
+	at org.apache.maven.surefire.booter.ProviderFactory$ClassLoaderProxy.invoke(ProviderFactory.java:103)
+	at $Proxy53.invoke(Unknown Source)
+	at org.apache.maven.surefire.booter.SurefireStarter.invokeProvider(SurefireStarter.java:145)
+	at org.apache.maven.surefire.booter.SurefireStarter.runSuitesInProcess(SurefireStarter.java:87)
+	at org.apache.maven.plugin.surefire.booterclient.ForkStarter.run(ForkStarter.java:102)
+	at org.apache.maven.plugin.surefire.SurefirePlugin.execute(SurefirePlugin.java:608)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:107)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:209)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:153)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:145)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:84)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:59)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.singleThreadedBuild(LifecycleStarter.java:183)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:161)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:319)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:156)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:534)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:196)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:141)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:597)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:290)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:230)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:409)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:352)
+	at org.codehaus.classworlds.Launcher.main(Launcher.java:47)
+</failure>
+    <system-out>
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running org.mule.devkit.it.OptionalModuleTest
+
+================================================================================
+= Testing: testOptionalParameter                                               =
+================================================================================
+</system-out>
+  </testcase>
+  <testcase time="0.494" classname="org.mule.devkit.it.OptionalModuleTest" name="testOptionalConfiguration"/>
+</testsuite>
