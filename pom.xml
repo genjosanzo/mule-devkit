@@ -22,11 +22,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>mule-devkit-annotations</module>	
-        <module>mule-devkit-annotations-processor</module>
-        <module>mule-devkit-annotations-plugin</module>
-        <!-- <module>mule-devkit-support</module> -->
-        <module>mule-devkit-maven-plugin</module>
+        <module>core</module>	
+        <module>tools</module>	
         <module>archetypes</module>
         <module>integration-tests</module>
     </modules>
