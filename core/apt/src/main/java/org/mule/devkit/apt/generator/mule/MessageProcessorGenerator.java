@@ -17,7 +17,6 @@
 
 package org.mule.devkit.apt.generator.mule;
 
-import com.sun.codemodel.*;
 import org.apache.commons.lang.StringUtils;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -29,8 +28,9 @@ import org.mule.api.transformer.Transformer;
 import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.annotations.SourceCallback;
 import org.mule.devkit.apt.AnnotationProcessorContext;
-import org.mule.devkit.apt.generator.GenerationException;
-import org.mule.devkit.apt.util.CodeModelUtils;
+import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.apt.util.TypeMirrorUtils;
+import org.mule.devkit.model.code.*;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transport.NullPayload;
 
@@ -61,7 +61,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
     private void generateMessageProcessor(TypeElement typeElement, ExecutableElement executableElement) {
         // get class
-        JDefinedClass messageProcessorClass = getMessageProcessorClass(executableElement);
+        DefinedClass messageProcessorClass = getMessageProcessorClass(executableElement);
 
         // add a field for each argument of the method
         Map<String, AbstractMessageGenerator.FieldVariableElement> fields = generateFieldForEachParameter(messageProcessorClass, executableElement);
@@ -102,7 +102,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         return defaultMuleEvent;
     }
 
-    private void generateProcessMethod(ExecutableElement executableElement, JDefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, JFieldVar muleContext, JFieldVar object, JFieldVar expressionManager, JFieldVar patternInfo) {
+    private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, JFieldVar muleContext, JFieldVar object, JFieldVar expressionManager, JFieldVar patternInfo) {
         String methodName = executableElement.getSimpleName().toString();
         JType muleEvent = ref(MuleEvent.class);
 
@@ -121,7 +121,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 continue;
 
             String fieldName = variable.getSimpleName().toString();
-            if (isTypeSupported(fields.get(fieldName).getVariableElement()) || CodeModelUtils.isXmlType(fields.get(fieldName).getVariableElement())) {
+            if (isTypeSupported(fields.get(fieldName).getVariableElement()) || TypeMirrorUtils.isXmlType(fields.get(fieldName).getVariableElement())) {
 
                 JVar evaluated = callProcessor.body().decl(ref(Object.class), "evaluated" + StringUtils.capitalize(fieldName), JExpr._null());
                 JVar transformed = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName), JExpr._null());

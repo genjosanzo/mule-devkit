@@ -17,10 +17,10 @@
 
 package org.mule.devkit.apt.generator.mule;
 
-import com.sun.codemodel.JDefinedClass;
+import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
-import org.mule.devkit.apt.generator.GenerationException;
+import org.mule.devkit.generation.GenerationException;
 
 import javax.lang.model.element.TypeElement;
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class RegistryBootstrapGenerator extends AbstractCodeGenerator {
             OutputStream registryBootstrapStream = getContext().getCodeWriter().openBinary(null, "META-INF/services/org/mule/config/registry-bootstrap.properties");
             OutputStreamWriter registryBootstrapStreamOut = new OutputStreamWriter(registryBootstrapStream, "UTF-8");
 
-            for (JDefinedClass clazz : getContext().getClassesToRegisterAtBoot()) {
+            for (DefinedClass clazz : getContext().getRegisterAtBoot()) {
                 registryBootstrapStreamOut.write(clazz.name() + "=" + clazz.fullName() + "\n");
 
             }

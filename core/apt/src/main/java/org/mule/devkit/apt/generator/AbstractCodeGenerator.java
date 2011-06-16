@@ -17,7 +17,6 @@
 
 package org.mule.devkit.apt.generator;
 
-import com.sun.codemodel.*;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
@@ -31,6 +30,7 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.devkit.annotations.SourceCallback;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.util.ClassNameUtils;
+import org.mule.devkit.model.code.*;
 import org.w3c.dom.Element;
 
 import javax.lang.model.element.ExecutableElement;
@@ -47,7 +47,7 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
         super(context);
     }
 
-    protected JDefinedClass getOrCreateClass(String className) {
+    protected DefinedClass getOrCreateClass(String className) {
         JClass generatedAnnotation = getContext().getCodeModel().ref("javax.annotation.Generated");
 
         try {
@@ -58,12 +58,12 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
         }
     }
 
-    protected JDefinedClass getOrCreateClass(String className, JClass ext) {
+    protected DefinedClass getOrCreateClass(String className, JClass ext) {
         JClass generatedAnnotation = getContext().getCodeModel().ref("javax.annotation.Generated");
 
         try {
             JPackage pkg = getContext().getCodeModel()._package(ClassNameUtils.getPackageName(className));
-            JDefinedClass clazz = pkg._class(ClassNameUtils.getClassName(className));
+            DefinedClass clazz = pkg._class(ClassNameUtils.getClassName(className));
             clazz._extends(ext);
 
             return clazz;
@@ -72,12 +72,12 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
         }
     }
 
-    protected JDefinedClass getOrCreateClass(String className, Class<?> ext) {
+    protected DefinedClass getOrCreateClass(String className, Class<?> ext) {
         JClass generatedAnnotation = getContext().getCodeModel().ref("javax.annotation.Generated");
 
         try {
             JPackage pkg = getContext().getCodeModel()._package(ClassNameUtils.getPackageName(className));
-            JDefinedClass clazz = pkg._class(ClassNameUtils.getClassName(className));
+            DefinedClass clazz = pkg._class(ClassNameUtils.getClassName(className));
             clazz._extends(ext);
 
             return clazz;
@@ -86,12 +86,12 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
         }
     }
 
-    protected JDefinedClass getOrCreateClass(String className, List<Class> impls) {
+    protected DefinedClass getOrCreateClass(String className, List<Class> impls) {
         JClass generatedAnnotation = getContext().getCodeModel().ref("javax.annotation.Generated");
 
         try {
             JPackage pkg = getContext().getCodeModel()._package(ClassNameUtils.getPackageName(className));
-            JDefinedClass clazz = pkg._class(ClassNameUtils.getClassName(className));
+            DefinedClass clazz = pkg._class(ClassNameUtils.getClassName(className));
             for (Class impl : impls)
                 clazz._implements(impl);
 
@@ -102,9 +102,9 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
     }
 
 
-    protected JDefinedClass getBeanDefinitionParserClass(ExecutableElement executableElement) {
+    protected DefinedClass getBeanDefinitionParserClass(ExecutableElement executableElement) {
         String beanDefinitionParserName = getBeanDefinitionParserClassNameFor(executableElement);
-        JDefinedClass beanDefinitionParser = getOrCreateClass(beanDefinitionParserName, ChildDefinitionParser.class);
+        DefinedClass beanDefinitionParser = getOrCreateClass(beanDefinitionParserName, ChildDefinitionParser.class);
 
         return beanDefinitionParser;
     }
@@ -125,9 +125,9 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
         return packageName + "." + className;
     }
 
-    protected JDefinedClass getLifecycleWrapperClass(TypeElement typeElement) {
+    protected DefinedClass getLifecycleWrapperClass(TypeElement typeElement) {
         String lifecycleWrapperClassName = getLifecycleWrapperClassNameFor(typeElement);
-        JDefinedClass lifecycleWrapper = getOrCreateClass(lifecycleWrapperClassName, ref(typeElement.asType()).boxify());
+        DefinedClass lifecycleWrapper = getOrCreateClass(lifecycleWrapperClassName, ref(typeElement.asType()).boxify());
 
         return lifecycleWrapper;
     }
@@ -141,9 +141,9 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
 
     }
 
-    protected JDefinedClass getMessageSourceClass(ExecutableElement executableElement) {
+    protected DefinedClass getMessageSourceClass(ExecutableElement executableElement) {
         String messageSourceClassName = getMessageSourceClassNameFor(executableElement);
-        JDefinedClass messageSourceClass = getOrCreateClass(messageSourceClassName, Arrays.asList(new Class[]{
+        DefinedClass messageSourceClass = getOrCreateClass(messageSourceClassName, Arrays.asList(new Class[]{
                 MuleContextAware.class,
                 Startable.class,
                 Stoppable.class,
@@ -165,9 +165,9 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
 
     }
 
-    protected JDefinedClass getMessageProcessorClass(ExecutableElement executableElement) {
+    protected DefinedClass getMessageProcessorClass(ExecutableElement executableElement) {
         String messageProcessorClassName = getMessageProcessorClassNameFor(executableElement);
-        JDefinedClass messageProcessor = getOrCreateClass(messageProcessorClassName, Arrays.asList(new Class[]{Initialisable.class, MessageProcessor.class, MuleContextAware.class}));
+        DefinedClass messageProcessor = getOrCreateClass(messageProcessorClassName, Arrays.asList(new Class[]{Initialisable.class, MessageProcessor.class, MuleContextAware.class}));
 
         return messageProcessor;
     }
@@ -182,9 +182,9 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
     }
 
 
-    protected JDefinedClass getAnyXmlChildDefinitionParserClass(VariableElement variableElement) {
+    protected DefinedClass getAnyXmlChildDefinitionParserClass(VariableElement variableElement) {
         String anyXmlChildDefinitionParserClassName = getAnyXmlChildDefinitionParserClassNameFor(variableElement);
-        JDefinedClass anyXmlChildDefinitionParser = getOrCreateClass(anyXmlChildDefinitionParserClassName, ChildDefinitionParser.class);
+        DefinedClass anyXmlChildDefinitionParser = getOrCreateClass(anyXmlChildDefinitionParserClassName, ChildDefinitionParser.class);
 
         return anyXmlChildDefinitionParser;
     }
@@ -197,9 +197,9 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
         return packageName + "." + className;
     }
 
-    protected JDefinedClass getDummyInboundEndpointClass(ExecutableElement executableElement) {
+    protected DefinedClass getDummyInboundEndpointClass(ExecutableElement executableElement) {
         String dummyInboundEndpointName = getDummyInboundEndpointClassName(executableElement);
-        JDefinedClass dummyInboundEndpoint = getOrCreateClass(dummyInboundEndpointName, Arrays.asList(new Class[]{ImmutableEndpoint.class}));
+        DefinedClass dummyInboundEndpoint = getOrCreateClass(dummyInboundEndpointName, Arrays.asList(new Class[]{ImmutableEndpoint.class}));
 
         return dummyInboundEndpoint;
     }
@@ -230,7 +230,7 @@ public abstract class AbstractCodeGenerator extends ContextualizedGenerator {
         return jtype;
     }
 
-    protected void generateGetBeanClass(JDefinedClass beanDefinitionparser, JExpression expr) {
+    protected void generateGetBeanClass(DefinedClass beanDefinitionparser, JExpression expr) {
         JMethod getBeanClass = beanDefinitionparser.method(JMod.PROTECTED, ref(Class.class), "getBeanClass");
         JVar element = getBeanClass.param(ref(Element.class), "element");
         getBeanClass.body()._return(expr);

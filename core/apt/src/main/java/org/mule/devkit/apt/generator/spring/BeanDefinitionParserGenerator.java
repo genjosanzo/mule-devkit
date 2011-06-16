@@ -17,7 +17,6 @@
 
 package org.mule.devkit.apt.generator.spring;
 
-import com.sun.codemodel.*;
 import org.apache.commons.lang.StringUtils;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.devkit.annotations.Processor;
@@ -25,7 +24,8 @@ import org.mule.devkit.annotations.Source;
 import org.mule.devkit.annotations.SourceCallback;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
-import org.mule.devkit.apt.generator.GenerationException;
+import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.model.code.*;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -70,8 +70,8 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
 
     private void generateBeanDefinitionParserForSource(ExecutableElement executableElement) {
         // get class
-        JDefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
-        JDefinedClass messageSourceClass = getMessageSourceClass(executableElement);
+        DefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
+        DefinedClass messageSourceClass = getMessageSourceClass(executableElement);
 
         // add constructor
         JMethod constructor = beanDefinitionparser.constructor(JMod.PUBLIC);
@@ -90,8 +90,8 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
 
     private void generateBeanDefinitionParserForProcessor(ExecutableElement executableElement) {
         // get class
-        JDefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
-        JDefinedClass messageProcessorClass = getMessageProcessorClass(executableElement);
+        DefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
+        DefinedClass messageProcessorClass = getMessageProcessorClass(executableElement);
 
         // add constructor
         JMethod constructor = beanDefinitionparser.constructor(JMod.PUBLIC);
@@ -108,7 +108,7 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
 
     }
 
-    private void generateGetAttributeValue(JDefinedClass beanDefinitionparser) {
+    private void generateGetAttributeValue(DefinedClass beanDefinitionparser) {
         JMethod getAttributeValue = beanDefinitionparser.method(JMod.PROTECTED, ref(String.class), "getAttributeValue");
         JVar element = getAttributeValue.param(ref(Element.class), "element");
         JVar attributeName = getAttributeValue.param(ref(String.class), "attributeName");
@@ -125,7 +125,7 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
     }
 
 
-    private void generateParseChild(JDefinedClass beanDefinitionparser, ExecutableElement executableElement) {
+    private void generateParseChild(DefinedClass beanDefinitionparser, ExecutableElement executableElement) {
         JMethod parseChild = beanDefinitionparser.method(JMod.PROTECTED, getContext().getCodeModel().VOID, "parseChild");
         JVar element = parseChild.param(ref(Element.class), "element");
         JVar parserContext = parseChild.param(ref(ParserContext.class), "parserContext");

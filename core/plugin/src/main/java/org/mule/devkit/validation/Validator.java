@@ -17,6 +17,8 @@
 
 package org.mule.devkit.validation;
 
-public interface Validator<T> {
-    void validate(T object) throws ValidationException;
+import javax.lang.model.element.Element;
+
+public interface Validator {
+    void validate(Element element) throws ValidationException;
 }

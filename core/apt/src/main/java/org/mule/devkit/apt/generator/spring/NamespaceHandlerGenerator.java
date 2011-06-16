@@ -17,7 +17,6 @@
 
 package org.mule.devkit.apt.generator.spring;
 
-import com.sun.codemodel.*;
 import org.mule.config.spring.handlers.AbstractPojoNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
@@ -27,10 +26,11 @@ import org.mule.devkit.annotations.Source;
 import org.mule.devkit.annotations.Transformer;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
-import org.mule.devkit.apt.generator.GenerationException;
-import org.mule.devkit.apt.util.CodeModelUtils;
+import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.apt.util.TypeMirrorUtils;
 import org.mule.devkit.apt.util.Inflection;
 import org.mule.devkit.apt.util.NameUtils;
+import org.mule.devkit.model.code.*;
 import org.springframework.beans.factory.config.ListFactoryBean;
 
 import javax.lang.model.element.ExecutableElement;
@@ -47,7 +47,7 @@ public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
     public void generate(TypeElement type) throws GenerationException {
         String namespaceHandlerName = getContext().getElements().getBinaryName(type) + "NamespaceHandler";
 
-        JDefinedClass namespaceHandlerClass = getOrCreateClass(namespaceHandlerName);
+        DefinedClass namespaceHandlerClass = getOrCreateClass(namespaceHandlerName);
         namespaceHandlerClass._extends(AbstractPojoNamespaceHandler.class);
 
         JMethod init = namespaceHandlerClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "init");
@@ -71,14 +71,14 @@ public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
     }
 
     private void registerMuleBeanDefinitionParserFor(JMethod init, VariableElement variable, JClass parentClass) {
-        if (CodeModelUtils.isXmlType(variable)) {
+        if (TypeMirrorUtils.isXmlType(variable)) {
             JInvocation newAnyXmlChildDefinitionParser = JExpr._new(getAnyXmlChildDefinitionParserClass(variable));
             newAnyXmlChildDefinitionParser.arg(JExpr.lit(variable.getSimpleName().toString()));
             newAnyXmlChildDefinitionParser.arg(JExpr.dotclass(parentClass));
 
             init.body().invoke("registerMuleBeanDefinitionParser").arg(JExpr.lit(variable.getSimpleName().toString())).arg(newAnyXmlChildDefinitionParser);
         } else {
-            if (CodeModelUtils.isArrayOrList(getContext().getTypes(), variable.asType())) {
+            if (TypeMirrorUtils.isArrayOrList(getContext().getTypes(), variable.asType())) {
                 JInvocation childDefinitionParser = JExpr._new(ref(ChildDefinitionParser.class));
                 childDefinitionParser.arg(JExpr.lit(variable.getSimpleName().toString()));
                 childDefinitionParser.arg(ref(ListFactoryBean.class).dotclass());
@@ -141,8 +141,8 @@ public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
     }
 
     private void registerBeanDefinitionParserForProcessor(JMethod init, ExecutableElement executableElement) {
-        JDefinedClass beanDefinitionParser = getBeanDefinitionParserClass(executableElement);
-        JDefinedClass messageProcessor = getMessageProcessorClass(executableElement);
+        DefinedClass beanDefinitionParser = getBeanDefinitionParserClass(executableElement);
+        DefinedClass messageProcessor = getMessageProcessorClass(executableElement);
 
         Processor processor = executableElement.getAnnotation(Processor.class);
         String elementName = executableElement.getSimpleName().toString();
@@ -157,8 +157,8 @@ public class NamespaceHandlerGenerator extends AbstractCodeGenerator {
     }
 
     private void registerBeanDefinitionParserForSource(JMethod init, ExecutableElement executableElement) {
-        JDefinedClass beanDefinitionParser = getBeanDefinitionParserClass(executableElement);
-        JDefinedClass messageSource = getMessageSourceClass(executableElement);
+        DefinedClass beanDefinitionParser = getBeanDefinitionParserClass(executableElement);
+        DefinedClass messageSource = getMessageSourceClass(executableElement);
 
         Source source = executableElement.getAnnotation(Source.class);
         String elementName = executableElement.getSimpleName().toString();

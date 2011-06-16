@@ -17,7 +17,6 @@
 
 package org.mule.devkit.apt.generator.mule;
 
-import com.sun.codemodel.*;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
@@ -32,7 +31,8 @@ import org.mule.api.transport.Connector;
 import org.mule.devkit.annotations.Source;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
-import org.mule.devkit.apt.generator.GenerationException;
+import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.model.code.*;
 import org.mule.transaction.MuleTransactionConfig;
 
 import javax.lang.model.element.ExecutableElement;
@@ -54,7 +54,7 @@ public class DummyInboundEndpointGenerator extends AbstractCodeGenerator {
             if (source == null)
                 continue;
 
-            JDefinedClass dummyInboundEndpoint = getDummyInboundEndpointClass(executableElement);
+            DefinedClass dummyInboundEndpoint = getDummyInboundEndpointClass(executableElement);
 
             // add internal fields
             JFieldVar muleContext = dummyInboundEndpoint.field(JMod.PRIVATE, ref(MuleContext.class), "muleContext");

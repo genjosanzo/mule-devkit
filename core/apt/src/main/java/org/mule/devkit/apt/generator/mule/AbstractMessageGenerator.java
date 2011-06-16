@@ -17,7 +17,6 @@
 
 package org.mule.devkit.apt.generator.mule;
 
-import com.sun.codemodel.*;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleContext;
 import org.mule.api.expression.ExpressionManager;
@@ -29,7 +28,8 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.annotations.SourceCallback;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
-import org.mule.devkit.apt.util.CodeModelUtils;
+import org.mule.devkit.apt.util.TypeMirrorUtils;
+import org.mule.devkit.model.code.*;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.TemplateParser;
 
@@ -81,29 +81,29 @@ public abstract class AbstractMessageGenerator extends AbstractCodeGenerator {
     }
 
 
-    protected JFieldVar generateFieldForPatternInfo(JDefinedClass messageProcessorClass) {
+    protected JFieldVar generateFieldForPatternInfo(DefinedClass messageProcessorClass) {
         return messageProcessorClass.field(JMod.PRIVATE, ref(TemplateParser.PatternInfo.class), "patternInfo");
     }
 
-    protected JFieldVar generateFieldForExpressionManager(JDefinedClass messageProcessorClass) {
+    protected JFieldVar generateFieldForExpressionManager(DefinedClass messageProcessorClass) {
         return messageProcessorClass.field(JMod.PRIVATE, ref(ExpressionManager.class), "expressionManager");
     }
 
-    protected JFieldVar generateFieldForMuleContext(JDefinedClass messageProcessorClass) {
+    protected JFieldVar generateFieldForMuleContext(DefinedClass messageProcessorClass) {
         return messageProcessorClass.field(JMod.PRIVATE, ref(MuleContext.class), "muleContext");
     }
 
-    protected JFieldVar generateFieldForPojo(JDefinedClass messageProcessorClass, TypeElement typeElement) {
+    protected JFieldVar generateFieldForPojo(DefinedClass messageProcessorClass, TypeElement typeElement) {
         return messageProcessorClass.field(JMod.PRIVATE, getLifecycleWrapperClass(typeElement), "object");
     }
 
-    protected Map<String, FieldVariableElement> generateFieldForEachParameter(JDefinedClass messageProcessorClass, ExecutableElement executableElement) {
+    protected Map<String, FieldVariableElement> generateFieldForEachParameter(DefinedClass messageProcessorClass, ExecutableElement executableElement) {
         Map<String, AbstractMessageGenerator.FieldVariableElement> fields = new HashMap<String, FieldVariableElement>();
         for (VariableElement variable : executableElement.getParameters()) {
             if (variable.asType().toString().contains(SourceCallback.class.getName()))
                 continue;
 
-            if (isTypeSupported(variable) || CodeModelUtils.isXmlType(variable)) {
+            if (isTypeSupported(variable) || TypeMirrorUtils.isXmlType(variable)) {
                 String fieldName = variable.getSimpleName().toString();
                 JFieldVar field = messageProcessorClass.field(JMod.PRIVATE, ref(Object.class), fieldName);
                 fields.put(variable.getSimpleName().toString(), new AbstractMessageGenerator.FieldVariableElement(field, variable));
@@ -116,7 +116,7 @@ public abstract class AbstractMessageGenerator extends AbstractCodeGenerator {
         return fields;
     }
 
-    protected JMethod generateInitialiseMethod(JDefinedClass messageProcessorClass, JClass lifecycleWrapperClass, JFieldVar muleContext, JFieldVar expressionManager, JFieldVar patternInfo, JFieldVar object) {
+    protected JMethod generateInitialiseMethod(DefinedClass messageProcessorClass, JClass lifecycleWrapperClass, JFieldVar muleContext, JFieldVar expressionManager, JFieldVar patternInfo, JFieldVar object) {
         JMethod initialise = messageProcessorClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "initialise");
         initialise._throws(InitialisationException.class);
 
@@ -145,7 +145,7 @@ public abstract class AbstractMessageGenerator extends AbstractCodeGenerator {
     }
 
 
-    protected JMethod generateSetObjectMethod(JDefinedClass messageProcessorClass, JFieldVar object) {
+    protected JMethod generateSetObjectMethod(DefinedClass messageProcessorClass, JFieldVar object) {
         JMethod setObject = messageProcessorClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "setObject");
         JVar objectParam = setObject.param(object.type(), "object");
         setObject.body().assign(JExpr._this().ref(object), objectParam);
@@ -154,7 +154,7 @@ public abstract class AbstractMessageGenerator extends AbstractCodeGenerator {
     }
 
 
-    protected JMethod generateSetMuleContextMethod(JDefinedClass messageProcessorClass, JFieldVar muleContext) {
+    protected JMethod generateSetMuleContextMethod(DefinedClass messageProcessorClass, JFieldVar muleContext) {
         JMethod setMuleContext = messageProcessorClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "setMuleContext");
         JVar muleContextParam = setMuleContext.param(ref(MuleContext.class), "context");
         setMuleContext.body().assign(JExpr._this().ref(muleContext), muleContextParam);
@@ -201,7 +201,7 @@ public abstract class AbstractMessageGenerator extends AbstractCodeGenerator {
         notAssignable.assign(transformedField, JExpr.cast(ref(expectedType).boxify(), evaluatedField));
     }
 
-    protected JMethod generateSetter(JDefinedClass messageProcessorClass, JFieldVar field) {
+    protected JMethod generateSetter(DefinedClass messageProcessorClass, JFieldVar field) {
         JMethod setter = messageProcessorClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "set" + StringUtils.capitalize(field.name()));
         JVar value = setter.param(field.type(), "value");
         setter.body().assign(JExpr._this().ref(field), value);

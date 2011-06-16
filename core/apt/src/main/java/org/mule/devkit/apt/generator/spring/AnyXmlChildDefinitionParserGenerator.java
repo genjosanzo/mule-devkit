@@ -17,15 +17,15 @@
 
 package org.mule.devkit.apt.generator.spring;
 
-import com.sun.codemodel.*;
 import org.apache.commons.lang.UnhandledException;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
-import org.mule.devkit.apt.generator.GenerationException;
-import org.mule.devkit.apt.util.CodeModelUtils;
+import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.apt.util.TypeMirrorUtils;
+import org.mule.devkit.model.code.*;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Attr;
@@ -59,8 +59,8 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractCodeGenerator 
 
             // generate extra parser
             for (VariableElement variable : executableElement.getParameters()) {
-                if (CodeModelUtils.isXmlType(variable)) {
-                    JDefinedClass anyXmlChildDefinitionParser = getAnyXmlChildDefinitionParserClass(variable);
+                if (TypeMirrorUtils.isXmlType(variable)) {
+                    DefinedClass anyXmlChildDefinitionParser = getAnyXmlChildDefinitionParserClass(variable);
                     generateAnyXmlChildDefinitionParser(anyXmlChildDefinitionParser);
 
                     break;
@@ -69,7 +69,7 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractCodeGenerator 
         }
     }
 
-    private void generateAnyXmlChildDefinitionParser(JDefinedClass anyXmlChildDefinitionParser) {
+    private void generateAnyXmlChildDefinitionParser(DefinedClass anyXmlChildDefinitionParser) {
         // generate constructor
         generateConstructor(anyXmlChildDefinitionParser);
 
@@ -83,7 +83,7 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractCodeGenerator 
         generateParseInternal(anyXmlChildDefinitionParser);
     }
 
-    private void generateParseInternal(JDefinedClass anyXmlChildDefinitionParser) {
+    private void generateParseInternal(DefinedClass anyXmlChildDefinitionParser) {
         JMethod parseInternal = anyXmlChildDefinitionParser.method(JMod.PROTECTED, ref(AbstractBeanDefinition.class), "parseInternal");
         JVar element = parseInternal.param(ref(Element.class), "element");
         JVar parserContext = parseInternal.param(ref(ParserContext.class), "parserContext");
@@ -143,7 +143,7 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractCodeGenerator 
         catchBlock.body()._throw(JExpr._new(ref(UnhandledException.class)).arg(e));
     }
 
-    private void generateConstructor(JDefinedClass anyXmlChildDefinitionParser) {
+    private void generateConstructor(DefinedClass anyXmlChildDefinitionParser) {
         JMethod constructor = anyXmlChildDefinitionParser.constructor(JMod.PUBLIC);
         JVar setterMethod = constructor.param(ref(String.class), "setterMethod");
         JVar clazz = constructor.param(ref(Class.class), "clazz");
@@ -156,7 +156,7 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractCodeGenerator 
         addIgnored.arg("xmlns");
     }
 
-    private void generateProcessProperty(JDefinedClass xmlAnyChildDefinitionParser) {
+    private void generateProcessProperty(DefinedClass xmlAnyChildDefinitionParser) {
         JMethod processProperty = xmlAnyChildDefinitionParser.method(JMod.PROTECTED, getContext().getCodeModel().VOID, "processProperty");
         JVar attribute = processProperty.param(ref(Attr.class), "attribute");
         JVar beanAssembler = processProperty.param(ref(BeanAssembler.class), "assembler");

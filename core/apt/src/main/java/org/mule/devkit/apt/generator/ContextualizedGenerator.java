@@ -18,6 +18,7 @@
 package org.mule.devkit.apt.generator;
 
 import org.mule.devkit.apt.AnnotationProcessorContext;
+import org.mule.devkit.generation.Generator;
 
 public abstract class ContextualizedGenerator implements Generator {
     private AnnotationProcessorContext context;

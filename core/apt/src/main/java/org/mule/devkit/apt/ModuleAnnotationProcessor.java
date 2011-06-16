@@ -18,13 +18,13 @@
 package org.mule.devkit.apt;
 
 import org.mule.devkit.annotations.Module;
-import org.mule.devkit.apt.generator.Generator;
+import org.mule.devkit.generation.Generator;
 import org.mule.devkit.apt.generator.MetadataGenerator;
 import org.mule.devkit.apt.generator.mule.*;
 import org.mule.devkit.apt.generator.schema.SchemaGenerator;
 import org.mule.devkit.apt.generator.spring.*;
-import org.mule.devkit.apt.validation.ModuleTypeValidator;
-import org.mule.devkit.validation.TypeValidator;
+import org.mule.devkit.module.validation.ModuleValidator;
+import org.mule.devkit.validation.Validator;
 
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
@@ -36,7 +36,7 @@ import java.util.List;
 @SupportedAnnotationTypes(value = {"org.mule.devkit.annotations.Module"})
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class ModuleAnnotationProcessor extends AbstractAnnotationProcessor {
-    private ModuleTypeValidator moduleTypeValidator = new ModuleTypeValidator();
+    private ModuleValidator moduleValidator = new ModuleValidator();
 
     public ModuleAnnotationProcessor() {
     }
@@ -50,8 +50,8 @@ public class ModuleAnnotationProcessor extends AbstractAnnotationProcessor {
     }
 
     @Override
-    public TypeValidator getValidator() {
-        return moduleTypeValidator;
+    public Validator<TypeElement> getValidator() {
+        return moduleValidator;
     }
 
     @Override

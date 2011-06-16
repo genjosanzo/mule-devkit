@@ -17,16 +17,16 @@
 
 package org.mule.devkit.apt;
 
-import com.sun.codemodel.JCodeModel;
+import org.mule.devkit.model.code.JCodeModel;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.mule.devkit.annotations.Module;
-import org.mule.devkit.apt.generator.GenerationException;
-import org.mule.devkit.apt.generator.Generator;
+import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.generation.Generator;
 import org.mule.devkit.apt.generator.schema.FileTypeSchema;
 import org.mule.devkit.apt.generator.schema.NamespaceFilter;
 import org.mule.devkit.apt.generator.schema.Schema;
-import org.mule.devkit.validation.TypeValidator;
+import org.mule.devkit.model.code.writer.FilerCodeWriter;
 import org.mule.devkit.validation.ValidationException;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -47,11 +47,7 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
     private AnnotationProcessorContext context;
 
     private void createContext() {
-        context = new AnnotationProcessorContext();
-        context.setCodeModel(new JCodeModel());
-        context.setElements(processingEnv.getElementUtils());
-        context.setCodeWriter(new FilerCodeWriter(processingEnv.getFiler()));
-        context.setTypes(processingEnv.getTypeUtils());
+        context = new AnnotationProcessorContext(processingEnv.getFiler(), processingEnv.getTypeUtils());
     }
 
     protected AnnotationProcessorContext getContext() {
@@ -90,31 +86,15 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
         }
 
         try {
-            FilerCodeWriter filerCodeWriter = new FilerCodeWriter(processingEnv.getFiler());
-            context.getCodeModel().build(filerCodeWriter);
+            context.getCodeModel().build();
         } catch (IOException e) {
             error(e.getMessage());
         }
 
-        if (getContext().getSchemas().size() > 0) {
-            for (Module mod : getContext().getSchemas().keySet()) {
-                FileTypeSchema fileTypeSchema = getContext().getSchemas().get(mod);
-                try {
-                    JAXBContext jaxbContext = JAXBContext.newInstance(Schema.class);
-                    Marshaller marshaller = jaxbContext.createMarshaller();
-                    NamespaceFilter outFilter = new NamespaceFilter("mule", "http://www.mulesoft.org/schema/mule/core", true);
-                    OutputFormat format = new OutputFormat();
-                    format.setIndent(true);
-                    format.setNewlines(true);
-                    XMLWriter writer = new XMLWriter(fileTypeSchema.getOs(), format);
-                    outFilter.setContentHandler(writer);
-                    marshaller.marshal(fileTypeSchema.getSchema(), outFilter);
-                } catch (JAXBException e) {
-                    error(e.getCause().getMessage());
-                } catch (UnsupportedEncodingException e) {
-                    error(e.getCause().getMessage());
-                }
-            }
+        try {
+            context.getSchemaModel().build();
+        } catch (IOException e) {
+            error(e.getMessage());
         }
 
         return true;
@@ -136,7 +116,7 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
 
     public abstract void postCodeGeneration(TypeElement e);
 
-    public abstract TypeValidator getValidator();
+    public abstract Validator getValidator();
 
     public abstract List<Generator> getCodeGenerators();
 }

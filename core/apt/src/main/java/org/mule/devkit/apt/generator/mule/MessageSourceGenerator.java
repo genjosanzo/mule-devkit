@@ -17,7 +17,6 @@
 
 package org.mule.devkit.apt.generator.mule;
 
-import com.sun.codemodel.*;
 import org.apache.commons.lang.StringUtils;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -30,8 +29,9 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.devkit.annotations.Source;
 import org.mule.devkit.annotations.SourceCallback;
 import org.mule.devkit.apt.AnnotationProcessorContext;
-import org.mule.devkit.apt.generator.GenerationException;
-import org.mule.devkit.apt.util.CodeModelUtils;
+import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.apt.util.TypeMirrorUtils;
+import org.mule.devkit.model.code.*;
 import org.mule.session.DefaultMuleSession;
 
 import javax.lang.model.element.ExecutableElement;
@@ -63,7 +63,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
     private void generateMessageSource(TypeElement typeElement, ExecutableElement executableElement) {
         // get class
-        JDefinedClass messageSourceClass = getMessageSourceClass(executableElement);
+        DefinedClass messageSourceClass = getMessageSourceClass(executableElement);
 
         // add a field for each argument of the method
         Map<String, FieldVariableElement> fields = generateFieldForEachParameter(messageSourceClass, executableElement);
@@ -108,7 +108,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         generateRunMethod(messageSourceClass, executableElement, fields, object, muleContext);
     }
 
-    private void generateRunMethod(JDefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, JFieldVar object, JFieldVar muleContext) {
+    private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, JFieldVar object, JFieldVar muleContext) {
         JMethod run = messageSourceClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "run");
         JTryBlock callSource = run.body()._try();
 
@@ -120,7 +120,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
                 parameters.add(JExpr._this());
             } else {
                 String fieldName = variable.getSimpleName().toString();
-                if (isTypeSupported(fields.get(fieldName).getVariableElement()) || CodeModelUtils.isXmlType(fields.get(fieldName).getVariableElement())) {
+                if (isTypeSupported(fields.get(fieldName).getVariableElement()) || TypeMirrorUtils.isXmlType(fields.get(fieldName).getVariableElement())) {
                     JVar transformed = callSource.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName), JExpr._null());
                     JConditional notNull = callSource.body()._if(JOp.ne(fields.get(fieldName).getField(), JExpr._null()));
                     generateTransform(notNull._then(), transformed, fields.get(fieldName).getField(), fields.get(fieldName).getVariableElement().asType(), muleContext);
@@ -146,7 +146,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
     }
 
 
-    private void generateStartMethod(JDefinedClass messageSourceClass, JFieldVar thread) {
+    private void generateStartMethod(DefinedClass messageSourceClass, JFieldVar thread) {
         JMethod start = messageSourceClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "start");
         start._throws(ref(MuleException.class));
         JConditional ifNoThread = start.body()._if(JOp.eq(thread, JExpr._null()));
@@ -158,7 +158,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         start.body().add(thread.invoke("start"));
     }
 
-    private void generateStopMethod(JDefinedClass messageSourceClass, JFieldVar thread) {
+    private void generateStopMethod(DefinedClass messageSourceClass, JFieldVar thread) {
         JMethod stop = messageSourceClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "stop");
         stop._throws(ref(MuleException.class));
 
@@ -166,7 +166,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
     }
 
 
-    private void generateSourceCallbackMethod(JDefinedClass messageSourceClass, ExecutableElement executableElement, JFieldVar messageProcessor, JFieldVar muleContext, JFieldVar flowConstruct) {
+    private void generateSourceCallbackMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, JFieldVar messageProcessor, JFieldVar muleContext, JFieldVar flowConstruct) {
         JMethod process = messageSourceClass.method(JMod.PUBLIC, ref(Object.class), "process");
         JVar message = process.param(ref(Object.class), "message");
 
@@ -209,7 +209,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         process.body()._return(JExpr._null());
     }
 
-    private JMethod generateSetListenerMethod(JDefinedClass messageSourceClass, JFieldVar messageProcessor) {
+    private JMethod generateSetListenerMethod(DefinedClass messageSourceClass, JFieldVar messageProcessor) {
         JMethod setListener = messageSourceClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "setListener");
         JVar listener = setListener.param(ref(MessageProcessor.class), "listener");
         setListener.body().assign(JExpr._this().ref(messageProcessor), listener);
@@ -217,7 +217,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         return setListener;
     }
 
-    private JMethod generateSetFlowConstructMethod(JDefinedClass messageSourceClass, JFieldVar flowConstruct) {
+    private JMethod generateSetFlowConstructMethod(DefinedClass messageSourceClass, JFieldVar flowConstruct) {
         JMethod setFlowConstruct = messageSourceClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "setFlowConstruct");
         JVar newFlowConstruct = setFlowConstruct.param(ref(FlowConstruct.class), "flowConstruct");
         setFlowConstruct.body().assign(JExpr._this().ref(flowConstruct), newFlowConstruct);

@@ -17,7 +17,6 @@
 
 package org.mule.devkit.apt.generator.mule;
 
-import com.sun.codemodel.*;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
@@ -25,9 +24,10 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
-import org.mule.devkit.apt.generator.GenerationException;
+import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.apt.util.ClassNameUtils;
-import org.mule.devkit.apt.util.CodeModelUtils;
+import org.mule.devkit.apt.util.TypeMirrorUtils;
+import org.mule.devkit.model.code.*;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
@@ -61,9 +61,9 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
                 continue;
 
             for (VariableElement variable : executableElement.getParameters()) {
-                if (CodeModelUtils.isXmlType(variable)) {
+                if (TypeMirrorUtils.isXmlType(variable)) {
                     // get class
-                    JDefinedClass jaxbTransformerClass = getJaxbTransformerClass(executableElement, variable);
+                    DefinedClass jaxbTransformerClass = getJaxbTransformerClass(executableElement, variable);
 
                     // declare weight
                     JFieldVar weighting = jaxbTransformerClass.field(JMod.PRIVATE, getContext().getCodeModel().INT, "weighting", JOp.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), JExpr.lit(1)));
@@ -84,25 +84,25 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
                     generateGetPriorityWeighting(jaxbTransformerClass, weighting);
                     generateSetPriorityWeighting(jaxbTransformerClass, weighting);
 
-                    getContext().registerClassAtBoot(jaxbTransformerClass);
+                    getContext().registerAtBoot(jaxbTransformerClass);
                 }
             }
         }
 
     }
 
-    private void generateSetPriorityWeighting(JDefinedClass jaxbTransformerClass, JFieldVar weighting) {
+    private void generateSetPriorityWeighting(DefinedClass jaxbTransformerClass, JFieldVar weighting) {
         JMethod setPriorityWeighting = jaxbTransformerClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "setPriorityWeighting");
         JVar localWeighting = setPriorityWeighting.param(getContext().getCodeModel().INT, "weighting");
         setPriorityWeighting.body().assign(JExpr._this().ref(weighting), localWeighting);
     }
 
-    private void generateGetPriorityWeighting(JDefinedClass jaxbTransformerClass, JFieldVar weighting) {
+    private void generateGetPriorityWeighting(DefinedClass jaxbTransformerClass, JFieldVar weighting) {
         JMethod getPriorityWeighting = jaxbTransformerClass.method(JMod.PUBLIC, getContext().getCodeModel().INT, "getPriorityWeighting");
         getPriorityWeighting.body()._return(weighting);
     }
 
-    private void generateDoTransform(JDefinedClass jaxbTransformerClass, JFieldVar jaxbContext, VariableElement variable) {
+    private void generateDoTransform(DefinedClass jaxbTransformerClass, JFieldVar jaxbContext, VariableElement variable) {
         JMethod doTransform = jaxbTransformerClass.method(JMod.PROTECTED, ref(Object.class), "doTransform");
         doTransform._throws(TransformerException.class);
         JVar src = doTransform.param(ref(Object.class), "src");
@@ -149,7 +149,7 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
         catchBlock.body()._throw(transformerException);
     }
 
-    private JMethod generateLoadJaxbContext(JDefinedClass jaxbTransformerClass) {
+    private JMethod generateLoadJaxbContext(DefinedClass jaxbTransformerClass) {
         JMethod loadJaxbContext = jaxbTransformerClass.method(JMod.PRIVATE | JMod.STATIC, ref(JAXBContext.class), "loadJaxbContext");
         JVar clazz = loadJaxbContext.param(ref(Class.class), "clazz");
         JVar innerJaxbContext = loadJaxbContext.body().decl(ref(JAXBContext.class), "context");
@@ -165,7 +165,7 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
         return loadJaxbContext;
     }
 
-    private void generateConstructor(JDefinedClass jaxbTransformerClass, ExecutableElement executableElement, VariableElement variable) {
+    private void generateConstructor(DefinedClass jaxbTransformerClass, ExecutableElement executableElement, VariableElement variable) {
         // generate constructor
         JMethod constructor = jaxbTransformerClass.constructor(JMod.PUBLIC);
 
@@ -200,9 +200,9 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
 
     }
 
-    private JDefinedClass getJaxbTransformerClass(ExecutableElement executableElement, VariableElement variable) {
+    private DefinedClass getJaxbTransformerClass(ExecutableElement executableElement, VariableElement variable) {
         String jaxbTransformerClassName = getJaxbTransformerNameFor(executableElement, variable);
-        JDefinedClass jaxbTransformer = getOrCreateClass(jaxbTransformerClassName, AbstractTransformer.class);
+        DefinedClass jaxbTransformer = getOrCreateClass(jaxbTransformerClassName, AbstractTransformer.class);
         jaxbTransformer._implements(DiscoverableTransformer.class);
 
         return jaxbTransformer;

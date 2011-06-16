@@ -20,10 +20,35 @@ package org.mule.devkit.apt.generator.schema;
 import org.mule.devkit.annotations.*;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.ContextualizedGenerator;
-import org.mule.devkit.apt.generator.GenerationException;
-import org.mule.devkit.apt.util.CodeModelUtils;
+import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.apt.util.TypeMirrorUtils;
 import org.mule.devkit.apt.util.Inflection;
 import org.mule.devkit.apt.util.NameUtils;
+import org.mule.devkit.model.schema.All;
+import org.mule.devkit.model.schema.Annotation;
+import org.mule.devkit.model.schema.Any;
+import org.mule.devkit.model.schema.Attribute;
+import org.mule.devkit.model.schema.ComplexContent;
+import org.mule.devkit.model.schema.ComplexType;
+import org.mule.devkit.model.schema.Documentation;
+import org.mule.devkit.model.schema.Element;
+import org.mule.devkit.model.schema.ExplicitGroup;
+import org.mule.devkit.model.schema.ExtensionType;
+import org.mule.devkit.model.schema.FormChoice;
+import org.mule.devkit.model.schema.Import;
+import org.mule.devkit.model.schema.LocalComplexType;
+import org.mule.devkit.model.schema.LocalSimpleType;
+import org.mule.devkit.model.schema.NumFacet;
+import org.mule.devkit.model.schema.ObjectFactory;
+import org.mule.devkit.model.schema.Pattern;
+import org.mule.devkit.model.schema.Restriction;
+import org.mule.devkit.model.schema.Schema;
+import org.mule.devkit.model.schema.SchemaLocation;
+import org.mule.devkit.model.schema.SimpleType;
+import org.mule.devkit.model.schema.TopLevelComplexType;
+import org.mule.devkit.model.schema.TopLevelElement;
+import org.mule.devkit.model.schema.TopLevelSimpleType;
+import org.mule.devkit.model.schema.Union;
 import org.mule.util.StringUtils;
 
 import javax.lang.model.element.ElementKind;
@@ -35,8 +60,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
@@ -82,9 +105,8 @@ public class SchemaGenerator extends ContextualizedGenerator {
         objectFactory = new ObjectFactory();
     }
 
-    public void generate(TypeElement type) throws GenerationException {
-
-        Module module = type.getAnnotation(Module.class);
+    public void generate(javax.lang.model.element.Element element) throws GenerationException {
+        Module module = element.getAnnotation(Module.class);
         String targetNamespace = module.namespace();
         if (targetNamespace == null || targetNamespace.length() == 0) {
             targetNamespace = BASE_NAMESPACE + module.name();
@@ -102,23 +124,20 @@ public class SchemaGenerator extends ContextualizedGenerator {
         importMuleSchemaDocNamespace();
 
         registerTypes();
-        registerConfigElement(type);
-        registerProcessors(targetNamespace, type);
-        registerTransformers(type);
+        registerConfigElement(element);
+        registerProcessors(targetNamespace, element);
+        registerTransformers(element);
 
-        try {
-            OutputStream schemaStream = getContext().getCodeWriter().openBinary(null, "META-INF/mule-" + module.name() + ".xsd");
+        String fileName = "META-INF/mule-" + module.name() + ".xsd";
 
-            String schemaLocation = module.schemaLocation();
-            if (schemaLocation == null || schemaLocation.length() == 0) {
-                schemaLocation = schema.getTargetNamespace() + "/" + module.version() + "/mule-" + module.name() + ".xsd";
-            }
-
-            FileTypeSchema fileTypeSchema = new FileTypeSchema(schemaStream, schema, schemaLocation, type);
-            getContext().addSchema(module, fileTypeSchema);
-        } catch (IOException ioe) {
-            throw new GenerationException(ioe);
+        String location = module.schemaLocation();
+        if (location == null || location.length() == 0) {
+            location = schema.getTargetNamespace() + "/" + module.version() + "/mule-" + module.name() + ".xsd";
         }
+
+        SchemaLocation schemaLocation = new SchemaLocation(schema, fileName, location);
+
+        getContext().getSchemaModel().addSchemaLocation(schemaLocation);
     }
 
     private void buildTypeMap(String targetNamespace) {
@@ -145,7 +164,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
         typeMap.put("java.net.URI", new QName(targetNamespace, "anyUriType"));
     }
 
-    private void registerTransformers(TypeElement type) {
+    private void registerTransformers(javax.lang.model.element.Element type) {
         java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(type.getEnclosedElements());
         for (ExecutableElement method : methods) {
             Transformer transformer = method.getAnnotation(Transformer.class);
@@ -157,7 +176,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
         }
     }
 
-    private void registerProcessors(String targetNamespace, TypeElement type) {
+    private void registerProcessors(String targetNamespace, javax.lang.model.element.Element type) {
         java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(type.getEnclosedElements());
         for (ExecutableElement method : methods) {
             Processor processor = method.getAnnotation(Processor.class);
@@ -238,10 +257,10 @@ public class SchemaGenerator extends ContextualizedGenerator {
                 if (variable.asType().toString().contains(SourceCallback.class.getName()))
                     continue;
 
-                if (CodeModelUtils.isXmlType(variable)) {
+                if (TypeMirrorUtils.isXmlType(variable.asType())) {
                     all.getParticle().add(objectFactory.createElement(generateXmlElement(variable.getSimpleName().toString(), targetNamespace)));
                 } else {
-                    if (CodeModelUtils.isArrayOrList(getContext().getTypes(), variable.asType())) {
+                    if (TypeMirrorUtils.isArrayOrList(getContext().getTypeUtils(), variable.asType())) {
                         generateParameterCollectionElement(all, variable);
                     } else {
                         complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(variable));
@@ -344,7 +363,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
         return xmlComplexType;
     }
 
-    private void registerConfigElement(TypeElement type) {
+    private void registerConfigElement(javax.lang.model.element.Element element) {
         ExtensionType config = registerExtension("config");
         Attribute nameAttribute = createAttribute("name", true, STRING, "Give a name to this configuration so it can be later referenced by config-ref.");
         config.getAttributeOrAttributeGroup().add(nameAttribute);
@@ -352,9 +371,9 @@ public class SchemaGenerator extends ContextualizedGenerator {
         All all = new All();
         config.setAll(all);
 
-        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(type.getEnclosedElements());
+        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(element.getEnclosedElements());
         for (VariableElement variable : variables) {
-            if (CodeModelUtils.isArrayOrList(getContext().getTypes(), variable.asType())) {
+            if (TypeMirrorUtils.isArrayOrList(getContext().getTypeUtils(), variable.asType())) {
                 generateConfigurableCollectionElement(all, variable);
             } else {
                 config.getAttributeOrAttributeGroup().add(createConfigurableAttribute(variable));

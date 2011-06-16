@@ -20,7 +20,7 @@ package org.mule.devkit.apt.generator.spring;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.ContextualizedGenerator;
-import org.mule.devkit.apt.generator.GenerationException;
+import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.apt.generator.schema.FileTypeSchema;
 
 import javax.lang.model.element.TypeElement;

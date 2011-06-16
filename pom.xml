@@ -22,6 +22,7 @@
     <packaging>pom</packaging>
 
     <modules>
+		<module>model</module>
         <module>core</module>	
         <module>tools</module>	
         <module>archetypes</module>
@@ -66,6 +67,7 @@
                         <exclude>**/*.ftl</exclude>
                         <exclude>**/build-number.txt</exclude> 
                         <exclude>**/*.ftl</exclude>
+						<exclude>model/codemodel/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>

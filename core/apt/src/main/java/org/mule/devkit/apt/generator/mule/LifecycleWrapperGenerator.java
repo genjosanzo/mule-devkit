@@ -17,7 +17,6 @@
 
 package org.mule.devkit.apt.generator.mule;
 
-import com.sun.codemodel.*;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.*;
 import org.mule.devkit.annotations.lifecycle.Dispose;
@@ -26,7 +25,8 @@ import org.mule.devkit.annotations.lifecycle.Start;
 import org.mule.devkit.annotations.lifecycle.Stop;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
-import org.mule.devkit.apt.generator.GenerationException;
+import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.model.code.*;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -40,7 +40,7 @@ public class LifecycleWrapperGenerator extends AbstractCodeGenerator {
     }
 
     public void generate(TypeElement element) throws GenerationException {
-        JDefinedClass lifecycleWrapper = getLifecycleWrapperClass(element);
+        DefinedClass lifecycleWrapper = getLifecycleWrapperClass(element);
 
         ExecutableElement startElement = getStartElement(element);
         if (startElement != null) {
@@ -71,7 +71,7 @@ public class LifecycleWrapperGenerator extends AbstractCodeGenerator {
         }
     }
 
-    private void generateLifecycleInvocation(JDefinedClass lifecycleWrapper, ExecutableElement superExecutableElement, String name, Class<?> catchException, boolean addThis) {
+    private void generateLifecycleInvocation(DefinedClass lifecycleWrapper, ExecutableElement superExecutableElement, String name, Class<?> catchException, boolean addThis) {
         JMethod startMethod = lifecycleWrapper.method(JMod.PUBLIC, getContext().getCodeModel().VOID, name);
 
         if (catchException != null) {

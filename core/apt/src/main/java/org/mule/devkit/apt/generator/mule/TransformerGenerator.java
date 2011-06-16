@@ -17,7 +17,6 @@
 
 package org.mule.devkit.apt.generator.mule;
 
-import com.sun.codemodel.*;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
@@ -29,7 +28,8 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.annotations.Transformer;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.generator.AbstractCodeGenerator;
-import org.mule.devkit.apt.generator.GenerationException;
+import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.model.code.*;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
@@ -56,7 +56,7 @@ public class TransformerGenerator extends AbstractCodeGenerator {
                 continue;
 
             // get class
-            JDefinedClass transformerClass = getTransformerClass(executableElement);
+            DefinedClass transformerClass = getTransformerClass(executableElement);
 
             // declare object
             JFieldVar object = transformerClass.field(JMod.PRIVATE, ref(executableElement.getEnclosingElement().asType()), "object");
@@ -84,23 +84,23 @@ public class TransformerGenerator extends AbstractCodeGenerator {
             generateGetPriorityWeighting(transformerClass, weighting);
             generateSetPriorityWeighting(transformerClass, weighting);
 
-            getContext().registerClassAtBoot(transformerClass);
+            getContext().registerAtBoot(transformerClass);
         }
 
     }
 
-    private void generateSetPriorityWeighting(JDefinedClass jaxbTransformerClass, JFieldVar weighting) {
+    private void generateSetPriorityWeighting(DefinedClass jaxbTransformerClass, JFieldVar weighting) {
         JMethod setPriorityWeighting = jaxbTransformerClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "setPriorityWeighting");
         JVar localWeighting = setPriorityWeighting.param(getContext().getCodeModel().INT, "weighting");
         setPriorityWeighting.body().assign(JExpr._this().ref(weighting), localWeighting);
     }
 
-    private void generateGetPriorityWeighting(JDefinedClass jaxbTransformerClass, JFieldVar weighting) {
+    private void generateGetPriorityWeighting(DefinedClass jaxbTransformerClass, JFieldVar weighting) {
         JMethod getPriorityWeighting = jaxbTransformerClass.method(JMod.PUBLIC, getContext().getCodeModel().INT, "getPriorityWeighting");
         getPriorityWeighting.body()._return(weighting);
     }
 
-    private void generateDoTransform(JDefinedClass jaxbTransformerClass, ExecutableElement executableElement, JFieldVar object) {
+    private void generateDoTransform(DefinedClass jaxbTransformerClass, ExecutableElement executableElement, JFieldVar object) {
         JMethod doTransform = jaxbTransformerClass.method(JMod.PROTECTED, ref(Object.class), "doTransform");
         doTransform._throws(TransformerException.class);
         JVar src = doTransform.param(ref(Object.class), "src");
@@ -135,7 +135,7 @@ public class TransformerGenerator extends AbstractCodeGenerator {
         catchBlock.body()._throw(transformerException);
     }
 
-    private void generateConstructor(JDefinedClass transformerClass, ExecutableElement executableElement) {
+    private void generateConstructor(DefinedClass transformerClass, ExecutableElement executableElement) {
         // generate constructor
         JMethod constructor = transformerClass.constructor(JMod.PUBLIC);
 
@@ -175,9 +175,9 @@ public class TransformerGenerator extends AbstractCodeGenerator {
         }
     }
 
-    private JDefinedClass getTransformerClass(ExecutableElement executableElement) {
+    private DefinedClass getTransformerClass(ExecutableElement executableElement) {
         String transformerClassName = getTransformerNameFor(executableElement);
-        JDefinedClass transformer = getOrCreateClass(transformerClassName, AbstractTransformer.class);
+        DefinedClass transformer = getOrCreateClass(transformerClassName, AbstractTransformer.class);
         transformer._implements(DiscoverableTransformer.class);
         transformer._implements(MuleContextAware.class);
         transformer._implements(Initialisable.class);
@@ -185,7 +185,7 @@ public class TransformerGenerator extends AbstractCodeGenerator {
         return transformer;
     }
 
-    private JMethod generateSetObjectMethod(JDefinedClass messageProcessorClass, JFieldVar object) {
+    private JMethod generateSetObjectMethod(DefinedClass messageProcessorClass, JFieldVar object) {
         JMethod setObject = messageProcessorClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "setObject");
         JVar objectParam = setObject.param(object.type(), "object");
         setObject.body().assign(JExpr._this().ref(object), objectParam);
@@ -194,7 +194,7 @@ public class TransformerGenerator extends AbstractCodeGenerator {
     }
 
 
-    private JMethod generateSetMuleContextMethod(JDefinedClass messageProcessorClass, JFieldVar muleContext) {
+    private JMethod generateSetMuleContextMethod(DefinedClass messageProcessorClass, JFieldVar muleContext) {
         JMethod setMuleContext = messageProcessorClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "setMuleContext");
         JVar muleContextParam = setMuleContext.param(ref(MuleContext.class), "context");
         setMuleContext.body().assign(JExpr._this().ref(muleContext), muleContextParam);
@@ -202,7 +202,7 @@ public class TransformerGenerator extends AbstractCodeGenerator {
         return setMuleContext;
     }
 
-    private JMethod generateInitialiseMethod(JDefinedClass messageProcessorClass, JClass messageProcessor, JFieldVar muleContext, JFieldVar object) {
+    private JMethod generateInitialiseMethod(DefinedClass messageProcessorClass, JClass messageProcessor, JFieldVar muleContext, JFieldVar object) {
         JMethod initialise = messageProcessorClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "initialise");
         initialise._throws(InitialisationException.class);
 

@@ -17,77 +17,46 @@
 
 package org.mule.devkit.apt;
 
-import com.sun.codemodel.CodeWriter;
-import com.sun.codemodel.JCodeModel;
-import com.sun.codemodel.JDefinedClass;
-import org.mule.devkit.annotations.Module;
-import org.mule.devkit.apt.generator.schema.FileTypeSchema;
+import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.JCodeModel;
+import org.mule.devkit.model.code.writer.FilerCodeWriter;
+import org.mule.devkit.model.schema.SchemaModel;
 
-import javax.lang.model.util.Elements;
+import javax.annotation.processing.Filer;
 import javax.lang.model.util.Types;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AnnotationProcessorContext {
     private JCodeModel codeModel;
-    private Elements elements;
+    private SchemaModel schemaModel;
+    private List<DefinedClass> registerAtBoot;
     private Types types;
-    private Map<Module, FileTypeSchema> schemas;
-    private CodeWriter codeWriter;
-    private List<JDefinedClass> classesToRegisterAtBoot;
 
-    public AnnotationProcessorContext() {
-        this.schemas = new HashMap<Module, FileTypeSchema>();
-        this.classesToRegisterAtBoot = new ArrayList<JDefinedClass>();
+    public AnnotationProcessorContext(Filer filer, Types types) {
+        this.registerAtBoot = new ArrayList<DefinedClass>();
+        this.codeModel = new JCodeModel(new FilerCodeWriter(filer));
+        this.schemaModel = new SchemaModel(new FilerCodeWriter(filer));
+        this.types = types;
     }
 
     public JCodeModel getCodeModel() {
         return codeModel;
     }
 
-    public void setCodeModel(JCodeModel codeModel) {
-        this.codeModel = codeModel;
+    public List<DefinedClass> getRegisterAtBoot() {
+        return registerAtBoot;
     }
 
-    public Elements getElements() {
-        return elements;
+    public void registerAtBoot(DefinedClass clazz) {
+        this.registerAtBoot.add(clazz);
     }
 
-    public void setElements(Elements elements) {
-        this.elements = elements;
+    public SchemaModel getSchemaModel() {
+        return schemaModel;
     }
 
-    public void addSchema(Module key, FileTypeSchema typeSchema) {
-        this.schemas.put(key, typeSchema);
-    }
-
-    public Map<Module, FileTypeSchema> getSchemas() {
-        return this.schemas;
-    }
-
-    public CodeWriter getCodeWriter() {
-        return codeWriter;
-    }
-
-    public void setCodeWriter(CodeWriter codeWriter) {
-        this.codeWriter = codeWriter;
-    }
-
-    public List<JDefinedClass> getClassesToRegisterAtBoot() {
-        return classesToRegisterAtBoot;
-    }
-
-    public void registerClassAtBoot(JDefinedClass clazz) {
-        this.classesToRegisterAtBoot.add(clazz);
-    }
-
-    public Types getTypes() {
-        return types;
-    }
-
-    public void setTypes(Types types) {
-        this.types = types;
+    public Types getTypeUtils() {
+        return this.types;
     }
 }

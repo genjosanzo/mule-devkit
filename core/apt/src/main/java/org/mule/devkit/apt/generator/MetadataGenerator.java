@@ -17,11 +17,12 @@
 
 package org.mule.devkit.apt.generator;
 
-import com.sun.codemodel.JClassAlreadyExistsException;
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JPackage;
+import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.JClassAlreadyExistsException;
+import org.mule.devkit.model.code.JPackage;
 import org.mule.devkit.apt.AnnotationProcessorContext;
 import org.mule.devkit.apt.util.ClassNameUtils;
+import org.mule.devkit.generation.GenerationException;
 
 import javax.lang.model.element.TypeElement;
 
@@ -35,7 +36,7 @@ public class MetadataGenerator extends ContextualizedGenerator {
 
         try {
             JPackage pkg = getContext().getCodeModel()._package(ClassNameUtils.getPackageName(metadataInterfaceName));
-            JDefinedClass jc = pkg._interface(ClassNameUtils.getClassName(metadataInterfaceName));
+            DefinedClass jc = pkg._interface(ClassNameUtils.getClassName(metadataInterfaceName));
         } catch (JClassAlreadyExistsException e) {
             throw new GenerationException("Internal Error: Class " + metadataInterfaceName + " already exists");
         }
