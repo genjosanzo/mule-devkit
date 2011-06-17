@@ -15,22 +15,28 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.apt.generator.mule;
+package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.annotations.Processor;
-import org.mule.devkit.apt.AnnotationProcessorContext;
-import org.mule.devkit.apt.generator.AbstractCodeGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.apt.util.ClassNameUtils;
-import org.mule.devkit.apt.util.TypeMirrorUtils;
-import org.mule.devkit.model.code.*;
-import org.mule.transformer.AbstractTransformer;
+import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.JCatchBlock;
+import org.mule.devkit.model.code.JExpr;
+import org.mule.devkit.model.code.JFieldVar;
+import org.mule.devkit.model.code.JInvocation;
+import org.mule.devkit.model.code.JMethod;
+import org.mule.devkit.model.code.JMod;
+import org.mule.devkit.model.code.JOp;
+import org.mule.devkit.model.code.JPackage;
+import org.mule.devkit.model.code.JTryBlock;
+import org.mule.devkit.model.code.JVar;
 import org.mule.transformer.types.DataTypeFactory;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -47,12 +53,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 
-public class JaxbTransformerGenerator extends AbstractCodeGenerator {
-    public JaxbTransformerGenerator(AnnotationProcessorContext context) {
-        super(context);
-    }
-
-    public void generate(TypeElement type) throws GenerationException {
+public class JaxbTransformerGenerator extends AbstractModuleGenerator {
+    public void generate(Element type) throws GenerationException {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(type.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Processor processor = executableElement.getAnnotation(Processor.class);
@@ -61,18 +63,18 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
                 continue;
 
             for (VariableElement variable : executableElement.getParameters()) {
-                if (TypeMirrorUtils.isXmlType(variable)) {
+                if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                     // get class
                     DefinedClass jaxbTransformerClass = getJaxbTransformerClass(executableElement, variable);
 
                     // declare weight
-                    JFieldVar weighting = jaxbTransformerClass.field(JMod.PRIVATE, getContext().getCodeModel().INT, "weighting", JOp.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), JExpr.lit(1)));
+                    JFieldVar weighting = jaxbTransformerClass.field(JMod.PRIVATE, context.getCodeModel().INT, "weighting", JOp.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), JExpr.lit(1)));
 
                     // load JAXB context
                     JMethod loadJaxbContext = generateLoadJaxbContext(jaxbTransformerClass);
 
                     // declare JAXB context
-                    JFieldVar jaxbContext = jaxbTransformerClass.field(JMod.PRIVATE | JMod.STATIC, ref(JAXBContext.class), "JAXB_CONTEXT", JExpr.invoke(loadJaxbContext).arg(JExpr.dotclass(ref(variable.asType()).boxify())));
+                    JFieldVar jaxbContext = jaxbTransformerClass.field(JMod.PRIVATE | JMod.STATIC, JAXBContext.class, "JAXB_CONTEXT", JExpr.invoke(loadJaxbContext).arg(ref(variable.asType()).boxify().dotclass()));
 
                     //generate constructor
                     generateConstructor(jaxbTransformerClass, executableElement, variable);
@@ -84,7 +86,7 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
                     generateGetPriorityWeighting(jaxbTransformerClass, weighting);
                     generateSetPriorityWeighting(jaxbTransformerClass, weighting);
 
-                    getContext().registerAtBoot(jaxbTransformerClass);
+                    context.registerAtBoot(jaxbTransformerClass);
                 }
             }
         }
@@ -92,26 +94,26 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
     }
 
     private void generateSetPriorityWeighting(DefinedClass jaxbTransformerClass, JFieldVar weighting) {
-        JMethod setPriorityWeighting = jaxbTransformerClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "setPriorityWeighting");
-        JVar localWeighting = setPriorityWeighting.param(getContext().getCodeModel().INT, "weighting");
+        JMethod setPriorityWeighting = jaxbTransformerClass.method(JMod.PUBLIC, context.getCodeModel().VOID, "setPriorityWeighting");
+        JVar localWeighting = setPriorityWeighting.param(context.getCodeModel().INT, "weighting");
         setPriorityWeighting.body().assign(JExpr._this().ref(weighting), localWeighting);
     }
 
     private void generateGetPriorityWeighting(DefinedClass jaxbTransformerClass, JFieldVar weighting) {
-        JMethod getPriorityWeighting = jaxbTransformerClass.method(JMod.PUBLIC, getContext().getCodeModel().INT, "getPriorityWeighting");
+        JMethod getPriorityWeighting = jaxbTransformerClass.method(JMod.PUBLIC, context.getCodeModel().INT, "getPriorityWeighting");
         getPriorityWeighting.body()._return(weighting);
     }
 
     private void generateDoTransform(DefinedClass jaxbTransformerClass, JFieldVar jaxbContext, VariableElement variable) {
-        JMethod doTransform = jaxbTransformerClass.method(JMod.PROTECTED, ref(Object.class), "doTransform");
+        JMethod doTransform = jaxbTransformerClass.method(JMod.PROTECTED, Object.class, "doTransform");
         doTransform._throws(TransformerException.class);
-        JVar src = doTransform.param(ref(Object.class), "src");
-        JVar encoding = doTransform.param(ref(String.class), "encoding");
+        JVar src = doTransform.param(Object.class, "src");
+        JVar encoding = doTransform.param(String.class, "encoding");
 
         JVar result = doTransform.body().decl(ref(variable.asType()).boxify(), "result", JExpr._null());
 
         JTryBlock tryBlock = doTransform.body()._try();
-        JVar unmarshaller = tryBlock.body().decl(ref(Unmarshaller.class), "unmarshaller");
+        JVar unmarshaller = tryBlock.body().decl(Unmarshaller.class, "unmarshaller");
         tryBlock.body().assign(unmarshaller, jaxbContext.invoke("createUnmarshaller"));
         JVar inputStream = tryBlock.body().decl(ref(InputStream.class), "is", JExpr._new(ref(ByteArrayInputStream.class)).arg(
                 JExpr.invoke(JExpr.cast(ref(String.class), src), "getBytes").arg(encoding)
@@ -175,7 +177,10 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
         // register destination data type
         registerDestinationType(constructor, variable);
 
-        constructor.body().invoke("setName").arg(getJaxbTransformerNameFor(executableElement, variable));
+        DeclaredType declaredType = (DeclaredType) variable.asType();
+        XmlType xmlType = declaredType.asElement().getAnnotation(XmlType.class);
+
+        constructor.body().invoke("setName").arg(StringUtils.capitalize(xmlType.name()) + "JaxbTransformer");
     }
 
     private void registerDestinationType(JMethod constructor, VariableElement variable) {
@@ -188,24 +193,16 @@ public class JaxbTransformerGenerator extends AbstractCodeGenerator {
         registerSourceType.arg(ref(DataTypeFactory.class).staticRef("STRING"));
     }
 
-    private String getJaxbTransformerNameFor(ExecutableElement executableElement, VariableElement variable) {
-        TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
-        String packageName = ClassNameUtils.getPackageName(getContext().getElements().getBinaryName(parentClass).toString());
+    private DefinedClass getJaxbTransformerClass(ExecutableElement executableElement, VariableElement variable) {
         DeclaredType declaredType = (DeclaredType) variable.asType();
         XmlType xmlType = declaredType.asElement().getAnnotation(XmlType.class);
+        TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
+        String packageName = context.getNameUtils().getPackageName(context.getElementsUtils().getBinaryName(parentClass).toString());
+        JPackage pkg = context.getCodeModel()._package(packageName);
+        DefinedClass dummyInboundEndpoint = pkg._class(StringUtils.capitalize(xmlType.name()) + "JaxbTransformer");
+        dummyInboundEndpoint._implements(DiscoverableTransformer.class);
 
-        String className = StringUtils.capitalize(xmlType.name()) + "JaxbTransformer";
-
-        return packageName + "." + className;
-
-    }
-
-    private DefinedClass getJaxbTransformerClass(ExecutableElement executableElement, VariableElement variable) {
-        String jaxbTransformerClassName = getJaxbTransformerNameFor(executableElement, variable);
-        DefinedClass jaxbTransformer = getOrCreateClass(jaxbTransformerClassName, AbstractTransformer.class);
-        jaxbTransformer._implements(DiscoverableTransformer.class);
-
-        return jaxbTransformer;
+        return dummyInboundEndpoint;
     }
 
 }

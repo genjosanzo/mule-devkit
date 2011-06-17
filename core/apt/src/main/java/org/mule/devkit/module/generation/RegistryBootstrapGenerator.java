@@ -15,30 +15,24 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.apt.generator.mule;
+package org.mule.devkit.module.generation;
 
-import org.mule.devkit.model.code.DefinedClass;
-import org.mule.devkit.apt.AnnotationProcessorContext;
-import org.mule.devkit.apt.generator.AbstractCodeGenerator;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.model.code.DefinedClass;
 
-import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.Element;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
-public class RegistryBootstrapGenerator extends AbstractCodeGenerator {
-    public RegistryBootstrapGenerator(AnnotationProcessorContext context) {
-        super(context);
-    }
-
-    public void generate(TypeElement element) throws GenerationException {
+public class RegistryBootstrapGenerator extends AbstractModuleGenerator {
+    public void generate(Element element) throws GenerationException {
 
         try {
-            OutputStream registryBootstrapStream = getContext().getCodeWriter().openBinary(null, "META-INF/services/org/mule/config/registry-bootstrap.properties");
+            OutputStream registryBootstrapStream = context.getCodeModel().getCodeWriter().openBinary(null, "META-INF/services/org/mule/config/registry-bootstrap.properties");
             OutputStreamWriter registryBootstrapStreamOut = new OutputStreamWriter(registryBootstrapStream, "UTF-8");
 
-            for (DefinedClass clazz : getContext().getRegisterAtBoot()) {
+            for (DefinedClass clazz : context.getRegisterAtBoot()) {
                 registryBootstrapStreamOut.write(clazz.name() + "=" + clazz.fullName() + "\n");
 
             }

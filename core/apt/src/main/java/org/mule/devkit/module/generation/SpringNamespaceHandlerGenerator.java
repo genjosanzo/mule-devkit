@@ -15,34 +15,25 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.apt.generator.spring;
+package org.mule.devkit.module.generation;
 
-import org.mule.devkit.annotations.Module;
-import org.mule.devkit.apt.AnnotationProcessorContext;
-import org.mule.devkit.apt.generator.AbstractCodeGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.apt.generator.schema.FileTypeSchema;
+import org.mule.devkit.model.schema.SchemaLocation;
 
-import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.Element;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
-public class SpringNamespaceHandlerGenerator extends AbstractCodeGenerator {
-    public SpringNamespaceHandlerGenerator(AnnotationProcessorContext context) {
-        super(context);
-    }
-
-    public void generate(TypeElement element) throws GenerationException {
+public class SpringNamespaceHandlerGenerator extends AbstractModuleGenerator {
+    public void generate(Element element) throws GenerationException {
 
         try {
-            OutputStream springNamespaceHandlersStream = getContext().getCodeWriter().openBinary(null, "META-INF/spring.handlers");
+            OutputStream springNamespaceHandlersStream = context.getCodeModel().getCodeWriter().openBinary(null, "META-INF/spring.handlers");
             OutputStreamWriter springNamespaceHandlersOut = new OutputStreamWriter(springNamespaceHandlersStream, "UTF-8");
 
-            for (Module mod : getContext().getSchemas().keySet()) {
-                FileTypeSchema fileTypeSchema = getContext().getSchemas().get(mod);
-                String namespaceHandlerName = getContext().getElements().getBinaryName(fileTypeSchema.getTypeElement()) + "NamespaceHandler";
-                springNamespaceHandlersOut.write(fileTypeSchema.getSchema().getTargetNamespace().replace("://", "\\://") + "=" + namespaceHandlerName + "\n");
+            for (SchemaLocation schemaLocation : context.getSchemaModel().getSchemaLocations()) {
+                springNamespaceHandlersOut.write(schemaLocation.getSchema().getTargetNamespace().replace("://", "\\://") + "=" + schemaLocation.getNamespaceHandler() + "\n");
             }
 
             springNamespaceHandlersOut.flush();

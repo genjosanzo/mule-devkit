@@ -20,5 +20,6 @@ package org.mule.devkit.generation;
 import javax.lang.model.element.Element;
 
 public interface Generator {
+    void setContext(GeneratorContext context);
     void generate(Element element) throws GenerationException;
 }

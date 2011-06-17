@@ -17,60 +17,169 @@
 
 package org.mule.devkit.apt;
 
-import org.mule.devkit.annotations.Module;
+import org.mule.devkit.Plugin;
+import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.Generator;
-import org.mule.devkit.apt.generator.MetadataGenerator;
-import org.mule.devkit.apt.generator.mule.*;
-import org.mule.devkit.apt.generator.schema.SchemaGenerator;
-import org.mule.devkit.apt.generator.spring.*;
-import org.mule.devkit.module.validation.ModuleValidator;
+import org.mule.devkit.generation.GeneratorContext;
+import org.mule.devkit.validation.ValidationException;
 import org.mule.devkit.validation.Validator;
 
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.ElementFilter;
+import javax.tools.Diagnostic;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ServiceLoader;
+import java.util.Set;
 
 @SupportedAnnotationTypes(value = {"org.mule.devkit.annotations.Module"})
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
-public class ModuleAnnotationProcessor extends AbstractAnnotationProcessor {
-    private ModuleValidator moduleValidator = new ModuleValidator();
+public class ModuleAnnotationProcessor extends AbstractProcessor {
+    private GeneratorContext context;
+    private List<Plugin> plugins;
 
     public ModuleAnnotationProcessor() {
     }
 
-    public void preCodeGeneration(TypeElement e) {
-        Module module = e.getAnnotation(Module.class);
+    /**
+     * Gets all the {@link Plugin}s discovered so far.
+     */
+    public List<Plugin> getPlugins() {
+        if (plugins == null) {
+            plugins = new ArrayList<Plugin>();
+            ClassLoader ucl = getUserClassLoader(getClass().getClassLoader());
+            for (Plugin aug : findServices(Plugin.class, ucl))
+                plugins.add(aug);
+        }
+
+        return plugins;
+    }
+
+    /**
+     * Gets a classLoader that can load classes specified via the
+     * -classpath option.
+     */
+    public URLClassLoader getUserClassLoader(ClassLoader parent) {
+        String classpath = processingEnv.getOptions().get("-cp");
+
+        if (classpath == null)
+            classpath = processingEnv.getOptions().get("-classpath");
+
+        List<URL> classpaths = new ArrayList<URL>();
+        for (String p : classpath.split(File.pathSeparator)) {
+            File file = new File(p);
+            try {
+                classpaths.add(file.toURL());
+            } catch (MalformedURLException e) {
+                warn(e.getMessage());
+            }
+        }
+
+        return new URLClassLoader(
+                classpaths.toArray(new URL[classpaths.size()]), parent);
+    }
+
+    /**
+     * Looks for all "META-INF/services/[className]" files and
+     * create one instance for each class name found inside this file.
+     */
+    private static <T> T[] findServices(Class<T> clazz, ClassLoader classLoader) {
+
+        Iterable<T> itr = ServiceLoader.load(clazz, classLoader);
+        List<T> r = new ArrayList<T>();
+        for (T t : itr)
+            r.add(t);
+
+        return r.toArray((T[]) Array.newInstance(clazz, r.size()));
     }
 
     @Override
-    public void postCodeGeneration(TypeElement e) {
+    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
+        createContext();
+
+        note("AbstractAnnotationProcessor: annotations=" + annotations + ", roundEnv=" + env);
+
+        for (TypeElement annotation : annotations) {
+            Set<? extends Element> elements = env.getElementsAnnotatedWith(annotation);
+            Set<TypeElement> typeElements = ElementFilter.typesIn(elements);
+            for (TypeElement e : typeElements) {
+
+                try {
+                    for (Plugin plugin : getPlugins()) {
+                        for (Validator validator : plugin.getValidators()) {
+                            validator.validate(e);
+                        }
+                        for (Generator generator : plugin.getGenerators()) {
+                            generator.generate(e);
+                        }
+                    }
+                } catch (ValidationException tve) {
+                    error(tve.getMessage(), tve.getElement());
+                    return false;
+                } catch (GenerationException ge) {
+                    error(ge.getMessage());
+                    return false;
+                }
+            }
+        }
+
+        try {
+            context.getCodeModel().build();
+        } catch (IOException e) {
+            error(e.getMessage());
+            return false;
+        }
+
+        try {
+            context.getSchemaModel().build();
+        } catch (IOException e) {
+            error(e.getMessage());
+            return false;
+        }
+
+        return true;
     }
 
-    @Override
-    public Validator<TypeElement> getValidator() {
-        return moduleValidator;
+    private void createContext() {
+        context = new GeneratorContext(processingEnv.getFiler(), processingEnv.getTypeUtils(), processingEnv.getElementUtils());
     }
 
+    protected GeneratorContext getContext() {
+        return context;
+    }
+
+    protected void note(String msg) {
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, msg);
+    }
+
+    protected void warn(String msg) {
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, msg);
+    }
+
+    protected void error(String msg) {
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, msg);
+    }
+
+    protected void error(String msg, Element element) {
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, msg, element);
+    }
+
+    /*
     @Override
     public List<Generator> getCodeGenerators() {
-        List<Generator> generators = new ArrayList<Generator>();
-        generators.add(new MetadataGenerator(getContext()));
-        generators.add(new NamespaceHandlerGenerator(getContext()));
-        generators.add(new BeanDefinitionParserGenerator(getContext()));
-        generators.add(new AnyXmlChildDefinitionParserGenerator(getContext()));
-        generators.add(new MessageProcessorGenerator(getContext()));
-        generators.add(new MessageSourceGenerator(getContext()));
-        generators.add(new LifecycleWrapperGenerator(getContext()));
-        generators.add(new SchemaGenerator(getContext()));
-        generators.add(new SpringSchemaGenerator(getContext()));
-        generators.add(new SpringNamespaceHandlerGenerator(getContext()));
-        generators.add(new JaxbTransformerGenerator(getContext()));
-        generators.add(new DummyInboundEndpointGenerator(getContext()));
-        generators.add(new RegistryBootstrapGenerator(getContext()));
-        generators.add(new TransformerGenerator(getContext()));
-        return generators;
+
     }
+    */
 }

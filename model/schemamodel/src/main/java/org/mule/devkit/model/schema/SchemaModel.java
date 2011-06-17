@@ -47,4 +47,8 @@ public final class SchemaModel {
             throw new IOException(e);
         }
     }
+
+    public java.util.List<SchemaLocation> getSchemaLocations() {
+        return this.schemas;
+    }
 }

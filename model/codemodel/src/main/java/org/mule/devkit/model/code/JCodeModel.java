@@ -55,6 +55,9 @@ import java.util.Map;
 import org.mule.devkit.model.code.writer.FileCodeWriter;
 import org.mule.devkit.model.code.writer.ProgressCodeWriter;
 
+import javax.lang.model.type.MirroredTypeException;
+import javax.lang.model.type.TypeMirror;
+
 
 /**
  * Root of the code DOM.
@@ -330,6 +333,9 @@ public final class JCodeModel {
         return r;
     }
 
+    public JType ref(TypeMirror typeMirror) {
+        return ref(typeMirror.toString());
+    }
 
     /**
      * Obtains a reference to an existing class from its Class object.

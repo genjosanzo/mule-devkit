@@ -28,12 +28,12 @@ public interface Plugin {
      *
      * @return A list of validators implementing Validator
      */
-    <T> List<Validator> getValidators();
+    List<Validator> getValidators();
 
     /**
      * Retrieve a list of generators for the specified object type
      *
      * @return A list of validators implementing Generator
      */
-    <T> List<Generator> getGenerators();
+    List<Generator> getGenerators();
 }

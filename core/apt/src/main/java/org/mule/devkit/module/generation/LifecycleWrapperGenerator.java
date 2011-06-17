@@ -15,31 +15,40 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.apt.generator.mule;
+package org.mule.devkit.module.generation;
 
 import org.mule.api.MuleException;
-import org.mule.api.lifecycle.*;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
+import org.mule.config.spring.handlers.AbstractPojoNamespaceHandler;
 import org.mule.devkit.annotations.lifecycle.Dispose;
 import org.mule.devkit.annotations.lifecycle.Initialise;
 import org.mule.devkit.annotations.lifecycle.Start;
 import org.mule.devkit.annotations.lifecycle.Stop;
-import org.mule.devkit.apt.AnnotationProcessorContext;
-import org.mule.devkit.apt.generator.AbstractCodeGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.model.code.*;
+import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.JCatchBlock;
+import org.mule.devkit.model.code.JClass;
+import org.mule.devkit.model.code.JExpr;
+import org.mule.devkit.model.code.JInvocation;
+import org.mule.devkit.model.code.JMethod;
+import org.mule.devkit.model.code.JMod;
+import org.mule.devkit.model.code.JPackage;
+import org.mule.devkit.model.code.JTryBlock;
+import org.mule.devkit.model.code.JVar;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import java.util.List;
 
-public class LifecycleWrapperGenerator extends AbstractCodeGenerator {
-    public LifecycleWrapperGenerator(AnnotationProcessorContext context) {
-        super(context);
-    }
-
-    public void generate(TypeElement element) throws GenerationException {
+public class LifecycleWrapperGenerator extends AbstractModuleGenerator {
+    public void generate(Element element) throws GenerationException {
         DefinedClass lifecycleWrapper = getLifecycleWrapperClass(element);
 
         ExecutableElement startElement = getStartElement(element);
@@ -71,8 +80,18 @@ public class LifecycleWrapperGenerator extends AbstractCodeGenerator {
         }
     }
 
+    private DefinedClass getLifecycleWrapperClass(Element typeElement) {
+        String namespaceHandlerName = context.getNameUtils().generateClassName((TypeElement) typeElement, "LifecycleWrapper");
+        JPackage pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(namespaceHandlerName));
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(namespaceHandlerName), (JClass)ref(typeElement.asType()));
+
+        context.setClassRole(context.getNameUtils().generateClassName((TypeElement) typeElement, "Pojo"), clazz);
+
+        return clazz;
+    }
+
     private void generateLifecycleInvocation(DefinedClass lifecycleWrapper, ExecutableElement superExecutableElement, String name, Class<?> catchException, boolean addThis) {
-        JMethod startMethod = lifecycleWrapper.method(JMod.PUBLIC, getContext().getCodeModel().VOID, name);
+        JMethod startMethod = lifecycleWrapper.method(JMod.PUBLIC, context.getCodeModel().VOID, name);
 
         if (catchException != null) {
             startMethod._throws(ref(catchException));
@@ -104,7 +123,7 @@ public class LifecycleWrapperGenerator extends AbstractCodeGenerator {
         }
     }
 
-    private ExecutableElement getStartElement(TypeElement element) {
+    private ExecutableElement getStartElement(Element element) {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(element.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Start start = executableElement.getAnnotation(Start.class);
@@ -117,7 +136,7 @@ public class LifecycleWrapperGenerator extends AbstractCodeGenerator {
         return null;
     }
 
-    private ExecutableElement getStopElement(TypeElement element) {
+    private ExecutableElement getStopElement(Element element) {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(element.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Stop stop = executableElement.getAnnotation(Stop.class);
@@ -130,7 +149,7 @@ public class LifecycleWrapperGenerator extends AbstractCodeGenerator {
         return null;
     }
 
-    private ExecutableElement getInitialiseElement(TypeElement element) {
+    private ExecutableElement getInitialiseElement(Element element) {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(element.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Initialise initialise = executableElement.getAnnotation(Initialise.class);
@@ -143,7 +162,7 @@ public class LifecycleWrapperGenerator extends AbstractCodeGenerator {
         return null;
     }
 
-    private ExecutableElement getDisposeElement(TypeElement element) {
+    private ExecutableElement getDisposeElement(Element element) {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(element.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Dispose dispose = executableElement.getAnnotation(Dispose.class);

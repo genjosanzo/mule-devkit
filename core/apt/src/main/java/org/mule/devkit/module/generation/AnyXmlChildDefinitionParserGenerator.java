@@ -15,40 +15,52 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.apt.generator.spring;
+package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.UnhandledException;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.devkit.annotations.Processor;
-import org.mule.devkit.apt.AnnotationProcessorContext;
-import org.mule.devkit.apt.generator.AbstractCodeGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.apt.util.TypeMirrorUtils;
-import org.mule.devkit.model.code.*;
+import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.JCatchBlock;
+import org.mule.devkit.model.code.JConditional;
+import org.mule.devkit.model.code.JExpr;
+import org.mule.devkit.model.code.JExpression;
+import org.mule.devkit.model.code.JForLoop;
+import org.mule.devkit.model.code.JInvocation;
+import org.mule.devkit.model.code.JMethod;
+import org.mule.devkit.model.code.JMod;
+import org.mule.devkit.model.code.JOp;
+import org.mule.devkit.model.code.JPackage;
+import org.mule.devkit.model.code.JTryBlock;
+import org.mule.devkit.model.code.JVar;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Attr;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
-import javax.xml.transform.*;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
 import java.util.List;
 
-public class AnyXmlChildDefinitionParserGenerator extends AbstractCodeGenerator {
-    public AnyXmlChildDefinitionParserGenerator(AnnotationProcessorContext context) {
-        super(context);
-    }
+public class AnyXmlChildDefinitionParserGenerator extends AbstractModuleGenerator {
 
-    public void generate(TypeElement type) throws GenerationException {
+    public static final String ANY_XML_CHILD_DEFINITION_PARSER_ROLE = "AnyXmlChildDefinitionParser";
+
+    public void generate(Element type) throws GenerationException {
 
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(type.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
@@ -59,7 +71,7 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractCodeGenerator 
 
             // generate extra parser
             for (VariableElement variable : executableElement.getParameters()) {
-                if (TypeMirrorUtils.isXmlType(variable)) {
+                if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                     DefinedClass anyXmlChildDefinitionParser = getAnyXmlChildDefinitionParserClass(variable);
                     generateAnyXmlChildDefinitionParser(anyXmlChildDefinitionParser);
 
@@ -68,6 +80,17 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractCodeGenerator 
             }
         }
     }
+
+    private DefinedClass getAnyXmlChildDefinitionParserClass(VariableElement variableElement) {
+        String anyXmlChildDefinitionParserClassName = context.getNameUtils().generateClassNameInPackage(variableElement, "AnyXmlChildDefinitionParser");
+        JPackage pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(anyXmlChildDefinitionParserClassName));
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(anyXmlChildDefinitionParserClassName), ChildDefinitionParser.class);
+
+        context.setClassRole(ANY_XML_CHILD_DEFINITION_PARSER_ROLE, clazz);
+
+        return clazz;
+    }
+
 
     private void generateAnyXmlChildDefinitionParser(DefinedClass anyXmlChildDefinitionParser) {
         // generate constructor
@@ -81,6 +104,13 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractCodeGenerator 
 
         // generateParseInternal
         generateParseInternal(anyXmlChildDefinitionParser);
+    }
+
+    private void generateGetBeanClass(DefinedClass beanDefinitionparser, JExpression expr) {
+        JMethod getBeanClass = beanDefinitionparser.method(JMod.PROTECTED, ref(Class.class), "getBeanClass");
+        JVar element = getBeanClass.param(ref(org.w3c.dom.Element.class), "element");
+        getBeanClass.body()._return(expr);
+
     }
 
     private void generateParseInternal(DefinedClass anyXmlChildDefinitionParser) {
@@ -103,7 +133,7 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractCodeGenerator 
         JConditional ifBlock = parseInternal.body()._if(JOp.eq(ref(Node.class).staticRef("ELEMENT_NODE"), element.invoke("getNodeType")));
 
         JVar nodeList = ifBlock._then().decl(ref(NodeList.class), "childs", element.invoke("getChildNodes"));
-        JVar i = ifBlock._then().decl(getContext().getCodeModel().INT, "i");
+        JVar i = ifBlock._then().decl(context.getCodeModel().INT, "i");
         JForLoop forLoop = ifBlock._then()._for();
         forLoop.init(i, JExpr.lit(0));
         forLoop.test(JOp.lt(i, nodeList.invoke("getLength")));
@@ -157,7 +187,7 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractCodeGenerator 
     }
 
     private void generateProcessProperty(DefinedClass xmlAnyChildDefinitionParser) {
-        JMethod processProperty = xmlAnyChildDefinitionParser.method(JMod.PROTECTED, getContext().getCodeModel().VOID, "processProperty");
+        JMethod processProperty = xmlAnyChildDefinitionParser.method(JMod.PROTECTED, context.getCodeModel().VOID, "processProperty");
         JVar attribute = processProperty.param(ref(Attr.class), "attribute");
         JVar beanAssembler = processProperty.param(ref(BeanAssembler.class), "assembler");
     }

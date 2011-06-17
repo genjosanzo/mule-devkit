@@ -1,27 +1,19 @@
-/**
- * Mule Development Kit
- * Copyright 2010-2011 (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+package org.mule.devkit.utils;
 
-package org.mule.devkit.apt.util;
+import org.apache.commons.lang.StringUtils;
 
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.ElementFilter;
+import javax.lang.model.util.Elements;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class Inflection {
+public class NameUtils {
+    private Elements elements;
 
     private static final List<Inflection> plural = new ArrayList<Inflection>();
     private static final List<Inflection> singular = new ArrayList<Inflection>();
@@ -89,27 +81,10 @@ public class Inflection {
         uncountable("series");
         uncountable("fish");
         uncountable("sheep");
-
-        //Collections.reverse(singular);
-        //Collections.reverse(plural);
     }
 
-    private String pattern;
-    private String replacement;
-    private boolean ignoreCase;
-
-    public Inflection(String pattern) {
-        this(pattern, null, true);
-    }
-
-    public Inflection(String pattern, String replacement) {
-        this(pattern, replacement, true);
-    }
-
-    public Inflection(String pattern, String replacement, boolean ignoreCase) {
-        this.pattern = pattern;
-        this.replacement = replacement;
-        this.ignoreCase = ignoreCase;
+    public NameUtils(Elements elements) {
+        this.elements = elements;
     }
 
     private static void plural(String pattern, String replacement) {
@@ -129,32 +104,24 @@ public class Inflection {
         uncountable.add(word);
     }
 
-    /**
-     * Does the given word match?
-     *
-     * @param word The word
-     * @return True if it matches the inflection pattern
-     */
-    public boolean match(String word) {
-        int flags = 0;
-        if (ignoreCase) {
-            flags = flags | Pattern.CASE_INSENSITIVE;
-        }
-        return Pattern.compile(pattern, flags).matcher(word).find();
+    public String uncamel(String camelCaseName) {
+        String result = "";
+        String[] parts = camelCaseName.split("(?<!^)(?=[A-Z])");
+
+        for (int i = 0; i < parts.length; i++)
+            result += parts[i].toLowerCase() + (i < parts.length - 1 ? "-" : "");
+
+        return result;
     }
 
-    /**
-     * Replace the word with its pattern.
-     *
-     * @param word The word
-     * @return The result
-     */
-    public String replace(String word) {
-        int flags = 0;
-        if (ignoreCase) {
-            flags = flags | Pattern.CASE_INSENSITIVE;
-        }
-        return Pattern.compile(pattern, flags).matcher(word).replaceAll(replacement);
+    public String getClassName(String fullyQualifiedClassName) {
+        int lastDot = fullyQualifiedClassName.lastIndexOf('.');
+        return fullyQualifiedClassName.substring(lastDot + 1);
+    }
+
+    public String getPackageName(String fullyQualifiedClassName) {
+        int lastDot = fullyQualifiedClassName.lastIndexOf('.');
+        return fullyQualifiedClassName.substring(0, lastDot);
     }
 
     /**
@@ -163,14 +130,12 @@ public class Inflection {
      * @param word The word
      * @return The pluralized word
      */
-    public static String pluralize(String word) {
-        if (Inflection.isUncountable(word)) {
+    public String pluralize(String word) {
+        if (isUncountable(word)) {
             return word;
         } else {
             for (Inflection inflection : plural) {
-                //                System.out.println(word + " matches " + inflection.pattern + "? (ignore case: " + inflection.ignoreCase + ")");
                 if (inflection.match(word)) {
-                    //                    System.out.println("match!");
                     return inflection.replace(word);
                 }
             }
@@ -184,14 +149,12 @@ public class Inflection {
      * @param word The word
      * @return The singularized word
      */
-    public static String singularize(String word) {
-        if (Inflection.isUncountable(word)) {
+    public String singularize(String word) {
+        if (isUncountable(word)) {
             return word;
         } else {
             for (Inflection inflection : singular) {
-                //System.out.println(word + " matches " + inflection.pattern + "? (ignore case: " + inflection.ignoreCase + ")");
                 if (inflection.match(word)) {
-                    //System.out.println("match!");
                     return inflection.replace(word);
                 }
             }
@@ -205,12 +168,81 @@ public class Inflection {
      * @param word The word
      * @return True if it is uncountable
      */
-    public static boolean isUncountable(String word) {
+    public boolean isUncountable(String word) {
         for (String w : uncountable) {
             if (w.equalsIgnoreCase(word)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public String generateClassName(ExecutableElement executableElement, String append) {
+        TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
+        String packageName = getPackageName(elements.getBinaryName(parentClass).toString());
+        String className = StringUtils.capitalize(executableElement.getSimpleName().toString()) + append;
+
+        return packageName + "." + className;
+    }
+
+    public String generateClassNameInPackage(VariableElement variableElement, String className) {
+        TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(variableElement.getEnclosingElement().getEnclosingElement())).get(0);
+        String packageName = getPackageName(elements.getBinaryName(parentClass).toString());
+
+        return packageName + "." + className;
+
+    }
+
+    public String generateClassName(TypeElement typeElement, String append) {
+        return elements.getBinaryName(typeElement).toString() + append;
+    }
+
+    private static class Inflection {
+        private String pattern;
+        private String replacement;
+        private boolean ignoreCase;
+
+        public Inflection(String pattern) {
+            this(pattern, null, true);
+        }
+
+        public Inflection(String pattern, String replacement) {
+            this(pattern, replacement, true);
+        }
+
+        public Inflection(String pattern, String replacement, boolean ignoreCase) {
+            this.pattern = pattern;
+            this.replacement = replacement;
+            this.ignoreCase = ignoreCase;
+        }
+
+
+        /**
+         * Does the given word match?
+         *
+         * @param word The word
+         * @return True if it matches the inflection pattern
+         */
+        public boolean match(String word) {
+            int flags = 0;
+            if (ignoreCase) {
+                flags = flags | Pattern.CASE_INSENSITIVE;
+            }
+            return Pattern.compile(pattern, flags).matcher(word).find();
+        }
+
+        /**
+         * Replace the word with its pattern.
+         *
+         * @param word The word
+         * @return The result
+         */
+        public String replace(String word) {
+            int flags = 0;
+            if (ignoreCase) {
+                flags = flags | Pattern.CASE_INSENSITIVE;
+            }
+            return Pattern.compile(pattern, flags).matcher(word).replaceAll(replacement);
+        }
     }
 }

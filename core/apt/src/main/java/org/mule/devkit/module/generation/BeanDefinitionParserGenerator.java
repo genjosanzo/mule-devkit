@@ -15,38 +15,38 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.apt.generator.spring;
+package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.annotations.Source;
 import org.mule.devkit.annotations.SourceCallback;
-import org.mule.devkit.apt.AnnotationProcessorContext;
-import org.mule.devkit.apt.generator.AbstractCodeGenerator;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.model.code.*;
+import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.JBlock;
+import org.mule.devkit.model.code.JConditional;
+import org.mule.devkit.model.code.JExpr;
+import org.mule.devkit.model.code.JExpression;
+import org.mule.devkit.model.code.JInvocation;
+import org.mule.devkit.model.code.JMethod;
+import org.mule.devkit.model.code.JMod;
+import org.mule.devkit.model.code.JOp;
+import org.mule.devkit.model.code.JPackage;
+import org.mule.devkit.model.code.JVar;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Element;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
-import java.util.ArrayList;
 import java.util.List;
 
-public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
-    private List<String> typeList;
+public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
-    public BeanDefinitionParserGenerator(AnnotationProcessorContext context) {
-        super(context);
-
-        buildTypeList();
-    }
-
-    public void generate(TypeElement type) throws GenerationException {
+    public void generate(Element type) throws GenerationException {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(type.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Processor processor = executableElement.getAnnotation(Processor.class);
@@ -88,6 +88,12 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
 
     }
 
+    private void generateGetBeanClass(DefinedClass beanDefinitionparser, JExpression expr) {
+        JMethod getBeanClass = beanDefinitionparser.method(JMod.PROTECTED, ref(Class.class), "getBeanClass");
+        JVar element = getBeanClass.param(ref(org.w3c.dom.Element.class), "element");
+        getBeanClass.body()._return(expr);
+    }
+
     private void generateBeanDefinitionParserForProcessor(ExecutableElement executableElement) {
         // get class
         DefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
@@ -126,7 +132,7 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
 
 
     private void generateParseChild(DefinedClass beanDefinitionparser, ExecutableElement executableElement) {
-        JMethod parseChild = beanDefinitionparser.method(JMod.PROTECTED, getContext().getCodeModel().VOID, "parseChild");
+        JMethod parseChild = beanDefinitionparser.method(JMod.PROTECTED, context.getCodeModel().VOID, "parseChild");
         JVar element = parseChild.param(ref(Element.class), "element");
         JVar parserContext = parseChild.param(ref(ParserContext.class), "parserContext");
         JVar beanDefinitionBuilder = parseChild.param(ref(BeanDefinitionBuilder.class), "beanDefinitionBuilder");
@@ -137,7 +143,7 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
             if (variable.asType().toString().contains(SourceCallback.class.getName()))
                 continue;
 
-            if (isTypeSupported(variable)) {
+            if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
                 parseChild.body().add(generateAddPropertyValue(element, beanDefinitionBuilder, variable));
             }
         }
@@ -211,33 +217,4 @@ public class BeanDefinitionParserGenerator extends AbstractCodeGenerator {
         postProcess.arg(assembler);
         postProcess.arg(element);
     }
-
-    private boolean isTypeSupported(VariableElement variableElement) {
-        return typeList.contains(variableElement.asType().toString());
-    }
-
-    private void buildTypeList() {
-        typeList = new ArrayList<String>();
-        typeList.add("java.lang.String");
-        typeList.add("int");
-        typeList.add("float");
-        typeList.add("long");
-        typeList.add("byte");
-        typeList.add("short");
-        typeList.add("double");
-        typeList.add("boolean");
-        typeList.add("char");
-        typeList.add("java.lang.Integer");
-        typeList.add("java.lang.Float");
-        typeList.add("java.lang.Long");
-        typeList.add("java.lang.Byte");
-        typeList.add("java.lang.Short");
-        typeList.add("java.lang.Double");
-        typeList.add("java.lang.Boolean");
-        typeList.add("java.lang.Character");
-        typeList.add("java.util.Date");
-        typeList.add("java.net.URL");
-        typeList.add("java.net.URI");
-    }
-
 }

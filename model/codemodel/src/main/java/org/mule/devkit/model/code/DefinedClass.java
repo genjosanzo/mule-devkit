@@ -591,6 +591,10 @@ public class DefinedClass
         return method(mods, owner()._ref(type), name);
     }
 
+    public JMethod method(int mods, Class<?> type, Class<?> narrowedType, String name) {
+        return method(mods, owner()._ref(type).boxify().narrow(narrowedType), name);
+    }
+
     /**
      * Returns the set of methods defined in this class.
      */

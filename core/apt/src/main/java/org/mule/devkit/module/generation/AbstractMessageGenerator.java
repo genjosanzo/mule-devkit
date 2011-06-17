@@ -15,71 +15,52 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.apt.generator.mule;
+package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleContext;
+import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionManager;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
+import org.mule.api.source.MessageSource;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.devkit.annotations.SourceCallback;
-import org.mule.devkit.apt.AnnotationProcessorContext;
-import org.mule.devkit.apt.generator.AbstractCodeGenerator;
-import org.mule.devkit.apt.util.TypeMirrorUtils;
-import org.mule.devkit.model.code.*;
+import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.JBlock;
+import org.mule.devkit.model.code.JCatchBlock;
+import org.mule.devkit.model.code.JClass;
+import org.mule.devkit.model.code.JConditional;
+import org.mule.devkit.model.code.JExpr;
+import org.mule.devkit.model.code.JExpression;
+import org.mule.devkit.model.code.JFieldVar;
+import org.mule.devkit.model.code.JInvocation;
+import org.mule.devkit.model.code.JMethod;
+import org.mule.devkit.model.code.JMod;
+import org.mule.devkit.model.code.JOp;
+import org.mule.devkit.model.code.JPackage;
+import org.mule.devkit.model.code.JTryBlock;
+import org.mule.devkit.model.code.JVar;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.TemplateParser;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractMessageGenerator extends AbstractCodeGenerator {
-    private List<String> typeList;
-
-    public AbstractMessageGenerator(AnnotationProcessorContext context) {
-        super(context);
-
-
-        buildTypeList();
-    }
-
-    protected boolean isTypeSupported(VariableElement variableElement) {
-        return typeList.contains(variableElement.asType().toString());
-    }
-
-    protected void buildTypeList() {
-        typeList = new ArrayList<String>();
-        typeList.add("java.lang.String");
-        typeList.add("int");
-        typeList.add("float");
-        typeList.add("long");
-        typeList.add("byte");
-        typeList.add("short");
-        typeList.add("double");
-        typeList.add("boolean");
-        typeList.add("char");
-        typeList.add("java.lang.Integer");
-        typeList.add("java.lang.Float");
-        typeList.add("java.lang.Long");
-        typeList.add("java.lang.Byte");
-        typeList.add("java.lang.Short");
-        typeList.add("java.lang.Double");
-        typeList.add("java.lang.Boolean");
-        typeList.add("java.lang.Character");
-        typeList.add("java.util.Date");
-        typeList.add("java.net.URL");
-        typeList.add("java.net.URI");
-    }
-
+public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
     protected JFieldVar generateFieldForPatternInfo(DefinedClass messageProcessorClass) {
         return messageProcessorClass.field(JMod.PRIVATE, ref(TemplateParser.PatternInfo.class), "patternInfo");
@@ -93,8 +74,42 @@ public abstract class AbstractMessageGenerator extends AbstractCodeGenerator {
         return messageProcessorClass.field(JMod.PRIVATE, ref(MuleContext.class), "muleContext");
     }
 
-    protected JFieldVar generateFieldForPojo(DefinedClass messageProcessorClass, TypeElement typeElement) {
-        return messageProcessorClass.field(JMod.PRIVATE, getLifecycleWrapperClass(typeElement), "object");
+    protected JFieldVar generateFieldForPojo(DefinedClass messageProcessorClass, Element typeElement) {
+        DefinedClass pojo = context.getClassForRole(context.getNameUtils().generateClassName((TypeElement) typeElement, "Pojo"));
+
+        return messageProcessorClass.field(JMod.PRIVATE, pojo, "object");
+    }
+
+    protected DefinedClass getBeanDefinitionParserClass(ExecutableElement executableElement) {
+        String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, "BeanDefinitionParser");
+        JPackage pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName));
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), ChildDefinitionParser.class);
+
+        return clazz;
+    }
+
+    protected DefinedClass getMessageProcessorClass(ExecutableElement executableElement) {
+        String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, "MessageProcessor");
+        JPackage pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName));
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), new Class[]{Initialisable.class, MessageProcessor.class, MuleContextAware.class});
+
+        return clazz;
+    }
+
+    protected DefinedClass getMessageSourceClass(ExecutableElement executableElement) {
+        String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, "MessageSource");
+        JPackage pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName));
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), new Class[]{
+                MuleContextAware.class,
+                Startable.class,
+                Stoppable.class,
+                Runnable.class,
+                Initialisable.class,
+                MessageSource.class,
+                SourceCallback.class,
+                FlowConstructAware.class});
+
+        return clazz;
     }
 
     protected Map<String, FieldVariableElement> generateFieldForEachParameter(DefinedClass messageProcessorClass, ExecutableElement executableElement) {
@@ -103,7 +118,7 @@ public abstract class AbstractMessageGenerator extends AbstractCodeGenerator {
             if (variable.asType().toString().contains(SourceCallback.class.getName()))
                 continue;
 
-            if (isTypeSupported(variable) || TypeMirrorUtils.isXmlType(variable)) {
+            if (SchemaTypeConversion.isSupported(variable.asType().toString()) || context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                 String fieldName = variable.getSimpleName().toString();
                 JFieldVar field = messageProcessorClass.field(JMod.PRIVATE, ref(Object.class), fieldName);
                 fields.put(variable.getSimpleName().toString(), new AbstractMessageGenerator.FieldVariableElement(field, variable));
@@ -116,8 +131,10 @@ public abstract class AbstractMessageGenerator extends AbstractCodeGenerator {
         return fields;
     }
 
-    protected JMethod generateInitialiseMethod(DefinedClass messageProcessorClass, JClass lifecycleWrapperClass, JFieldVar muleContext, JFieldVar expressionManager, JFieldVar patternInfo, JFieldVar object) {
-        JMethod initialise = messageProcessorClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "initialise");
+    protected JMethod generateInitialiseMethod(DefinedClass messageProcessorClass, Element typeElement, JFieldVar muleContext, JFieldVar expressionManager, JFieldVar patternInfo, JFieldVar object) {
+        DefinedClass pojoClass = context.getClassForRole(context.getNameUtils().generateClassName((TypeElement) typeElement, "Pojo"));
+
+        JMethod initialise = messageProcessorClass.method(JMod.PUBLIC, context.getCodeModel().VOID, "initialise");
         initialise._throws(InitialisationException.class);
 
         if (expressionManager != null) {
@@ -129,12 +146,12 @@ public abstract class AbstractMessageGenerator extends AbstractCodeGenerator {
 
         JConditional ifNoObject = initialise.body()._if(JOp.eq(object, JExpr._null()));
         JTryBlock tryLookUp = ifNoObject._then()._try();
-        tryLookUp.body().assign(object, muleContext.invoke("getRegistry").invoke("lookupObject").arg(JExpr.dotclass(lifecycleWrapperClass)));
+        tryLookUp.body().assign(object, muleContext.invoke("getRegistry").invoke("lookupObject").arg(JExpr.dotclass(pojoClass)));
         JCatchBlock catchBlock = tryLookUp._catch(ref(RegistrationException.class));
         JVar exception = catchBlock.param("e");
         JClass coreMessages = ref(CoreMessages.class);
         JInvocation failedToInvoke = coreMessages.staticInvoke("initialisationFailure");
-        failedToInvoke.arg(lifecycleWrapperClass.fullName());
+        failedToInvoke.arg(pojoClass.fullName());
         JInvocation messageException = JExpr._new(ref(InitialisationException.class));
         messageException.arg(failedToInvoke);
         messageException.arg(exception);
@@ -146,7 +163,7 @@ public abstract class AbstractMessageGenerator extends AbstractCodeGenerator {
 
 
     protected JMethod generateSetObjectMethod(DefinedClass messageProcessorClass, JFieldVar object) {
-        JMethod setObject = messageProcessorClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "setObject");
+        JMethod setObject = messageProcessorClass.method(JMod.PUBLIC, context.getCodeModel().VOID, "setObject");
         JVar objectParam = setObject.param(object.type(), "object");
         setObject.body().assign(JExpr._this().ref(object), objectParam);
 
@@ -155,7 +172,7 @@ public abstract class AbstractMessageGenerator extends AbstractCodeGenerator {
 
 
     protected JMethod generateSetMuleContextMethod(DefinedClass messageProcessorClass, JFieldVar muleContext) {
-        JMethod setMuleContext = messageProcessorClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "setMuleContext");
+        JMethod setMuleContext = messageProcessorClass.method(JMod.PUBLIC, context.getCodeModel().VOID, "setMuleContext");
         JVar muleContextParam = setMuleContext.param(ref(MuleContext.class), "context");
         setMuleContext.body().assign(JExpr._this().ref(muleContext), muleContextParam);
 
@@ -202,7 +219,7 @@ public abstract class AbstractMessageGenerator extends AbstractCodeGenerator {
     }
 
     protected JMethod generateSetter(DefinedClass messageProcessorClass, JFieldVar field) {
-        JMethod setter = messageProcessorClass.method(JMod.PUBLIC, getContext().getCodeModel().VOID, "set" + StringUtils.capitalize(field.name()));
+        JMethod setter = messageProcessorClass.method(JMod.PUBLIC, context.getCodeModel().VOID, "set" + StringUtils.capitalize(field.name()));
         JVar value = setter.param(field.type(), "value");
         setter.body().assign(JExpr._this().ref(field), value);
 

@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.apt.generator.schema;
+package org.mule.devkit.module.generation;
 
-import org.mule.devkit.annotations.*;
-import org.mule.devkit.apt.AnnotationProcessorContext;
-import org.mule.devkit.apt.generator.ContextualizedGenerator;
+import org.mule.devkit.annotations.Configurable;
+import org.mule.devkit.annotations.Module;
+import org.mule.devkit.annotations.Parameter;
+import org.mule.devkit.annotations.Processor;
+import org.mule.devkit.annotations.Source;
+import org.mule.devkit.annotations.SourceCallback;
+import org.mule.devkit.annotations.Transformer;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.apt.util.TypeMirrorUtils;
-import org.mule.devkit.apt.util.Inflection;
-import org.mule.devkit.apt.util.NameUtils;
 import org.mule.devkit.model.schema.All;
 import org.mule.devkit.model.schema.Annotation;
 import org.mule.devkit.model.schema.Any;
@@ -61,46 +62,12 @@ import javax.lang.model.util.ElementFilter;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
 
-public class SchemaGenerator extends ContextualizedGenerator {
-    private static final String BASE_NAMESPACE = "http://www.mulesoft.org/schema/mule/";
-    private static final String XML_NAMESPACE = "http://www.w3.org/XML/1998/namespace";
-    private static final String XSD_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
-    private static final String SPRING_FRAMEWORK_NAMESPACE = "http://www.springframework.org/schema/beans";
-    private static final String SPRING_FRAMEWORK_SCHEMA_LOCATION = "http://www.springframework.org/schema/beans/spring-beans-3.0.xsd";
-    private static final String MULE_NAMESPACE = "http://www.mulesoft.org/schema/mule/core";
-    private static final String MULE_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd";
-    private static final String MULE_SCHEMADOC_NAMESPACE = "http://www.mulesoft.org/schema/mule/schemadoc";
-    private static final String MULE_SCHEMADOC_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/schemadoc/3.1/mule-schemadoc.xsd";
-    private static final QName MULE_ABSTRACT_EXTENSION = new QName(MULE_NAMESPACE, "abstract-extension", "mule");
-    private static final QName MULE_ABSTRACT_EXTENSION_TYPE = new QName(MULE_NAMESPACE, "abstractExtensionType", "mule");
-    private static final QName MULE_ABSTRACT_MESSAGE_PROCESSOR = new QName(MULE_NAMESPACE, "abstract-message-processor", "mule");
-    private static final QName MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE = new QName(MULE_NAMESPACE, "abstractInterceptingMessageProcessorType", "mule");
-    private static final QName MULE_ABSTRACT_TRANSFORMER = new QName(MULE_NAMESPACE, "abstract-transformer", "mule");
-    private static final QName MULE_ABSTRACT_TRANSFORMER_TYPE = new QName(MULE_NAMESPACE, "abstractTransformerType", "mule");
-    private static final QName MULE_ABSTRACT_INBOUND_ENDPOINT = new QName(MULE_NAMESPACE, "abstract-inbound-endpoint", "mule");
-    private static final QName MULE_ABSTRACT_INBOUND_ENDPOINT_TYPE = new QName(MULE_NAMESPACE, "abstractInboundEndpointType", "mule");
-    private static final QName STRING = new QName(XSD_NAMESPACE, "string", "xs");
-    private static final QName DECIMAL = new QName(XSD_NAMESPACE, "decimal", "xs");
-    private static final QName FLOAT = new QName(XSD_NAMESPACE, "float", "xs");
-    private static final QName INTEGER = new QName(XSD_NAMESPACE, "integer", "xs");
-    private static final QName DOUBLE = new QName(XSD_NAMESPACE, "double", "xs");
-    private static final QName DATETIME = new QName(XSD_NAMESPACE, "dateTime", "xs");
-    private static final QName LONG = new QName(XSD_NAMESPACE, "long", "xs");
-    private static final QName BYTE = new QName(XSD_NAMESPACE, "byte", "xs");
-    private static final QName BOOLEAN = new QName(XSD_NAMESPACE, "boolean", "xs");
-    private static final QName ANYURI = new QName(XSD_NAMESPACE, "anyURI", "xs");
-    private static final String USE_REQUIRED = "required";
-    private static final String USE_OPTIONAL = "optional";
-    private Map<String, QName> typeMap;
+public class SchemaGenerator extends AbstractModuleGenerator {
     private Schema schema;
     private ObjectFactory objectFactory;
 
-    public SchemaGenerator(AnnotationProcessorContext context) {
-        super(context);
-
+    public SchemaGenerator() {
         schema = new Schema();
         objectFactory = new ObjectFactory();
     }
@@ -109,14 +76,12 @@ public class SchemaGenerator extends ContextualizedGenerator {
         Module module = element.getAnnotation(Module.class);
         String targetNamespace = module.namespace();
         if (targetNamespace == null || targetNamespace.length() == 0) {
-            targetNamespace = BASE_NAMESPACE + module.name();
+            targetNamespace = SchemaConstants.BASE_NAMESPACE + module.name();
         }
 
         schema.setTargetNamespace(targetNamespace);
         schema.setElementFormDefault(FormChoice.QUALIFIED);
         schema.setAttributeFormDefault(FormChoice.UNQUALIFIED);
-
-        buildTypeMap(targetNamespace);
 
         importXmlNamespace();
         importSpringFrameworkNamespace();
@@ -135,33 +100,11 @@ public class SchemaGenerator extends ContextualizedGenerator {
             location = schema.getTargetNamespace() + "/" + module.version() + "/mule-" + module.name() + ".xsd";
         }
 
-        SchemaLocation schemaLocation = new SchemaLocation(schema, fileName, location);
+        String namespaceHandlerName = context.getNameUtils().generateClassName((TypeElement) element, "NamespaceHandler");
 
-        getContext().getSchemaModel().addSchemaLocation(schemaLocation);
-    }
+        SchemaLocation schemaLocation = new SchemaLocation(schema, fileName, location, namespaceHandlerName);
 
-    private void buildTypeMap(String targetNamespace) {
-        typeMap = new HashMap<String, QName>();
-        typeMap.put("java.lang.String", new QName(XSD_NAMESPACE, "string", "xs"));
-        typeMap.put("int", new QName(targetNamespace, "integerType"));
-        typeMap.put("float", new QName(targetNamespace, "floatType"));
-        typeMap.put("long", new QName(targetNamespace, "longType"));
-        typeMap.put("byte", new QName(targetNamespace, "byteType"));
-        typeMap.put("short", new QName(targetNamespace, "integerType"));
-        typeMap.put("double", new QName(targetNamespace, "doubleType"));
-        typeMap.put("boolean", new QName(targetNamespace, "booleanType"));
-        typeMap.put("char", new QName(targetNamespace, "charType"));
-        typeMap.put("java.lang.Integer", new QName(targetNamespace, "integerType"));
-        typeMap.put("java.lang.Float", new QName(targetNamespace, "floatType"));
-        typeMap.put("java.lang.Long", new QName(targetNamespace, "longType"));
-        typeMap.put("java.lang.Byte", new QName(targetNamespace, "byteType"));
-        typeMap.put("java.lang.Short", new QName(targetNamespace, "integerType"));
-        typeMap.put("java.lang.Double", new QName(targetNamespace, "doubleType"));
-        typeMap.put("java.lang.Boolean", new QName(targetNamespace, "booleanType"));
-        typeMap.put("java.lang.Character", new QName(targetNamespace, "charType"));
-        typeMap.put("java.util.Date", new QName(targetNamespace, "dateTimeType"));
-        typeMap.put("java.net.URL", new QName(targetNamespace, "anyUriType"));
-        typeMap.put("java.net.URI", new QName(targetNamespace, "anyUriType"));
+        context.getSchemaModel().addSchemaLocation(schemaLocation);
     }
 
     private void registerTransformers(javax.lang.model.element.Element type) {
@@ -171,7 +114,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
             if (transformer == null)
                 continue;
 
-            Element transformerElement = registerTransformer(NameUtils.uncamel(method.getSimpleName().toString()));
+            Element transformerElement = registerTransformer(context.getNameUtils().uncamel(method.getSimpleName().toString()));
             schema.getSimpleTypeOrComplexTypeOrGroup().add(transformerElement);
         }
     }
@@ -212,8 +155,8 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
     private void registerProcessorElement(String targetNamespace, String name, String typeName) {
         Element element = new TopLevelElement();
-        element.setName(NameUtils.uncamel(name));
-        element.setSubstitutionGroup(MULE_ABSTRACT_MESSAGE_PROCESSOR);
+        element.setName(context.getNameUtils().uncamel(name));
+        element.setSubstitutionGroup(SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR);
         element.setType(new QName(targetNamespace, typeName));
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
@@ -221,19 +164,19 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
     private void registerSourceElement(String targetNamespace, String name, String typeName) {
         Element element = new TopLevelElement();
-        element.setName(NameUtils.uncamel(name));
-        element.setSubstitutionGroup(MULE_ABSTRACT_INBOUND_ENDPOINT);
+        element.setName(context.getNameUtils().uncamel(name));
+        element.setSubstitutionGroup(SchemaConstants.MULE_ABSTRACT_INBOUND_ENDPOINT);
         element.setType(new QName(targetNamespace, typeName));
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
     }
 
     private void registerProcessorType(String targetNamespace, String name, ExecutableElement element) {
-        registerExtendedType(MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE, targetNamespace, name, element);
+        registerExtendedType(SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE, targetNamespace, name, element);
     }
 
     private void registerSourceType(String targetNamespace, String name, ExecutableElement element) {
-        registerExtendedType(MULE_ABSTRACT_INBOUND_ENDPOINT_TYPE, targetNamespace, name, element);
+        registerExtendedType(SchemaConstants.MULE_ABSTRACT_INBOUND_ENDPOINT_TYPE, targetNamespace, name, element);
     }
 
     private void registerExtendedType(QName base, String targetNamespace, String name, ExecutableElement element) {
@@ -246,7 +189,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
         complexContentExtension.setBase(base);
         complexContent.setExtension(complexContentExtension);
 
-        Attribute configRefAttr = createAttribute("config-ref", true, STRING, "Specify which configuration to use for this invocation.");
+        Attribute configRefAttr = createAttribute("config-ref", true, SchemaConstants.STRING, "Specify which configuration to use for this invocation.");
         complexContentExtension.getAttributeOrAttributeGroup().add(configRefAttr);
 
         All all = new All();
@@ -257,10 +200,10 @@ public class SchemaGenerator extends ContextualizedGenerator {
                 if (variable.asType().toString().contains(SourceCallback.class.getName()))
                     continue;
 
-                if (TypeMirrorUtils.isXmlType(variable.asType())) {
+                if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                     all.getParticle().add(objectFactory.createElement(generateXmlElement(variable.getSimpleName().toString(), targetNamespace)));
                 } else {
-                    if (TypeMirrorUtils.isArrayOrList(getContext().getTypeUtils(), variable.asType())) {
+                    if (context.getTypeMirrorUtils().isArrayOrList(context.getTypeUtils(), variable.asType())) {
                         generateParameterCollectionElement(all, variable);
                     } else {
                         complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(variable));
@@ -292,7 +235,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
         TopLevelElement collectionItemElement = new TopLevelElement();
         sequence.getParticle().add(objectFactory.createElement(collectionItemElement));
 
-        collectionItemElement.setName(Inflection.singularize(collectionElement.getName()));
+        collectionItemElement.setName(context.getNameUtils().singularize(collectionElement.getName()));
         collectionItemElement.setMinOccurs(BigInteger.valueOf(0L));
         collectionItemElement.setMaxOccurs("unbounded");
 
@@ -302,7 +245,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
             TypeMirror genericType = variableTypeParameters.get(0);
 
             if (isTypeSupported(genericType)) {
-                collectionItemElement.setType(typeMap.get(genericType.toString()));
+                collectionItemElement.setType(SchemaTypeConversion.convertType(genericType.toString(), schema.getTargetNamespace()));
             } else {
                 collectionItemElement.setComplexType(generateRefComplexType());
             }
@@ -331,9 +274,9 @@ public class SchemaGenerator extends ContextualizedGenerator {
         LocalComplexType itemComplexType = new LocalComplexType();
 
         Attribute refAttribute = new Attribute();
-        refAttribute.setUse(USE_REQUIRED);
+        refAttribute.setUse(SchemaConstants.USE_REQUIRED);
         refAttribute.setName("ref");
-        refAttribute.setType(STRING);
+        refAttribute.setType(SchemaConstants.STRING);
 
         itemComplexType.getAttributeOrAttributeGroup().add(refAttribute);
         return itemComplexType;
@@ -357,7 +300,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
         all.getParticle().add(any);
         xmlComplexType.setSequence(all);
 
-        Attribute ref = createAttribute("ref", true, STRING, "The reference object for this parameter");
+        Attribute ref = createAttribute("ref", true, SchemaConstants.STRING, "The reference object for this parameter");
         xmlComplexType.getAttributeOrAttributeGroup().add(ref);
 
         return xmlComplexType;
@@ -365,7 +308,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
     private void registerConfigElement(javax.lang.model.element.Element element) {
         ExtensionType config = registerExtension("config");
-        Attribute nameAttribute = createAttribute("name", true, STRING, "Give a name to this configuration so it can be later referenced by config-ref.");
+        Attribute nameAttribute = createAttribute("name", true, SchemaConstants.STRING, "Give a name to this configuration so it can be later referenced by config-ref.");
         config.getAttributeOrAttributeGroup().add(nameAttribute);
 
         All all = new All();
@@ -373,7 +316,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
         java.util.List<VariableElement> variables = ElementFilter.fieldsIn(element.getEnclosedElements());
         for (VariableElement variable : variables) {
-            if (TypeMirrorUtils.isArrayOrList(getContext().getTypeUtils(), variable.asType())) {
+            if (context.getTypeMirrorUtils().isArrayOrList(context.getTypeUtils(), variable.asType())) {
                 generateConfigurableCollectionElement(all, variable);
             } else {
                 config.getAttributeOrAttributeGroup().add(createConfigurableAttribute(variable));
@@ -393,15 +336,15 @@ public class SchemaGenerator extends ContextualizedGenerator {
         Attribute attribute = new Attribute();
 
         // set whenever or not is optional
-        attribute.setUse(configurable.optional() ? USE_OPTIONAL : USE_REQUIRED);
+        attribute.setUse(configurable.optional() ? SchemaConstants.USE_OPTIONAL : SchemaConstants.USE_REQUIRED);
 
         if (isTypeSupported(variable.asType())) {
             attribute.setName(name);
-            attribute.setType(typeMap.get(variable.asType().toString()));
+            attribute.setType(SchemaTypeConversion.convertType(variable.asType().toString(), schema.getTargetNamespace()));
         } else {
             // non-supported types will get "-ref" so beans can be injected
             attribute.setName(name + "-ref");
-            attribute.setType(STRING);
+            attribute.setType(SchemaConstants.STRING);
         }
 
         // add default value
@@ -422,19 +365,19 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
         // set whenever or not is optional
         if (parameter != null) {
-            attribute.setUse(parameter.optional() ? USE_OPTIONAL : USE_REQUIRED);
+            attribute.setUse(parameter.optional() ? SchemaConstants.USE_OPTIONAL : SchemaConstants.USE_REQUIRED);
         } else {
-            attribute.setUse(USE_REQUIRED);
+            attribute.setUse(SchemaConstants.USE_REQUIRED);
         }
 
 
         if (isTypeSupported(variable.asType())) {
             attribute.setName(name);
-            attribute.setType(typeMap.get(variable.asType().toString()));
+            attribute.setType(SchemaTypeConversion.convertType(variable.asType().toString(), schema.getTargetNamespace()));
         } else {
             // non-supported types will get "-ref" so beans can be injected
             attribute.setName(name + "-ref");
-            attribute.setType(STRING);
+            attribute.setType(SchemaConstants.STRING);
         }
 
         // add default value
@@ -445,40 +388,40 @@ public class SchemaGenerator extends ContextualizedGenerator {
     }
 
     private boolean isTypeSupported(TypeMirror typeMirror) {
-        return typeMap.containsKey(typeMirror.toString());
+        return SchemaTypeConversion.isSupported(typeMirror.toString());
     }
 
     private void importMuleSchemaDocNamespace() {
         Import muleSchemaDocImport = new Import();
-        muleSchemaDocImport.setNamespace(MULE_SCHEMADOC_NAMESPACE);
-        muleSchemaDocImport.setSchemaLocation(MULE_SCHEMADOC_SCHEMA_LOCATION);
+        muleSchemaDocImport.setNamespace(SchemaConstants.MULE_SCHEMADOC_NAMESPACE);
+        muleSchemaDocImport.setSchemaLocation(SchemaConstants.MULE_SCHEMADOC_SCHEMA_LOCATION);
         schema.getIncludeOrImportOrRedefine().add(muleSchemaDocImport);
     }
 
     private void importMuleNamespace() {
         Import muleSchemaImport = new Import();
-        muleSchemaImport.setNamespace(MULE_NAMESPACE);
-        muleSchemaImport.setSchemaLocation(MULE_SCHEMA_LOCATION);
+        muleSchemaImport.setNamespace(SchemaConstants.MULE_NAMESPACE);
+        muleSchemaImport.setSchemaLocation(SchemaConstants.MULE_SCHEMA_LOCATION);
         schema.getIncludeOrImportOrRedefine().add(muleSchemaImport);
     }
 
     private void importSpringFrameworkNamespace() {
         Import springFrameworkImport = new Import();
-        springFrameworkImport.setNamespace(SPRING_FRAMEWORK_NAMESPACE);
-        springFrameworkImport.setSchemaLocation(SPRING_FRAMEWORK_SCHEMA_LOCATION);
+        springFrameworkImport.setNamespace(SchemaConstants.SPRING_FRAMEWORK_NAMESPACE);
+        springFrameworkImport.setSchemaLocation(SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION);
         schema.getIncludeOrImportOrRedefine().add(springFrameworkImport);
     }
 
     private void importXmlNamespace() {
         Import xmlImport = new Import();
-        xmlImport.setNamespace(XML_NAMESPACE);
+        xmlImport.setNamespace(SchemaConstants.XML_NAMESPACE);
         schema.getIncludeOrImportOrRedefine().add(xmlImport);
     }
 
     private Attribute createAttribute(String name, boolean optional, QName type, String description) {
         Attribute attr = new Attribute();
         attr.setName(name);
-        attr.setUse(optional ? USE_OPTIONAL : USE_REQUIRED);
+        attr.setUse(optional ? SchemaConstants.USE_OPTIONAL : SchemaConstants.USE_REQUIRED);
         attr.setType(type);
         Annotation nameAnnotation = new Annotation();
         attr.setAnnotation(nameAnnotation);
@@ -492,8 +435,8 @@ public class SchemaGenerator extends ContextualizedGenerator {
     private Element registerTransformer(String name) {
         Element transformer = new TopLevelElement();
         transformer.setName(name);
-        transformer.setSubstitutionGroup(MULE_ABSTRACT_TRANSFORMER);
-        transformer.setType(MULE_ABSTRACT_TRANSFORMER_TYPE);
+        transformer.setSubstitutionGroup(SchemaConstants.MULE_ABSTRACT_TRANSFORMER);
+        transformer.setType(SchemaConstants.MULE_ABSTRACT_TRANSFORMER_TYPE);
 
         return transformer;
     }
@@ -503,13 +446,13 @@ public class SchemaGenerator extends ContextualizedGenerator {
 
         Element extension = new TopLevelElement();
         extension.setName(name);
-        extension.setSubstitutionGroup(MULE_ABSTRACT_EXTENSION);
+        extension.setSubstitutionGroup(SchemaConstants.MULE_ABSTRACT_EXTENSION);
         extension.setComplexType(complexType);
 
         ComplexContent complexContent = new ComplexContent();
         complexType.setComplexContent(complexContent);
         ExtensionType complexContentExtension = new ExtensionType();
-        complexContentExtension.setBase(MULE_ABSTRACT_EXTENSION_TYPE);
+        complexContentExtension.setBase(SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE);
         complexContent.setExtension(complexContentExtension);
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(extension);
@@ -518,16 +461,16 @@ public class SchemaGenerator extends ContextualizedGenerator {
     }
 
     private void registerTypes() {
-        registerType("integerType", INTEGER);
-        registerType("decimalType", DECIMAL);
-        registerType("floatType", FLOAT);
-        registerType("doubleType", DOUBLE);
-        registerType("dateTimeType", DATETIME);
-        registerType("longType", LONG);
-        registerType("byteType", BYTE);
-        registerType("booleanType", BOOLEAN);
-        registerType("anyUriType", ANYURI);
-        registerType("charType", STRING, 1, 1);
+        registerType("integerType", SchemaConstants.INTEGER);
+        registerType("decimalType", SchemaConstants.DECIMAL);
+        registerType("floatType", SchemaConstants.FLOAT);
+        registerType("doubleType", SchemaConstants.DOUBLE);
+        registerType("dateTimeType", SchemaConstants.DATETIME);
+        registerType("longType", SchemaConstants.LONG);
+        registerType("byteType", SchemaConstants.BYTE);
+        registerType("booleanType", SchemaConstants.BOOLEAN);
+        registerType("anyUriType", SchemaConstants.ANYURI);
+        registerType("charType", SchemaConstants.STRING, 1, 1);
 
         registerAnyXmlType();
     }
@@ -581,7 +524,7 @@ public class SchemaGenerator extends ContextualizedGenerator {
         LocalSimpleType expression = new LocalSimpleType();
         Restriction restriction = new Restriction();
         expression.setRestriction(restriction);
-        restriction.setBase(STRING);
+        restriction.setBase(SchemaConstants.STRING);
         Pattern pattern = new Pattern();
         pattern.setValue("\\#\\[[^\\]]+\\]");
         restriction.getFacets().add(pattern);

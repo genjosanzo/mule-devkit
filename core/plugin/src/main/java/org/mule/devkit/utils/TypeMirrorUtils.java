@@ -15,9 +15,8 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.apt.util;
+package org.mule.devkit.utils;
 
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -26,11 +25,7 @@ import javax.xml.bind.annotation.XmlType;
 import java.util.List;
 
 public final class TypeMirrorUtils {
-    private TypeMirrorUtils() {
-    }
-
-
-    public static boolean isXmlType(TypeMirror type) {
+    public boolean isXmlType(TypeMirror type) {
         if (type.getKind() == TypeKind.DECLARED) {
 
             DeclaredType declaredType = (DeclaredType) type;
@@ -45,7 +40,7 @@ public final class TypeMirrorUtils {
 
     }
 
-    public static boolean isArrayOrList(Types types, TypeMirror type) {
+    public boolean isArrayOrList(Types types, TypeMirror type) {
         if (type.getKind() == TypeKind.ARRAY) {
             return true;
         }
