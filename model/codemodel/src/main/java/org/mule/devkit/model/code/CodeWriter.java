@@ -40,14 +40,14 @@
 
 package org.mule.devkit.model.code;
 
+import org.mule.devkit.model.code.util.EncoderFactory;
+import org.mule.devkit.model.code.util.UnicodeEscapeWriter;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.CharsetEncoder;
-
-import org.mule.devkit.model.code.util.EncoderFactory;
-import org.mule.devkit.model.code.util.UnicodeEscapeWriter;
 
 /**
  * Receives generated code and writes to the appropriate storage.

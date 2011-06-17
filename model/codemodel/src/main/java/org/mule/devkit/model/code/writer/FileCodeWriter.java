@@ -40,15 +40,15 @@
 
 package org.mule.devkit.model.code.writer;
 
+import org.mule.devkit.model.code.CodeWriter;
+import org.mule.devkit.model.code.JPackage;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.mule.devkit.model.code.CodeWriter;
-import org.mule.devkit.model.code.JPackage;
 
 /**
  * Writes all the source files under the specified file folder.

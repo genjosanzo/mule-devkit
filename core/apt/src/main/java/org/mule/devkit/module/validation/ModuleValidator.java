@@ -21,9 +21,12 @@ import org.mule.devkit.annotations.Configurable;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.validation.ValidationException;
 import org.mule.devkit.validation.Validator;
-import sun.tools.tree.ContinueStatement;
 
-import javax.lang.model.element.*;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 import java.util.List;
 

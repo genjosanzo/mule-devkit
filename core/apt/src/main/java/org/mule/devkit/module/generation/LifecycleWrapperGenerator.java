@@ -23,7 +23,6 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.config.spring.handlers.AbstractPojoNamespaceHandler;
 import org.mule.devkit.annotations.lifecycle.Dispose;
 import org.mule.devkit.annotations.lifecycle.Initialise;
 import org.mule.devkit.annotations.lifecycle.Start;

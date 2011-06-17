@@ -42,9 +42,9 @@ package org.mule.devkit.model.code;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 
 /**

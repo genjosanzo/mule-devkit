@@ -40,12 +40,12 @@
 
 package org.mule.devkit.model.code.fmt;
 
+import org.mule.devkit.model.code.JResourceFile;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-
-import org.mule.devkit.model.code.JResourceFile;
 
 
 /**

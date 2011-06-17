@@ -40,11 +40,11 @@
 
 package org.mule.devkit.model.code.fmt;
 
+import org.mule.devkit.model.code.JResourceFile;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
-import org.mule.devkit.model.code.JResourceFile;
 
 /**
  * Allows an application to copy a resource file to the output. 

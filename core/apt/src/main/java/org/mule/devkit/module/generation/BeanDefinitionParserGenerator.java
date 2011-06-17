@@ -19,7 +19,6 @@ package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.annotations.Source;
 import org.mule.devkit.annotations.SourceCallback;
@@ -33,7 +32,6 @@ import org.mule.devkit.model.code.JInvocation;
 import org.mule.devkit.model.code.JMethod;
 import org.mule.devkit.model.code.JMod;
 import org.mule.devkit.model.code.JOp;
-import org.mule.devkit.model.code.JPackage;
 import org.mule.devkit.model.code.JVar;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;

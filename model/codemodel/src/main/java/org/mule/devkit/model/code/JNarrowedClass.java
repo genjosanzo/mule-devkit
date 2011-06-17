@@ -40,11 +40,11 @@
 
 package org.mule.devkit.model.code;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Collections;
-import java.util.ArrayList;
 
 /**
  * Represents X&lt;Y>.

@@ -40,9 +40,9 @@
 
 package org.mule.devkit.model.code;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Collections;
 
 /**
  * A special {@link JClass} that represents an unknown class (except its name.)

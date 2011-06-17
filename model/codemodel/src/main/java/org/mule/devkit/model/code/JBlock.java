@@ -41,8 +41,8 @@
 package org.mule.devkit.model.code;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * A block of Java code, which may contain statements and local declarations.

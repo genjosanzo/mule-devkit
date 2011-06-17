@@ -40,12 +40,12 @@
 
 package org.mule.devkit.model.code.writer;
 
-import java.io.OutputStream;
-import java.io.IOException;
-import java.io.Writer;
-
 import org.mule.devkit.model.code.CodeWriter;
 import org.mule.devkit.model.code.JPackage;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Writer;
 
 /**
  * {@link org.mule.devkit.model.code.CodeWriter} that delegates to another {@link org.mule.devkit.model.code.CodeWriter}.

@@ -40,14 +40,14 @@
 
 package org.mule.devkit.model.code.writer;
 
+import org.mule.devkit.model.code.CodeWriter;
+import org.mule.devkit.model.code.JPackage;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Writer;
-
-import org.mule.devkit.model.code.CodeWriter;
-import org.mule.devkit.model.code.JPackage;
 
 /**
  * Filter CodeWriter that writes a progress message to the specified

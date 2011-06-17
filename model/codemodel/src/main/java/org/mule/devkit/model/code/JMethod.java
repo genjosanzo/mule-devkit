@@ -40,15 +40,15 @@
 
 package org.mule.devkit.model.code;
 
+import org.mule.devkit.model.code.util.ClassNameComparator;
+
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Collections;
-import java.util.Collection;
-
-import org.mule.devkit.model.code.util.ClassNameComparator;
 
 /**
  * Java method.

@@ -40,8 +40,9 @@
 
 package org.mule.devkit.model.code.util;
 
-import java.util.Comparator;
 import org.mule.devkit.model.code.JClass;
+
+import java.util.Comparator;
 
 /**
  * Comparator object that sorts {@link org.mule.devkit.model.code.JClass}es in the order

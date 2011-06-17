@@ -40,11 +40,11 @@
 
 package org.mule.devkit.model.code.fmt;
 
+import org.mule.devkit.model.code.JResourceFile;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Properties;
-
-import org.mule.devkit.model.code.JResourceFile;
 
 /**
  * A property file.

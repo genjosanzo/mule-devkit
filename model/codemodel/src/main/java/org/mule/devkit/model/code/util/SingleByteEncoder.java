@@ -44,13 +44,13 @@
 
 package org.mule.devkit.model.code.util;
 
+import sun.nio.cs.Surrogate;
+
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
-
-import sun.nio.cs.Surrogate;
 
 
 abstract class SingleByteEncoder

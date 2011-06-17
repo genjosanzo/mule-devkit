@@ -17,7 +17,11 @@
 
 package org.mule.devkit.annotations;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Marks a field inside a {@link Module} as being configurable. A user will be able to use XML attributes to set this

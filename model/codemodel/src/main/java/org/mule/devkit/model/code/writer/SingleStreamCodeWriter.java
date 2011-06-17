@@ -40,13 +40,13 @@
 
 package org.mule.devkit.model.code.writer;
 
+import org.mule.devkit.model.code.CodeWriter;
+import org.mule.devkit.model.code.JPackage;
+
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-
-import org.mule.devkit.model.code.CodeWriter;
-import org.mule.devkit.model.code.JPackage;
 
 /**
  * Output all source files into a single stream with a little

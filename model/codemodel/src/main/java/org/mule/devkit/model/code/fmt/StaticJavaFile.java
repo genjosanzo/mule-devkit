@@ -40,6 +40,11 @@
 
 package org.mule.devkit.model.code.fmt;
 
+import org.mule.devkit.model.code.JClass;
+import org.mule.devkit.model.code.JPackage;
+import org.mule.devkit.model.code.JResourceFile;
+import org.mule.devkit.model.code.JTypeVar;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -52,11 +57,6 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.List;
-
-import org.mule.devkit.model.code.JClass;
-import org.mule.devkit.model.code.JPackage;
-import org.mule.devkit.model.code.JResourceFile;
-import org.mule.devkit.model.code.JTypeVar;
 
 /**
  * Statically generated Java soruce file.

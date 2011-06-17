@@ -17,11 +17,8 @@
 
 package org.mule.devkit.module.generation;
 
-import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
@@ -30,7 +27,6 @@ import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.JCatchBlock;
 import org.mule.devkit.model.code.JClass;
-import org.mule.devkit.model.code.JConditional;
 import org.mule.devkit.model.code.JExpr;
 import org.mule.devkit.model.code.JFieldVar;
 import org.mule.devkit.model.code.JInvocation;

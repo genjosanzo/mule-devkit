@@ -40,14 +40,14 @@
 
 package org.mule.devkit.model.code.writer;
 
+import org.mule.devkit.model.code.CodeWriter;
+import org.mule.devkit.model.code.JPackage;
+
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import org.mule.devkit.model.code.CodeWriter;
-import org.mule.devkit.model.code.JPackage;
 
 /**
  * Writes all the files into a zip file.

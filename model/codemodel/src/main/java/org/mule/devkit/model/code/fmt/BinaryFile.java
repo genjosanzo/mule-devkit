@@ -40,11 +40,11 @@
 
 package org.mule.devkit.model.code.fmt;
 
+import org.mule.devkit.model.code.JResourceFile;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
-import org.mule.devkit.model.code.JResourceFile;
 
 /**
  * Allows the application to use OutputStream to define data

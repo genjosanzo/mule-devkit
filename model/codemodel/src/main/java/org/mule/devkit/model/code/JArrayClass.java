@@ -40,8 +40,8 @@
 
 package org.mule.devkit.model.code;
 
-import java.util.Iterator;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
