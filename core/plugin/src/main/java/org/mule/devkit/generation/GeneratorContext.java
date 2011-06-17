@@ -50,7 +50,7 @@ public class GeneratorContext {
         this.elements = elements;
         this.types = types;
         this.typeMirrorUtils = new TypeMirrorUtils();
-        this.nameUtils = new NameUtils();
+        this.nameUtils = new NameUtils(this.elements);
     }
 
     public JCodeModel getCodeModel() {

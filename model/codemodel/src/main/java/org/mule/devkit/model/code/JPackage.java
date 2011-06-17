@@ -227,6 +227,25 @@ public final class JPackage implements JDeclaration, JGenerable, JClassContainer
             return ee.getExistingClass();
         }
     }
+
+    /**
+     * Adds a public class to this package.
+     */
+    public DefinedClass _class(String name, Class<?> _extends, Class<?>[] _implements) {
+        try {
+            DefinedClass clazz = _class(JMod.PUBLIC, name);
+            clazz._extends(_extends);
+            for(Class<?> _implement : _implements)
+            {
+                clazz._implements(_implement);
+            }
+
+            return clazz;
+        } catch (JClassAlreadyExistsException ee) {
+            return ee.getExistingClass();
+        }
+    }
+
     /**
      * Adds a public class to this package.
      */

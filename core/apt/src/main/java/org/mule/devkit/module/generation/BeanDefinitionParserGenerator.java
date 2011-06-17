@@ -116,7 +116,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
     private void generateGetAttributeValue(DefinedClass beanDefinitionparser) {
         JMethod getAttributeValue = beanDefinitionparser.method(JMod.PROTECTED, ref(String.class), "getAttributeValue");
-        JVar element = getAttributeValue.param(ref(Element.class), "element");
+        JVar element = getAttributeValue.param(ref(org.w3c.dom.Element.class), "element");
         JVar attributeName = getAttributeValue.param(ref(String.class), "attributeName");
 
         JInvocation getAttribute = element.invoke("getAttribute").arg(attributeName);
@@ -133,7 +133,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
     private void generateParseChild(DefinedClass beanDefinitionparser, ExecutableElement executableElement) {
         JMethod parseChild = beanDefinitionparser.method(JMod.PROTECTED, context.getCodeModel().VOID, "parseChild");
-        JVar element = parseChild.param(ref(Element.class), "element");
+        JVar element = parseChild.param(ref(org.w3c.dom.Element.class), "element");
         JVar parserContext = parseChild.param(ref(ParserContext.class), "parserContext");
         JVar beanDefinitionBuilder = parseChild.param(ref(BeanDefinitionBuilder.class), "beanDefinitionBuilder");
 

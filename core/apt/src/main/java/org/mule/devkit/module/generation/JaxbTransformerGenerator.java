@@ -34,6 +34,7 @@ import org.mule.devkit.model.code.JOp;
 import org.mule.devkit.model.code.JPackage;
 import org.mule.devkit.model.code.JTryBlock;
 import org.mule.devkit.model.code.JVar;
+import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
 import javax.lang.model.element.Element;
@@ -113,7 +114,7 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
         JVar result = doTransform.body().decl(ref(variable.asType()).boxify(), "result", JExpr._null());
 
         JTryBlock tryBlock = doTransform.body()._try();
-        JVar unmarshaller = tryBlock.body().decl(Unmarshaller.class, "unmarshaller");
+        JVar unmarshaller = tryBlock.body().decl(ref(Unmarshaller.class), "unmarshaller");
         tryBlock.body().assign(unmarshaller, jaxbContext.invoke("createUnmarshaller"));
         JVar inputStream = tryBlock.body().decl(ref(InputStream.class), "is", JExpr._new(ref(ByteArrayInputStream.class)).arg(
                 JExpr.invoke(JExpr.cast(ref(String.class), src), "getBytes").arg(encoding)
@@ -199,10 +200,9 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
         TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
         String packageName = context.getNameUtils().getPackageName(context.getElementsUtils().getBinaryName(parentClass).toString());
         JPackage pkg = context.getCodeModel()._package(packageName);
-        DefinedClass dummyInboundEndpoint = pkg._class(StringUtils.capitalize(xmlType.name()) + "JaxbTransformer");
-        dummyInboundEndpoint._implements(DiscoverableTransformer.class);
+        DefinedClass jaxbTransformer = pkg._class(StringUtils.capitalize(xmlType.name()) + "JaxbTransformer", AbstractTransformer.class, new Class<?>[] { DiscoverableTransformer.class });
 
-        return dummyInboundEndpoint;
+        return jaxbTransformer;
     }
 
 }

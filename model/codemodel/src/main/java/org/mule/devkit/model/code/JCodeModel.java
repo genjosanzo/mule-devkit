@@ -41,6 +41,10 @@
 
 package org.mule.devkit.model.code;
 
+import org.mule.devkit.model.code.writer.FileCodeWriter;
+import org.mule.devkit.model.code.writer.ProgressCodeWriter;
+
+import javax.lang.model.type.TypeMirror;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -51,12 +55,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.mule.devkit.model.code.writer.FileCodeWriter;
-import org.mule.devkit.model.code.writer.ProgressCodeWriter;
-
-import javax.lang.model.type.MirroredTypeException;
-import javax.lang.model.type.TypeMirror;
 
 
 /**
@@ -376,7 +374,16 @@ public final class JCodeModel {
      * If that fails, we assume that the class is derived straight from
      * {@link Object}, and return a {@link JClass}.
      */
-    public JClass ref(String fullyQualifiedClassName) {
+    public JType ref(String fullyQualifiedClassName) {
+        try {
+            return parseType(fullyQualifiedClassName);
+        } catch (ClassNotFoundException e) {
+            // fall through
+        }
+        return refClass(fullyQualifiedClassName);
+    }
+
+    private JClass refClass(String fullyQualifiedClassName) {
         try {
             // try the context class loader first
             return ref(Thread.currentThread().getContextClassLoader().loadClass(fullyQualifiedClassName));
@@ -477,7 +484,7 @@ public final class JCodeModel {
                     break;
             }
 
-            JClass clazz = ref(s.substring(start, idx));
+            JClass clazz = refClass(s.substring(start, idx));
 
             return parseSuffix(clazz);
         }

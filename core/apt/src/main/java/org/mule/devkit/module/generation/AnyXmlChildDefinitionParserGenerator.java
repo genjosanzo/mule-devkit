@@ -115,7 +115,7 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractModuleGenerato
 
     private void generateParseInternal(DefinedClass anyXmlChildDefinitionParser) {
         JMethod parseInternal = anyXmlChildDefinitionParser.method(JMod.PROTECTED, ref(AbstractBeanDefinition.class), "parseInternal");
-        JVar element = parseInternal.param(ref(Element.class), "element");
+        JVar element = parseInternal.param(ref(org.w3c.dom.Element.class), "element");
         JVar parserContext = parseInternal.param(ref(ParserContext.class), "parserContext");
 
         JVar bd = parseInternal.body().decl(ref(AbstractBeanDefinition.class), "bd");

@@ -78,12 +78,15 @@ public class ModuleAnnotationProcessor extends AbstractProcessor {
             classpath = processingEnv.getOptions().get("-classpath");
 
         List<URL> classpaths = new ArrayList<URL>();
-        for (String p : classpath.split(File.pathSeparator)) {
-            File file = new File(p);
-            try {
-                classpaths.add(file.toURL());
-            } catch (MalformedURLException e) {
-                warn(e.getMessage());
+
+        if (classpath != null) {
+            for (String p : classpath.split(File.pathSeparator)) {
+                File file = new File(p);
+                try {
+                    classpaths.add(file.toURL());
+                } catch (MalformedURLException e) {
+                    warn(e.getMessage());
+                }
             }
         }
 
@@ -122,6 +125,7 @@ public class ModuleAnnotationProcessor extends AbstractProcessor {
                             validator.validate(e);
                         }
                         for (Generator generator : plugin.getGenerators()) {
+                            generator.setContext(context);
                             generator.generate(e);
                         }
                     }

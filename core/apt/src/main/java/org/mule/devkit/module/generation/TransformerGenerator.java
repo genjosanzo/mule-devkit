@@ -40,6 +40,7 @@ import org.mule.devkit.model.code.JOp;
 import org.mule.devkit.model.code.JPackage;
 import org.mule.devkit.model.code.JTryBlock;
 import org.mule.devkit.model.code.JVar;
+import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
 import javax.lang.model.element.AnnotationMirror;
@@ -51,7 +52,7 @@ import javax.lang.model.util.ElementFilter;
 import java.util.List;
 import java.util.Map;
 
-public class TransformerGenerator extends AbstractModuleGenerator {
+public class TransformerGenerator extends AbstractMessageGenerator {
 
     public void generate(Element type) throws GenerationException {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(type.getEnclosedElements());
@@ -65,8 +66,8 @@ public class TransformerGenerator extends AbstractModuleGenerator {
             DefinedClass transformerClass = getTransformerClass(executableElement);
 
             // declare object
-            JFieldVar object = transformerClass.field(JMod.PRIVATE, ref(executableElement.getEnclosingElement().asType()), "object");
-            JFieldVar muleContext = transformerClass.field(JMod.PRIVATE, ref(MuleContext.class), "muleContext");
+            JFieldVar object = generateFieldForPojo(transformerClass, type);
+            JFieldVar muleContext = generateFieldForMuleContext(transformerClass);
 
             // declare weight
             JFieldVar weighting = transformerClass.field(JMod.PRIVATE, context.getCodeModel().INT, "weighting", JOp.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), JExpr.lit(transformer.priorityWeighting())));
@@ -75,7 +76,7 @@ public class TransformerGenerator extends AbstractModuleGenerator {
             generateConstructor(transformerClass, executableElement);
 
             // generate initialise
-            generateInitialiseMethod(transformerClass, ref(executableElement.getEnclosingElement().asType()).boxify(), muleContext, object);
+            generateInitialiseMethod(transformerClass, executableElement.getEnclosingElement(), muleContext, null, null, object);
 
             // add setmulecontext
             generateSetMuleContextMethod(transformerClass, muleContext);
@@ -184,46 +185,8 @@ public class TransformerGenerator extends AbstractModuleGenerator {
     private DefinedClass getTransformerClass(ExecutableElement executableElement) {
         String transformerClassName = context.getNameUtils().generateClassName(executableElement, "Transformer");
         JPackage pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(transformerClassName));
-        DefinedClass transformer = pkg._class(context.getNameUtils().getClassName(transformerClassName), new Class<?>[] {DiscoverableTransformer.class, MuleContextAware.class, Initialisable.class});
+        DefinedClass transformer = pkg._class(context.getNameUtils().getClassName(transformerClassName), AbstractTransformer.class, new Class<?>[] {DiscoverableTransformer.class, MuleContextAware.class, Initialisable.class});
 
         return transformer;
-    }
-
-    private JMethod generateSetObjectMethod(DefinedClass messageProcessorClass, JFieldVar object) {
-        JMethod setObject = messageProcessorClass.method(JMod.PUBLIC, context.getCodeModel().VOID, "setObject");
-        JVar objectParam = setObject.param(object.type(), "object");
-        setObject.body().assign(JExpr._this().ref(object), objectParam);
-
-        return setObject;
-    }
-
-
-    private JMethod generateSetMuleContextMethod(DefinedClass messageProcessorClass, JFieldVar muleContext) {
-        JMethod setMuleContext = messageProcessorClass.method(JMod.PUBLIC, context.getCodeModel().VOID, "setMuleContext");
-        JVar muleContextParam = setMuleContext.param(ref(MuleContext.class), "context");
-        setMuleContext.body().assign(JExpr._this().ref(muleContext), muleContextParam);
-
-        return setMuleContext;
-    }
-
-    private JMethod generateInitialiseMethod(DefinedClass messageProcessorClass, JClass messageProcessor, JFieldVar muleContext, JFieldVar object) {
-        JMethod initialise = messageProcessorClass.method(JMod.PUBLIC, context.getCodeModel().VOID, "initialise");
-        initialise._throws(InitialisationException.class);
-
-        JConditional ifNoObject = initialise.body()._if(JOp.eq(object, JExpr._null()));
-        JTryBlock tryLookUp = ifNoObject._then()._try();
-        tryLookUp.body().assign(object, muleContext.invoke("getRegistry").invoke("lookupObject").arg(JExpr.dotclass(messageProcessor)));
-        JCatchBlock catchBlock = tryLookUp._catch(ref(RegistrationException.class));
-        JVar exception = catchBlock.param("e");
-        JClass coreMessages = ref(CoreMessages.class);
-        JInvocation failedToInvoke = coreMessages.staticInvoke("initialisationFailure");
-        failedToInvoke.arg(messageProcessor.fullName());
-        JInvocation messageException = JExpr._new(ref(InitialisationException.class));
-        messageException.arg(failedToInvoke);
-        messageException.arg(exception);
-        messageException.arg(JExpr._this());
-        catchBlock.body()._throw(messageException);
-
-        return initialise;
     }
 }

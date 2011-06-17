@@ -158,21 +158,6 @@ public final class JBlock implements JGenerable, JStatement {
      * @param name
      *        Name of the variable
      *
-     * @return Newly generated JVar
-     */
-    public JVar decl(Class<?> type, String name) {
-        return decl(JMod.NONE, ref(type), name, null);
-    }
-
-    /**
-     * Adds a local variable declaration to this block
-     *
-     * @param type
-     *        JType of the variable
-     *
-     * @param name
-     *        Name of the variable
-     *
      * @param init
      *        Initialization expression for this variable.  May be null.
      *

@@ -67,7 +67,7 @@
                         <exclude>**/*.ftl</exclude>
                         <exclude>**/build-number.txt</exclude> 
                         <exclude>**/*.ftl</exclude>
-						<exclude>model/codemodel/**</exclude>
+						<exclude>**/org/mule/devkit/model/code/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>
