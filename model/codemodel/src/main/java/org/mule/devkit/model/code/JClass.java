@@ -54,9 +54,9 @@ import java.util.List;
  * To be exact, this object represents an "use" of a reference type,
  * not necessarily a declaration of it, which is modeled as {@link DefinedClass}.
  */
-public abstract class JClass extends JType
+public abstract class JClass extends Type
 {
-    protected JClass( JCodeModel _owner ) {
+    protected JClass( CodeModel _owner ) {
         this._owner = _owner;
     }
 
@@ -84,9 +84,9 @@ public abstract class JClass extends JType
         return null;
     }
 	
-    private final JCodeModel _owner;
-    /** Gets the JCodeModel object to which this object belongs. */
-    public final JCodeModel owner() { return _owner; }
+    private final CodeModel _owner;
+    /** Gets the CodeModel object to which this object belongs. */
+    public final CodeModel owner() { return _owner; }
     
     /**
      * Gets the super class of this class.
@@ -118,16 +118,16 @@ public abstract class JClass extends JType
      * <p>
      * For example, if this {@link JClass} represents
      * <code>Set&lt;T></code>, this method returns an array
-     * that contains single {@link JTypeVar} for 'T'.
+     * that contains single {@link TypeVariable} for 'T'.
      */
-    public JTypeVar[] typeParams() {
+    public TypeVariable[] typeParams() {
         return EMPTY_ARRAY;
     }
 
     /**
      * Sometimes useful reusable empty array.
      */
-    protected static final JTypeVar[] EMPTY_ARRAY = new JTypeVar[0];
+    protected static final TypeVariable[] EMPTY_ARRAY = new TypeVariable[0];
 
     /**
      * Checks if this object represents an interface.
@@ -144,7 +144,7 @@ public abstract class JClass extends JType
      * defined in the java.lang package, return the corresponding
      * primitive type. Otherwise null.
      */
-    public JPrimitiveType getPrimitiveType() { return null; }
+    public PrimitiveType getPrimitiveType() { return null; }
 
     /**
      * @deprecated calling this method from {@link JClass}
@@ -153,9 +153,9 @@ public abstract class JClass extends JType
      */
     public JClass boxify() { return this; }
 
-    public JType unboxify() {
-        JPrimitiveType pt = getPrimitiveType();
-        return pt==null ? (JType)this : pt;
+    public Type unboxify() {
+        PrimitiveType pt = getPrimitiveType();
+        return pt==null ? (Type)this : pt;
     }
 
     public JClass erasure() {
@@ -172,7 +172,7 @@ public abstract class JClass extends JType
         // to avoid the confusion, always use "this" explicitly in this method.
         
         // null can be assigned to any type.
-        if( derived instanceof JNullType )  return true;
+        if( derived instanceof NullType)  return true;
         
         if( this==derived )     return true;
         
@@ -277,19 +277,19 @@ public abstract class JClass extends JType
      * <code>.narrow(X)</code> builds <code>Set&lt;X></code> from <code>Set</code>.
      */
     public JClass narrow( JClass clazz ) {
-        return new JNarrowedClass(this,clazz);
+        return new NarrowedClass(this,clazz);
     }
 
-    public JClass narrow( JType type ) {
+    public JClass narrow( Type type ) {
         return narrow(type.boxify());
     }
 
     public JClass narrow( JClass... clazz ) {
-        return new JNarrowedClass(this,Arrays.asList(clazz.clone()));
+        return new NarrowedClass(this,Arrays.asList(clazz.clone()));
     }
 
     public JClass narrow( List<? extends JClass> clazz ) {
-        return new JNarrowedClass(this,new ArrayList<JClass>(clazz));
+        return new NarrowedClass(this,new ArrayList<JClass>(clazz));
     }
 
     /**
@@ -312,7 +312,7 @@ public abstract class JClass extends JType
      * @return never null
      */
     public final JClass wildcard() {
-        return new JTypeWildcard(this);
+        return new TypeWildcard(this);
     }
 
     /**
@@ -327,45 +327,45 @@ public abstract class JClass extends JType
      * <p>
      * This method needs to work recursively.
      */
-    protected abstract JClass substituteParams( JTypeVar[] variables, List<JClass> bindings );
+    protected abstract JClass substituteParams( TypeVariable[] variables, List<JClass> bindings );
     
     public String toString() {
         return this.getClass().getName() + '(' + name() + ')';
     }
 
 
-    public final JExpression dotclass() {
+    public final Expression dotclass() {
         return JExpr.dotclass(this);
     }
 
     /** Generates a static method invocation. */
-    public final JInvocation staticInvoke(JMethod method) {
-        return new JInvocation(this,method);
+    public final Invocation staticInvoke(Method method) {
+        return new Invocation(this,method);
     }
     
     /** Generates a static method invocation. */
-    public final JInvocation staticInvoke(String method) {
-        return new JInvocation(this,method);
+    public final Invocation staticInvoke(String method) {
+        return new Invocation(this,method);
     }
     
     /** Static field reference. */
-    public final JFieldRef staticRef(String field) {
-        return new JFieldRef(this, field);
+    public final FieldRef staticRef(String field) {
+        return new FieldRef(this, field);
     }
 
     /** Static field reference. */
-    public final JFieldRef staticRef(JVar field) {
-        return new JFieldRef(this, field);
+    public final FieldRef staticRef(Variable field) {
+        return new FieldRef(this, field);
     }
 
-    public void generate(JFormatter f) {
+    public void generate(Formatter f) {
         f.t(this);
     }
 
     /**
      * Prints the class name in javadoc @link format.
      */
-    void printLink(JFormatter f) {
+    void printLink(Formatter f) {
         f.p("{@link ").g(this).p('}');
     }
 }

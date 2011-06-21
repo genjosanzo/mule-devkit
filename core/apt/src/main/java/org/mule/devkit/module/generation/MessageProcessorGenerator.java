@@ -29,18 +29,18 @@ import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.annotations.SourceCallback;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
-import org.mule.devkit.model.code.JBlock;
+import org.mule.devkit.model.code.Block;
+import org.mule.devkit.model.code.FieldVariable;
+import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.JClass;
-import org.mule.devkit.model.code.JConditional;
+import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.JExpr;
-import org.mule.devkit.model.code.JFieldVar;
-import org.mule.devkit.model.code.JInvocation;
-import org.mule.devkit.model.code.JMethod;
-import org.mule.devkit.model.code.JMod;
-import org.mule.devkit.model.code.JOp;
-import org.mule.devkit.model.code.JTryBlock;
-import org.mule.devkit.model.code.JType;
-import org.mule.devkit.model.code.JVar;
+import org.mule.devkit.model.code.Method;
+import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Op;
+import org.mule.devkit.model.code.TryStatement;
+import org.mule.devkit.model.code.Type;
+import org.mule.devkit.model.code.Variable;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transport.NullPayload;
 
@@ -73,10 +73,10 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         Map<String, AbstractMessageGenerator.FieldVariableElement> fields = generateFieldForEachParameter(messageProcessorClass, executableElement);
 
         // add standard fields
-        JFieldVar object = generateFieldForPojo(messageProcessorClass, typeElement);
-        JFieldVar muleContext = generateFieldForMuleContext(messageProcessorClass);
-        JFieldVar expressionManager = generateFieldForExpressionManager(messageProcessorClass);
-        JFieldVar patternInfo = generateFieldForPatternInfo(messageProcessorClass);
+        FieldVariable object = generateFieldForPojo(messageProcessorClass, typeElement);
+        FieldVariable muleContext = generateFieldForMuleContext(messageProcessorClass);
+        FieldVariable expressionManager = generateFieldForExpressionManager(messageProcessorClass);
+        FieldVariable patternInfo = generateFieldForPatternInfo(messageProcessorClass);
 
         // add initialise
         generateInitialiseMethod(messageProcessorClass, typeElement, muleContext, expressionManager, patternInfo, object);
@@ -96,10 +96,10 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         generateProcessMethod(executableElement, messageProcessorClass, fields, muleContext, object, expressionManager, patternInfo);
     }
 
-    private JInvocation generateNullPayload(JFieldVar muleContext, JVar event) {
-        JInvocation defaultMuleEvent = JExpr._new(ref(DefaultMuleEvent.class));
-        JInvocation defaultMuleMessage = JExpr._new(ref(DefaultMuleMessage.class));
-        JInvocation nullPayload = ref(NullPayload.class).staticInvoke("getInstance");
+    private Invocation generateNullPayload(FieldVariable muleContext, Variable event) {
+        Invocation defaultMuleEvent = JExpr._new(ref(DefaultMuleEvent.class));
+        Invocation defaultMuleMessage = JExpr._new(ref(DefaultMuleMessage.class));
+        Invocation nullPayload = ref(NullPayload.class).staticInvoke("getInstance");
         defaultMuleMessage.arg(nullPayload);
         defaultMuleMessage.arg(muleContext);
         defaultMuleEvent.arg(defaultMuleMessage);
@@ -108,20 +108,20 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         return defaultMuleEvent;
     }
 
-    private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, JFieldVar muleContext, JFieldVar object, JFieldVar expressionManager, JFieldVar patternInfo) {
+    private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, FieldVariable muleContext, FieldVariable object, FieldVariable expressionManager, FieldVariable patternInfo) {
         String methodName = executableElement.getSimpleName().toString();
-        JType muleEvent = ref(MuleEvent.class);
+        Type muleEvent = ref(MuleEvent.class);
 
 
-        JMethod process = messageProcessorClass.method(JMod.PUBLIC, muleEvent, "process");
+        Method process = messageProcessorClass.method(Modifier.PUBLIC, muleEvent, "process");
         process._throws(MuleException.class);
-        JVar event = process.param(muleEvent, "event");
-        JVar muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage");
+        Variable event = process.param(muleEvent, "event");
+        Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage");
         process.body().assign(muleMessage, event.invoke("getMessage"));
 
-        JTryBlock callProcessor = process.body()._try();
+        TryStatement callProcessor = process.body()._try();
 
-        List<JVar> parameters = new ArrayList<JVar>();
+        List<Variable> parameters = new ArrayList<Variable>();
         for (VariableElement variable : executableElement.getParameters()) {
             if (variable.asType().toString().contains(SourceCallback.class.getName()))
                 continue;
@@ -130,32 +130,32 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             if (SchemaTypeConversion.isSupported(fields.get(fieldName).getVariableElement().asType().toString()) ||
                     context.getTypeMirrorUtils().isXmlType(fields.get(fieldName).getVariableElement().asType())) {
 
-                JVar evaluated = callProcessor.body().decl(ref(Object.class), "evaluated" + StringUtils.capitalize(fieldName), JExpr._null());
-                JVar transformed = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName), JExpr._null());
+                Variable evaluated = callProcessor.body().decl(ref(Object.class), "evaluated" + StringUtils.capitalize(fieldName), JExpr._null());
+                Variable transformed = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName), JExpr._null());
 
-                JConditional notNull = callProcessor.body()._if(JOp.ne(fields.get(fieldName).getField(), JExpr._null()));
+                Conditional notNull = callProcessor.body()._if(Op.ne(fields.get(fieldName).getField(), JExpr._null()));
 
                 generateExpressionEvaluator(notNull._then(), evaluated, fields.get(fieldName).getField(), patternInfo, expressionManager, muleMessage);
                 generateTransform(notNull._then(), transformed, evaluated, fields.get(fieldName).getVariableElement().asType(), muleContext);
 
                 parameters.add(transformed);
             } else {
-                //JVar ref = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "ref" + StringUtils.capitalize(fieldName));
+                //Variable ref = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "ref" + StringUtils.capitalize(fieldName));
                 parameters.add(fields.get(fieldName).getField());
             }
         }
 
-        JType returnType = ref(executableElement.getReturnType());
+        Type returnType = ref(executableElement.getReturnType());
         generateMethodCall(callProcessor.body(), object, methodName, parameters, muleContext, event, returnType);
         generateThrow("failedToInvoke", MessagingException.class, callProcessor._catch((JClass) ref(Exception.class)), event, methodName);
     }
 
-    private JVar generateMethodCall(JBlock body, JFieldVar object, String methodName, List<JVar> parameters, JFieldVar muleContext, JVar event, JType returnType) {
-        JVar resultPayload = null;
+    private Variable generateMethodCall(Block body, FieldVariable object, String methodName, List<Variable> parameters, FieldVariable muleContext, Variable event, Type returnType) {
+        Variable resultPayload = null;
         if (returnType != context.getCodeModel().VOID) {
             resultPayload = body.decl(ref(Object.class), "resultPayload");
         }
-        JInvocation methodCall = object.invoke(methodName);
+        Invocation methodCall = object.invoke(methodName);
         for (int i = 0; i < parameters.size(); i++) {
             methodCall.arg(parameters.get(i));
         }
@@ -173,15 +173,15 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         return resultPayload;
     }
 
-    private void generatePayloadOverwrite(JBlock block, JVar event, JVar resultPayload) {
-        JInvocation applyTransformers = event.invoke("getMessage").invoke("applyTransformers");
+    private void generatePayloadOverwrite(Block block, Variable event, Variable resultPayload) {
+        Invocation applyTransformers = event.invoke("getMessage").invoke("applyTransformers");
         applyTransformers.arg(event);
-        JInvocation newTransformerTemplate = JExpr._new(ref(TransformerTemplate.class));
-        JInvocation newOverwritePayloadCallback = JExpr._new(ref(TransformerTemplate.OverwitePayloadCallback.class));
+        Invocation newTransformerTemplate = JExpr._new(ref(TransformerTemplate.class));
+        Invocation newOverwritePayloadCallback = JExpr._new(ref(TransformerTemplate.OverwitePayloadCallback.class));
         newOverwritePayloadCallback.arg(resultPayload);
         newTransformerTemplate.arg(newOverwritePayloadCallback);
 
-        JVar transformerList = block.decl(ref(List.class).narrow(Transformer.class), "transformerList");
+        Variable transformerList = block.decl(ref(List.class).narrow(Transformer.class), "transformerList");
         block.assign(transformerList, JExpr._new(ref(ArrayList.class).narrow(Transformer.class)));
         block.add(transformerList.invoke("add").arg(newTransformerTemplate));
 

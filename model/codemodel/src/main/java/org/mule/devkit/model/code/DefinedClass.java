@@ -62,17 +62,17 @@ import java.util.TreeSet;
  * <h2>Where to go from here?</h2>
  * <p>
  * You'd want to generate fields and methods on a class.
- * See {@link #method(int, JType, String)} and {@link #field(int, JType, String)}.
+ * See {@link #method(int, Type, String)} and {@link #field(int, Type, String)}.
  */
 public class DefinedClass
     extends JClass
-    implements JDeclaration, JClassContainer, JGenerifiable, Annotable, JDocCommentable {
+    implements Declaration, ClassContainer, Generifiable, Annotable, DocCommentable {
 
     /** Name of this class. Null if anonymous. */
     private String name = null;
     
     /** Modifiers for the class declaration */
-    private JMods mods;
+    private Modifiers mods;
 
     /** Name of the super class of this class. */
     private JClass superClass;
@@ -81,24 +81,24 @@ public class DefinedClass
     private final Set<JClass> interfaces = new TreeSet<JClass>();
 
     /** Fields keyed by their names. */
-    /*package*/ final Map<String,JFieldVar> fields = new LinkedHashMap<String,JFieldVar>();
+    /*package*/ final Map<String,FieldVariable> fields = new LinkedHashMap<String,FieldVariable>();
 
     /** Static initializer, if this class has one */
-    private JBlock init = null;
+    private Block init = null;
 
     /** class javadoc */
-    private JDocComment jdoc = null;
+    private DocComment jdoc = null;
 
     /** Set of constructors for this class, if any */
-    private final List<JMethod> constructors = new ArrayList<JMethod>();
+    private final List<Method> constructors = new ArrayList<Method>();
 
     /** Set of methods that are members of this class */
-    private final List<JMethod> methods = new ArrayList<JMethod>();
+    private final List<Method> methods = new ArrayList<Method>();
 
     /**
      * Nested classes as a map from name to DefinedClass.
      * The name is all capitalized in a case sensitive file system
-     * ({@link JCodeModel#isCaseSensitiveFileSystem}) to avoid conflicts.
+     * ({@link CodeModel#isCaseSensitiveFileSystem}) to avoid conflicts.
      *
      * Lazily created to save footprint.
      *
@@ -132,7 +132,7 @@ public class DefinedClass
      * If this is a nested class, this is {@link DefinedClass}.
      * If this is an anonymous class, this constructor shouldn't be used.
      */
-    private JClassContainer outer = null;
+    private ClassContainer outer = null;
 
     
     /** Default value is class or interface
@@ -152,7 +152,7 @@ public class DefinedClass
      * In Java, enum constant order is actually significant,
      * because of order ID they get. So let's preserve the order.
      */
-    private final Map<String,JEnumConstant> enumConstantsByName = new LinkedHashMap<String,JEnumConstant>();
+    private final Map<String,EnumConstant> enumConstantsByName = new LinkedHashMap<String,EnumConstant>();
 
     /**
      * Annotations on this variable. Lazily created.
@@ -161,15 +161,15 @@ public class DefinedClass
 
 
     /**
-     * Helper class to implement {@link JGenerifiable}.
+     * Helper class to implement {@link Generifiable}.
      */
-    private final JGenerifiableImpl generifiable = new JGenerifiableImpl() {
-        protected JCodeModel owner() {
+    private final AbstractGenerifiable generifiable = new AbstractGenerifiable() {
+        protected CodeModel owner() {
             return DefinedClass.this.owner();
         }
     };
 
-    DefinedClass(JClassContainer parent, int mods, String name, ClassType classTypeval) {
+    DefinedClass(ClassContainer parent, int mods, String name, ClassType classTypeval) {
         this(mods, name, parent, parent.owner(), classTypeval);
     }
 
@@ -177,7 +177,7 @@ public class DefinedClass
      * Constructor for creating anonymous inner class.
      */
     DefinedClass(
-            JCodeModel owner,
+            CodeModel owner,
             int mods,
             String name) {
         this(mods, name, null, owner);
@@ -186,8 +186,8 @@ public class DefinedClass
     private DefinedClass(
             int mods,
             String name,
-            JClassContainer parent,
-            JCodeModel owner) {
+            ClassContainer parent,
+            CodeModel owner) {
     	this (mods,name,parent,owner,ClassType.CLASS);
     }
 
@@ -203,8 +203,8 @@ public class DefinedClass
     private DefinedClass(
             int mods,
             String name,
-            JClassContainer parent,
-            JCodeModel owner,
+            ClassContainer parent,
+            CodeModel owner,
             ClassType classTypeVal) {
         super(owner);
 
@@ -235,9 +235,9 @@ public class DefinedClass
 
         this.classType = classTypeVal;
         if (isInterface())
-            this.mods = JMods.forInterface(mods);
+            this.mods = Modifiers.forInterface(mods);
         else
-            this.mods = JMods.forClass(mods);
+            this.mods = Modifiers.forClass(mods);
 
         this.name = name;
 
@@ -339,10 +339,10 @@ public class DefinedClass
      * @return
      *      The generated type-safe enum constant.
      */
-    public JEnumConstant enumConstant(String name){
-        JEnumConstant ec = enumConstantsByName.get(name);
+    public EnumConstant enumConstant(String name){
+        EnumConstant ec = enumConstantsByName.get(name);
         if (null == ec) {
-            ec = new JEnumConstant(this, name);
+            ec = new EnumConstant(this, name);
             enumConstantsByName.put(name, ec);
         }
         return ec;
@@ -385,18 +385,18 @@ public class DefinedClass
      *        Modifiers for this field
      *
      * @param type
-     *        JType of this field
+     *        Type of this field
      *
      * @param name
      *        Name of this field
      *
      * @return Newly generated field
      */
-    public JFieldVar field(int mods, JType type, String name) {
+    public FieldVariable field(int mods, Type type, String name) {
         return field(mods, type, name, null);
     }
 
-    public JFieldVar field(int mods, Class<?> type, String name) {
+    public FieldVariable field(int mods, Class<?> type, String name) {
         return field(mods, owner()._ref(type), name);
     }
 
@@ -406,7 +406,7 @@ public class DefinedClass
      * @param mods
      *        Modifiers for this field.
      * @param type
-     *        JType of this field.
+     *        Type of this field.
      * @param name
      *        Name of this field.
      * @param init
@@ -414,12 +414,12 @@ public class DefinedClass
      *
      * @return Newly generated field
      */
-    public JFieldVar field(
+    public FieldVariable field(
         int mods,
-        JType type,
+        Type type,
         String name,
-        JExpression init) {
-        JFieldVar f = new JFieldVar(this,JMods.forField(mods), type, name, init);
+        Expression init) {
+        FieldVariable f = new FieldVariable(this, Modifiers.forField(mods), type, name, init);
 
         if (fields.containsKey(name)) {
             throw new IllegalArgumentException("trying to create the same field twice: "+name);
@@ -445,12 +445,12 @@ public class DefinedClass
      *      Name of the annotation Type declaration to be added to this package
      * @return
      *      newly created Annotation Type Declaration
-     * @exception JClassAlreadyExistsException
+     * @exception ClassAlreadyExistsException
      *      When the specified class/interface was already created.
      
      */
-    public DefinedClass _annotationTypeDeclaration(String name) throws JClassAlreadyExistsException {
-    	return _class (JMod.PUBLIC,name,ClassType.ANNOTATION_TYPE_DECL);
+    public DefinedClass _annotationTypeDeclaration(String name) throws ClassAlreadyExistsException {
+    	return _class (Modifier.PUBLIC,name,ClassType.ANNOTATION_TYPE_DECL);
     }
    
     /**
@@ -459,12 +459,12 @@ public class DefinedClass
      *      Name of the enum to be added to this package
      * @return
      *      newly created Enum
-     * @exception JClassAlreadyExistsException
+     * @exception ClassAlreadyExistsException
      *      When the specified class/interface was already created.
      
      */
-    public DefinedClass _enum (String name) throws JClassAlreadyExistsException {
-    	return _class (JMod.PUBLIC,name,ClassType.ENUM);
+    public DefinedClass _enum (String name) throws ClassAlreadyExistsException {
+    	return _class (Modifier.PUBLIC,name,ClassType.ENUM);
     }
     
     /**
@@ -475,11 +475,11 @@ public class DefinedClass
      * 		Modifiers for this enum declaration
      * @return
      *      newly created Enum
-     * @exception JClassAlreadyExistsException
+     * @exception ClassAlreadyExistsException
      *      When the specified class/interface was already created.
      
      */
-    public DefinedClass _enum (int mods,String name) throws JClassAlreadyExistsException {
+    public DefinedClass _enum (int mods,String name) throws ClassAlreadyExistsException {
     	return _class (mods,name,ClassType.ENUM);
     }
     
@@ -491,11 +491,11 @@ public class DefinedClass
         return this.classType;
     }
     
-    public JFieldVar field(
+    public FieldVariable field(
         int mods,
         Class<?> type,
         String name,
-        JExpression init) {
+        Expression init) {
         return field(mods, owner()._ref(type), name, init);
     }
 
@@ -505,17 +505,17 @@ public class DefinedClass
      *
      * @return always non-null.
      */
-    public Map<String,JFieldVar> fields() {
+    public Map<String,FieldVariable> fields() {
         return Collections.unmodifiableMap(fields);
     }
 
     /**
-     * Removes a {@link JFieldVar} from this class.
+     * Removes a {@link FieldVariable} from this class.
      *
      * @throws IllegalArgumentException
      *      if the given field is not a field on this class. 
      */
-    public void removeField(JFieldVar field) {
+    public void removeField(FieldVariable field) {
         if(fields.remove(field.name())!=field)
             throw new IllegalArgumentException();
     }
@@ -526,9 +526,9 @@ public class DefinedClass
      *
      * @return JBlock containing initialization statements for this class
      */
-    public JBlock init() {
+    public Block init() {
         if (init == null)
-            init = new JBlock();
+            init = new Block();
         return init;
     }
 
@@ -538,8 +538,8 @@ public class DefinedClass
      * @param mods
      *        Modifiers for this constructor
      */
-    public JMethod constructor(int mods) {
-        JMethod c = new JMethod(mods, this);
+    public Method constructor(int mods) {
+        Method c = new Method(mods, this);
         constructors.add(c);
         return c;
     }
@@ -547,7 +547,7 @@ public class DefinedClass
     /**
      * Returns an iterator that walks the constructors defined in this class.
      */
-    public Iterator<JMethod> constructors() {
+    public Iterator<Method> constructors() {
         return constructors.iterator();
     }
 
@@ -558,8 +558,8 @@ public class DefinedClass
      * @return
      *      null if not found.
      */
-    public JMethod getConstructor(JType[] argTypes) {
-        for (JMethod m : constructors) {
+    public Method getConstructor(Type[] argTypes) {
+        for (Method m : constructors) {
             if (m.hasSignature(argTypes))
                 return m;
         }
@@ -578,27 +578,27 @@ public class DefinedClass
      * @param name
      *        Name of the method
      *
-     * @return Newly generated JMethod
+     * @return Newly generated Method
      */
-    public JMethod method(int mods, JType type, String name) {
+    public Method method(int mods, Type type, String name) {
         // XXX problems caught in M constructor
-        JMethod m = new JMethod(this, mods, type, name);
+        Method m = new Method(this, mods, type, name);
         methods.add(m);
         return m;
     }
 
-    public JMethod method(int mods, Class<?> type, String name) {
+    public Method method(int mods, Class<?> type, String name) {
         return method(mods, owner()._ref(type), name);
     }
 
-    public JMethod method(int mods, Class<?> type, Class<?> narrowedType, String name) {
+    public Method method(int mods, Class<?> type, Class<?> narrowedType, String name) {
         return method(mods, owner()._ref(type).boxify().narrow(narrowedType), name);
     }
 
     /**
      * Returns the set of methods defined in this class.
      */
-    public Collection<JMethod> methods() {
+    public Collection<Method> methods() {
         return methods;
     }
 
@@ -609,8 +609,8 @@ public class DefinedClass
      * @return
      *      null if not found.
      */
-    public JMethod getMethod(String name, JType[] argTypes) {
-        for (JMethod m : methods) {
+    public Method getMethod(String name, Type[] argTypes) {
+        for (Method m : methods) {
             if (!m.name().equals(name))
                 continue;
 
@@ -640,7 +640,7 @@ public class DefinedClass
      * @return Newly generated class
      */
     public DefinedClass _class(int mods, String name)
-        throws JClassAlreadyExistsException {
+        throws ClassAlreadyExistsException {
         return _class(mods, name, ClassType.CLASS);
     }
 
@@ -649,21 +649,21 @@ public class DefinedClass
      *
      * @deprecated
      */
-    public DefinedClass _class(int mods, String name, boolean isInterface) throws JClassAlreadyExistsException {
+    public DefinedClass _class(int mods, String name, boolean isInterface) throws ClassAlreadyExistsException {
     	return _class(mods,name,isInterface?ClassType.INTERFACE:ClassType.CLASS);
     }
 
     public DefinedClass _class(int mods, String name, ClassType classTypeVal)
-        throws JClassAlreadyExistsException {
+        throws ClassAlreadyExistsException {
 
         String NAME;
-        if (JCodeModel.isCaseSensitiveFileSystem)
+        if (CodeModel.isCaseSensitiveFileSystem)
             NAME = name.toUpperCase();
         else
             NAME = name;
 
         if (getClasses().containsKey(NAME))
-            throw new JClassAlreadyExistsException(getClasses().get(NAME));
+            throw new ClassAlreadyExistsException(getClasses().get(NAME));
         else {
             // XXX problems caught in the NC constructor
             DefinedClass c = new DefinedClass(this, mods, name, classTypeVal);
@@ -676,8 +676,8 @@ public class DefinedClass
      * Add a new public nested class to this class.
      */
     public DefinedClass _class(String name)
-        throws JClassAlreadyExistsException {
-        return _class(JMod.PUBLIC, name);
+        throws ClassAlreadyExistsException {
+        return _class(Modifier.PUBLIC, name);
     }
 
     /**
@@ -692,7 +692,7 @@ public class DefinedClass
      * @return Newly generated interface
      */
     public DefinedClass _interface(int mods, String name)
-        throws JClassAlreadyExistsException {
+        throws ClassAlreadyExistsException {
         return _class(mods, name, ClassType.INTERFACE);
     }
 
@@ -700,8 +700,8 @@ public class DefinedClass
      * Adds a public interface to this package.
      */
     public DefinedClass _interface(String name)
-        throws JClassAlreadyExistsException {
-        return _interface(JMod.PUBLIC, name);
+        throws ClassAlreadyExistsException {
+        return _interface(Modifier.PUBLIC, name);
     }
 
     /**
@@ -710,9 +710,9 @@ public class DefinedClass
      *
      * @return JDocComment containing javadocs for this class
      */
-    public JDocComment javadoc() {
+    public DocComment javadoc() {
         if (jdoc == null)
-            jdoc = new JDocComment(owner());
+            jdoc = new DocComment(owner());
         return jdoc;
     }
 
@@ -768,7 +768,7 @@ public class DefinedClass
             return null;
     }
 
-    public void declare(JFormatter f) {
+    public void declare(Formatter f) {
         if (jdoc != null)
             f.nl().g(jdoc);
 
@@ -795,12 +795,12 @@ public class DefinedClass
     /**
      * prints the body of a class.
      */
-    protected void declareBody(JFormatter f) {
+    protected void declareBody(Formatter f) {
         f.p('{').nl().nl().i();
         boolean first = true;
 
         if (!enumConstantsByName.isEmpty()) {
-            for (JEnumConstant c : enumConstantsByName.values()) {
+            for (EnumConstant c : enumConstantsByName.values()) {
                 if (!first) f.p(',').nl();
                 f.d(c);
                 first = false;
@@ -808,14 +808,14 @@ public class DefinedClass
         	f.p(';').nl();
         }
 
-        for( JFieldVar field : fields.values() )
+        for( FieldVariable field : fields.values() )
             f.d(field);
         if (init != null)
             f.nl().p("static").s(init);
-        for (JMethod m : constructors) {
+        for (Method m : constructors) {
             f.nl().d(m);
         }
-        for (JMethod m : methods) {
+        for (Method m : methods) {
             f.nl().d(m);
         }
         if(classes!=null)
@@ -843,32 +843,32 @@ public class DefinedClass
     }
 
     public final JPackage _package() {
-        JClassContainer p = outer;
+        ClassContainer p = outer;
         while (!(p instanceof JPackage))
             p = p.parentContainer();
         return (JPackage) p;
     }
 
-    public final JClassContainer parentContainer() {
+    public final ClassContainer parentContainer() {
         return outer;
     }
 
-    public JTypeVar generify(String name) {
+    public TypeVariable generify(String name) {
         return generifiable.generify(name);
     }
-    public JTypeVar generify(String name, Class<?> bound) {
+    public TypeVariable generify(String name, Class<?> bound) {
         return generifiable.generify(name, bound);
     }
-    public JTypeVar generify(String name, JClass bound) {
+    public TypeVariable generify(String name, JClass bound) {
         return generifiable.generify(name, bound);
     }
     @Override
-    public JTypeVar[] typeParams() {
+    public TypeVariable[] typeParams() {
         return generifiable.typeParams();
     }
 
     protected JClass substituteParams(
-        JTypeVar[] variables,
+        TypeVariable[] variables,
         List<JClass> bindings) {
         return this;
     }
@@ -911,7 +911,7 @@ public class DefinedClass
      *      the current modifiers of this class.
      *      Always return non-null valid object.
      */
-    public JMods mods() {
+    public Modifiers mods() {
         return mods;
     }
 }

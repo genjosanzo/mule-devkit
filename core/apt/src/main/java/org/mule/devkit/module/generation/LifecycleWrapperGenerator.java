@@ -29,15 +29,15 @@ import org.mule.devkit.annotations.lifecycle.Start;
 import org.mule.devkit.annotations.lifecycle.Stop;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
-import org.mule.devkit.model.code.JCatchBlock;
+import org.mule.devkit.model.code.CatchBlock;
+import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.JClass;
 import org.mule.devkit.model.code.JExpr;
-import org.mule.devkit.model.code.JInvocation;
-import org.mule.devkit.model.code.JMethod;
-import org.mule.devkit.model.code.JMod;
+import org.mule.devkit.model.code.Method;
+import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.JPackage;
-import org.mule.devkit.model.code.JTryBlock;
-import org.mule.devkit.model.code.JVar;
+import org.mule.devkit.model.code.TryStatement;
+import org.mule.devkit.model.code.Variable;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -90,24 +90,24 @@ public class LifecycleWrapperGenerator extends AbstractModuleGenerator {
     }
 
     private void generateLifecycleInvocation(DefinedClass lifecycleWrapper, ExecutableElement superExecutableElement, String name, Class<?> catchException, boolean addThis) {
-        JMethod startMethod = lifecycleWrapper.method(JMod.PUBLIC, context.getCodeModel().VOID, name);
+        Method startMethod = lifecycleWrapper.method(Modifier.PUBLIC, context.getCodeModel().VOID, name);
 
         if (catchException != null) {
             startMethod._throws(ref(catchException));
         }
 
-        JInvocation startInvocation = JExpr._super().invoke(superExecutableElement.getSimpleName().toString());
+        Invocation startInvocation = JExpr._super().invoke(superExecutableElement.getSimpleName().toString());
 
         if (catchException != null) {
-            JTryBlock tryBlock = startMethod.body()._try();
+            TryStatement tryBlock = startMethod.body()._try();
             tryBlock.body().add(startInvocation);
 
             int i = 0;
             for (TypeMirror exception : superExecutableElement.getThrownTypes()) {
-                JCatchBlock catchBlock = tryBlock._catch(ref(exception).boxify());
-                JVar catchedException = catchBlock.param("e" + i);
+                CatchBlock catchBlock = tryBlock._catch(ref(exception).boxify());
+                Variable catchedException = catchBlock.param("e" + i);
 
-                JInvocation newMuleException = JExpr._new(ref(catchException));
+                Invocation newMuleException = JExpr._new(ref(catchException));
                 newMuleException.arg(catchedException);
 
                 if (addThis) {

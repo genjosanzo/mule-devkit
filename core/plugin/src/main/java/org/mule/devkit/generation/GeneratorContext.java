@@ -17,8 +17,8 @@
 
 package org.mule.devkit.generation;
 
+import org.mule.devkit.model.code.CodeModel;
 import org.mule.devkit.model.code.DefinedClass;
-import org.mule.devkit.model.code.JCodeModel;
 import org.mule.devkit.model.code.writer.FilerCodeWriter;
 import org.mule.devkit.model.schema.SchemaModel;
 import org.mule.devkit.utils.NameUtils;
@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 public class GeneratorContext {
-    private JCodeModel codeModel;
+    private CodeModel codeModel;
     private SchemaModel schemaModel;
     private List<DefinedClass> registerAtBoot;
     private Map<String, DefinedClass> roles;
@@ -44,7 +44,7 @@ public class GeneratorContext {
 
     public GeneratorContext(Filer filer, Types types, Elements elements) {
         this.registerAtBoot = new ArrayList<DefinedClass>();
-        this.codeModel = new JCodeModel(new FilerCodeWriter(filer));
+        this.codeModel = new CodeModel(new FilerCodeWriter(filer));
         this.schemaModel = new SchemaModel(new FilerCodeWriter(filer));
         this.roles = new HashMap<String, DefinedClass>();
         this.elements = elements;
@@ -53,7 +53,7 @@ public class GeneratorContext {
         this.nameUtils = new NameUtils(this.elements);
     }
 
-    public JCodeModel getCodeModel() {
+    public CodeModel getCodeModel() {
         return codeModel;
     }
 

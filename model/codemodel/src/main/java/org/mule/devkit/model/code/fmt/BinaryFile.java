@@ -40,7 +40,7 @@
 
 package org.mule.devkit.model.code.fmt;
 
-import org.mule.devkit.model.code.JResourceFile;
+import org.mule.devkit.model.code.ResourceFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -53,7 +53,7 @@ import java.io.OutputStream;
  * @author
  *     Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
-public final class BinaryFile extends JResourceFile {
+public final class BinaryFile extends ResourceFile {
     
     private final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     

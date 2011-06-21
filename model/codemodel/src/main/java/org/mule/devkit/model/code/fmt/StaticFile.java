@@ -40,7 +40,7 @@
 
 package org.mule.devkit.model.code.fmt;
 
-import org.mule.devkit.model.code.JResourceFile;
+import org.mule.devkit.model.code.ResourceFile;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -52,7 +52,7 @@ import java.io.OutputStream;
  * @author
  *     Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
-public final class StaticFile extends JResourceFile {
+public final class StaticFile extends ResourceFile {
     
     private final ClassLoader classLoader;
     private final String resourceName;

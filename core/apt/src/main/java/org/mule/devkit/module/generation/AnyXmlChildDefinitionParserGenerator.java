@@ -24,18 +24,18 @@ import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
-import org.mule.devkit.model.code.JCatchBlock;
-import org.mule.devkit.model.code.JConditional;
+import org.mule.devkit.model.code.Expression;
+import org.mule.devkit.model.code.CatchBlock;
+import org.mule.devkit.model.code.Conditional;
+import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.JExpr;
-import org.mule.devkit.model.code.JExpression;
-import org.mule.devkit.model.code.JForLoop;
-import org.mule.devkit.model.code.JInvocation;
-import org.mule.devkit.model.code.JMethod;
-import org.mule.devkit.model.code.JMod;
-import org.mule.devkit.model.code.JOp;
+import org.mule.devkit.model.code.ForLoop;
+import org.mule.devkit.model.code.Method;
+import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.JPackage;
-import org.mule.devkit.model.code.JTryBlock;
-import org.mule.devkit.model.code.JVar;
+import org.mule.devkit.model.code.TryStatement;
+import org.mule.devkit.model.code.Variable;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Attr;
@@ -106,56 +106,56 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractModuleGenerato
         generateParseInternal(anyXmlChildDefinitionParser);
     }
 
-    private void generateGetBeanClass(DefinedClass beanDefinitionparser, JExpression expr) {
-        JMethod getBeanClass = beanDefinitionparser.method(JMod.PROTECTED, ref(Class.class), "getBeanClass");
-        JVar element = getBeanClass.param(ref(org.w3c.dom.Element.class), "element");
+    private void generateGetBeanClass(DefinedClass beanDefinitionparser, Expression expr) {
+        Method getBeanClass = beanDefinitionparser.method(Modifier.PROTECTED, ref(Class.class), "getBeanClass");
+        Variable element = getBeanClass.param(ref(org.w3c.dom.Element.class), "element");
         getBeanClass.body()._return(expr);
 
     }
 
     private void generateParseInternal(DefinedClass anyXmlChildDefinitionParser) {
-        JMethod parseInternal = anyXmlChildDefinitionParser.method(JMod.PROTECTED, ref(AbstractBeanDefinition.class), "parseInternal");
-        JVar element = parseInternal.param(ref(org.w3c.dom.Element.class), "element");
-        JVar parserContext = parseInternal.param(ref(ParserContext.class), "parserContext");
+        Method parseInternal = anyXmlChildDefinitionParser.method(Modifier.PROTECTED, ref(AbstractBeanDefinition.class), "parseInternal");
+        Variable element = parseInternal.param(ref(org.w3c.dom.Element.class), "element");
+        Variable parserContext = parseInternal.param(ref(ParserContext.class), "parserContext");
 
-        JVar bd = parseInternal.body().decl(ref(AbstractBeanDefinition.class), "bd");
-        JInvocation superParserInternal = JExpr._super().invoke("parseInternal");
+        Variable bd = parseInternal.body().decl(ref(AbstractBeanDefinition.class), "bd");
+        Invocation superParserInternal = JExpr._super().invoke("parseInternal");
         superParserInternal.arg(element);
         superParserInternal.arg(parserContext);
 
         parseInternal.body().assign(bd, superParserInternal);
 
-        JInvocation setAttribute = bd.invoke("setAttribute");
+        Invocation setAttribute = bd.invoke("setAttribute");
         setAttribute.arg(ref(MuleHierarchicalBeanDefinitionParserDelegate.class).boxify().staticRef("MULE_NO_RECURSE"));
         setAttribute.arg(ref(Boolean.class).boxify().staticRef("TRUE"));
         parseInternal.body().add(setAttribute);
 
-        JConditional ifBlock = parseInternal.body()._if(JOp.eq(ref(Node.class).staticRef("ELEMENT_NODE"), element.invoke("getNodeType")));
+        Conditional ifBlock = parseInternal.body()._if(Op.eq(ref(Node.class).staticRef("ELEMENT_NODE"), element.invoke("getNodeType")));
 
-        JVar nodeList = ifBlock._then().decl(ref(NodeList.class), "childs", element.invoke("getChildNodes"));
-        JVar i = ifBlock._then().decl(context.getCodeModel().INT, "i");
-        JForLoop forLoop = ifBlock._then()._for();
+        Variable nodeList = ifBlock._then().decl(ref(NodeList.class), "childs", element.invoke("getChildNodes"));
+        Variable i = ifBlock._then().decl(context.getCodeModel().INT, "i");
+        ForLoop forLoop = ifBlock._then()._for();
         forLoop.init(i, JExpr.lit(0));
-        forLoop.test(JOp.lt(i, nodeList.invoke("getLength")));
-        forLoop.update(JOp.incr(i));
-        JVar child = forLoop.body().decl(ref(Node.class), "child", nodeList.invoke("item").arg(i));
+        forLoop.test(Op.lt(i, nodeList.invoke("getLength")));
+        forLoop.update(Op.incr(i));
+        Variable child = forLoop.body().decl(ref(Node.class), "child", nodeList.invoke("item").arg(i));
 
-        JConditional ifBlock2 = forLoop.body()._if(JOp.eq(ref(Node.class).staticRef("ELEMENT_NODE"), child.invoke("getNodeType")));
+        Conditional ifBlock2 = forLoop.body()._if(Op.eq(ref(Node.class).staticRef("ELEMENT_NODE"), child.invoke("getNodeType")));
 
-        JTryBlock tryBlock = ifBlock2._then()._try();
-        JVar domSource = tryBlock.body().decl(ref(DOMSource.class), "domSource", JExpr._new(ref(DOMSource.class)).arg(child));
-        JVar stringWriter = tryBlock.body().decl(ref(StringWriter.class), "stringWriter", JExpr._new(ref(StringWriter.class)));
-        JVar streamResult = tryBlock.body().decl(ref(StreamResult.class), "result", JExpr._new(ref(StreamResult.class)).arg(stringWriter));
-        JVar tf = tryBlock.body().decl(ref(TransformerFactory.class), "tf", ref(TransformerFactory.class).staticInvoke("newInstance"));
-        JVar transformer = tryBlock.body().decl(ref(Transformer.class), "transformer", tf.invoke("newTransformer"));
-        JInvocation transform = transformer.invoke("transform");
+        TryStatement tryBlock = ifBlock2._then()._try();
+        Variable domSource = tryBlock.body().decl(ref(DOMSource.class), "domSource", JExpr._new(ref(DOMSource.class)).arg(child));
+        Variable stringWriter = tryBlock.body().decl(ref(StringWriter.class), "stringWriter", JExpr._new(ref(StringWriter.class)));
+        Variable streamResult = tryBlock.body().decl(ref(StreamResult.class), "result", JExpr._new(ref(StreamResult.class)).arg(stringWriter));
+        Variable tf = tryBlock.body().decl(ref(TransformerFactory.class), "tf", ref(TransformerFactory.class).staticInvoke("newInstance"));
+        Variable transformer = tryBlock.body().decl(ref(Transformer.class), "transformer", tf.invoke("newTransformer"));
+        Invocation transform = transformer.invoke("transform");
         transform.arg(domSource);
         transform.arg(streamResult);
         tryBlock.body().add(transform);
         tryBlock.body().add(stringWriter.invoke("flush"));
 
         //bd.getPropertyValues().add(clazzProperty, arguments);
-        JInvocation add = bd.invoke("getConstructorArgumentValues").invoke("addIndexedArgumentValue");
+        Invocation add = bd.invoke("getConstructorArgumentValues").invoke("addIndexedArgumentValue");
         add.arg(JExpr.lit(0));
         add.arg(stringWriter.invoke("toString"));
         tryBlock.body().add(add);
@@ -167,29 +167,29 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractModuleGenerato
         parseInternal.body()._return(bd);
     }
 
-    private void generateReThrow(JTryBlock tryBlock, Class<?> clazz) {
-        JCatchBlock catchBlock = tryBlock._catch(ref(clazz).boxify());
-        JVar e = catchBlock.param("e");
+    private void generateReThrow(TryStatement tryBlock, Class<?> clazz) {
+        CatchBlock catchBlock = tryBlock._catch(ref(clazz).boxify());
+        Variable e = catchBlock.param("e");
         catchBlock.body()._throw(JExpr._new(ref(UnhandledException.class)).arg(e));
     }
 
     private void generateConstructor(DefinedClass anyXmlChildDefinitionParser) {
-        JMethod constructor = anyXmlChildDefinitionParser.constructor(JMod.PUBLIC);
-        JVar setterMethod = constructor.param(ref(String.class), "setterMethod");
-        JVar clazz = constructor.param(ref(Class.class), "clazz");
+        Method constructor = anyXmlChildDefinitionParser.constructor(Modifier.PUBLIC);
+        Variable setterMethod = constructor.param(ref(String.class), "setterMethod");
+        Variable clazz = constructor.param(ref(Class.class), "clazz");
 
-        JInvocation superInvocation = constructor.body().invoke("super");
+        Invocation superInvocation = constructor.body().invoke("super");
         superInvocation.arg(setterMethod);
         superInvocation.arg(clazz);
 
-        JInvocation addIgnored = constructor.body().invoke("addIgnored");
+        Invocation addIgnored = constructor.body().invoke("addIgnored");
         addIgnored.arg("xmlns");
     }
 
     private void generateProcessProperty(DefinedClass xmlAnyChildDefinitionParser) {
-        JMethod processProperty = xmlAnyChildDefinitionParser.method(JMod.PROTECTED, context.getCodeModel().VOID, "processProperty");
-        JVar attribute = processProperty.param(ref(Attr.class), "attribute");
-        JVar beanAssembler = processProperty.param(ref(BeanAssembler.class), "assembler");
+        Method processProperty = xmlAnyChildDefinitionParser.method(Modifier.PROTECTED, context.getCodeModel().VOID, "processProperty");
+        Variable attribute = processProperty.param(ref(Attr.class), "attribute");
+        Variable beanAssembler = processProperty.param(ref(BeanAssembler.class), "assembler");
     }
 
 

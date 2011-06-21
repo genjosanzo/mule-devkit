@@ -44,9 +44,9 @@ package org.mule.devkit.model.code;
 /**
  * JContinue statement
  */
-class JContinue implements JStatement {
+class JContinue implements Statement {
     
-    private final JLabel label;
+    private final Label label;
     
     /**
      * JContinue constructor.
@@ -54,11 +54,11 @@ class JContinue implements JStatement {
      * @param _label
      *      a valid label or null.
      */
-    JContinue(JLabel _label) {
+    JContinue(Label _label) {
         this.label = _label;
     }
 
-    public void state(JFormatter f) {
+    public void state(Formatter f) {
         if( label==null )
             f.p("continue;").nl();
         else

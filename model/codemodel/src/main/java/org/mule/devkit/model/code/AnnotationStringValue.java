@@ -53,13 +53,13 @@ final class AnnotationStringValue extends AnnotationValue {
     /**
      * The value of the Annotation member
      */
-    private final JExpression value;
+    private final Expression value;
 
-    AnnotationStringValue(JExpression value) {
+    AnnotationStringValue(Expression value) {
         this.value = value;
     }
 
-    public void generate(JFormatter f) {
+    public void generate(Formatter f) {
         f.g(value);
     }
 }

@@ -34,21 +34,21 @@ import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.devkit.annotations.SourceCallback;
+import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.DefinedClass;
-import org.mule.devkit.model.code.JBlock;
-import org.mule.devkit.model.code.JCatchBlock;
+import org.mule.devkit.model.code.CatchBlock;
+import org.mule.devkit.model.code.FieldVariable;
+import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.JClass;
-import org.mule.devkit.model.code.JConditional;
+import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.JExpr;
-import org.mule.devkit.model.code.JExpression;
-import org.mule.devkit.model.code.JFieldVar;
-import org.mule.devkit.model.code.JInvocation;
-import org.mule.devkit.model.code.JMethod;
-import org.mule.devkit.model.code.JMod;
-import org.mule.devkit.model.code.JOp;
+import org.mule.devkit.model.code.Expression;
+import org.mule.devkit.model.code.Method;
+import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.JPackage;
-import org.mule.devkit.model.code.JTryBlock;
-import org.mule.devkit.model.code.JVar;
+import org.mule.devkit.model.code.TryStatement;
+import org.mule.devkit.model.code.Variable;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.TemplateParser;
 
@@ -62,22 +62,22 @@ import java.util.Map;
 
 public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
-    protected JFieldVar generateFieldForPatternInfo(DefinedClass messageProcessorClass) {
-        return messageProcessorClass.field(JMod.PRIVATE, ref(TemplateParser.PatternInfo.class), "patternInfo");
+    protected FieldVariable generateFieldForPatternInfo(DefinedClass messageProcessorClass) {
+        return messageProcessorClass.field(Modifier.PRIVATE, ref(TemplateParser.PatternInfo.class), "patternInfo");
     }
 
-    protected JFieldVar generateFieldForExpressionManager(DefinedClass messageProcessorClass) {
-        return messageProcessorClass.field(JMod.PRIVATE, ref(ExpressionManager.class), "expressionManager");
+    protected FieldVariable generateFieldForExpressionManager(DefinedClass messageProcessorClass) {
+        return messageProcessorClass.field(Modifier.PRIVATE, ref(ExpressionManager.class), "expressionManager");
     }
 
-    protected JFieldVar generateFieldForMuleContext(DefinedClass messageProcessorClass) {
-        return messageProcessorClass.field(JMod.PRIVATE, ref(MuleContext.class), "muleContext");
+    protected FieldVariable generateFieldForMuleContext(DefinedClass messageProcessorClass) {
+        return messageProcessorClass.field(Modifier.PRIVATE, ref(MuleContext.class), "muleContext");
     }
 
-    protected JFieldVar generateFieldForPojo(DefinedClass messageProcessorClass, Element typeElement) {
+    protected FieldVariable generateFieldForPojo(DefinedClass messageProcessorClass, Element typeElement) {
         DefinedClass pojo = context.getClassForRole(context.getNameUtils().generateClassName((TypeElement) typeElement, "Pojo"));
 
-        return messageProcessorClass.field(JMod.PRIVATE, pojo, "object");
+        return messageProcessorClass.field(Modifier.PRIVATE, pojo, "object");
     }
 
     protected DefinedClass getBeanDefinitionParserClass(ExecutableElement executableElement) {
@@ -120,21 +120,21 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
             if (SchemaTypeConversion.isSupported(variable.asType().toString()) || context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                 String fieldName = variable.getSimpleName().toString();
-                JFieldVar field = messageProcessorClass.field(JMod.PRIVATE, ref(Object.class), fieldName);
+                FieldVariable field = messageProcessorClass.field(Modifier.PRIVATE, ref(Object.class), fieldName);
                 fields.put(variable.getSimpleName().toString(), new AbstractMessageGenerator.FieldVariableElement(field, variable));
             } else {
                 String fieldName = variable.getSimpleName().toString();
-                JFieldVar field = messageProcessorClass.field(JMod.PRIVATE, ref(variable.asType()), fieldName);
+                FieldVariable field = messageProcessorClass.field(Modifier.PRIVATE, ref(variable.asType()), fieldName);
                 fields.put(variable.getSimpleName().toString(), new AbstractMessageGenerator.FieldVariableElement(field, variable));
             }
         }
         return fields;
     }
 
-    protected JMethod generateInitialiseMethod(DefinedClass messageProcessorClass, Element typeElement, JFieldVar muleContext, JFieldVar expressionManager, JFieldVar patternInfo, JFieldVar object) {
+    protected Method generateInitialiseMethod(DefinedClass messageProcessorClass, Element typeElement, FieldVariable muleContext, FieldVariable expressionManager, FieldVariable patternInfo, FieldVariable object) {
         DefinedClass pojoClass = context.getClassForRole(context.getNameUtils().generateClassName((TypeElement) typeElement, "Pojo"));
 
-        JMethod initialise = messageProcessorClass.method(JMod.PUBLIC, context.getCodeModel().VOID, "initialise");
+        Method initialise = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "initialise");
         initialise._throws(InitialisationException.class);
 
         if (expressionManager != null) {
@@ -144,15 +144,15 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             initialise.body().assign(patternInfo, ref(TemplateParser.class).staticInvoke("createMuleStyleParser").invoke("getStyle"));
         }
 
-        JConditional ifNoObject = initialise.body()._if(JOp.eq(object, JExpr._null()));
-        JTryBlock tryLookUp = ifNoObject._then()._try();
+        Conditional ifNoObject = initialise.body()._if(Op.eq(object, JExpr._null()));
+        TryStatement tryLookUp = ifNoObject._then()._try();
         tryLookUp.body().assign(object, muleContext.invoke("getRegistry").invoke("lookupObject").arg(JExpr.dotclass(pojoClass)));
-        JCatchBlock catchBlock = tryLookUp._catch(ref(RegistrationException.class));
-        JVar exception = catchBlock.param("e");
+        CatchBlock catchBlock = tryLookUp._catch(ref(RegistrationException.class));
+        Variable exception = catchBlock.param("e");
         JClass coreMessages = ref(CoreMessages.class);
-        JInvocation failedToInvoke = coreMessages.staticInvoke("initialisationFailure");
+        Invocation failedToInvoke = coreMessages.staticInvoke("initialisationFailure");
         failedToInvoke.arg(pojoClass.fullName());
-        JInvocation messageException = JExpr._new(ref(InitialisationException.class));
+        Invocation messageException = JExpr._new(ref(InitialisationException.class));
         messageException.arg(failedToInvoke);
         messageException.arg(exception);
         messageException.arg(JExpr._this());
@@ -162,79 +162,79 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
 
-    protected JMethod generateSetObjectMethod(DefinedClass messageProcessorClass, JFieldVar object) {
-        JMethod setObject = messageProcessorClass.method(JMod.PUBLIC, context.getCodeModel().VOID, "setObject");
-        JVar objectParam = setObject.param(object.type(), "object");
+    protected Method generateSetObjectMethod(DefinedClass messageProcessorClass, FieldVariable object) {
+        Method setObject = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setObject");
+        Variable objectParam = setObject.param(object.type(), "object");
         setObject.body().assign(JExpr._this().ref(object), objectParam);
 
         return setObject;
     }
 
 
-    protected JMethod generateSetMuleContextMethod(DefinedClass messageProcessorClass, JFieldVar muleContext) {
-        JMethod setMuleContext = messageProcessorClass.method(JMod.PUBLIC, context.getCodeModel().VOID, "setMuleContext");
-        JVar muleContextParam = setMuleContext.param(ref(MuleContext.class), "context");
+    protected Method generateSetMuleContextMethod(DefinedClass messageProcessorClass, FieldVariable muleContext) {
+        Method setMuleContext = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setMuleContext");
+        Variable muleContextParam = setMuleContext.param(ref(MuleContext.class), "context");
         setMuleContext.body().assign(JExpr._this().ref(muleContext), muleContextParam);
 
         return setMuleContext;
     }
 
-    protected void generateExpressionEvaluator(JBlock block, JVar evaluatedField, JFieldVar field, JFieldVar patternInfo, JFieldVar expressionManager, JVar muleMessage) {
-        JConditional conditional = block._if(JOp._instanceof(field, ref(String.class)));
-        JBlock trueBlock = conditional._then();
-        JConditional isPattern = trueBlock._if(JOp.cand(
+    protected void generateExpressionEvaluator(Block block, Variable evaluatedField, FieldVariable field, FieldVariable patternInfo, FieldVariable expressionManager, Variable muleMessage) {
+        Conditional conditional = block._if(Op._instanceof(field, ref(String.class)));
+        Block trueBlock = conditional._then();
+        Conditional isPattern = trueBlock._if(Op.cand(
                 JExpr.invoke(JExpr.cast(ref(String.class), field), "startsWith").arg(patternInfo.invoke("getPrefix")),
                 JExpr.invoke(JExpr.cast(ref(String.class), field), "endsWith").arg(patternInfo.invoke("getSuffix"))));
-        JInvocation evaluate = expressionManager.invoke("evaluate");
+        Invocation evaluate = expressionManager.invoke("evaluate");
         evaluate.arg(JExpr.cast(ref(String.class), field));
         evaluate.arg(muleMessage);
         isPattern._then().assign(evaluatedField, evaluate);
-        JInvocation parse = expressionManager.invoke("parse");
+        Invocation parse = expressionManager.invoke("parse");
         parse.arg(JExpr.cast(ref(String.class), field));
         parse.arg(muleMessage);
         isPattern._else().assign(evaluatedField, parse);
-        JBlock falseBlock = conditional._else();
+        Block falseBlock = conditional._else();
         falseBlock.assign(evaluatedField, field);
     }
 
-    protected void generateTransform(JBlock block, JVar transformedField, JVar evaluatedField, TypeMirror expectedType, JFieldVar muleContext) {
-        JInvocation isAssignableFrom = JExpr.dotclass(ref(expectedType).boxify()).invoke("isAssignableFrom").arg(evaluatedField.invoke("getClass"));
-        JConditional ifIsAssignableFrom = block._if(JOp.not(isAssignableFrom));
-        JBlock isAssignable = ifIsAssignableFrom._then();
-        JVar dataTypeSource = isAssignable.decl(ref(DataType.class), "source");
-        JVar dataTypeTarget = isAssignable.decl(ref(DataType.class), "target");
+    protected void generateTransform(Block block, Variable transformedField, Variable evaluatedField, TypeMirror expectedType, FieldVariable muleContext) {
+        Invocation isAssignableFrom = JExpr.dotclass(ref(expectedType).boxify()).invoke("isAssignableFrom").arg(evaluatedField.invoke("getClass"));
+        Conditional ifIsAssignableFrom = block._if(Op.not(isAssignableFrom));
+        Block isAssignable = ifIsAssignableFrom._then();
+        Variable dataTypeSource = isAssignable.decl(ref(DataType.class), "source");
+        Variable dataTypeTarget = isAssignable.decl(ref(DataType.class), "target");
 
         isAssignable.assign(dataTypeSource, ref(DataTypeFactory.class).staticInvoke("create").arg(evaluatedField.invoke("getClass")));
         isAssignable.assign(dataTypeTarget, ref(DataTypeFactory.class).staticInvoke("create").arg(JExpr.dotclass(ref(expectedType).boxify())));
 
-        JVar transformer = isAssignable.decl(ref(Transformer.class), "t");
-        JInvocation lookupTransformer = muleContext.invoke("getRegistry").invoke("lookupTransformer");
+        Variable transformer = isAssignable.decl(ref(Transformer.class), "t");
+        Invocation lookupTransformer = muleContext.invoke("getRegistry").invoke("lookupTransformer");
         lookupTransformer.arg(dataTypeSource);
         lookupTransformer.arg(dataTypeTarget);
         isAssignable.assign(transformer, lookupTransformer);
         isAssignable.assign(transformedField, JExpr.cast(ref(expectedType).boxify(), transformer.invoke("transform").arg(evaluatedField)));
 
-        JBlock notAssignable = ifIsAssignableFrom._else();
+        Block notAssignable = ifIsAssignableFrom._else();
         notAssignable.assign(transformedField, JExpr.cast(ref(expectedType).boxify(), evaluatedField));
     }
 
-    protected JMethod generateSetter(DefinedClass messageProcessorClass, JFieldVar field) {
-        JMethod setter = messageProcessorClass.method(JMod.PUBLIC, context.getCodeModel().VOID, "set" + StringUtils.capitalize(field.name()));
-        JVar value = setter.param(field.type(), "value");
+    protected Method generateSetter(DefinedClass messageProcessorClass, FieldVariable field) {
+        Method setter = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "set" + StringUtils.capitalize(field.name()));
+        Variable value = setter.param(field.type(), "value");
         setter.body().assign(JExpr._this().ref(field), value);
 
         return setter;
     }
 
 
-    protected void generateThrow(String bundle, Class<?> clazz, JCatchBlock callProcessorCatch, JExpression event, String methodName) {
-        JVar exception = callProcessorCatch.param("e");
+    protected void generateThrow(String bundle, Class<?> clazz, CatchBlock callProcessorCatch, Expression event, String methodName) {
+        Variable exception = callProcessorCatch.param("e");
         JClass coreMessages = ref(CoreMessages.class);
-        JInvocation failedToInvoke = coreMessages.staticInvoke(bundle);
+        Invocation failedToInvoke = coreMessages.staticInvoke(bundle);
         if (methodName != null) {
             failedToInvoke.arg(JExpr.lit(methodName));
         }
-        JInvocation messageException = JExpr._new(ref(clazz));
+        Invocation messageException = JExpr._new(ref(clazz));
         messageException.arg(failedToInvoke);
         if (event != null) {
             messageException.arg(event);
@@ -244,10 +244,10 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected class FieldVariableElement {
-        private final JFieldVar field;
+        private final FieldVariable field;
         private final VariableElement variableElement;
 
-        public FieldVariableElement(JFieldVar field, VariableElement variableElement) {
+        public FieldVariableElement(FieldVariable field, VariableElement variableElement) {
             this.field = field;
             this.variableElement = variableElement;
         }
@@ -283,7 +283,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             return true;
         }
 
-        public JFieldVar getField() {
+        public FieldVariable getField() {
             return field;
         }
 

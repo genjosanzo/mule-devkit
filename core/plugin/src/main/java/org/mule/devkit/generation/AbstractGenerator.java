@@ -17,7 +17,7 @@
 
 package org.mule.devkit.generation;
 
-import org.mule.devkit.model.code.JCodeModel;
+import org.mule.devkit.model.code.CodeModel;
 
 public abstract class AbstractGenerator implements Generator {
     protected GeneratorContext context;
@@ -26,7 +26,7 @@ public abstract class AbstractGenerator implements Generator {
         this.context = context;
     }
 
-    protected JCodeModel getCodeModel()
+    protected CodeModel getCodeModel()
     {
         return this.context.getCodeModel();
     }

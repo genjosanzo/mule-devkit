@@ -44,9 +44,9 @@ package org.mule.devkit.model.code;
 /**
  * JBreak statement
  */
-final class JBreak implements JStatement {
+final class JBreak implements Statement {
     
-    private final JLabel label;
+    private final Label label;
     
     /**
      * JBreak constructor
@@ -54,11 +54,11 @@ final class JBreak implements JStatement {
      * @param   _label
      *      break label or null.
      */
-    JBreak( JLabel _label ) {
+    JBreak( Label _label ) {
         this.label = _label;
     }
 
-    public void state(JFormatter f) {
+    public void state(Formatter f) {
         if( label==null )
             f.p("break;").nl();
         else

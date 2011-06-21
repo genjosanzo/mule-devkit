@@ -33,13 +33,13 @@ import org.mule.devkit.annotations.Source;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.GeneratorContext;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.FieldVariable;
+import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.JExpr;
-import org.mule.devkit.model.code.JFieldVar;
-import org.mule.devkit.model.code.JInvocation;
-import org.mule.devkit.model.code.JMethod;
-import org.mule.devkit.model.code.JMod;
+import org.mule.devkit.model.code.Method;
+import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.JPackage;
-import org.mule.devkit.model.code.JVar;
+import org.mule.devkit.model.code.Variable;
 import org.mule.transaction.MuleTransactionConfig;
 
 import javax.lang.model.element.Element;
@@ -65,98 +65,98 @@ public class DummyInboundEndpointGenerator extends AbstractModuleGenerator {
             DefinedClass dummyInboundEndpoint = getDummyInboundEndpointClass(executableElement, context);
 
             // add internal fields
-            JFieldVar muleContext = dummyInboundEndpoint.field(JMod.PRIVATE, ref(MuleContext.class), "muleContext");
-            JFieldVar transactionConfig = dummyInboundEndpoint.field(JMod.PRIVATE, ref(TransactionConfig.class), "transactionConfig");
+            FieldVariable muleContext = dummyInboundEndpoint.field(Modifier.PRIVATE, ref(MuleContext.class), "muleContext");
+            FieldVariable transactionConfig = dummyInboundEndpoint.field(Modifier.PRIVATE, ref(TransactionConfig.class), "transactionConfig");
 
             // add constructor
-            JMethod constructor = dummyInboundEndpoint.constructor(JMod.PUBLIC);
-            JVar muleContextParam = constructor.param(ref(MuleContext.class), "muleContext");
+            Method constructor = dummyInboundEndpoint.constructor(Modifier.PUBLIC);
+            Variable muleContextParam = constructor.param(ref(MuleContext.class), "muleContext");
             constructor.body().assign(JExpr._this().ref(muleContext), muleContextParam);
-            JInvocation newTransactionConfig = JExpr._new(ref(MuleTransactionConfig.class));
+            Invocation newTransactionConfig = JExpr._new(ref(MuleTransactionConfig.class));
             constructor.body().assign(JExpr._this().ref(transactionConfig), newTransactionConfig);
             constructor.body().add(newTransactionConfig.invoke("setAction").arg(ref(TransactionConfig.class).staticRef("ACTION_NONE")));
 
-            JMethod getEndpointURI = dummyInboundEndpoint.method(JMod.PUBLIC, EndpointURI.class, "getEndpointURI");
+            Method getEndpointURI = dummyInboundEndpoint.method(Modifier.PUBLIC, EndpointURI.class, "getEndpointURI");
             getEndpointURI.body()._return(JExpr._null());
 
-            JMethod getAddress = dummyInboundEndpoint.method(JMod.PUBLIC, String.class, "getAddress");
+            Method getAddress = dummyInboundEndpoint.method(Modifier.PUBLIC, String.class, "getAddress");
             getAddress.body()._return(JExpr._null());
 
-            JMethod getEncoding = dummyInboundEndpoint.method(JMod.PUBLIC, String.class, "getEncoding");
+            Method getEncoding = dummyInboundEndpoint.method(Modifier.PUBLIC, String.class, "getEncoding");
             getEncoding.body()._return(JExpr._null());
 
-            JMethod getConnector = dummyInboundEndpoint.method(JMod.PUBLIC, Connector.class, "getConnector");
+            Method getConnector = dummyInboundEndpoint.method(Modifier.PUBLIC, Connector.class, "getConnector");
             getConnector.body()._return(JExpr._null());
 
-            JMethod getName = dummyInboundEndpoint.method(JMod.PUBLIC, String.class, "getName");
+            Method getName = dummyInboundEndpoint.method(Modifier.PUBLIC, String.class, "getName");
             getName.body()._return(JExpr._null());
 
-            JMethod getTransformers = dummyInboundEndpoint.method(JMod.PUBLIC, List.class, Transformer.class, "getTransformers");
+            Method getTransformers = dummyInboundEndpoint.method(Modifier.PUBLIC, List.class, Transformer.class, "getTransformers");
             getTransformers.body()._return(JExpr._null());
 
-            JMethod getResponseTransformers = dummyInboundEndpoint.method(JMod.PUBLIC, List.class, Transformer.class, "getResponseTransformers");
+            Method getResponseTransformers = dummyInboundEndpoint.method(Modifier.PUBLIC, List.class, Transformer.class, "getResponseTransformers");
             getResponseTransformers.body()._return(JExpr._null());
 
-            JMethod getProperties = dummyInboundEndpoint.method(JMod.PUBLIC, Map.class, "getProperties");
+            Method getProperties = dummyInboundEndpoint.method(Modifier.PUBLIC, Map.class, "getProperties");
             getProperties.body()._return(JExpr._null());
 
-            JMethod getProperty = dummyInboundEndpoint.method(JMod.PUBLIC, Object.class, "getProperty");
+            Method getProperty = dummyInboundEndpoint.method(Modifier.PUBLIC, Object.class, "getProperty");
             getProperty.param(Object.class, "key");
             getProperty.body()._return(JExpr._null());
 
-            JMethod getProtocol = dummyInboundEndpoint.method(JMod.PUBLIC, String.class, "getProtocol");
+            Method getProtocol = dummyInboundEndpoint.method(Modifier.PUBLIC, String.class, "getProtocol");
             getProtocol.body()._return(JExpr._null());
 
-            JMethod isReadOnly = dummyInboundEndpoint.method(JMod.PUBLIC, context.getCodeModel().BOOLEAN, "isReadOnly");
+            Method isReadOnly = dummyInboundEndpoint.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "isReadOnly");
             isReadOnly.body()._return(JExpr.lit(false));
 
-            JMethod getTransactionConfig = dummyInboundEndpoint.method(JMod.PUBLIC, TransactionConfig.class, "getTransactionConfig");
+            Method getTransactionConfig = dummyInboundEndpoint.method(Modifier.PUBLIC, TransactionConfig.class, "getTransactionConfig");
             getTransactionConfig.body()._return(transactionConfig);
 
-            JMethod getFilter = dummyInboundEndpoint.method(JMod.PUBLIC, Filter.class, "getFilter");
+            Method getFilter = dummyInboundEndpoint.method(Modifier.PUBLIC, Filter.class, "getFilter");
             getFilter.body()._return(JExpr._null());
 
-            JMethod isDeleteUnacceptedMessages = dummyInboundEndpoint.method(JMod.PUBLIC, context.getCodeModel().BOOLEAN, "isDeleteUnacceptedMessages");
+            Method isDeleteUnacceptedMessages = dummyInboundEndpoint.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "isDeleteUnacceptedMessages");
             isDeleteUnacceptedMessages.body()._return(JExpr.lit(false));
 
-            JMethod getSecurityFilter = dummyInboundEndpoint.method(JMod.PUBLIC, EndpointSecurityFilter.class, "getSecurityFilter");
+            Method getSecurityFilter = dummyInboundEndpoint.method(Modifier.PUBLIC, EndpointSecurityFilter.class, "getSecurityFilter");
             getSecurityFilter.body()._return(JExpr._null());
 
-            JMethod getMessageProcessorsFactory = dummyInboundEndpoint.method(JMod.PUBLIC, EndpointMessageProcessorChainFactory.class, "getMessageProcessorsFactory");
+            Method getMessageProcessorsFactory = dummyInboundEndpoint.method(Modifier.PUBLIC, EndpointMessageProcessorChainFactory.class, "getMessageProcessorsFactory");
             getMessageProcessorsFactory.body()._return(JExpr._null());
 
-            JMethod getMessageProcessors = dummyInboundEndpoint.method(JMod.PUBLIC, List.class, MessageProcessor.class, "getMessageProcessors");
+            Method getMessageProcessors = dummyInboundEndpoint.method(Modifier.PUBLIC, List.class, MessageProcessor.class, "getMessageProcessors");
             getMessageProcessors.body()._return(JExpr._null());
 
-            JMethod getResponseMessageProcessors = dummyInboundEndpoint.method(JMod.PUBLIC, List.class, MessageProcessor.class, "getResponseMessageProcessors");
+            Method getResponseMessageProcessors = dummyInboundEndpoint.method(Modifier.PUBLIC, List.class, MessageProcessor.class, "getResponseMessageProcessors");
             getResponseMessageProcessors.body()._return(JExpr._null());
 
-            JMethod getExchangePattern = dummyInboundEndpoint.method(JMod.PUBLIC, MessageExchangePattern.class, "getExchangePattern");
+            Method getExchangePattern = dummyInboundEndpoint.method(Modifier.PUBLIC, MessageExchangePattern.class, "getExchangePattern");
             getExchangePattern.body()._return(ref(MessageExchangePattern.class).staticRef("ONE_WAY"));
 
-            JMethod getResponseTimeout = dummyInboundEndpoint.method(JMod.PUBLIC, context.getCodeModel().INT, "getResponseTimeout");
+            Method getResponseTimeout = dummyInboundEndpoint.method(Modifier.PUBLIC, context.getCodeModel().INT, "getResponseTimeout");
             getResponseTimeout.body()._return(JExpr.lit(0));
 
-            JMethod getInitialState = dummyInboundEndpoint.method(JMod.PUBLIC, String.class, "getInitialState");
+            Method getInitialState = dummyInboundEndpoint.method(Modifier.PUBLIC, String.class, "getInitialState");
             getInitialState.body()._return(JExpr._null());
 
-            JMethod getMuleContext = dummyInboundEndpoint.method(JMod.PUBLIC, MuleContext.class, "getMuleContext");
+            Method getMuleContext = dummyInboundEndpoint.method(Modifier.PUBLIC, MuleContext.class, "getMuleContext");
             getMuleContext.body()._return(muleContext);
 
-            JMethod getRetryPolicyTemplate = dummyInboundEndpoint.method(JMod.PUBLIC, RetryPolicyTemplate.class, "getRetryPolicyTemplate");
+            Method getRetryPolicyTemplate = dummyInboundEndpoint.method(Modifier.PUBLIC, RetryPolicyTemplate.class, "getRetryPolicyTemplate");
             getRetryPolicyTemplate.body()._return(JExpr._null());
 
-            JMethod getEndpointBuilderName = dummyInboundEndpoint.method(JMod.PUBLIC, String.class, "getEndpointBuilderName");
+            Method getEndpointBuilderName = dummyInboundEndpoint.method(Modifier.PUBLIC, String.class, "getEndpointBuilderName");
             getEndpointBuilderName.body()._return(JExpr._null());
 
-            JMethod isProtocolSupported = dummyInboundEndpoint.method(JMod.PUBLIC, context.getCodeModel().BOOLEAN, "isProtocolSupported");
+            Method isProtocolSupported = dummyInboundEndpoint.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "isProtocolSupported");
             isProtocolSupported.param(String.class, "protocol");
             isProtocolSupported.body()._return(JExpr.lit(false));
 
-            JMethod getMimeType = dummyInboundEndpoint.method(JMod.PUBLIC, String.class, "getMimeType");
+            Method getMimeType = dummyInboundEndpoint.method(Modifier.PUBLIC, String.class, "getMimeType");
             getMimeType.body()._return(JExpr._null());
 
-            JMethod isDisableTransportTransformer = dummyInboundEndpoint.method(JMod.PUBLIC, context.getCodeModel().BOOLEAN, "isDisableTransportTransformer");
+            Method isDisableTransportTransformer = dummyInboundEndpoint.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "isDisableTransportTransformer");
             isDisableTransportTransformer.body()._return(JExpr.lit(false));
         }
     }

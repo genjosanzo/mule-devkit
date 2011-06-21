@@ -45,33 +45,33 @@ package org.mule.devkit.model.code;
 /**
  * A cast operation.
  */
-final class JCast extends JExpressionImpl {
+final class JCast extends AbstractExpression {
     /**
-     * JType to which the expression is to be cast.
+     * Type to which the expression is to be cast.
      */
-    private final JType type;
+    private final Type type;
 
     /**
-     * JExpression to be cast.
+     * Expression to be cast.
      */
-    private final JExpression object;
+    private final Expression object;
 
     /**
      * JCast constructor 
      *
      * @param type
-     *        JType to which the expression is cast
+     *        Type to which the expression is cast
      *
      * @param object
-     *        JExpression for the object upon which
+     *        Expression for the object upon which
      *        the cast is applied
      */
-    JCast(JType type, JExpression object) {
+    JCast(Type type, Expression object) {
         this.type = type;
         this.object = object;
     }
 
-    public void generate(JFormatter f) {
+    public void generate(Formatter f) {
         f.p("((").g(type).p(')').g(object).p(')');
     }
 }

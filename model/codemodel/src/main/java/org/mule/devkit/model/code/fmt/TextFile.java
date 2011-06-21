@@ -40,7 +40,7 @@
 
 package org.mule.devkit.model.code.fmt;
 
-import org.mule.devkit.model.code.JResourceFile;
+import org.mule.devkit.model.code.ResourceFile;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -54,7 +54,7 @@ import java.io.Writer;
  * @author
  * 	Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
-public class TextFile extends JResourceFile
+public class TextFile extends ResourceFile
 {
     public TextFile(String name) {
         super(name);

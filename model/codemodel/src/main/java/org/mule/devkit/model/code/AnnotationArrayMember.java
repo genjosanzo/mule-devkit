@@ -59,9 +59,9 @@ import java.util.List;
  */
 public final class AnnotationArrayMember extends AnnotationValue implements Annotable {
     private final List<AnnotationValue> values = new ArrayList<AnnotationValue>();
-    private final JCodeModel owner;
+    private final CodeModel owner;
 
-    AnnotationArrayMember(JCodeModel owner) {
+    AnnotationArrayMember(CodeModel owner) {
         this.owner = owner;
     }
 
@@ -191,7 +191,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
      */
     public AnnotationArrayMember param(final Enum<?> value) {
         AnnotationValue annotationValue = new AnnotationValue() {
-            public void generate(JFormatter f) {
+            public void generate(Formatter f) {
                 f.t(owner.ref(value.getDeclaringClass())).p('.').p(value.name());
             }
         };
@@ -206,7 +206,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
      * @return The AnnotationArrayMember. More elements can be added by calling
      *         the same method multiple times
      */
-    public AnnotationArrayMember param(final JEnumConstant value) {
+    public AnnotationArrayMember param(final EnumConstant value) {
         AnnotationValue annotationValue = new AnnotationStringValue(value);
         values.add(annotationValue);
         return this;
@@ -219,7 +219,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
      * @return The AnnotationArrayMember. More elements can be added by calling
      *         the same method multiple times
      */
-    public AnnotationArrayMember param(final JExpression value) {
+    public AnnotationArrayMember param(final Expression value) {
         AnnotationValue annotationValue = new AnnotationStringValue(value);
         values.add(annotationValue);
         return this;
@@ -234,8 +234,8 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
      */
     public AnnotationArrayMember param(final Class<?> value){
        AnnotationValue annotationValue = new AnnotationStringValue(
-    		   new JExpressionImpl() {
-      			 public void generate(JFormatter f) {
+    		   new AbstractExpression() {
+      			 public void generate(Formatter f) {
       				 f.p(value.getName().replace('$', '.'));
       				 f.p(".class");
       			}
@@ -244,7 +244,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
        return this;
    }
 
-    public AnnotationArrayMember param(JType type){
+    public AnnotationArrayMember param(Type type){
         JClass clazz = type.boxify();
         AnnotationValue annotationValue = new AnnotationStringValue( clazz.dotclass() );
         values.add(annotationValue);
@@ -298,7 +298,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
         return this;
     }
 
-    public void generate(JFormatter f) {
+    public void generate(Formatter f) {
         f.p('{').nl().i();
 
         boolean first = true;

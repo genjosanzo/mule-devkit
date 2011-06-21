@@ -46,7 +46,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -126,8 +125,8 @@ class TypedAnnotationWriter<A extends Annotation,W extends AnnotationWriter<A>>
 
         // scalar value
 
-        if(arg instanceof JType) {
-            JType targ = (JType) arg;
+        if(arg instanceof Type) {
+            Type targ = (Type) arg;
             checkType(Class.class,rt);
             if(m.getDefaultValue()!=null) {
                 // check the default
@@ -187,9 +186,9 @@ class TypedAnnotationWriter<A extends Annotation,W extends AnnotationWriter<A>>
         }
 
         // primitive
-        if(arg instanceof JType) {
+        if(arg instanceof Type) {
             checkType(Class.class,itemType);
-            m.param((JType)arg);
+            m.param((Type)arg);
             return proxy;
         }
         checkType(arg.getClass(),itemType);
@@ -223,7 +222,7 @@ class TypedAnnotationWriter<A extends Annotation,W extends AnnotationWriter<A>>
         if(expected==actual || expected.isAssignableFrom(actual))
             return; // no problem
 
-        if( expected==JCodeModel.boxToPrimitive.get(actual) )
+        if( expected== CodeModel.boxToPrimitive.get(actual) )
             return; // no problem
 
         throw new IllegalArgumentException("Expected "+expected+" but found "+actual);
@@ -248,7 +247,7 @@ class TypedAnnotationWriter<A extends Annotation,W extends AnnotationWriter<A>>
     }
 
     private static Class<? extends Annotation> findAnnotationType(Class<?> clazz) {
-        for( Type t : clazz.getGenericInterfaces()) {
+        for( java.lang.reflect.Type t : clazz.getGenericInterfaces()) {
             if(t instanceof ParameterizedType) {
                 ParameterizedType p = (ParameterizedType) t;
                 if(p.getRawType()==AnnotationWriter.class)

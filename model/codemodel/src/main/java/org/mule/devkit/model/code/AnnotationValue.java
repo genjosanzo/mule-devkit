@@ -46,5 +46,5 @@ package org.mule.devkit.model.code;
  * @author
  *     Bhakti Mehta (bhakti.mehta@sun.com)
  */
-public abstract class AnnotationValue implements JGenerable {
+public abstract class AnnotationValue implements Generable {
 }

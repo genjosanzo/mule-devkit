@@ -25,17 +25,17 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.annotations.Transformer;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
-import org.mule.devkit.model.code.JCatchBlock;
+import org.mule.devkit.model.code.CatchBlock;
+import org.mule.devkit.model.code.FieldVariable;
+import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.JClass;
 import org.mule.devkit.model.code.JExpr;
-import org.mule.devkit.model.code.JFieldVar;
-import org.mule.devkit.model.code.JInvocation;
-import org.mule.devkit.model.code.JMethod;
-import org.mule.devkit.model.code.JMod;
-import org.mule.devkit.model.code.JOp;
+import org.mule.devkit.model.code.Method;
+import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.JPackage;
-import org.mule.devkit.model.code.JTryBlock;
-import org.mule.devkit.model.code.JVar;
+import org.mule.devkit.model.code.TryStatement;
+import org.mule.devkit.model.code.Variable;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
@@ -62,11 +62,11 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             DefinedClass transformerClass = getTransformerClass(executableElement);
 
             // declare object
-            JFieldVar object = generateFieldForPojo(transformerClass, type);
-            JFieldVar muleContext = generateFieldForMuleContext(transformerClass);
+            FieldVariable object = generateFieldForPojo(transformerClass, type);
+            FieldVariable muleContext = generateFieldForMuleContext(transformerClass);
 
             // declare weight
-            JFieldVar weighting = transformerClass.field(JMod.PRIVATE, context.getCodeModel().INT, "weighting", JOp.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), JExpr.lit(transformer.priorityWeighting())));
+            FieldVariable weighting = transformerClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "weighting", Op.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), JExpr.lit(transformer.priorityWeighting())));
 
             //generate constructor
             generateConstructor(transformerClass, executableElement);
@@ -92,46 +92,46 @@ public class TransformerGenerator extends AbstractMessageGenerator {
 
     }
 
-    private void generateSetPriorityWeighting(DefinedClass jaxbTransformerClass, JFieldVar weighting) {
-        JMethod setPriorityWeighting = jaxbTransformerClass.method(JMod.PUBLIC, context.getCodeModel().VOID, "setPriorityWeighting");
-        JVar localWeighting = setPriorityWeighting.param(context.getCodeModel().INT, "weighting");
+    private void generateSetPriorityWeighting(DefinedClass jaxbTransformerClass, FieldVariable weighting) {
+        Method setPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setPriorityWeighting");
+        Variable localWeighting = setPriorityWeighting.param(context.getCodeModel().INT, "weighting");
         setPriorityWeighting.body().assign(JExpr._this().ref(weighting), localWeighting);
     }
 
-    private void generateGetPriorityWeighting(DefinedClass jaxbTransformerClass, JFieldVar weighting) {
-        JMethod getPriorityWeighting = jaxbTransformerClass.method(JMod.PUBLIC, context.getCodeModel().INT, "getPriorityWeighting");
+    private void generateGetPriorityWeighting(DefinedClass jaxbTransformerClass, FieldVariable weighting) {
+        Method getPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, context.getCodeModel().INT, "getPriorityWeighting");
         getPriorityWeighting.body()._return(weighting);
     }
 
-    private void generateDoTransform(DefinedClass jaxbTransformerClass, ExecutableElement executableElement, JFieldVar object) {
-        JMethod doTransform = jaxbTransformerClass.method(JMod.PROTECTED, ref(Object.class), "doTransform");
+    private void generateDoTransform(DefinedClass jaxbTransformerClass, ExecutableElement executableElement, FieldVariable object) {
+        Method doTransform = jaxbTransformerClass.method(Modifier.PROTECTED, ref(Object.class), "doTransform");
         doTransform._throws(TransformerException.class);
-        JVar src = doTransform.param(ref(Object.class), "src");
-        JVar encoding = doTransform.param(ref(String.class), "encoding");
+        Variable src = doTransform.param(ref(Object.class), "src");
+        Variable encoding = doTransform.param(ref(String.class), "encoding");
 
-        JVar result = doTransform.body().decl(ref(executableElement.getReturnType()).boxify(), "result", JExpr._null());
+        Variable result = doTransform.body().decl(ref(executableElement.getReturnType()).boxify(), "result", JExpr._null());
 
-        JTryBlock tryBlock = doTransform.body()._try();
+        TryStatement tryBlock = doTransform.body()._try();
 
         // do something
-        JInvocation invoke = object.invoke(executableElement.getSimpleName().toString());
+        Invocation invoke = object.invoke(executableElement.getSimpleName().toString());
         invoke.arg(src);
         tryBlock.body().assign(result, invoke);
 
-        JCatchBlock exceptionCatch = tryBlock._catch(ref(Exception.class));
-        JVar exception = exceptionCatch.param("exception");
+        CatchBlock exceptionCatch = tryBlock._catch(ref(Exception.class));
+        Variable exception = exceptionCatch.param("exception");
 
         generateThrowTransformFailedException(exceptionCatch, exception, src, ref(executableElement.getReturnType()).boxify());
 
         doTransform.body()._return(result);
     }
 
-    private void generateThrowTransformFailedException(JCatchBlock catchBlock, JVar exception, JVar src, JClass target) {
-        JInvocation transformFailedInvoke = ref(CoreMessages.class).staticInvoke("transformFailed");
+    private void generateThrowTransformFailedException(CatchBlock catchBlock, Variable exception, Variable src, JClass target) {
+        Invocation transformFailedInvoke = ref(CoreMessages.class).staticInvoke("transformFailed");
         transformFailedInvoke.arg(src.invoke("getClass").invoke("getName"));
         transformFailedInvoke.arg(JExpr.lit(target.fullName()));
 
-        JInvocation transformerException = JExpr._new(ref(TransformerException.class));
+        Invocation transformerException = JExpr._new(ref(TransformerException.class));
         transformerException.arg(transformFailedInvoke);
         transformerException.arg(JExpr._this());
         transformerException.arg(exception);
@@ -140,7 +140,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
 
     private void generateConstructor(DefinedClass transformerClass, ExecutableElement executableElement) {
         // generate constructor
-        JMethod constructor = transformerClass.constructor(JMod.PUBLIC);
+        Method constructor = transformerClass.constructor(Modifier.PUBLIC);
 
         // register source data type
         registerSourceTypes(constructor, executableElement);
@@ -151,12 +151,12 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         constructor.body().invoke("setName").arg(context.getNameUtils().generateClassName(executableElement, "Transformer"));
     }
 
-    private void registerDestinationType(JMethod constructor, JClass clazz) {
-        JInvocation setReturnClass = constructor.body().invoke("setReturnClass");
+    private void registerDestinationType(Method constructor, JClass clazz) {
+        Invocation setReturnClass = constructor.body().invoke("setReturnClass");
         setReturnClass.arg(JExpr.dotclass(clazz));
     }
 
-    private void registerSourceTypes(JMethod constructor, ExecutableElement executableElement) {
+    private void registerSourceTypes(Method constructor, ExecutableElement executableElement) {
         final String transformerAnnotationName = Transformer.class.getName();
         List<? extends AnnotationValue> sourceTypes = null;
         List<? extends AnnotationMirror> annotationMirrors = executableElement.getAnnotationMirrors();
@@ -173,7 +173,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         }
 
         for (AnnotationValue sourceType : sourceTypes) {
-            JInvocation registerSourceType = constructor.body().invoke("registerSourceType");
+            Invocation registerSourceType = constructor.body().invoke("registerSourceType");
             registerSourceType.arg(ref(DataTypeFactory.class).staticInvoke("create").arg(ref((TypeMirror) sourceType.getValue()).boxify().dotclass()));
         }
     }

@@ -53,10 +53,10 @@ import java.util.List;
 final class JArrayClass extends JClass {
     
     // array component type
-    private final JType componentType;
+    private final Type componentType;
     
     
-    JArrayClass( JCodeModel owner, JType component ) {
+    JArrayClass( CodeModel owner, Type component ) {
         super(owner);
         this.componentType = component;
     }
@@ -74,7 +74,7 @@ final class JArrayClass extends JClass {
         return componentType.binaryName()+"[]";
     }
 
-    public void generate(JFormatter f) {
+    public void generate(Formatter f) {
         f.g(componentType).p("[]");
     }
 
@@ -98,7 +98,7 @@ final class JArrayClass extends JClass {
         return false;
     }
 
-    public JType elementType() {
+    public Type elementType() {
         return componentType;
     }
 
@@ -124,7 +124,7 @@ final class JArrayClass extends JClass {
         return componentType.hashCode();
     }
 
-    protected JClass substituteParams(JTypeVar[] variables, List<JClass> bindings) {
+    protected JClass substituteParams(TypeVariable[] variables, List<JClass> bindings) {
         if( componentType.isPrimitive() )
             return this;
         

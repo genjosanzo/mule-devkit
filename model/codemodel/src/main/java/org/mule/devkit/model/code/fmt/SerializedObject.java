@@ -40,7 +40,7 @@
 
 package org.mule.devkit.model.code.fmt;
 
-import org.mule.devkit.model.code.JResourceFile;
+import org.mule.devkit.model.code.ResourceFile;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -51,7 +51,7 @@ import java.io.OutputStream;
  * A simple class that takes an object and serializes it into a file
  * in the parent package with the given name.
  */
-public class SerializedObject extends JResourceFile {
+public class SerializedObject extends ResourceFile {
 
     private final Object obj;
     

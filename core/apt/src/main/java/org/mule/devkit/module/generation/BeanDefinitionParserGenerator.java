@@ -24,15 +24,15 @@ import org.mule.devkit.annotations.Source;
 import org.mule.devkit.annotations.SourceCallback;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
-import org.mule.devkit.model.code.JBlock;
-import org.mule.devkit.model.code.JConditional;
+import org.mule.devkit.model.code.Block;
+import org.mule.devkit.model.code.Conditional;
+import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.JExpr;
-import org.mule.devkit.model.code.JExpression;
-import org.mule.devkit.model.code.JInvocation;
-import org.mule.devkit.model.code.JMethod;
-import org.mule.devkit.model.code.JMod;
-import org.mule.devkit.model.code.JOp;
-import org.mule.devkit.model.code.JVar;
+import org.mule.devkit.model.code.Expression;
+import org.mule.devkit.model.code.Method;
+import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Op;
+import org.mule.devkit.model.code.Variable;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 
@@ -72,7 +72,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         DefinedClass messageSourceClass = getMessageSourceClass(executableElement);
 
         // add constructor
-        JMethod constructor = beanDefinitionparser.constructor(JMod.PUBLIC);
+        Method constructor = beanDefinitionparser.constructor(Modifier.PUBLIC);
         constructor.body().invoke("super").arg(JExpr.lit("messageSource")).arg(JExpr.dotclass(messageSourceClass));
 
         // add getBeanClass
@@ -86,9 +86,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
     }
 
-    private void generateGetBeanClass(DefinedClass beanDefinitionparser, JExpression expr) {
-        JMethod getBeanClass = beanDefinitionparser.method(JMod.PROTECTED, ref(Class.class), "getBeanClass");
-        JVar element = getBeanClass.param(ref(org.w3c.dom.Element.class), "element");
+    private void generateGetBeanClass(DefinedClass beanDefinitionparser, Expression expr) {
+        Method getBeanClass = beanDefinitionparser.method(Modifier.PROTECTED, ref(Class.class), "getBeanClass");
+        Variable element = getBeanClass.param(ref(org.w3c.dom.Element.class), "element");
         getBeanClass.body()._return(expr);
     }
 
@@ -98,7 +98,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         DefinedClass messageProcessorClass = getMessageProcessorClass(executableElement);
 
         // add constructor
-        JMethod constructor = beanDefinitionparser.constructor(JMod.PUBLIC);
+        Method constructor = beanDefinitionparser.constructor(Modifier.PUBLIC);
         constructor.body().invoke("super").arg(JExpr.lit("messageProcessor")).arg(JExpr.dotclass(messageProcessorClass));
 
         // add getBeanClass
@@ -113,16 +113,16 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     }
 
     private void generateGetAttributeValue(DefinedClass beanDefinitionparser) {
-        JMethod getAttributeValue = beanDefinitionparser.method(JMod.PROTECTED, ref(String.class), "getAttributeValue");
-        JVar element = getAttributeValue.param(ref(org.w3c.dom.Element.class), "element");
-        JVar attributeName = getAttributeValue.param(ref(String.class), "attributeName");
+        Method getAttributeValue = beanDefinitionparser.method(Modifier.PROTECTED, ref(String.class), "getAttributeValue");
+        Variable element = getAttributeValue.param(ref(org.w3c.dom.Element.class), "element");
+        Variable attributeName = getAttributeValue.param(ref(String.class), "attributeName");
 
-        JInvocation getAttribute = element.invoke("getAttribute").arg(attributeName);
+        Invocation getAttribute = element.invoke("getAttribute").arg(attributeName);
 
-        JInvocation isEmpty = ref(StringUtils.class).staticInvoke("isEmpty");
+        Invocation isEmpty = ref(StringUtils.class).staticInvoke("isEmpty");
         isEmpty.arg(getAttribute);
 
-        JBlock ifIsEmpty = getAttributeValue.body()._if(isEmpty.not())._then();
+        Block ifIsEmpty = getAttributeValue.body()._if(isEmpty.not())._then();
         ifIsEmpty._return(getAttribute);
 
         getAttributeValue.body()._return(JExpr._null());
@@ -130,10 +130,10 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
 
     private void generateParseChild(DefinedClass beanDefinitionparser, ExecutableElement executableElement) {
-        JMethod parseChild = beanDefinitionparser.method(JMod.PROTECTED, context.getCodeModel().VOID, "parseChild");
-        JVar element = parseChild.param(ref(org.w3c.dom.Element.class), "element");
-        JVar parserContext = parseChild.param(ref(ParserContext.class), "parserContext");
-        JVar beanDefinitionBuilder = parseChild.param(ref(BeanDefinitionBuilder.class), "beanDefinitionBuilder");
+        Method parseChild = beanDefinitionparser.method(Modifier.PROTECTED, context.getCodeModel().VOID, "parseChild");
+        Variable element = parseChild.param(ref(org.w3c.dom.Element.class), "element");
+        Variable parserContext = parseChild.param(ref(ParserContext.class), "parserContext");
+        Variable beanDefinitionBuilder = parseChild.param(ref(BeanDefinitionBuilder.class), "beanDefinitionBuilder");
 
         generateSetObjectIfConfigRefNotEmpty(parseChild, element, beanDefinitionBuilder);
 
@@ -146,53 +146,53 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
-        JVar assembler = generateBeanAssembler(parseChild, element, beanDefinitionBuilder);
+        Variable assembler = generateBeanAssembler(parseChild, element, beanDefinitionBuilder);
         generatePostProcessCall(parseChild, element, assembler);
     }
 
-    private void generateSetObjectIfConfigRefNotEmpty(JMethod parseChild, JVar element, JVar beanDefinitionBuilder) {
-        JConditional isConfigRefEmpty = parseChild.body()._if(JOp.not(generateIsEmptyConfigRef(element)));
-        JInvocation addPropertyReference = beanDefinitionBuilder.invoke("addPropertyReference");
+    private void generateSetObjectIfConfigRefNotEmpty(Method parseChild, Variable element, Variable beanDefinitionBuilder) {
+        Conditional isConfigRefEmpty = parseChild.body()._if(Op.not(generateIsEmptyConfigRef(element)));
+        Invocation addPropertyReference = beanDefinitionBuilder.invoke("addPropertyReference");
         addPropertyReference.arg("object");
-        JInvocation getAttributeAlias = generateGetAttributeConfigRef();
-        JInvocation getAttribute = element.invoke("getAttribute");
+        Invocation getAttributeAlias = generateGetAttributeConfigRef();
+        Invocation getAttribute = element.invoke("getAttribute");
         getAttribute.arg(getAttributeAlias);
         addPropertyReference.arg(getAttribute);
         isConfigRefEmpty._then().add(addPropertyReference);
     }
 
-    private JInvocation generateIsEmptyConfigRef(JVar element) {
-        JInvocation getAttributeAlias = generateGetAttributeConfigRef();
-        JInvocation getAttribute = element.invoke("getAttribute");
+    private Invocation generateIsEmptyConfigRef(Variable element) {
+        Invocation getAttributeAlias = generateGetAttributeConfigRef();
+        Invocation getAttribute = element.invoke("getAttribute");
         getAttribute.arg(getAttributeAlias);
-        JInvocation isEmpty = ref(StringUtils.class).staticInvoke("isEmpty");
+        Invocation isEmpty = ref(StringUtils.class).staticInvoke("isEmpty");
         isEmpty.arg(getAttribute);
         return isEmpty;
     }
 
-    private JInvocation generateGetAttributeConfigRef() {
-        JInvocation getTargetPropertyConfiguration = JExpr.invoke("getTargetPropertyConfiguration");
-        JInvocation getAttributeAlias = getTargetPropertyConfiguration.invoke("getAttributeAlias");
+    private Invocation generateGetAttributeConfigRef() {
+        Invocation getTargetPropertyConfiguration = JExpr.invoke("getTargetPropertyConfiguration");
+        Invocation getAttributeAlias = getTargetPropertyConfiguration.invoke("getAttributeAlias");
         getAttributeAlias.arg("config-ref");
         return getAttributeAlias;
     }
 
-    private JInvocation generateAddPropertyValue(JVar element, JVar beanDefinitionBuilder, VariableElement variable) {
-        JInvocation getAttributeValue = JExpr.invoke("getAttributeValue");
+    private Invocation generateAddPropertyValue(Variable element, Variable beanDefinitionBuilder, VariableElement variable) {
+        Invocation getAttributeValue = JExpr.invoke("getAttributeValue");
         getAttributeValue.arg(element);
         getAttributeValue.arg(JExpr.lit(variable.getSimpleName().toString()));
-        JInvocation addPropertyValue = beanDefinitionBuilder.invoke("addPropertyValue");
+        Invocation addPropertyValue = beanDefinitionBuilder.invoke("addPropertyValue");
         addPropertyValue.arg(JExpr.lit(variable.getSimpleName().toString()));
         addPropertyValue.arg(getAttributeValue);
 
         return addPropertyValue;
     }
 
-    private JInvocation generateAddPropertyRefValue(JVar element, JVar beanDefinitionBuilder, VariableElement variable) {
-        JInvocation getAttributeValue = JExpr.invoke("getAttributeValue");
+    private Invocation generateAddPropertyRefValue(Variable element, Variable beanDefinitionBuilder, VariableElement variable) {
+        Invocation getAttributeValue = JExpr.invoke("getAttributeValue");
         getAttributeValue.arg(element);
         getAttributeValue.arg(JExpr.lit(variable.getSimpleName().toString() + "-ref"));
-        JInvocation addPropertyValue = beanDefinitionBuilder.invoke("addPropertyValue");
+        Invocation addPropertyValue = beanDefinitionBuilder.invoke("addPropertyValue");
         addPropertyValue.arg(JExpr.lit(variable.getSimpleName().toString()));
         addPropertyValue.arg(getAttributeValue);
 
@@ -200,17 +200,17 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     }
 
 
-    private JVar generateBeanAssembler(JMethod parseChild, JVar element, JVar beanDefinitionBuilder) {
-        JVar assembler = parseChild.body().decl(ref(BeanAssembler.class), "assembler");
-        JInvocation getBeanAssembler = JExpr.invoke("getBeanAssembler");
+    private Variable generateBeanAssembler(Method parseChild, Variable element, Variable beanDefinitionBuilder) {
+        Variable assembler = parseChild.body().decl(ref(BeanAssembler.class), "assembler");
+        Invocation getBeanAssembler = JExpr.invoke("getBeanAssembler");
         getBeanAssembler.arg(element);
         getBeanAssembler.arg(beanDefinitionBuilder);
         parseChild.body().assign(assembler, getBeanAssembler);
         return assembler;
     }
 
-    private void generatePostProcessCall(JMethod parseChild, JVar element, JVar assembler) {
-        JInvocation postProcess = parseChild.body().invoke("postProcess");
+    private void generatePostProcessCall(Method parseChild, Variable element, Variable assembler) {
+        Invocation postProcess = parseChild.body().invoke("postProcess");
         postProcess.arg(JExpr.invoke("getParserContext"));
         postProcess.arg(assembler);
         postProcess.arg(element);

@@ -45,36 +45,36 @@ package org.mule.devkit.model.code;
  * While statement
  */
 
-public class JWhileLoop implements JStatement {
+public class JWhileLoop implements Statement {
 
     /**
      * Test part of While statement for determining exit state
      */
-    private JExpression test;
+    private Expression test;
 
     /**
-     * JBlock of statements which makes up body of this While statement
+     * Block of statements which makes up body of this While statement
      */
-    private JBlock body = null;
+    private Block body = null;
 
     /**
      * Construct a While statment
      */
-    JWhileLoop(JExpression test) {
+    JWhileLoop(Expression test) {
         this.test = test;
     }
 
-    public JExpression test() {
+    public Expression test() {
         return test;
     }
 
-    public JBlock body() {
-        if (body == null) body = new JBlock();
+    public Block body() {
+        if (body == null) body = new Block();
         return body;
     }
 
-    public void state(JFormatter f) {
-        if (JOp.hasTopOp(test)) {
+    public void state(Formatter f) {
+        if (Op.hasTopOp(test)) {
             f.p("while ").g(test);
         } else {
             f.p("while (").g(test).p(')');

@@ -40,7 +40,7 @@
 
 package org.mule.devkit.model.code.fmt;
 
-import org.mule.devkit.model.code.JResourceFile;
+import org.mule.devkit.model.code.ResourceFile;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -49,7 +49,7 @@ import java.util.Properties;
 /**
  * A property file.
  */
-public class PropertyFile extends JResourceFile
+public class PropertyFile extends ResourceFile
 {
     public PropertyFile(String name) {
         super(name);

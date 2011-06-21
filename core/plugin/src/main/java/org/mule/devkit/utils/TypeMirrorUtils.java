@@ -58,4 +58,19 @@ public final class TypeMirrorUtils {
 
         return false;
     }
+
+    public boolean isMap(Types types, TypeMirror type) {
+        if (type.toString().contains(java.util.Map.class.getName())) {
+            return true;
+        }
+
+        List<? extends TypeMirror> inherits = types.directSupertypes(type);
+        for (TypeMirror inherit : inherits) {
+            if (isMap(types, inherit)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

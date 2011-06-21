@@ -64,7 +64,7 @@ class AnonymousClass extends DefinedClass {
     }
     
     @Override
-    public void generate(JFormatter f) { 
+    public void generate(Formatter f) {
         f.t(base);
     }
     

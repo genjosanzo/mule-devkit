@@ -48,13 +48,13 @@ import java.util.List;
  * A special {@link JClass} that represents an unknown class (except its name.)
  *
  * @author Kohsuke Kawaguchi
- * @see JCodeModel#directClass(String)
+ * @see CodeModel#directClass(String)
  */
 final class DirectClass extends JClass {
 
     private final String fullName;
 
-    public DirectClass(JCodeModel _owner, String fullName) {
+    public DirectClass(CodeModel _owner, String fullName) {
         super(_owner);
         this.fullName = fullName;
     }
@@ -91,7 +91,7 @@ final class DirectClass extends JClass {
         return false;
     }
 
-    protected JClass substituteParams(JTypeVar[] variables, List<JClass> bindings) {
+    protected JClass substituteParams(TypeVariable[] variables, List<JClass> bindings) {
         return this;
     }
 }

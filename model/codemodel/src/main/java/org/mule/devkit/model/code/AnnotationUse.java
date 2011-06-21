@@ -73,7 +73,7 @@ public final class AnnotationUse extends AnnotationValue {
         return Collections.unmodifiableMap(memberValues);
     }
     
-    private JCodeModel owner() {
+    private CodeModel owner() {
         return clazz.owner();
     }
 
@@ -275,7 +275,7 @@ public final class AnnotationUse extends AnnotationValue {
      */
     public AnnotationUse param(String name, final Enum<?> value) {
         addValue(name, new AnnotationValue() {
-                    public void generate(JFormatter f) {
+                    public void generate(Formatter f) {
                         f.t(owner().ref(value.getDeclaringClass())).p('.').p(value.name());
                     }
                 });
@@ -288,13 +288,13 @@ public final class AnnotationUse extends AnnotationValue {
      *        The simple name for this annotation
      *
      * @param value
-     *        The JEnumConstant which is member value for this annotation
+     *        The EnumConstant which is member value for this annotation
      * @return
      *         The AnnotationUse. More member value pairs can
      *         be added to it using the same or the overloaded methods.
      *
      */
-    public AnnotationUse param(String name, JEnumConstant value){
+    public AnnotationUse param(String name, EnumConstant value){
         addValue(name, new AnnotationStringValue(value));
         return this;
     }
@@ -322,8 +322,8 @@ public final class AnnotationUse extends AnnotationValue {
       */
      public AnnotationUse param(String name, final Class<?> value){
          addValue(name, new AnnotationStringValue(
-        		 new JExpressionImpl() {
-        			 public void generate(JFormatter f) {
+        		 new AbstractExpression() {
+        			 public void generate(Formatter f) {
         				 f.p(value.getName().replace('$', '.'));
         				 f.p(".class");
         			}
@@ -333,14 +333,14 @@ public final class AnnotationUse extends AnnotationValue {
 
     /**
      * Adds a member value pair to this annotation based on the
-     * type represented by the given JType
+     * type represented by the given Type
      *
      * @param name The simple name for this annotation param
-     * @param type the JType representing the actual type
+     * @param type the Type representing the actual type
      * @return The AnnotationUse. More member value pairs can
      *         be added to it using the same or the overloaded methods.
      */
-    public AnnotationUse param(String name, JType type){
+    public AnnotationUse param(String name, Type type){
         JClass c = type.boxify();
         addValue(name, new AnnotationStringValue( c.dotclass() ));
         return this;
@@ -352,13 +352,13 @@ public final class AnnotationUse extends AnnotationValue {
      *        The simple name for this annotation
      *
      * @param value
-     *        The JExpression which provides the contant value for this annotation
+     *        The Expression which provides the contant value for this annotation
      * @return
      *         The AnnotationUse. More member value pairs can
      *         be added to it using the same or the overloaded methods.
      *
      */
-    public AnnotationUse param(String name, JExpression value){
+    public AnnotationUse param(String name, Expression value){
         addValue(name, new AnnotationStringValue(value));
         return this;
     }
@@ -410,7 +410,7 @@ public final class AnnotationUse extends AnnotationValue {
          return annotationUse;
     }
 
-    public void generate(JFormatter f) {
+    public void generate(Formatter f) {
         f.p('@').g(clazz);
         if(memberValues!=null) {
             f.p('(');

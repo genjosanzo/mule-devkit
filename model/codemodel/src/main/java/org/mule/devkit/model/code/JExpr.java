@@ -42,7 +42,7 @@ package org.mule.devkit.model.code;
 
 
 /**
- * Factory methods that generate various {@link JExpression}s.
+ * Factory methods that generate various {@link Expression}s.
  */
 public abstract class JExpr {
 
@@ -51,60 +51,60 @@ public abstract class JExpr {
      */
     private JExpr() { }
 
-    public static JExpression assign(JAssignmentTarget lhs, JExpression rhs) {
-        return new JAssignment(lhs, rhs);
+    public static Expression assign(AssignmentTarget lhs, Expression rhs) {
+        return new Assignment(lhs, rhs);
     }
 
-    public static JExpression assignPlus(JAssignmentTarget lhs, JExpression rhs) {
-        return new JAssignment(lhs, rhs, "+");
+    public static Expression assignPlus(AssignmentTarget lhs, Expression rhs) {
+        return new Assignment(lhs, rhs, "+");
     }
 
-    public static JInvocation _new(JClass c) {
-        return new JInvocation(c);
+    public static Invocation _new(JClass c) {
+        return new Invocation(c);
     }
 
-    public static JInvocation _new(JType t) {
-        return new JInvocation(t);
+    public static Invocation _new(Type t) {
+        return new Invocation(t);
     }
     
-    public static JInvocation invoke(String method) {
-        return new JInvocation((JExpression)null, method);
+    public static Invocation invoke(String method) {
+        return new Invocation((Expression)null, method);
     }
     
-    public static JInvocation invoke(JMethod method) {
-        return new JInvocation((JExpression)null,method);
+    public static Invocation invoke(Method method) {
+        return new Invocation((Expression)null,method);
     }
 
-    public static JInvocation invoke(JExpression lhs, JMethod method) {
-        return new JInvocation(lhs, method);
+    public static Invocation invoke(Expression lhs, Method method) {
+        return new Invocation(lhs, method);
     }
 
-    public static JInvocation invoke(JExpression lhs, String method) {
-        return new JInvocation(lhs, method);
+    public static Invocation invoke(Expression lhs, String method) {
+        return new Invocation(lhs, method);
     }
 
-    public static JFieldRef ref(String field) {
-        return new JFieldRef((JExpression)null, field);
+    public static FieldRef ref(String field) {
+        return new FieldRef((Expression)null, field);
     }
 
-    public static JFieldRef ref(JExpression lhs, JVar field) {
-        return new JFieldRef(lhs,field);
+    public static FieldRef ref(Expression lhs, Variable field) {
+        return new FieldRef(lhs,field);
     }
 
-    public static JFieldRef ref(JExpression lhs, String field) {
-        return new JFieldRef(lhs, field);
+    public static FieldRef ref(Expression lhs, String field) {
+        return new FieldRef(lhs, field);
     }
 
-    public static JFieldRef refthis(String field) {
-         return new JFieldRef(null, field, true);
+    public static FieldRef refthis(String field) {
+         return new FieldRef(null, field, true);
     }
 
-    public static JExpression dotclass(final JClass cl) {
-        return new JExpressionImpl() {
-                public void generate(JFormatter f) {
+    public static Expression dotclass(final JClass cl) {
+        return new AbstractExpression() {
+                public void generate(Formatter f) {
                     JClass c;
-                    if(cl instanceof JNarrowedClass)
-                        c = ((JNarrowedClass)cl).basis;
+                    if(cl instanceof NarrowedClass)
+                        c = ((NarrowedClass)cl).basis;
                     else
                         c = cl;
                     f.g(c).p(".class");
@@ -112,15 +112,15 @@ public abstract class JExpr {
             };
     }
 
-    public static JArrayCompRef component(JExpression lhs, JExpression index) {
-        return new JArrayCompRef(lhs, index);
+    public static ArrayCompRef component(Expression lhs, Expression index) {
+        return new ArrayCompRef(lhs, index);
     }
 
-    public static JCast cast(JType type, JExpression expr) {
+    public static JCast cast(Type type, Expression expr) {
         return new JCast(type, expr);
     }
 
-    public static JArray newArray(JType type) {
+    public static JArray newArray(Type type) {
         return newArray(type,null);
     }
 
@@ -130,7 +130,7 @@ public abstract class JExpr {
      * @param type
      *      The type of the array component. 'T' or {@code new T[size]}.
      */
-    public static JArray newArray(JType type, JExpression size) {
+    public static JArray newArray(Type type, Expression size) {
         // you cannot create an array whose component type is a generic
         return new JArray(type.erasure(), size);
     }
@@ -141,90 +141,90 @@ public abstract class JExpr {
      * @param type
      *      The type of the array component. 'T' or {@code new T[size]}.
      */
-    public static JArray newArray(JType type, int size) {
+    public static JArray newArray(Type type, int size) {
         return newArray(type,lit(size));
     }
     
     
-    private static final JExpression __this = new JAtom("this");
+    private static final Expression __this = new Atom("this");
     /**
      * Returns a reference to "this", an implicit reference
      * to the current object.
      */
-    public static JExpression _this() { return __this; }
+    public static Expression _this() { return __this; }
 
-    private static final JExpression __super = new JAtom("super");
+    private static final Expression __super = new Atom("super");
     /**
      * Returns a reference to "super", an implicit reference
      * to the super class.
      */
-    public static JExpression _super() { return __super; }
+    public static Expression _super() { return __super; }
     
     
     /* -- Literals -- */
 
-    private static final JExpression __null = new JAtom("null");
-    public static JExpression _null() {
+    private static final Expression __null = new Atom("null");
+    public static Expression _null() {
         return __null;
     }
     
     /**
      * Boolean constant that represents <code>true</code>
      */
-    public static final JExpression TRUE = new JAtom("true");
+    public static final Expression TRUE = new Atom("true");
     
     /**
      * Boolean constant that represents <code>false</code>
      */
-    public static final JExpression FALSE = new JAtom("false");
+    public static final Expression FALSE = new Atom("false");
 
-    public static JExpression lit(boolean b) {
+    public static Expression lit(boolean b) {
         return b?TRUE:FALSE;
     }
     
-    public static JExpression lit(int n) {
-        return new JAtom(Integer.toString(n));
+    public static Expression lit(int n) {
+        return new Atom(Integer.toString(n));
     }
 
-    public static JExpression lit(long n) {
-        return new JAtom(Long.toString(n) + "L");
+    public static Expression lit(long n) {
+        return new Atom(Long.toString(n) + "L");
     }
 
-    public static JExpression lit(float f) {
+    public static Expression lit(float f) {
     	if (f == Float.NEGATIVE_INFINITY)
     	{
-    		return new JAtom("java.lang.Float.NEGATIVE_INFINITY");
+    		return new Atom("java.lang.Float.NEGATIVE_INFINITY");
     	}
     	else if (f == Float.POSITIVE_INFINITY)
     	{
-    		return new JAtom("java.lang.Float.POSITIVE_INFINITY");
+    		return new Atom("java.lang.Float.POSITIVE_INFINITY");
     	}
     	else if (Float.isNaN(f))
     	{
-    		return new JAtom("java.lang.Float.NaN");
+    		return new Atom("java.lang.Float.NaN");
     	}
     	else
     	{
-    		return new JAtom(Float.toString(f) + "F");
+    		return new Atom(Float.toString(f) + "F");
     	}
     }
 
-    public static JExpression lit(double d) {
+    public static Expression lit(double d) {
     	if (d == Double.NEGATIVE_INFINITY)
     	{
-    		return new JAtom("java.lang.Double.NEGATIVE_INFINITY");
+    		return new Atom("java.lang.Double.NEGATIVE_INFINITY");
     	}
     	else if (d == Double.POSITIVE_INFINITY)
     	{
-    		return new JAtom("java.lang.Double.POSITIVE_INFINITY");
+    		return new Atom("java.lang.Double.POSITIVE_INFINITY");
     	}
     	else if (Double.isNaN(d))
     	{
-    		return new JAtom("java.lang.Double.NaN");
+    		return new Atom("java.lang.Double.NaN");
     	}
     	else
     	{
-    		return new JAtom(Double.toString(d) + "D");
+    		return new Atom(Double.toString(d) + "D");
     	}
     }
 
@@ -274,19 +274,19 @@ public abstract class JExpr {
         return sb.toString();
     }
 
-    public static JExpression lit(char c) {
-        return new JAtom(quotify('\'', "" + c));
+    public static Expression lit(char c) {
+        return new Atom(quotify('\'', "" + c));
     }
 
-    public static JExpression lit(String s) {
-        return new JStringLiteral(s);
+    public static Expression lit(String s) {
+        return new StringLiteral(s);
     }
     
     /**
      * Creates an expression directly from a source code fragment.
      * 
      * <p>
-     * This method can be used as a short-cut to create a JExpression.
+     * This method can be used as a short-cut to create a Expression.
      * For example, instead of <code>_a.gt(_b)</code>, you can write
      * it as: <code>JExpr.direct("a>b")</code>.
      * 
@@ -294,9 +294,9 @@ public abstract class JExpr {
      * Be warned that there is a danger in using this method,
      * as it obfuscates the object model.
      */
-    public static JExpression direct( final String source ) {
-        return new JExpressionImpl(){
-            public void generate( JFormatter f ) {
+    public static Expression direct( final String source ) {
+        return new AbstractExpression(){
+            public void generate( Formatter f ) {
                     f.p('(').p(source).p(')');
             }
         };

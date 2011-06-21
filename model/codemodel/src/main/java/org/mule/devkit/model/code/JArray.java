@@ -47,33 +47,33 @@ import java.util.List;
 /**
  * array creation and initialization.
  */
-public final class JArray extends JExpressionImpl {
+public final class JArray extends AbstractExpression {
 
-    private final JType type;
-    private final JExpression size;
-    private List<JExpression> exprs = null;
+    private final Type type;
+    private final Expression size;
+    private List<Expression> exprs = null;
 
     /**
      * Add an element to the array initializer
      */
-    public JArray add(JExpression e) {
+    public JArray add(Expression e) {
         if (exprs == null)
-            exprs = new ArrayList<JExpression>();
+            exprs = new ArrayList<Expression>();
         exprs.add(e);
         return this;
     }
 
-    JArray(JType type, JExpression size) {
+    JArray(Type type, Expression size) {
         this.type = type;
         this.size = size;
     }
 
-    public void generate(JFormatter f) {
+    public void generate(Formatter f) {
         
         // generally we produce new T[x], but when T is an array type (T=T'[])
         // then new T'[][x] is wrong. It has to be new T'[x][].
         int arrayCount = 0;
-        JType t = type;
+        Type t = type;
         
         while( t.isArray() ) {
             t = t.elementType();

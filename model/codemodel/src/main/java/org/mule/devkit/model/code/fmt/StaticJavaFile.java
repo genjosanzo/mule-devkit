@@ -42,8 +42,8 @@ package org.mule.devkit.model.code.fmt;
 
 import org.mule.devkit.model.code.JClass;
 import org.mule.devkit.model.code.JPackage;
-import org.mule.devkit.model.code.JResourceFile;
-import org.mule.devkit.model.code.JTypeVar;
+import org.mule.devkit.model.code.ResourceFile;
+import org.mule.devkit.model.code.TypeVariable;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -62,7 +62,7 @@ import java.util.List;
  * Statically generated Java soruce file.
  * 
  * <p>
- * This {@link JResourceFile} implementation will generate a Java source
+ * This {@link org.mule.devkit.model.code.ResourceFile} implementation will generate a Java source
  * file by copying the source code from a resource.
  * <p>
  * While copying a resource, we look for a package declaration and
@@ -80,7 +80,7 @@ import java.util.List;
  * @author
  *     Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
-public final class StaticJavaFile extends JResourceFile {
+public final class StaticJavaFile extends ResourceFile {
     
     private final JPackage pkg;
     private final String className;
@@ -204,12 +204,12 @@ public final class StaticJavaFile extends JResourceFile {
     
     private class JStaticClass extends JClass {
 
-        private final JTypeVar[] typeParams;
+        private final TypeVariable[] typeParams;
         
         JStaticClass() {
             super(pkg.owner());
             // TODO: allow those to be specified
-            typeParams = new JTypeVar[0];
+            typeParams = new TypeVariable[0];
         }
 
         public String name() {
@@ -243,11 +243,11 @@ public final class StaticJavaFile extends JResourceFile {
             throw new UnsupportedOperationException();
         }
 
-        public JTypeVar[] typeParams() {
+        public TypeVariable[] typeParams() {
             return typeParams;
         }
 
-        protected JClass substituteParams(JTypeVar[] variables, List<JClass> bindings) {
+        protected JClass substituteParams(TypeVariable[] variables, List<JClass> bindings) {
             return this;
         }
     };

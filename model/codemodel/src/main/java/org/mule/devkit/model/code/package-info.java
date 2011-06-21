@@ -54,25 +54,25 @@
     digraph G {
         cls1 [label="DefinedClass"];
         cls2 [label="DefinedClass"];
-        JCodeModel -> cls1 [label="generated class"];
-        JCodeModel -> cls2 [label="generated class"];
+        CodeModel -> cls1 [label="generated class"];
+        CodeModel -> cls2 [label="generated class"];
 
-        m1 [label="JMethod"];
-        m2 [label="JMethod"];
+        m1 [label="Method"];
+        m2 [label="Method"];
 
         cls1 -> m1;
         cls1 -> m2;
         cls1 -> JField;
 
-        m1 -> JVar [label="method parameter"];
-        m1 -> JBlock [label="code"];
+        m1 -> Variable [label="method parameter"];
+        m1 -> Block [label="code"];
     }
  * }
  *
  * <p>
  * You bulid this tree mostly from top-down. So, you first create
- * a new {@link DefinedClass} from {@link JCodeModel}, then you
- * create a {@link JMethod} from {@link DefinedClass}, and so on.
+ * a new {@link DefinedClass} from {@link CodeModel}, then you
+ * create a {@link Method} from {@link DefinedClass}, and so on.
  *
  * <p>
  * This design brings the following beneefits:
@@ -93,7 +93,7 @@
  *
  * <h2>Using CodeModel</h2>
  * <p>
- * {@link JCodeModel} is the entry point to
+ * {@link CodeModel} is the entry point to
  * the library. See its javadoc for more details about how to use
  * CodeModel.
  *
