@@ -53,4 +53,8 @@
         <basic:passthru-long value="3456443463342345734"/>
     </flow>
 
+    <flow name="passthruEnumFlow">
+        <basic:passthru-enum mode="In"/>
+    </flow>
+
 </mule>

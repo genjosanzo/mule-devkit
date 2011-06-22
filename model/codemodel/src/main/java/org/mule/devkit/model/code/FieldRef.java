@@ -126,9 +126,9 @@ public class FieldRef extends AbstractExpression implements AssignmentTarget {
     }
 
     public Expression assign(Expression rhs) {
-        return JExpr.assign(this, rhs);
+        return ExpressionFactory.assign(this, rhs);
     }
     public Expression assignPlus(Expression rhs) {
-        return JExpr.assignPlus(this, rhs);
+        return ExpressionFactory.assignPlus(this, rhs);
     }
 }

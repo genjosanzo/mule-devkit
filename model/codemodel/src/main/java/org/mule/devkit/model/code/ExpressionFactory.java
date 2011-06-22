@@ -44,12 +44,12 @@ package org.mule.devkit.model.code;
 /**
  * Factory methods that generate various {@link Expression}s.
  */
-public abstract class JExpr {
+public abstract class ExpressionFactory {
 
     /**
      * This class is not instanciable.
      */
-    private JExpr() { }
+    private ExpressionFactory() { }
 
     public static Expression assign(AssignmentTarget lhs, Expression rhs) {
         return new Assignment(lhs, rhs);
@@ -59,7 +59,7 @@ public abstract class JExpr {
         return new Assignment(lhs, rhs, "+");
     }
 
-    public static Invocation _new(JClass c) {
+    public static Invocation _new(TypeReference c) {
         return new Invocation(c);
     }
 
@@ -99,10 +99,10 @@ public abstract class JExpr {
          return new FieldRef(null, field, true);
     }
 
-    public static Expression dotclass(final JClass cl) {
+    public static Expression dotclass(final TypeReference cl) {
         return new AbstractExpression() {
                 public void generate(Formatter f) {
-                    JClass c;
+                    TypeReference c;
                     if(cl instanceof NarrowedClass)
                         c = ((NarrowedClass)cl).basis;
                     else
@@ -288,7 +288,7 @@ public abstract class JExpr {
      * <p>
      * This method can be used as a short-cut to create a Expression.
      * For example, instead of <code>_a.gt(_b)</code>, you can write
-     * it as: <code>JExpr.direct("a>b")</code>.
+     * it as: <code>ExpressionFactory.direct("a>b")</code>.
      * 
      * <p>
      * Be warned that there is a danger in using this method,

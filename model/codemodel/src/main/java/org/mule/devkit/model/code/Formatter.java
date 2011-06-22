@@ -57,11 +57,11 @@ import java.util.List;
  */
 public final class Formatter {
     /** all classes and ids encountered during the collection mode **/
-    /** map from short type name to ReferenceList (list of JClass and ids sharing that name) **/
+    /** map from short type name to ReferenceList (list of TypeReference and ids sharing that name) **/
     private HashMap<String,ReferenceList> collectedReferences;
 
     /** set of imported types (including package java types, eventhough we won't generate imports for them) */
-    private HashSet<JClass> importedClasses;
+    private HashSet<TypeReference> importedClasses;
 
     private static enum Mode {
         /**
@@ -111,7 +111,7 @@ public final class Formatter {
         indentSpace = space;
         collectedReferences = new HashMap<String,ReferenceList>();
         //ids = new HashSet<String>();
-        importedClasses = new HashSet<JClass>();
+        importedClasses = new HashSet<TypeReference>();
     }
 
     /**
@@ -256,7 +256,7 @@ public final class Formatter {
 
     public Formatter t(Type type) {
         if(type.isReference()) {
-            return t((JClass)type);
+            return t((TypeReference)type);
         } else {
             return g(type);
         }
@@ -269,7 +269,7 @@ public final class Formatter {
      * In the collecting mode we use this information to
      * decide what types to import and what not to.
      */
-    public Formatter t(JClass type) {
+    public Formatter t(TypeReference type) {
         switch(mode) {
         case PRINTING:
             // many of the JTypes in this list are either primitive or belong to package java
@@ -309,7 +309,7 @@ public final class Formatter {
             // see if there is a type name that collides with this id
             if(collectedReferences.containsKey(id)) {
                 if( !collectedReferences.get(id).getClasses().isEmpty() ) {
-                    for( JClass type : collectedReferences.get(id).getClasses() ) {
+                    for( TypeReference type : collectedReferences.get(id).getClasses() ) {
                         if (type.outer()!=null) {
                             collectedReferences.get(id).setId(false);
                             return this;
@@ -424,16 +424,16 @@ public final class Formatter {
         mode = Mode.PRINTING;
 
         assert c.parentContainer().isPackage() : "this method is only for a pacakge-level class";
-        JPackage pkg = (JPackage) c.parentContainer();
+        Package pkg = (Package) c.parentContainer();
         if (!pkg.isUnnamed()) {
             nl().d(pkg);
             nl();
         }
 
         // generate import statements
-        JClass[] imports = importedClasses.toArray(new JClass[importedClasses.size()]);
+        TypeReference[] imports = importedClasses.toArray(new TypeReference[importedClasses.size()]);
         Arrays.sort(imports);
-        for (JClass clazz : imports) {
+        for (TypeReference clazz : imports) {
             // suppress import statements for primitive types, built-in types,
             // types in the root package, and types in
             // the same package as the current type
@@ -457,7 +457,7 @@ public final class Formatter {
      * @param c Type that is the current class being processed
      * @return true if an import statement should be suppressed, false otherwise
      */
-    private boolean supressImport(JClass clazz, JClass c) {
+    private boolean supressImport(TypeReference clazz, TypeReference c) {
         if (clazz instanceof NarrowedClass) {
             clazz = clazz.erasure();
         }
@@ -483,7 +483,7 @@ public final class Formatter {
         return false;
     }
 
-    private JPackage javaLang;
+    private Package javaLang;
 
 
 
@@ -498,12 +498,12 @@ public final class Formatter {
     /**
      * Used during the optimization of class imports.
      *
-     * List of {@link JClass}es whose short name is the same.
+     * List of {@link TypeReference}es whose short name is the same.
      *
      * @author Ryan.Shoemaker@Sun.COM
      */
     final class ReferenceList {
-        private final ArrayList<JClass> classes = new ArrayList<JClass>();
+        private final ArrayList<TypeReference> classes = new ArrayList<TypeReference>();
 
         /** true if this name is used as an identifier (like a variable name.) **/
         private boolean id;
@@ -523,7 +523,7 @@ public final class Formatter {
             if(id && classes.size() != 0)
                 return true;
 
-            for(JClass c : classes) {
+            for(TypeReference c : classes) {
                 if (c instanceof AnonymousClass) {
                     c = c._extends();
                 } 
@@ -546,12 +546,12 @@ public final class Formatter {
             return false;
         }
 
-        public void add(JClass clazz) {
+        public void add(TypeReference clazz) {
             if(!classes.contains(clazz))
                 classes.add(clazz);
         }
 
-        public List<JClass> getClasses() {
+        public List<TypeReference> getClasses() {
             return classes;
         }
 

@@ -73,7 +73,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
      *         the same method multiple times
      */
     public AnnotationArrayMember param(String value) {
-        AnnotationValue annotationValue = new AnnotationStringValue(JExpr.lit(value));
+        AnnotationValue annotationValue = new AnnotationStringValue(ExpressionFactory.lit(value));
         values.add(annotationValue);
         return this;
     }
@@ -86,7 +86,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
      *         the same method multiple times
      */
     public AnnotationArrayMember param(boolean value) {
-        AnnotationValue annotationValue = new AnnotationStringValue(JExpr.lit(value));
+        AnnotationValue annotationValue = new AnnotationStringValue(ExpressionFactory.lit(value));
         values.add(annotationValue);
         return this;
     }
@@ -99,7 +99,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
      *         the same method multiple times
      */
     public AnnotationArrayMember param(byte value) {
-        AnnotationValue annotationValue = new AnnotationStringValue(JExpr.lit(value));
+        AnnotationValue annotationValue = new AnnotationStringValue(ExpressionFactory.lit(value));
         values.add(annotationValue);
         return this;
     }
@@ -112,7 +112,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
      *         the same method multiple times
      */
     public AnnotationArrayMember param(char value) {
-        AnnotationValue annotationValue = new AnnotationStringValue(JExpr.lit(value));
+        AnnotationValue annotationValue = new AnnotationStringValue(ExpressionFactory.lit(value));
         values.add(annotationValue);
         return this;
     }
@@ -125,7 +125,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
      *         the same method multiple times
      */
     public AnnotationArrayMember param(double value) {
-        AnnotationValue annotationValue = new AnnotationStringValue(JExpr.lit(value));
+        AnnotationValue annotationValue = new AnnotationStringValue(ExpressionFactory.lit(value));
         values.add(annotationValue);
         return this;
     }
@@ -138,7 +138,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
      *         the same method multiple times
      */
     public AnnotationArrayMember param(long value) {
-        AnnotationValue annotationValue = new AnnotationStringValue(JExpr.lit(value));
+        AnnotationValue annotationValue = new AnnotationStringValue(ExpressionFactory.lit(value));
         values.add(annotationValue);
         return this;
     }
@@ -151,7 +151,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
      *         the same method multiple times
      */
     public AnnotationArrayMember param(short value) {
-        AnnotationValue annotationValue = new AnnotationStringValue(JExpr.lit(value));
+        AnnotationValue annotationValue = new AnnotationStringValue(ExpressionFactory.lit(value));
         values.add(annotationValue);
         return this;
     }
@@ -164,7 +164,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
      *         the same method multiple times
      */
     public AnnotationArrayMember param(int value) {
-        AnnotationValue annotationValue = new AnnotationStringValue(JExpr.lit(value));
+        AnnotationValue annotationValue = new AnnotationStringValue(ExpressionFactory.lit(value));
         values.add(annotationValue);
         return this;
     }
@@ -177,7 +177,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
      *         the same method multiple times
      */
     public AnnotationArrayMember param(float value) {
-        AnnotationValue annotationValue = new AnnotationStringValue(JExpr.lit(value));
+        AnnotationValue annotationValue = new AnnotationStringValue(ExpressionFactory.lit(value));
         values.add(annotationValue);
         return this;
     }
@@ -245,7 +245,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
    }
 
     public AnnotationArrayMember param(Type type){
-        JClass clazz = type.boxify();
+        TypeReference clazz = type.boxify();
         AnnotationValue annotationValue = new AnnotationStringValue( clazz.dotclass() );
         values.add(annotationValue);
         return this;
@@ -261,7 +261,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
     /**
      * Adds a new annotation to the array.
      */
-    public AnnotationUse annotate(JClass clazz){
+    public AnnotationUse annotate(TypeReference clazz){
         AnnotationUse a = new AnnotationUse(clazz);
         values.add(a);
         return a;

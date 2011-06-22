@@ -14,11 +14,8 @@
                 <plugin>
                     <groupId>org.mule</groupId>
                     <artifactId>mule-devkit-maven-plugin</artifactId>
-                    <version>@project.version@</version>
+                    <version>1.0-SNAPSHOT</version>
                     <extensions>true</extensions>
-                    <configuration>
-                        <schemaVersion>1.0</schemaVersion>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -43,7 +40,7 @@
             <plugin>
                 <groupId>org.mule</groupId>
                 <artifactId>mule-devkit-maven-plugin</artifactId>
-                <version>@project.version@</version>
+                <version>1.0-SNAPSHOT</version>
                 <extensions>true</extensions>
             </plugin>
         </plugins>

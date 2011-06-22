@@ -27,7 +27,7 @@ import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.Invocation;
-import org.mule.devkit.model.code.JExpr;
+import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
@@ -73,10 +73,10 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         // add constructor
         Method constructor = beanDefinitionparser.constructor(Modifier.PUBLIC);
-        constructor.body().invoke("super").arg(JExpr.lit("messageSource")).arg(JExpr.dotclass(messageSourceClass));
+        constructor.body().invoke("super").arg(ExpressionFactory.lit("messageSource")).arg(ExpressionFactory.dotclass(messageSourceClass));
 
         // add getBeanClass
-        generateGetBeanClass(beanDefinitionparser, JExpr.dotclass(messageSourceClass));
+        generateGetBeanClass(beanDefinitionparser, ExpressionFactory.dotclass(messageSourceClass));
 
         // add parseChild
         generateParseChild(beanDefinitionparser, executableElement);
@@ -99,10 +99,10 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         // add constructor
         Method constructor = beanDefinitionparser.constructor(Modifier.PUBLIC);
-        constructor.body().invoke("super").arg(JExpr.lit("messageProcessor")).arg(JExpr.dotclass(messageProcessorClass));
+        constructor.body().invoke("super").arg(ExpressionFactory.lit("messageProcessor")).arg(ExpressionFactory.dotclass(messageProcessorClass));
 
         // add getBeanClass
-        generateGetBeanClass(beanDefinitionparser, JExpr.dotclass(messageProcessorClass));
+        generateGetBeanClass(beanDefinitionparser, ExpressionFactory.dotclass(messageProcessorClass));
 
         // add parseChild
         generateParseChild(beanDefinitionparser, executableElement);
@@ -125,7 +125,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         Block ifIsEmpty = getAttributeValue.body()._if(isEmpty.not())._then();
         ifIsEmpty._return(getAttribute);
 
-        getAttributeValue.body()._return(JExpr._null());
+        getAttributeValue.body()._return(ExpressionFactory._null());
     }
 
 
@@ -141,7 +141,8 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             if (variable.asType().toString().contains(SourceCallback.class.getName()))
                 continue;
 
-            if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
+            if (SchemaTypeConversion.isSupported(variable.asType().toString()) ||
+                context.getTypeMirrorUtils().isEnum(variable.asType())) {
                 parseChild.body().add(generateAddPropertyValue(element, beanDefinitionBuilder, variable));
             }
         }
@@ -171,29 +172,29 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     }
 
     private Invocation generateGetAttributeConfigRef() {
-        Invocation getTargetPropertyConfiguration = JExpr.invoke("getTargetPropertyConfiguration");
+        Invocation getTargetPropertyConfiguration = ExpressionFactory.invoke("getTargetPropertyConfiguration");
         Invocation getAttributeAlias = getTargetPropertyConfiguration.invoke("getAttributeAlias");
         getAttributeAlias.arg("config-ref");
         return getAttributeAlias;
     }
 
     private Invocation generateAddPropertyValue(Variable element, Variable beanDefinitionBuilder, VariableElement variable) {
-        Invocation getAttributeValue = JExpr.invoke("getAttributeValue");
+        Invocation getAttributeValue = ExpressionFactory.invoke("getAttributeValue");
         getAttributeValue.arg(element);
-        getAttributeValue.arg(JExpr.lit(variable.getSimpleName().toString()));
+        getAttributeValue.arg(ExpressionFactory.lit(variable.getSimpleName().toString()));
         Invocation addPropertyValue = beanDefinitionBuilder.invoke("addPropertyValue");
-        addPropertyValue.arg(JExpr.lit(variable.getSimpleName().toString()));
+        addPropertyValue.arg(ExpressionFactory.lit(variable.getSimpleName().toString()));
         addPropertyValue.arg(getAttributeValue);
 
         return addPropertyValue;
     }
 
     private Invocation generateAddPropertyRefValue(Variable element, Variable beanDefinitionBuilder, VariableElement variable) {
-        Invocation getAttributeValue = JExpr.invoke("getAttributeValue");
+        Invocation getAttributeValue = ExpressionFactory.invoke("getAttributeValue");
         getAttributeValue.arg(element);
-        getAttributeValue.arg(JExpr.lit(variable.getSimpleName().toString() + "-ref"));
+        getAttributeValue.arg(ExpressionFactory.lit(variable.getSimpleName().toString() + "-ref"));
         Invocation addPropertyValue = beanDefinitionBuilder.invoke("addPropertyValue");
-        addPropertyValue.arg(JExpr.lit(variable.getSimpleName().toString()));
+        addPropertyValue.arg(ExpressionFactory.lit(variable.getSimpleName().toString()));
         addPropertyValue.arg(getAttributeValue);
 
         return addPropertyValue;
@@ -202,7 +203,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
     private Variable generateBeanAssembler(Method parseChild, Variable element, Variable beanDefinitionBuilder) {
         Variable assembler = parseChild.body().decl(ref(BeanAssembler.class), "assembler");
-        Invocation getBeanAssembler = JExpr.invoke("getBeanAssembler");
+        Invocation getBeanAssembler = ExpressionFactory.invoke("getBeanAssembler");
         getBeanAssembler.arg(element);
         getBeanAssembler.arg(beanDefinitionBuilder);
         parseChild.body().assign(assembler, getBeanAssembler);
@@ -211,7 +212,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
     private void generatePostProcessCall(Method parseChild, Variable element, Variable assembler) {
         Invocation postProcess = parseChild.body().invoke("postProcess");
-        postProcess.arg(JExpr.invoke("getParserContext"));
+        postProcess.arg(ExpressionFactory.invoke("getParserContext"));
         postProcess.arg(assembler);
         postProcess.arg(element);
     }

@@ -54,7 +54,7 @@ public interface Annotable {
      * @param clazz
      *          The annotation class to annotate the program element with
      */
-    AnnotationUse annotate(JClass clazz);
+    AnnotationUse annotate(TypeReference clazz);
 
     /**
      * Adds an annotation to this program element.

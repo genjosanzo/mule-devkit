@@ -41,7 +41,7 @@
 package org.mule.devkit.model.code.writer;
 
 import org.mule.devkit.model.code.CodeWriter;
-import org.mule.devkit.model.code.JPackage;
+import org.mule.devkit.model.code.Package;
 
 import java.io.FilterOutputStream;
 import java.io.IOException;
@@ -72,7 +72,7 @@ public class ZipCodeWriter extends CodeWriter {
     
     private final OutputStream filter;
         
-    public OutputStream openBinary(JPackage pkg, String fileName) throws IOException {
+    public OutputStream openBinary(Package pkg, String fileName) throws IOException {
         String name = fileName;
         if(!pkg.isUnnamed())    name = toDirName(pkg)+name;
         
@@ -81,7 +81,7 @@ public class ZipCodeWriter extends CodeWriter {
     }
 
     /** Converts a package name to the directory name. */
-    private static String toDirName( JPackage pkg ) {
+    private static String toDirName( Package pkg ) {
         return pkg.name().replace('.','/')+'/';
     }
 

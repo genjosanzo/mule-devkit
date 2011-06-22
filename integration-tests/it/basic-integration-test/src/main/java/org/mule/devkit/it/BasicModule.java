@@ -84,4 +84,16 @@ public class BasicModule
         return value;
     }
 
+    public enum Mode
+    {
+        In,
+        Out
+    }
+
+    @Processor
+    public String passthruEnum(Mode mode)
+    {
+        return mode.name();
+    }
+
 }

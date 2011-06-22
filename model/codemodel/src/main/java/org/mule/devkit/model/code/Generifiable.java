@@ -62,7 +62,7 @@ public interface Generifiable {
     /**
      * Adds a new type variable to this declaration with a bound.
      */
-    TypeVariable generify(String name, JClass bound);
+    TypeVariable generify(String name, TypeReference bound);
     
     /**
      * Iterates all the type parameters of this class/interface.

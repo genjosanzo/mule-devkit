@@ -40,23 +40,23 @@
 
 package org.mule.devkit.model.code.util;
 
-import org.mule.devkit.model.code.JClass;
+import org.mule.devkit.model.code.TypeReference;
 
 import java.util.Comparator;
 
 /**
- * Comparator object that sorts {@link org.mule.devkit.model.code.JClass}es in the order
+ * Comparator object that sorts {@link org.mule.devkit.model.code.TypeReference}es in the order
  * of their names.
  * 
  * @author
  * 	Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
-public class ClassNameComparator implements Comparator<JClass> {
+public class ClassNameComparator implements Comparator<TypeReference> {
     private ClassNameComparator() {}
     
-    public int compare(JClass l, JClass r) {
+    public int compare(TypeReference l, TypeReference r) {
         return l.fullName().compareTo(r.fullName());
     }
 
-    public static final Comparator<JClass> theInstance = new ClassNameComparator();
+    public static final Comparator<TypeReference> theInstance = new ClassNameComparator();
 }

@@ -42,26 +42,47 @@ package org.mule.devkit.model.code;
 
 
 /**
- * JBreak statement
+ * While statement
  */
-final class JBreak implements Statement {
-    
-    private final Label label;
-    
+
+public class WhileLoop implements Statement {
+
     /**
-     * JBreak constructor
-     * 
-     * @param   _label
-     *      break label or null.
+     * Test part of While statement for determining exit state
      */
-    JBreak( Label _label ) {
-        this.label = _label;
+    private Expression test;
+
+    /**
+     * Block of statements which makes up body of this While statement
+     */
+    private Block body = null;
+
+    /**
+     * Construct a While statment
+     */
+    WhileLoop(Expression test) {
+        this.test = test;
+    }
+
+    public Expression test() {
+        return test;
+    }
+
+    public Block body() {
+        if (body == null) body = new Block();
+        return body;
     }
 
     public void state(Formatter f) {
-        if( label==null )
-            f.p("break;").nl();
+        if (Op.hasTopOp(test)) {
+            f.p("while ").g(test);
+        } else {
+            f.p("while (").g(test).p(')');
+        }
+        if (body != null)
+            f.s(body);
         else
-            f.p("break").p(label.label).p(';').nl();
+            f.p(';').nl();
     }
+
 }

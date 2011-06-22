@@ -27,13 +27,13 @@ import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
+import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.Invocation;
-import org.mule.devkit.model.code.JExpr;
 import org.mule.devkit.model.code.ForLoop;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
-import org.mule.devkit.model.code.JPackage;
+import org.mule.devkit.model.code.Package;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -83,7 +83,7 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractModuleGenerato
 
     private DefinedClass getAnyXmlChildDefinitionParserClass(VariableElement variableElement) {
         String anyXmlChildDefinitionParserClassName = context.getNameUtils().generateClassNameInPackage(variableElement, "AnyXmlChildDefinitionParser");
-        JPackage pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(anyXmlChildDefinitionParserClassName));
+        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(anyXmlChildDefinitionParserClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(anyXmlChildDefinitionParserClassName), ChildDefinitionParser.class);
 
         context.setClassRole(ANY_XML_CHILD_DEFINITION_PARSER_ROLE, clazz);
@@ -119,7 +119,7 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractModuleGenerato
         Variable parserContext = parseInternal.param(ref(ParserContext.class), "parserContext");
 
         Variable bd = parseInternal.body().decl(ref(AbstractBeanDefinition.class), "bd");
-        Invocation superParserInternal = JExpr._super().invoke("parseInternal");
+        Invocation superParserInternal = ExpressionFactory._super().invoke("parseInternal");
         superParserInternal.arg(element);
         superParserInternal.arg(parserContext);
 
@@ -135,7 +135,7 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractModuleGenerato
         Variable nodeList = ifBlock._then().decl(ref(NodeList.class), "childs", element.invoke("getChildNodes"));
         Variable i = ifBlock._then().decl(context.getCodeModel().INT, "i");
         ForLoop forLoop = ifBlock._then()._for();
-        forLoop.init(i, JExpr.lit(0));
+        forLoop.init(i, ExpressionFactory.lit(0));
         forLoop.test(Op.lt(i, nodeList.invoke("getLength")));
         forLoop.update(Op.incr(i));
         Variable child = forLoop.body().decl(ref(Node.class), "child", nodeList.invoke("item").arg(i));
@@ -143,9 +143,9 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractModuleGenerato
         Conditional ifBlock2 = forLoop.body()._if(Op.eq(ref(Node.class).staticRef("ELEMENT_NODE"), child.invoke("getNodeType")));
 
         TryStatement tryBlock = ifBlock2._then()._try();
-        Variable domSource = tryBlock.body().decl(ref(DOMSource.class), "domSource", JExpr._new(ref(DOMSource.class)).arg(child));
-        Variable stringWriter = tryBlock.body().decl(ref(StringWriter.class), "stringWriter", JExpr._new(ref(StringWriter.class)));
-        Variable streamResult = tryBlock.body().decl(ref(StreamResult.class), "result", JExpr._new(ref(StreamResult.class)).arg(stringWriter));
+        Variable domSource = tryBlock.body().decl(ref(DOMSource.class), "domSource", ExpressionFactory._new(ref(DOMSource.class)).arg(child));
+        Variable stringWriter = tryBlock.body().decl(ref(StringWriter.class), "stringWriter", ExpressionFactory._new(ref(StringWriter.class)));
+        Variable streamResult = tryBlock.body().decl(ref(StreamResult.class), "result", ExpressionFactory._new(ref(StreamResult.class)).arg(stringWriter));
         Variable tf = tryBlock.body().decl(ref(TransformerFactory.class), "tf", ref(TransformerFactory.class).staticInvoke("newInstance"));
         Variable transformer = tryBlock.body().decl(ref(Transformer.class), "transformer", tf.invoke("newTransformer"));
         Invocation transform = transformer.invoke("transform");
@@ -156,7 +156,7 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractModuleGenerato
 
         //bd.getPropertyValues().add(clazzProperty, arguments);
         Invocation add = bd.invoke("getConstructorArgumentValues").invoke("addIndexedArgumentValue");
-        add.arg(JExpr.lit(0));
+        add.arg(ExpressionFactory.lit(0));
         add.arg(stringWriter.invoke("toString"));
         tryBlock.body().add(add);
 
@@ -170,7 +170,7 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractModuleGenerato
     private void generateReThrow(TryStatement tryBlock, Class<?> clazz) {
         CatchBlock catchBlock = tryBlock._catch(ref(clazz).boxify());
         Variable e = catchBlock.param("e");
-        catchBlock.body()._throw(JExpr._new(ref(UnhandledException.class)).arg(e));
+        catchBlock.body()._throw(ExpressionFactory._new(ref(UnhandledException.class)).arg(e));
     }
 
     private void generateConstructor(DefinedClass anyXmlChildDefinitionParser) {

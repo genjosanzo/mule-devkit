@@ -80,7 +80,7 @@ abstract class AbstractGenerifiable implements Generifiable, Declaration {
         return generify(name,owner().ref(bound));
     }
 
-    public TypeVariable generify(String name, JClass bound) {
+    public TypeVariable generify(String name, TypeReference bound) {
         return generify(name).bound(bound);
     }
     

@@ -47,11 +47,11 @@ package org.mule.devkit.model.code;
 
 public class CatchBlock implements Generable {
 
-    JClass exception;
+    TypeReference exception;
     private Variable var = null;
     private Block body = new Block();
 
-    CatchBlock(JClass exception) {
+    CatchBlock(TypeReference exception) {
         this.exception = exception;
     }
 

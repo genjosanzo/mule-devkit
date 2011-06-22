@@ -51,9 +51,9 @@ class AnonymousClass extends DefinedClass {
     /**
      * Base interface/class from which this anonymous class is built.
      */
-    private final JClass base;
+    private final TypeReference base;
     
-    AnonymousClass(JClass _base) {
+    AnonymousClass(TypeReference _base) {
         super(_base.owner(), 0, null);
         this.base = _base;
     }

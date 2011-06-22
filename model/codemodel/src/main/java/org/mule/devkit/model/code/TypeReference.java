@@ -54,9 +54,9 @@ import java.util.List;
  * To be exact, this object represents an "use" of a reference type,
  * not necessarily a declaration of it, which is modeled as {@link DefinedClass}.
  */
-public abstract class JClass extends Type
+public abstract class TypeReference extends Type
 {
-    protected JClass( CodeModel _owner ) {
+    protected TypeReference(CodeModel _owner) {
         this._owner = _owner;
     }
 
@@ -74,13 +74,13 @@ public abstract class JClass extends Type
      * Gets the package to which this class belongs.
      * TODO: shall we move move this down?
      */
-    abstract public JPackage _package();
+    abstract public Package _package();
 
     /**
      * Returns the class in which this class is nested, or <tt>null</tt> if
      * this is a top-level class.
      */
-    public JClass outer() {
+    public TypeReference outer() {
         return null;
     }
 	
@@ -92,14 +92,14 @@ public abstract class JClass extends Type
      * Gets the super class of this class.
      * 
      * @return
-     *      Returns the JClass representing the superclass of the
-     *      entity (class or interface) represented by this {@link JClass}.
-     *      Even if no super class is given explicitly or this {@link JClass}
+     *      Returns the TypeReference representing the superclass of the
+     *      entity (class or interface) represented by this {@link TypeReference}.
+     *      Even if no super class is given explicitly or this {@link TypeReference}
      *      is not a class, this method still returns
-     *      {@link JClass} for {@link Object}.
-     *      If this JClass represents {@link Object}, return null.
+     *      {@link TypeReference} for {@link Object}.
+     *      If this TypeReference represents {@link Object}, return null.
      */
-    abstract public JClass _extends();
+    abstract public TypeReference _extends();
     
     /**
      * Iterates all super interfaces directly implemented by
@@ -107,16 +107,16 @@ public abstract class JClass extends Type
      * 
      * @return
      *		A non-null valid iterator that iterates all
-     *		{@link JClass} objects that represents those interfaces
+     *		{@link TypeReference} objects that represents those interfaces
      *		implemented by this object.
      */
-    abstract public Iterator<JClass> _implements();
+    abstract public Iterator<TypeReference> _implements();
     
     /**
      * Iterates all the type parameters of this class/interface.
      * 
      * <p>
-     * For example, if this {@link JClass} represents
+     * For example, if this {@link TypeReference} represents
      * <code>Set&lt;T></code>, this method returns an array
      * that contains single {@link TypeVariable} for 'T'.
      */
@@ -147,18 +147,18 @@ public abstract class JClass extends Type
     public PrimitiveType getPrimitiveType() { return null; }
 
     /**
-     * @deprecated calling this method from {@link JClass}
+     * @deprecated calling this method from {@link TypeReference}
      * would be meaningless, since it's always guaranteed to
      * return <tt>this</tt>.
      */
-    public JClass boxify() { return this; }
+    public TypeReference boxify() { return this; }
 
     public Type unboxify() {
         PrimitiveType pt = getPrimitiveType();
         return pt==null ? (Type)this : pt;
     }
 
-    public JClass erasure() {
+    public TypeReference erasure() {
         return this;
     }
 
@@ -168,7 +168,7 @@ public abstract class JClass extends Type
      * This method works in the same way as {@link Class#isAssignableFrom(Class)}
      * works. For example, baseClass.isAssignableFrom(derivedClass)==true.
      */
-    public final boolean isAssignableFrom( JClass derived ) {
+    public final boolean isAssignableFrom( TypeReference derived ) {
         // to avoid the confusion, always use "this" explicitly in this method.
         
         // null can be assigned to any type.
@@ -180,12 +180,12 @@ public abstract class JClass extends Type
         // java.lang.Object
         if( this==_package().owner().ref(Object.class) )  return true;
         
-        JClass b = derived._extends();
+        TypeReference b = derived._extends();
         if( b!=null && this.isAssignableFrom(b) )
             return true;
         
         if( this.isInterface() ) {
-            Iterator<JClass> itfs = derived._implements();
+            Iterator<TypeReference> itfs = derived._implements();
             while( itfs.hasNext() )
                 if( this.isAssignableFrom(itfs.next()) )
                     return true;
@@ -217,21 +217,21 @@ public abstract class JClass extends Type
      *      The use of {@code baseType} in {@code this} type.
      *      or null if the type is not assignable to the base type.
      */
-    public final JClass getBaseClass( JClass baseType ) {
+    public final TypeReference getBaseClass( TypeReference baseType ) {
 
         if( this.erasure().equals(baseType) )
             return this;
 
-        JClass b = _extends();
+        TypeReference b = _extends();
         if( b!=null ) {
-            JClass bc = b.getBaseClass(baseType);
+            TypeReference bc = b.getBaseClass(baseType);
             if(bc!=null)
                 return bc;
         }
 
-        Iterator<JClass> itfs = _implements();
+        Iterator<TypeReference> itfs = _implements();
         while( itfs.hasNext() ) {
-            JClass bc = itfs.next().getBaseClass(baseType);
+            TypeReference bc = itfs.next().getBaseClass(baseType);
             if(bc!=null)
                 return bc;
         }
@@ -239,15 +239,15 @@ public abstract class JClass extends Type
         return null;
     }
 
-    public final JClass getBaseClass( Class<?> baseType ) {
+    public final TypeReference getBaseClass( Class<?> baseType ) {
         return getBaseClass(owner().ref(baseType));
     }
 
 
-    private JClass arrayClass;
-    public JClass array() {
+    private TypeReference arrayClass;
+    public TypeReference array() {
         if(arrayClass==null)
-            arrayClass = new JArrayClass(owner(),this);
+            arrayClass = new ArrayClass(owner(),this);
         return arrayClass;
     }
 
@@ -258,12 +258,12 @@ public abstract class JClass extends Type
      * <p>
      * <code>.narrow(X)</code> builds <code>Set&lt;X></code> from <code>Set</code>.
      */
-    public JClass narrow( Class<?> clazz ) {
+    public TypeReference narrow( Class<?> clazz ) {
         return narrow(owner().ref(clazz));
     }
 
-    public JClass narrow( Class<?>... clazz ) {
-        JClass[] r = new JClass[clazz.length];
+    public TypeReference narrow( Class<?>... clazz ) {
+        TypeReference[] r = new TypeReference[clazz.length];
         for( int i=0; i<clazz.length; i++ )
             r[i] = owner().ref(clazz[i]);
         return narrow(r);
@@ -276,26 +276,26 @@ public abstract class JClass extends Type
      * <p>
      * <code>.narrow(X)</code> builds <code>Set&lt;X></code> from <code>Set</code>.
      */
-    public JClass narrow( JClass clazz ) {
+    public TypeReference narrow( TypeReference clazz ) {
         return new NarrowedClass(this,clazz);
     }
 
-    public JClass narrow( Type type ) {
+    public TypeReference narrow( Type type ) {
         return narrow(type.boxify());
     }
 
-    public JClass narrow( JClass... clazz ) {
+    public TypeReference narrow( TypeReference... clazz ) {
         return new NarrowedClass(this,Arrays.asList(clazz.clone()));
     }
 
-    public JClass narrow( List<? extends JClass> clazz ) {
-        return new NarrowedClass(this,new ArrayList<JClass>(clazz));
+    public TypeReference narrow( List<? extends TypeReference> clazz ) {
+        return new NarrowedClass(this,new ArrayList<TypeReference>(clazz));
     }
 
     /**
      * If this class is parameterized, return the type parameter of the given index.
      */
-    public List<JClass> getTypeParameters() {
+    public List<TypeReference> getTypeParameters() {
         return Collections.emptyList();
     }
 
@@ -311,7 +311,7 @@ public abstract class JClass extends Type
      *
      * @return never null
      */
-    public final JClass wildcard() {
+    public final TypeReference wildcard() {
         return new TypeWildcard(this);
     }
 
@@ -321,13 +321,13 @@ public abstract class JClass extends Type
      * <p>
      * For example, when this class is Map&lt;String,Map&lt;V>>,
      * (where V then doing
-     * substituteParams( V, Integer ) returns a {@link JClass}
+     * substituteParams( V, Integer ) returns a {@link TypeReference}
      * for <code>Map&lt;String,Map&lt;Integer>></code>.
      * 
      * <p>
      * This method needs to work recursively.
      */
-    protected abstract JClass substituteParams( TypeVariable[] variables, List<JClass> bindings );
+    protected abstract TypeReference substituteParams( TypeVariable[] variables, List<TypeReference> bindings );
     
     public String toString() {
         return this.getClass().getName() + '(' + name() + ')';
@@ -335,7 +335,7 @@ public abstract class JClass extends Type
 
 
     public final Expression dotclass() {
-        return JExpr.dotclass(this);
+        return ExpressionFactory.dotclass(this);
     }
 
     /** Generates a static method invocation. */

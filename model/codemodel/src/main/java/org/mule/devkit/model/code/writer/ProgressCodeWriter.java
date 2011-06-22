@@ -41,7 +41,7 @@
 package org.mule.devkit.model.code.writer;
 
 import org.mule.devkit.model.code.CodeWriter;
-import org.mule.devkit.model.code.JPackage;
+import org.mule.devkit.model.code.Package;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,17 +66,17 @@ public class ProgressCodeWriter extends FilterCodeWriter {
 
     private final PrintStream progress;
     
-    public OutputStream openBinary(JPackage pkg, String fileName) throws IOException {
+    public OutputStream openBinary(Package pkg, String fileName) throws IOException {
         report(pkg, fileName);
         return super.openBinary(pkg,fileName);
     }
 
-    public Writer openSource(JPackage pkg, String fileName) throws IOException {
+    public Writer openSource(Package pkg, String fileName) throws IOException {
         report(pkg, fileName);
         return super.openSource(pkg,fileName);
     }
     
-    private void report(JPackage pkg, String fileName) {
+    private void report(Package pkg, String fileName) {
         if(pkg.isUnnamed()) progress.println(fileName);
         else
             progress.println(

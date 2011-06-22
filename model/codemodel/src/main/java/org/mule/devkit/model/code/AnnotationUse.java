@@ -54,18 +54,18 @@ public final class AnnotationUse extends AnnotationValue {
     /**
      * The {@link java.lang.annotation.Annotation} class
      */
-    private final JClass clazz;
+    private final TypeReference clazz;
 
     /**
      * Map of member values.
      */
     private Map<String,AnnotationValue> memberValues;
 
-    AnnotationUse(JClass clazz){
+    AnnotationUse(TypeReference clazz){
         this.clazz = clazz;
     }
 
-    public JClass getAnnotationClass() {
+    public TypeReference getAnnotationClass() {
         return clazz;
     }
 
@@ -99,7 +99,7 @@ public final class AnnotationUse extends AnnotationValue {
      *
      */
     public AnnotationUse param(String name, boolean value){
-        addValue(name, new AnnotationStringValue(JExpr.lit(value)));
+        addValue(name, new AnnotationStringValue(ExpressionFactory.lit(value)));
         return this;
     }
 
@@ -116,7 +116,7 @@ public final class AnnotationUse extends AnnotationValue {
      *
      */
     public AnnotationUse param(String name, byte value){
-        addValue(name, new AnnotationStringValue(JExpr.lit(value)));
+        addValue(name, new AnnotationStringValue(ExpressionFactory.lit(value)));
         return this;
     }
 
@@ -133,7 +133,7 @@ public final class AnnotationUse extends AnnotationValue {
      *
      */
     public AnnotationUse param(String name, char value){
-        addValue(name, new AnnotationStringValue(JExpr.lit(value)));
+        addValue(name, new AnnotationStringValue(ExpressionFactory.lit(value)));
         return this;
     }
 
@@ -150,7 +150,7 @@ public final class AnnotationUse extends AnnotationValue {
      *
      */
     public AnnotationUse param(String name, double value){
-        addValue(name, new AnnotationStringValue(JExpr.lit(value)));
+        addValue(name, new AnnotationStringValue(ExpressionFactory.lit(value)));
         return this;
     }
 
@@ -167,7 +167,7 @@ public final class AnnotationUse extends AnnotationValue {
      *
      */
     public AnnotationUse param(String name, float value){
-        addValue(name, new AnnotationStringValue(JExpr.lit(value)));
+        addValue(name, new AnnotationStringValue(ExpressionFactory.lit(value)));
         return this;
     }
 
@@ -184,7 +184,7 @@ public final class AnnotationUse extends AnnotationValue {
      *
      */
     public AnnotationUse param(String name, long value){
-        addValue(name, new AnnotationStringValue(JExpr.lit(value)));
+        addValue(name, new AnnotationStringValue(ExpressionFactory.lit(value)));
         return this;
     }
 
@@ -201,7 +201,7 @@ public final class AnnotationUse extends AnnotationValue {
      *
      */
     public AnnotationUse param(String name, short value){
-        addValue(name, new AnnotationStringValue(JExpr.lit(value)));
+        addValue(name, new AnnotationStringValue(ExpressionFactory.lit(value)));
         return this;
     }
 
@@ -218,7 +218,7 @@ public final class AnnotationUse extends AnnotationValue {
      *
      */
     public AnnotationUse param(String name, int value){
-        addValue(name, new AnnotationStringValue(JExpr.lit(value)));
+        addValue(name, new AnnotationStringValue(ExpressionFactory.lit(value)));
         return this;
     }
 
@@ -237,7 +237,7 @@ public final class AnnotationUse extends AnnotationValue {
     public AnnotationUse param(String name, String value){
         //Escape string values with quotes so that they can
         //be generated accordingly
-        addValue(name, new AnnotationStringValue(JExpr.lit(value)));
+        addValue(name, new AnnotationStringValue(ExpressionFactory.lit(value)));
         return this;
     }
 
@@ -341,7 +341,7 @@ public final class AnnotationUse extends AnnotationValue {
      *         be added to it using the same or the overloaded methods.
      */
     public AnnotationUse param(String name, Type type){
-        JClass c = type.boxify();
+        TypeReference c = type.boxify();
         addValue(name, new AnnotationStringValue( c.dotclass() ));
         return this;
     }

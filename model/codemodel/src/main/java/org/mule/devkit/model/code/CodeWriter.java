@@ -72,7 +72,7 @@ public abstract class CodeWriter {
      *      File name without the path. Something like
      *      "Foo.java" or "Bar.properties"
      */
-    public abstract OutputStream openBinary( JPackage pkg, String fileName ) throws IOException;
+    public abstract OutputStream openBinary( Package pkg, String fileName ) throws IOException;
 
     /**
      * Called by CodeModel to store the specified file.
@@ -89,7 +89,7 @@ public abstract class CodeWriter {
      *      File name without the path. Something like
      *      "Foo.java" or "Bar.properties"
      */
-    public Writer openSource( JPackage pkg, String fileName ) throws IOException {
+    public Writer openSource( Package pkg, String fileName ) throws IOException {
         final OutputStreamWriter bw = new OutputStreamWriter(openBinary(pkg,fileName));
 
         // create writer

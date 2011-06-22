@@ -112,8 +112,6 @@ public class ModuleAnnotationProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         createContext();
 
-        note("AbstractAnnotationProcessor: annotations=" + annotations + ", roundEnv=" + env);
-
         for (TypeElement annotation : annotations) {
             Set<? extends Element> elements = env.getElementsAnnotatedWith(annotation);
             Set<TypeElement> typeElements = ElementFilter.typesIn(elements);

@@ -17,8 +17,8 @@
 
 package org.mule.devkit.model.code.writer;
 
-import org.mule.devkit.model.code.CodeWriter;
-import org.mule.devkit.model.code.JPackage;
+import org.mule.devkit.model.code.*;
+import org.mule.devkit.model.code.Package;
 
 import javax.annotation.processing.Filer;
 import javax.tools.JavaFileManager;
@@ -36,7 +36,7 @@ public final class FilerCodeWriter extends CodeWriter {
         this.filer = filer;
     }
 
-    public OutputStream openBinary(JPackage pkg, String fileName) throws IOException {
+    public OutputStream openBinary(Package pkg, String fileName) throws IOException {
         JavaFileManager.Location loc;
 
         if (pkg != null)
@@ -45,7 +45,7 @@ public final class FilerCodeWriter extends CodeWriter {
             return filer.createResource(SOURCE_OUTPUT, "", fileName).openOutputStream();
     }
 
-    public Writer openSource(JPackage pkg, String fileName) throws IOException {
+    public Writer openSource(org.mule.devkit.model.code.Package pkg, String fileName) throws IOException {
         String name;
         if (pkg.isUnnamed())
             name = fileName;

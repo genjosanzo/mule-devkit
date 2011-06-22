@@ -25,13 +25,13 @@ import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.CatchBlock;
+import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Invocation;
-import org.mule.devkit.model.code.JExpr;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
-import org.mule.devkit.model.code.JPackage;
+import org.mule.devkit.model.code.Package;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
 import org.mule.transformer.AbstractTransformer;
@@ -69,13 +69,13 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
                     DefinedClass jaxbTransformerClass = getJaxbTransformerClass(executableElement, variable);
 
                     // declare weight
-                    FieldVariable weighting = jaxbTransformerClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "weighting", Op.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), JExpr.lit(1)));
+                    FieldVariable weighting = jaxbTransformerClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "weighting", Op.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), ExpressionFactory.lit(1)));
 
                     // load JAXB context
                     Method loadJaxbContext = generateLoadJaxbContext(jaxbTransformerClass);
 
                     // declare JAXB context
-                    FieldVariable jaxbContext = jaxbTransformerClass.field(Modifier.PRIVATE | Modifier.STATIC, JAXBContext.class, "JAXB_CONTEXT", JExpr.invoke(loadJaxbContext).arg(ref(variable.asType()).boxify().dotclass()));
+                    FieldVariable jaxbContext = jaxbTransformerClass.field(Modifier.PRIVATE | Modifier.STATIC, JAXBContext.class, "JAXB_CONTEXT", ExpressionFactory.invoke(loadJaxbContext).arg(ref(variable.asType()).boxify().dotclass()));
 
                     //generate constructor
                     generateConstructor(jaxbTransformerClass, executableElement, variable);
@@ -97,7 +97,7 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
     private void generateSetPriorityWeighting(DefinedClass jaxbTransformerClass, FieldVariable weighting) {
         Method setPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setPriorityWeighting");
         Variable localWeighting = setPriorityWeighting.param(context.getCodeModel().INT, "weighting");
-        setPriorityWeighting.body().assign(JExpr._this().ref(weighting), localWeighting);
+        setPriorityWeighting.body().assign(ExpressionFactory._this().ref(weighting), localWeighting);
     }
 
     private void generateGetPriorityWeighting(DefinedClass jaxbTransformerClass, FieldVariable weighting) {
@@ -111,19 +111,19 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
         Variable src = doTransform.param(Object.class, "src");
         Variable encoding = doTransform.param(String.class, "encoding");
 
-        Variable result = doTransform.body().decl(ref(variable.asType()).boxify(), "result", JExpr._null());
+        Variable result = doTransform.body().decl(ref(variable.asType()).boxify(), "result", ExpressionFactory._null());
 
         TryStatement tryBlock = doTransform.body()._try();
         Variable unmarshaller = tryBlock.body().decl(ref(Unmarshaller.class), "unmarshaller");
         tryBlock.body().assign(unmarshaller, jaxbContext.invoke("createUnmarshaller"));
-        Variable inputStream = tryBlock.body().decl(ref(InputStream.class), "is", JExpr._new(ref(ByteArrayInputStream.class)).arg(
-                JExpr.invoke(JExpr.cast(ref(String.class), src), "getBytes").arg(encoding)
+        Variable inputStream = tryBlock.body().decl(ref(InputStream.class), "is", ExpressionFactory._new(ref(ByteArrayInputStream.class)).arg(
+                ExpressionFactory.invoke(ExpressionFactory.cast(ref(String.class), src), "getBytes").arg(encoding)
         ));
 
-        Variable streamSource = tryBlock.body().decl(ref(StreamSource.class), "ss", JExpr._new(ref(StreamSource.class)).arg(inputStream));
+        Variable streamSource = tryBlock.body().decl(ref(StreamSource.class), "ss", ExpressionFactory._new(ref(StreamSource.class)).arg(inputStream));
         Invocation unmarshal = unmarshaller.invoke("unmarshal");
         unmarshal.arg(streamSource);
-        unmarshal.arg(JExpr.dotclass(ref(variable.asType()).boxify()));
+        unmarshal.arg(ExpressionFactory.dotclass(ref(variable.asType()).boxify()));
 
         tryBlock.body().assign(result, unmarshal.invoke("getValue"));
 
@@ -143,11 +143,11 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
     private void generateThrowTransformFailedException(CatchBlock catchBlock, Variable exception, VariableElement variable) {
         Invocation transformFailedInvoke = ref(CoreMessages.class).staticInvoke("transformFailed");
         transformFailedInvoke.arg("String");
-        transformFailedInvoke.arg(JExpr.lit(ref(variable.asType()).boxify().fullName()));
+        transformFailedInvoke.arg(ExpressionFactory.lit(ref(variable.asType()).boxify().fullName()));
 
-        Invocation transformerException = JExpr._new(ref(TransformerException.class));
+        Invocation transformerException = ExpressionFactory._new(ref(TransformerException.class));
         transformerException.arg(transformFailedInvoke);
-        transformerException.arg(JExpr._this());
+        transformerException.arg(ExpressionFactory._this());
         transformerException.arg(exception);
         catchBlock.body()._throw(transformerException);
     }
@@ -161,7 +161,7 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
         tryBlock.body().assign(innerJaxbContext, ref(JAXBContext.class).staticInvoke("newInstance").arg(clazz));
         CatchBlock catchBlock = tryBlock._catch(ref(JAXBException.class));
         Variable e = catchBlock.param("e");
-        catchBlock.body()._throw(JExpr._new(ref(RuntimeException.class)).arg(e));
+        catchBlock.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(e));
 
         loadJaxbContext.body()._return(innerJaxbContext);
 
@@ -186,7 +186,7 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
 
     private void registerDestinationType(Method constructor, VariableElement variable) {
         Invocation setReturnClass = constructor.body().invoke("setReturnClass");
-        setReturnClass.arg(JExpr.dotclass(ref(variable.asType()).boxify()));
+        setReturnClass.arg(ExpressionFactory.dotclass(ref(variable.asType()).boxify()));
     }
 
     private void registerSourceType(Method constructor) {
@@ -199,7 +199,7 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
         XmlType xmlType = declaredType.asElement().getAnnotation(XmlType.class);
         TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
         String packageName = context.getNameUtils().getPackageName(context.getElementsUtils().getBinaryName(parentClass).toString());
-        JPackage pkg = context.getCodeModel()._package(packageName);
+        Package pkg = context.getCodeModel()._package(packageName);
         DefinedClass jaxbTransformer = pkg._class(StringUtils.capitalize(xmlType.name()) + "JaxbTransformer", AbstractTransformer.class, new Class<?>[] { DiscoverableTransformer.class });
 
         return jaxbTransformer;

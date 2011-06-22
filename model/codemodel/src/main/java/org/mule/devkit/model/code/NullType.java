@@ -53,7 +53,7 @@ import java.util.List;
  * @author
  * 	Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
-public final class NullType extends JClass {
+public final class NullType extends TypeReference {
 
     NullType(CodeModel _owner) {
         super(_owner);
@@ -62,18 +62,18 @@ public final class NullType extends JClass {
     public String name() { return "null"; }
     public String fullName() { return "null"; }
 
-    public JPackage _package() { return owner()._package(""); }
+    public Package _package() { return owner()._package(""); }
 
-    public JClass _extends() { return null; }
+    public TypeReference _extends() { return null; }
 
-    public Iterator<JClass> _implements() {
-        return Collections.<JClass>emptyList().iterator();
+    public Iterator<TypeReference> _implements() {
+        return Collections.<TypeReference>emptyList().iterator();
     }
 
     public boolean isInterface() { return false; }
     public boolean isAbstract() { return false; }
 
-    protected JClass substituteParams(TypeVariable[] variables, List<JClass> bindings) {
+    protected TypeReference substituteParams(TypeVariable[] variables, List<TypeReference> bindings) {
         return this;
     }
 }

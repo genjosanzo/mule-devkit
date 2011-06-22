@@ -61,7 +61,7 @@ public class TryStatement implements Statement {
         return body;
     }
 
-    public CatchBlock _catch(JClass exception) {
+    public CatchBlock _catch(TypeReference exception) {
         CatchBlock cb = new CatchBlock(exception);
         catches.add(cb);
         return cb;

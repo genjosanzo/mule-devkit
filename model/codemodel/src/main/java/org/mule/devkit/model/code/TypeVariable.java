@@ -50,11 +50,11 @@ import java.util.List;
  * @author
  *     Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
-public final class TypeVariable extends JClass implements Declaration {
+public final class TypeVariable extends TypeReference implements Declaration {
     
     private final String name;
     
-    private JClass bound;
+    private TypeReference bound;
 
     TypeVariable(CodeModel owner, String _name) {
         super(owner);
@@ -69,7 +69,7 @@ public final class TypeVariable extends JClass implements Declaration {
         return name;
     }
 
-    public JPackage _package() {
+    public Package _package() {
         return null;
     }
     
@@ -78,7 +78,7 @@ public final class TypeVariable extends JClass implements Declaration {
      * 
      * @return  this
      */
-    public TypeVariable bound( JClass c ) {
+    public TypeVariable bound( TypeReference c ) {
         if(bound!=null)
             throw new IllegalArgumentException("type variable has an existing class bound "+bound);
         bound = c;
@@ -91,7 +91,7 @@ public final class TypeVariable extends JClass implements Declaration {
      * <p>
      * If no bound is given, this method returns {@link Object}.
      */
-    public JClass _extends() {
+    public TypeReference _extends() {
         if(bound!=null)
             return bound;
         else
@@ -101,7 +101,7 @@ public final class TypeVariable extends JClass implements Declaration {
     /**
      * Returns the interface bounds of this variable.
      */
-    public Iterator<JClass> _implements() {
+    public Iterator<TypeReference> _implements() {
         return bound._implements();
     }
 
@@ -123,7 +123,7 @@ public final class TypeVariable extends JClass implements Declaration {
     }
 
 
-    protected JClass substituteParams(TypeVariable[] variables, List<JClass> bindings) {
+    protected TypeReference substituteParams(TypeVariable[] variables, List<TypeReference> bindings) {
         for(int i=0;i<variables.length;i++)
             if(variables[i]==this)
                 return bindings.get(i);

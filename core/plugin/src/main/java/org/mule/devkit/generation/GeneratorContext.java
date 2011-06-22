@@ -49,7 +49,7 @@ public class GeneratorContext {
         this.roles = new HashMap<String, DefinedClass>();
         this.elements = elements;
         this.types = types;
-        this.typeMirrorUtils = new TypeMirrorUtils();
+        this.typeMirrorUtils = new TypeMirrorUtils(this.types);
         this.nameUtils = new NameUtils(this.elements);
     }
 

@@ -55,7 +55,7 @@ public final class PrimitiveType extends Type {
      * Corresponding wrapper class.
      * For example, this would be "java.lang.Short" for short.
      */
-    private final JClass wrapperClass;
+    private final TypeReference wrapperClass;
     
     PrimitiveType(CodeModel owner, String typeName, Class<?> wrapper) {
         this.owner = owner;
@@ -77,10 +77,10 @@ public final class PrimitiveType extends Type {
         return true;
     }
 
-    private JClass arrayClass;
-    public JClass array() {
+    private TypeReference arrayClass;
+    public TypeReference array() {
         if(arrayClass==null)
-            arrayClass = new JArrayClass(owner,this);
+            arrayClass = new ArrayClass(owner,this);
         return arrayClass;
     }
     
@@ -89,7 +89,7 @@ public final class PrimitiveType extends Type {
      * For example, this method returns a reference to java.lang.Integer
      * if this object represents int.
      */
-    public JClass boxify() {
+    public TypeReference boxify() {
         return wrapperClass;
     }
 
@@ -106,7 +106,7 @@ public final class PrimitiveType extends Type {
      * @deprecated
      *      Use {@link #boxify()}.
      */
-    public JClass getWrapperClass() {
+    public TypeReference getWrapperClass() {
         return boxify();
     }
 
@@ -118,7 +118,7 @@ public final class PrimitiveType extends Type {
      * REVISIT: it's not clear how this method works for VOID.
      */
     public Expression wrap( Expression exp ) {
-        return JExpr._new(boxify()).arg(exp);
+        return ExpressionFactory._new(boxify()).arg(exp);
     }
     
     /**

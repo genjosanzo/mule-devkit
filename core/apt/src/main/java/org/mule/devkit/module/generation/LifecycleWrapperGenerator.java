@@ -28,16 +28,7 @@ import org.mule.devkit.annotations.lifecycle.Initialise;
 import org.mule.devkit.annotations.lifecycle.Start;
 import org.mule.devkit.annotations.lifecycle.Stop;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.model.code.DefinedClass;
-import org.mule.devkit.model.code.CatchBlock;
-import org.mule.devkit.model.code.Invocation;
-import org.mule.devkit.model.code.JClass;
-import org.mule.devkit.model.code.JExpr;
-import org.mule.devkit.model.code.Method;
-import org.mule.devkit.model.code.Modifier;
-import org.mule.devkit.model.code.JPackage;
-import org.mule.devkit.model.code.TryStatement;
-import org.mule.devkit.model.code.Variable;
+import org.mule.devkit.model.code.*;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -81,8 +72,8 @@ public class LifecycleWrapperGenerator extends AbstractModuleGenerator {
 
     private DefinedClass getLifecycleWrapperClass(Element typeElement) {
         String namespaceHandlerName = context.getNameUtils().generateClassName((TypeElement) typeElement, "LifecycleWrapper");
-        JPackage pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(namespaceHandlerName));
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(namespaceHandlerName), (JClass)ref(typeElement.asType()));
+        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(namespaceHandlerName));
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(namespaceHandlerName), (TypeReference)ref(typeElement.asType()));
 
         context.setClassRole(context.getNameUtils().generateClassName((TypeElement) typeElement, "Pojo"), clazz);
 
@@ -96,7 +87,7 @@ public class LifecycleWrapperGenerator extends AbstractModuleGenerator {
             startMethod._throws(ref(catchException));
         }
 
-        Invocation startInvocation = JExpr._super().invoke(superExecutableElement.getSimpleName().toString());
+        Invocation startInvocation = ExpressionFactory._super().invoke(superExecutableElement.getSimpleName().toString());
 
         if (catchException != null) {
             TryStatement tryBlock = startMethod.body()._try();
@@ -107,11 +98,11 @@ public class LifecycleWrapperGenerator extends AbstractModuleGenerator {
                 CatchBlock catchBlock = tryBlock._catch(ref(exception).boxify());
                 Variable catchedException = catchBlock.param("e" + i);
 
-                Invocation newMuleException = JExpr._new(ref(catchException));
+                Invocation newMuleException = ExpressionFactory._new(ref(catchException));
                 newMuleException.arg(catchedException);
 
                 if (addThis) {
-                    newMuleException.arg(JExpr._this());
+                    newMuleException.arg(ExpressionFactory._this());
                 }
 
                 catchBlock.body().add(newMuleException);

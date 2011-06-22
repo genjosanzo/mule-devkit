@@ -51,7 +51,7 @@ public class Label implements Statement {
     final String label;
     
     /**
-     * JBreak constructor
+     * BreakStatement constructor
      * 
      * @param   _label
      *      break label or null.

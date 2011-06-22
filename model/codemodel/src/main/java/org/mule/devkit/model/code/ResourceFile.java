@@ -74,7 +74,7 @@ public abstract class ResourceFile {
     }
 
     /**
-     * called by JPackage to produce the file image.
+     * called by Package to produce the file image.
      */
     protected abstract void build( OutputStream os ) throws IOException;
 }

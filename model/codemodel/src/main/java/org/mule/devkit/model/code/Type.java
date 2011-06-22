@@ -45,7 +45,7 @@ package org.mule.devkit.model.code;
  * A representation of a type in codeModel.
  *
  * A type is always either primitive ({@link PrimitiveType}) or
- * a reference type ({@link JClass}).
+ * a reference type ({@link TypeReference}).
  */
 public abstract class Type implements Generable, Comparable<Type> {
 
@@ -115,10 +115,10 @@ public abstract class Type implements Generable, Comparable<Type> {
      * This method is undefined for primitive void type, which
      * doesn't have any corresponding array representation.
      *
-     * @return A {@link JClass} representing the array type
+     * @return A {@link TypeReference} representing the array type
      *         whose element type is this type
      */
-    public abstract JClass array();
+    public abstract TypeReference array();
 
     /** Tell whether or not this is an array type. */
     public boolean isArray() {
@@ -136,7 +136,7 @@ public abstract class Type implements Generable, Comparable<Type> {
      * <p>
      * For example, for "int", this method returns "java.lang.Integer".
      */
-    public abstract JClass boxify();
+    public abstract TypeReference boxify();
 
     /**
      * If this class is a wrapper type for a primitive, return the primitive type.

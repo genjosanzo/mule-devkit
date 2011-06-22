@@ -42,7 +42,7 @@ package org.mule.devkit.model.code;
 
 
 /**
- * JClass for generating expressions containing operators
+ * TypeReference for generating expressions containing operators
  */
 
 abstract public class Op {
@@ -95,8 +95,8 @@ abstract public class Op {
      * Logical not <tt>'!x'</tt>.
      */
     public static Expression not(Expression e) {
-        if (e == JExpr.TRUE) return JExpr.FALSE;
-        if (e == JExpr.FALSE) return JExpr.TRUE;
+        if (e == ExpressionFactory.TRUE) return ExpressionFactory.FALSE;
+        if (e == ExpressionFactory.FALSE) return ExpressionFactory.TRUE;
         return new UnaryOp("!", e);
     }
 
@@ -189,18 +189,18 @@ abstract public class Op {
     }
 
     public static Expression cand(Expression left, Expression right) {
-        if (left == JExpr.TRUE) return right;
-        if (right == JExpr.TRUE) return left;
-        if (left == JExpr.FALSE) return left;    // JExpr.FALSE
-        if (right == JExpr.FALSE) return right;   // JExpr.FALSE
+        if (left == ExpressionFactory.TRUE) return right;
+        if (right == ExpressionFactory.TRUE) return left;
+        if (left == ExpressionFactory.FALSE) return left;    // ExpressionFactory.FALSE
+        if (right == ExpressionFactory.FALSE) return right;   // ExpressionFactory.FALSE
         return new BinaryOp("&&", left, right);
     }
 
     public static Expression cor(Expression left, Expression right) {
-        if (left == JExpr.TRUE) return left;    // JExpr.TRUE
-        if (right == JExpr.TRUE) return right;   // JExpr.FALSE
-        if (left == JExpr.FALSE) return right;
-        if (right == JExpr.FALSE) return left;
+        if (left == ExpressionFactory.TRUE) return left;    // ExpressionFactory.TRUE
+        if (right == ExpressionFactory.TRUE) return right;   // ExpressionFactory.FALSE
+        if (left == ExpressionFactory.FALSE) return right;
+        if (right == ExpressionFactory.FALSE) return left;
         return new BinaryOp("||", left, right);
     }
 

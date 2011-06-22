@@ -32,14 +32,7 @@ import org.mule.api.transport.Connector;
 import org.mule.devkit.annotations.Source;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.GeneratorContext;
-import org.mule.devkit.model.code.DefinedClass;
-import org.mule.devkit.model.code.FieldVariable;
-import org.mule.devkit.model.code.Invocation;
-import org.mule.devkit.model.code.JExpr;
-import org.mule.devkit.model.code.Method;
-import org.mule.devkit.model.code.Modifier;
-import org.mule.devkit.model.code.JPackage;
-import org.mule.devkit.model.code.Variable;
+import org.mule.devkit.model.code.*;
 import org.mule.transaction.MuleTransactionConfig;
 
 import javax.lang.model.element.Element;
@@ -71,100 +64,100 @@ public class DummyInboundEndpointGenerator extends AbstractModuleGenerator {
             // add constructor
             Method constructor = dummyInboundEndpoint.constructor(Modifier.PUBLIC);
             Variable muleContextParam = constructor.param(ref(MuleContext.class), "muleContext");
-            constructor.body().assign(JExpr._this().ref(muleContext), muleContextParam);
-            Invocation newTransactionConfig = JExpr._new(ref(MuleTransactionConfig.class));
-            constructor.body().assign(JExpr._this().ref(transactionConfig), newTransactionConfig);
+            constructor.body().assign(ExpressionFactory._this().ref(muleContext), muleContextParam);
+            Invocation newTransactionConfig = ExpressionFactory._new(ref(MuleTransactionConfig.class));
+            constructor.body().assign(ExpressionFactory._this().ref(transactionConfig), newTransactionConfig);
             constructor.body().add(newTransactionConfig.invoke("setAction").arg(ref(TransactionConfig.class).staticRef("ACTION_NONE")));
 
             Method getEndpointURI = dummyInboundEndpoint.method(Modifier.PUBLIC, EndpointURI.class, "getEndpointURI");
-            getEndpointURI.body()._return(JExpr._null());
+            getEndpointURI.body()._return(ExpressionFactory._null());
 
             Method getAddress = dummyInboundEndpoint.method(Modifier.PUBLIC, String.class, "getAddress");
-            getAddress.body()._return(JExpr._null());
+            getAddress.body()._return(ExpressionFactory._null());
 
             Method getEncoding = dummyInboundEndpoint.method(Modifier.PUBLIC, String.class, "getEncoding");
-            getEncoding.body()._return(JExpr._null());
+            getEncoding.body()._return(ExpressionFactory._null());
 
             Method getConnector = dummyInboundEndpoint.method(Modifier.PUBLIC, Connector.class, "getConnector");
-            getConnector.body()._return(JExpr._null());
+            getConnector.body()._return(ExpressionFactory._null());
 
             Method getName = dummyInboundEndpoint.method(Modifier.PUBLIC, String.class, "getName");
-            getName.body()._return(JExpr._null());
+            getName.body()._return(ExpressionFactory._null());
 
             Method getTransformers = dummyInboundEndpoint.method(Modifier.PUBLIC, List.class, Transformer.class, "getTransformers");
-            getTransformers.body()._return(JExpr._null());
+            getTransformers.body()._return(ExpressionFactory._null());
 
             Method getResponseTransformers = dummyInboundEndpoint.method(Modifier.PUBLIC, List.class, Transformer.class, "getResponseTransformers");
-            getResponseTransformers.body()._return(JExpr._null());
+            getResponseTransformers.body()._return(ExpressionFactory._null());
 
             Method getProperties = dummyInboundEndpoint.method(Modifier.PUBLIC, Map.class, "getProperties");
-            getProperties.body()._return(JExpr._null());
+            getProperties.body()._return(ExpressionFactory._null());
 
             Method getProperty = dummyInboundEndpoint.method(Modifier.PUBLIC, Object.class, "getProperty");
             getProperty.param(Object.class, "key");
-            getProperty.body()._return(JExpr._null());
+            getProperty.body()._return(ExpressionFactory._null());
 
             Method getProtocol = dummyInboundEndpoint.method(Modifier.PUBLIC, String.class, "getProtocol");
-            getProtocol.body()._return(JExpr._null());
+            getProtocol.body()._return(ExpressionFactory._null());
 
             Method isReadOnly = dummyInboundEndpoint.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "isReadOnly");
-            isReadOnly.body()._return(JExpr.lit(false));
+            isReadOnly.body()._return(ExpressionFactory.lit(false));
 
             Method getTransactionConfig = dummyInboundEndpoint.method(Modifier.PUBLIC, TransactionConfig.class, "getTransactionConfig");
             getTransactionConfig.body()._return(transactionConfig);
 
             Method getFilter = dummyInboundEndpoint.method(Modifier.PUBLIC, Filter.class, "getFilter");
-            getFilter.body()._return(JExpr._null());
+            getFilter.body()._return(ExpressionFactory._null());
 
             Method isDeleteUnacceptedMessages = dummyInboundEndpoint.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "isDeleteUnacceptedMessages");
-            isDeleteUnacceptedMessages.body()._return(JExpr.lit(false));
+            isDeleteUnacceptedMessages.body()._return(ExpressionFactory.lit(false));
 
             Method getSecurityFilter = dummyInboundEndpoint.method(Modifier.PUBLIC, EndpointSecurityFilter.class, "getSecurityFilter");
-            getSecurityFilter.body()._return(JExpr._null());
+            getSecurityFilter.body()._return(ExpressionFactory._null());
 
             Method getMessageProcessorsFactory = dummyInboundEndpoint.method(Modifier.PUBLIC, EndpointMessageProcessorChainFactory.class, "getMessageProcessorsFactory");
-            getMessageProcessorsFactory.body()._return(JExpr._null());
+            getMessageProcessorsFactory.body()._return(ExpressionFactory._null());
 
             Method getMessageProcessors = dummyInboundEndpoint.method(Modifier.PUBLIC, List.class, MessageProcessor.class, "getMessageProcessors");
-            getMessageProcessors.body()._return(JExpr._null());
+            getMessageProcessors.body()._return(ExpressionFactory._null());
 
             Method getResponseMessageProcessors = dummyInboundEndpoint.method(Modifier.PUBLIC, List.class, MessageProcessor.class, "getResponseMessageProcessors");
-            getResponseMessageProcessors.body()._return(JExpr._null());
+            getResponseMessageProcessors.body()._return(ExpressionFactory._null());
 
             Method getExchangePattern = dummyInboundEndpoint.method(Modifier.PUBLIC, MessageExchangePattern.class, "getExchangePattern");
             getExchangePattern.body()._return(ref(MessageExchangePattern.class).staticRef("ONE_WAY"));
 
             Method getResponseTimeout = dummyInboundEndpoint.method(Modifier.PUBLIC, context.getCodeModel().INT, "getResponseTimeout");
-            getResponseTimeout.body()._return(JExpr.lit(0));
+            getResponseTimeout.body()._return(ExpressionFactory.lit(0));
 
             Method getInitialState = dummyInboundEndpoint.method(Modifier.PUBLIC, String.class, "getInitialState");
-            getInitialState.body()._return(JExpr._null());
+            getInitialState.body()._return(ExpressionFactory._null());
 
             Method getMuleContext = dummyInboundEndpoint.method(Modifier.PUBLIC, MuleContext.class, "getMuleContext");
             getMuleContext.body()._return(muleContext);
 
             Method getRetryPolicyTemplate = dummyInboundEndpoint.method(Modifier.PUBLIC, RetryPolicyTemplate.class, "getRetryPolicyTemplate");
-            getRetryPolicyTemplate.body()._return(JExpr._null());
+            getRetryPolicyTemplate.body()._return(ExpressionFactory._null());
 
             Method getEndpointBuilderName = dummyInboundEndpoint.method(Modifier.PUBLIC, String.class, "getEndpointBuilderName");
-            getEndpointBuilderName.body()._return(JExpr._null());
+            getEndpointBuilderName.body()._return(ExpressionFactory._null());
 
             Method isProtocolSupported = dummyInboundEndpoint.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "isProtocolSupported");
             isProtocolSupported.param(String.class, "protocol");
-            isProtocolSupported.body()._return(JExpr.lit(false));
+            isProtocolSupported.body()._return(ExpressionFactory.lit(false));
 
             Method getMimeType = dummyInboundEndpoint.method(Modifier.PUBLIC, String.class, "getMimeType");
-            getMimeType.body()._return(JExpr._null());
+            getMimeType.body()._return(ExpressionFactory._null());
 
             Method isDisableTransportTransformer = dummyInboundEndpoint.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "isDisableTransportTransformer");
-            isDisableTransportTransformer.body()._return(JExpr.lit(false));
+            isDisableTransportTransformer.body()._return(ExpressionFactory.lit(false));
         }
     }
 
     private DefinedClass getDummyInboundEndpointClass(ExecutableElement executableElement, GeneratorContext context) {
         TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
         String packageName = context.getNameUtils().getPackageName(context.getElementsUtils().getBinaryName(parentClass).toString());
-        JPackage pkg = context.getCodeModel()._package(packageName);
+        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(packageName);
         DefinedClass dummyInboundEndpoint = pkg._class("DummyInboundEndpoint");
         dummyInboundEndpoint._implements(ImmutableEndpoint.class);
 

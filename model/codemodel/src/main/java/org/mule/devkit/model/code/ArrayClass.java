@@ -40,49 +40,99 @@
 
 package org.mule.devkit.model.code;
 
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
- * While statement
+ * Array class.
+ * 
+ * @author
+ * 	Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
-
-public class JWhileLoop implements Statement {
-
-    /**
-     * Test part of While statement for determining exit state
-     */
-    private Expression test;
-
-    /**
-     * Block of statements which makes up body of this While statement
-     */
-    private Block body = null;
-
-    /**
-     * Construct a While statment
-     */
-    JWhileLoop(Expression test) {
-        this.test = test;
+final class ArrayClass extends TypeReference {
+    
+    // array component type
+    private final Type componentType;
+    
+    
+    ArrayClass(CodeModel owner, Type component) {
+        super(owner);
+        this.componentType = component;
+    }
+    
+    
+    public String name() {
+        return componentType.name()+"[]";
+    }
+    
+    public String fullName() {
+        return componentType.fullName()+"[]";
     }
 
-    public Expression test() {
-        return test;
+    public String binaryName() {
+        return componentType.binaryName()+"[]";
     }
 
-    public Block body() {
-        if (body == null) body = new Block();
-        return body;
+    public void generate(Formatter f) {
+        f.g(componentType).p("[]");
     }
 
-    public void state(Formatter f) {
-        if (Op.hasTopOp(test)) {
-            f.p("while ").g(test);
-        } else {
-            f.p("while (").g(test).p(')');
-        }
-        if (body != null)
-            f.s(body);
-        else
-            f.p(';').nl();
+    public Package _package() {
+        return owner().rootPackage();
+    }
+
+    public TypeReference _extends() {
+        return owner().ref(Object.class);
+    }
+
+    public Iterator<TypeReference> _implements() {
+        return Collections.<TypeReference>emptyList().iterator();
+    }
+
+    public boolean isInterface() {
+        return false;
+    }
+
+    public boolean isAbstract() {
+        return false;
+    }
+
+    public Type elementType() {
+        return componentType;
+    }
+
+    public boolean isArray() {
+        return true;
+    }
+
+
+    //
+    // Equality is based on value
+    //
+
+    public boolean equals(Object obj) {
+        if(!(obj instanceof ArrayClass))   return false;
+        
+        if( componentType.equals( ((ArrayClass)obj).componentType ) )
+            return true;
+        
+        return false;
+    }
+
+    public int hashCode() {
+        return componentType.hashCode();
+    }
+
+    protected TypeReference substituteParams(TypeVariable[] variables, List<TypeReference> bindings) {
+        if( componentType.isPrimitive() )
+            return this;
+        
+        TypeReference c = ((TypeReference)componentType).substituteParams(variables,bindings);
+        if(c==componentType)
+            return this;
+        
+        return new ArrayClass(owner(),c);
     }
 
 }

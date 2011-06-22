@@ -99,8 +99,8 @@ public class CommentPart extends ArrayList<Object> {
             // quickly pass the types to Formatter, as that's all we care.
             // we don't need to worry about the exact formatting of text.
             for( Object o : this )
-                if(o instanceof JClass)
-                    f.g((JClass)o);
+                if(o instanceof TypeReference)
+                    f.g((TypeReference)o);
             return;
         }
 
@@ -124,9 +124,9 @@ public class CommentPart extends ArrayList<Object> {
                 if(s.length()!=0)
                     f.p(escape(s));
             } else
-            if(o instanceof JClass) {
+            if(o instanceof TypeReference) {
                 // TODO: this doesn't print the parameterized type properly
-                ((JClass)o).printLink(f);
+                ((TypeReference)o).printLink(f);
             } else
             if(o instanceof Type) {
                 f.g((Type)o);

@@ -41,7 +41,7 @@
 package org.mule.devkit.model.code.writer;
 
 import org.mule.devkit.model.code.CodeWriter;
-import org.mule.devkit.model.code.JPackage;
+import org.mule.devkit.model.code.Package;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -79,11 +79,11 @@ public class FileCodeWriter extends CodeWriter {
     }
     
     
-    public OutputStream openBinary(JPackage pkg, String fileName) throws IOException {
+    public OutputStream openBinary(Package pkg, String fileName) throws IOException {
         return new FileOutputStream(getFile(pkg,fileName));
     }
     
-    protected File getFile(JPackage pkg, String fileName ) throws IOException {
+    protected File getFile(Package pkg, String fileName ) throws IOException {
         File dir;
         if(pkg.isUnnamed())
             dir = target;
@@ -111,7 +111,7 @@ public class FileCodeWriter extends CodeWriter {
     }
     
     /** Converts a package name to the directory name. */
-    private static String toDirName( JPackage pkg ) {
+    private static String toDirName( Package pkg ) {
         return pkg.name().replace('.',File.separatorChar);
     }
 

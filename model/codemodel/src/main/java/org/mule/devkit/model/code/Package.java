@@ -63,7 +63,7 @@ import java.util.TreeMap;
 /**
  * A Java package.
  */
-public final class JPackage implements Declaration, Generable, ClassContainer, Annotable, Comparable<JPackage>, DocCommentable {
+public final class Package implements Declaration, Generable, ClassContainer, Annotable, Comparable<Package>, DocCommentable {
 
     /**
      * Name of the package.
@@ -84,7 +84,7 @@ public final class JPackage implements Declaration, Generable, ClassContainer, A
     private final Set<ResourceFile> resources = new HashSet<ResourceFile>();
 
     /**
-     * All {@link JClass}s in this package keyed the upper case class name.
+     * All {@link TypeReference}s in this package keyed the upper case class name.
      * <p/>
      * This field is non-null only on Windows, to detect
      * "Foo" and "foo" as a collision.
@@ -102,13 +102,13 @@ public final class JPackage implements Declaration, Generable, ClassContainer, A
     private DocComment jdoc = null;
 
     /**
-     * JPackage constructor
+     * Package constructor
      *
      * @param name Name of package
      * @param cw   The code writer being used to create this package
      * @throws IllegalArgumentException If each part of the package name is not a valid identifier
      */
-    JPackage(String name, CodeModel cw) {
+    Package(String name, CodeModel cw) {
         this.owner = cw;
         if (name.equals(".")) {
             String msg = "Package name . is not allowed";
@@ -131,7 +131,7 @@ public final class JPackage implements Declaration, Generable, ClassContainer, A
     /**
      * Gets the parent package, or null if this class is the root package.
      */
-    public JPackage parent() {
+    public Package parent() {
         if (name.length() == 0) return null;
 
         int idx = name.lastIndexOf('.');
@@ -146,7 +146,7 @@ public final class JPackage implements Declaration, Generable, ClassContainer, A
         return true;
     }
 
-    public JPackage getPackage() {
+    public Package getPackage() {
         return this;
     }
 
@@ -203,7 +203,7 @@ public final class JPackage implements Declaration, Generable, ClassContainer, A
     /**
      * Adds a public class to this package.
      */
-    public DefinedClass _class(String name, JClass _extends) {
+    public DefinedClass _class(String name, TypeReference _extends) {
         try {
             DefinedClass clazz = _class(Modifier.PUBLIC, name);
             clazz._extends(_extends);
@@ -280,7 +280,7 @@ public final class JPackage implements Declaration, Generable, ClassContainer, A
     /**
      * Order is based on the lexicological order of the package name.
      */
-    public int compareTo(JPackage that) {
+    public int compareTo(Package that) {
         return this.name.compareTo(that.name);
     }
 
@@ -364,7 +364,7 @@ public final class JPackage implements Declaration, Generable, ClassContainer, A
     /**
      * Removes a class from this package.
      */
-    public void remove(JClass c) {
+    public void remove(TypeReference c) {
         if (c._package() != this)
             throw new IllegalArgumentException(
                     "the specified class is not a member of this package," + " or it is a referenced class");
@@ -379,9 +379,9 @@ public final class JPackage implements Declaration, Generable, ClassContainer, A
     /**
      * Reference a class within this package.
      */
-    public JClass ref(String name) throws ClassNotFoundException {
+    public TypeReference ref(String name) throws ClassNotFoundException {
         if (name.indexOf('.') >= 0)
-            throw new IllegalArgumentException("JClass name contains '.': " + name);
+            throw new IllegalArgumentException("TypeReference name contains '.': " + name);
 
         String n = "";
         if (!isUnnamed())
@@ -394,7 +394,7 @@ public final class JPackage implements Declaration, Generable, ClassContainer, A
     /**
      * Gets a reference to a sub package of this package.
      */
-    public JPackage subPackage(String pkg) {
+    public Package subPackage(String pkg) {
         if (isUnnamed()) return owner()._package(pkg);
         else return owner()._package(name + '.' + pkg);
     }
@@ -446,7 +446,7 @@ public final class JPackage implements Declaration, Generable, ClassContainer, A
     }
 
 
-    public AnnotationUse annotate(JClass clazz) {
+    public AnnotationUse annotate(TypeReference clazz) {
         if (isUnnamed())
             throw new IllegalArgumentException("the root package cannot be annotated");
         if (annotations == null)

@@ -45,12 +45,12 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A special {@link JClass} that represents an unknown class (except its name.)
+ * A special {@link TypeReference} that represents an unknown class (except its name.)
  *
  * @author Kohsuke Kawaguchi
  * @see CodeModel#directClass(String)
  */
-final class DirectClass extends JClass {
+final class DirectClass extends TypeReference {
 
     private final String fullName;
 
@@ -69,18 +69,18 @@ final class DirectClass extends JClass {
         return fullName;
     }
 
-    public JPackage _package() {
+    public Package _package() {
         int i = fullName.lastIndexOf('.');
         if(i>=0)    return owner()._package(fullName.substring(0,i));
         else        return owner().rootPackage();
     }
 
-    public JClass _extends() {
+    public TypeReference _extends() {
         return owner().ref(Object.class);
     }
 
-    public Iterator<JClass> _implements() {
-        return Collections.<JClass>emptyList().iterator();
+    public Iterator<TypeReference> _implements() {
+        return Collections.<TypeReference>emptyList().iterator();
     }
 
     public boolean isInterface() {
@@ -91,7 +91,7 @@ final class DirectClass extends JClass {
         return false;
     }
 
-    protected JClass substituteParams(TypeVariable[] variables, List<JClass> bindings) {
+    protected TypeReference substituteParams(TypeVariable[] variables, List<TypeReference> bindings) {
         return this;
     }
 }

@@ -65,7 +65,7 @@ public class SerializedObject extends ResourceFile {
     }
     
     /**
-     * called by JPackage to serialize the object 
+     * called by Package to serialize the object
      */
     protected void build( OutputStream os ) throws IOException {
         // serialize the obj into a ByteArrayOutputStream

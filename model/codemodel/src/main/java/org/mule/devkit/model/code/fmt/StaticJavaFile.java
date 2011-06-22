@@ -40,10 +40,8 @@
 
 package org.mule.devkit.model.code.fmt;
 
-import org.mule.devkit.model.code.JClass;
-import org.mule.devkit.model.code.JPackage;
-import org.mule.devkit.model.code.ResourceFile;
-import org.mule.devkit.model.code.TypeVariable;
+import org.mule.devkit.model.code.*;
+import org.mule.devkit.model.code.Package;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -69,12 +67,12 @@ import java.util.List;
  * replace it with the target package name. This allows the static Java
  * source code to have an arbitrary package declaration.
  * <p>
- * You can also use the getJClass method to obtain a {@link JClass}
+ * You can also use the getJClass method to obtain a {@link org.mule.devkit.model.code.TypeReference}
  * object that represents the static file. This allows the client code
  * to refer to the class from other CodeModel generated code.
  * <p>
  * Note that because we don't parse the static Java source code,
- * the returned {@link JClass} object doesn't respond to methods like
+ * the returned {@link org.mule.devkit.model.code.TypeReference} object doesn't respond to methods like
  * "isInterface" or "_extends",  
  * 
  * @author
@@ -82,18 +80,18 @@ import java.util.List;
  */
 public final class StaticJavaFile extends ResourceFile {
     
-    private final JPackage pkg;
+    private final org.mule.devkit.model.code.Package pkg;
     private final String className;
     private final URL source;
     private final JStaticClass clazz;
     private final LineFilter filter;
     
-    public StaticJavaFile(JPackage _pkg, String className, String _resourceName) {
+    public StaticJavaFile(Package _pkg, String className, String _resourceName) {
         this( _pkg, className,
             StaticJavaFile.class.getClassLoader().getResource(_resourceName), null );
     }
     
-    public StaticJavaFile(JPackage _pkg, String _className, URL _source, LineFilter _filter) {
+    public StaticJavaFile(Package _pkg, String _className, URL _source, LineFilter _filter) {
         super(_className+".java");
         if(_source==null)   throw new NullPointerException();
         this.pkg = _pkg;
@@ -106,7 +104,7 @@ public final class StaticJavaFile extends ResourceFile {
     /**
      * Returns a class object that represents a statically generated code. 
      */
-    public final JClass getJClass() {
+    public final TypeReference getJClass() {
         return clazz;
     }
 
@@ -202,7 +200,7 @@ public final class StaticJavaFile extends ResourceFile {
     }
     
     
-    private class JStaticClass extends JClass {
+    private class JStaticClass extends TypeReference {
 
         private final TypeVariable[] typeParams;
         
@@ -223,15 +221,15 @@ public final class StaticJavaFile extends ResourceFile {
                 return pkg.name()+'.'+className;
         }
 
-        public JPackage _package() {
+        public Package _package() {
             return pkg;
         }
 
-        public JClass _extends() {
+        public TypeReference _extends() {
             throw new UnsupportedOperationException();
         }
 
-        public Iterator<JClass> _implements() {
+        public Iterator<TypeReference> _implements() {
             throw new UnsupportedOperationException();
         }
 
@@ -247,7 +245,7 @@ public final class StaticJavaFile extends ResourceFile {
             return typeParams;
         }
 
-        protected JClass substituteParams(TypeVariable[] variables, List<JClass> bindings) {
+        protected TypeReference substituteParams(TypeVariable[] variables, List<TypeReference> bindings) {
             return this;
         }
     };

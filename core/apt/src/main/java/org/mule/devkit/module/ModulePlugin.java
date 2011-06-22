@@ -22,6 +22,7 @@ import org.mule.devkit.generation.Generator;
 import org.mule.devkit.module.generation.AnyXmlChildDefinitionParserGenerator;
 import org.mule.devkit.module.generation.BeanDefinitionParserGenerator;
 import org.mule.devkit.module.generation.DummyInboundEndpointGenerator;
+import org.mule.devkit.module.generation.EnumTransformerGenerator;
 import org.mule.devkit.module.generation.JaxbTransformerGenerator;
 import org.mule.devkit.module.generation.LifecycleWrapperGenerator;
 import org.mule.devkit.module.generation.MessageProcessorGenerator;
@@ -44,19 +45,20 @@ public class ModulePlugin implements Plugin {
 
     public ModulePlugin() {
         this.generators = new ArrayList<Generator>();
-        this.generators.add(new LifecycleWrapperGenerator());
+        this.generators.add(new AnyXmlChildDefinitionParserGenerator());
         this.generators.add(new DummyInboundEndpointGenerator());
+        this.generators.add(new LifecycleWrapperGenerator());
+        this.generators.add(new SchemaGenerator());
         this.generators.add(new JaxbTransformerGenerator());
         this.generators.add(new TransformerGenerator());
-        this.generators.add(new RegistryBootstrapGenerator());
-        this.generators.add(new SchemaGenerator());
-        this.generators.add(new SpringSchemaGenerator());
-        this.generators.add(new MessageSourceGenerator());
-        this.generators.add(new NamespaceHandlerGenerator());
+        this.generators.add(new EnumTransformerGenerator());
         this.generators.add(new BeanDefinitionParserGenerator());
-        this.generators.add(new AnyXmlChildDefinitionParserGenerator());
+        this.generators.add(new MessageSourceGenerator());
         this.generators.add(new MessageProcessorGenerator());
+        this.generators.add(new NamespaceHandlerGenerator());
         this.generators.add(new SpringNamespaceHandlerGenerator());
+        this.generators.add(new SpringSchemaGenerator());
+        this.generators.add(new RegistryBootstrapGenerator());
         //return generators;
 
         this.validators = new ArrayList<Validator>();

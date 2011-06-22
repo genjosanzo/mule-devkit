@@ -248,7 +248,7 @@ public final class Block implements Generable, Statement {
     /**
      * Creates a static invocation statement.
      */
-    public Invocation staticInvoke(JClass type, String method) {
+    public Invocation staticInvoke(TypeReference type, String method) {
         return insert(new Invocation(type, method));
     }
 
@@ -315,8 +315,8 @@ public final class Block implements Generable, Statement {
      *
      * @return Newly generated While statement
      */
-    public JWhileLoop _while(Expression test) {
-        return insert(new JWhileLoop(test));
+    public WhileLoop _while(Expression test) {
+        return insert(new WhileLoop(test));
     }
 
     /**
@@ -373,7 +373,7 @@ public final class Block implements Generable, Statement {
     }
 
     public void _break(Label label) {
-        insert(new JBreak(label));
+        insert(new BreakStatement(label));
     }
 
     /**
@@ -390,7 +390,7 @@ public final class Block implements Generable, Statement {
      * Create a continue statement and add it to this block
      */
     public void _continue(Label label) {
-        insert(new JContinue(label));
+        insert(new ContinueStatement(label));
     }
 
     public void _continue() {

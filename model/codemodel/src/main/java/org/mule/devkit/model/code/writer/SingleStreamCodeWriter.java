@@ -40,8 +40,7 @@
 
 package org.mule.devkit.model.code.writer;
 
-import org.mule.devkit.model.code.CodeWriter;
-import org.mule.devkit.model.code.JPackage;
+import org.mule.devkit.model.code.*;
 
 import java.io.FilterOutputStream;
 import java.io.IOException;
@@ -70,7 +69,7 @@ public class SingleStreamCodeWriter extends CodeWriter {
         out = new PrintStream(os);
     }
 
-    public OutputStream openBinary(JPackage pkg, String fileName) throws IOException {
+    public OutputStream openBinary(org.mule.devkit.model.code.Package pkg, String fileName) throws IOException {
         String pkgName = pkg.name();
         if(pkgName.length()!=0)     pkgName += '.';
         

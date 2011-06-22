@@ -64,7 +64,7 @@ public class DocComment extends CommentPart implements Generable {
     private final Map<String,Map<String,String>> atXdoclets = new HashMap<String,Map<String,String>>();
     
     /** list of @throws tags */
-    private final Map<JClass,CommentPart> atThrows = new HashMap<JClass,CommentPart>();
+    private final Map<TypeReference,CommentPart> atThrows = new HashMap<TypeReference,CommentPart>();
     
     /**
      * The @return tag part.
@@ -114,7 +114,7 @@ public class DocComment extends CommentPart implements Generable {
     /**
      * add an @throws tag to the javadoc
      */
-    public CommentPart addThrows( JClass exception ) {
+    public CommentPart addThrows( TypeReference exception ) {
         CommentPart p = atThrows.get(exception);
         if(p==null)
             atThrows.put(exception,p=new CommentPart());
@@ -188,7 +188,7 @@ public class DocComment extends CommentPart implements Generable {
             f.p(" * @return").nl();
             atReturn.format(f,INDENT);
         }
-        for (Map.Entry<JClass,CommentPart> e : atThrows.entrySet()) {
+        for (Map.Entry<TypeReference,CommentPart> e : atThrows.entrySet()) {
             f.p(" * @throws ").t(e.getKey()).nl();
             e.getValue().format(f,INDENT);
         }

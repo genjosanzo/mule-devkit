@@ -79,7 +79,7 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
 	 * Set of exceptions that this method may throw.
      * A set instance lazily created.
 	 */
-	private Set<JClass> _throws;
+	private Set<TypeReference> _throws;
 
 	/**
 	 * Block of statements that makes up the body this method
@@ -141,7 +141,7 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
 	 *        Modifiers for this constructor's declaration
 	 *
 	 * @param _class
-	 *        JClass containing this constructor
+	 *        TypeReference containing this constructor
 	 */
 	Method(int mods, DefinedClass _class) {
 		this.mods = Modifiers.forMethod(mods);
@@ -150,9 +150,9 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
 		this.outer = _class;
 	}
     
-    private Set<JClass> getThrows() {
+    private Set<TypeReference> getThrows() {
         if(_throws==null)
-            _throws = new TreeSet<JClass>(ClassNameComparator.theInstance);
+            _throws = new TreeSet<TypeReference>(ClassNameComparator.theInstance);
         return _throws;
     }
 
@@ -163,7 +163,7 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
 	 * @param exception
 	 *        Name of an exception that this method may throw
 	 */
-	public Method _throws(JClass exception) {
+	public Method _throws(TypeReference exception) {
         getThrows().add(exception);
 		return this;
 	}
@@ -260,7 +260,7 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
      * @param clazz
      *          The annotation class to annotate the field with
      */
-    public AnnotationUse annotate(JClass clazz){
+    public AnnotationUse annotate(TypeReference clazz){
         if(annotations==null)
            annotations = new ArrayList<AnnotationUse>();
         AnnotationUse a = new AnnotationUse(clazz);

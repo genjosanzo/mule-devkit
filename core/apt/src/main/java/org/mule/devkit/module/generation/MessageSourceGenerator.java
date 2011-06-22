@@ -32,11 +32,11 @@ import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.CatchBlock;
+import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Invocation;
-import org.mule.devkit.model.code.JClass;
+import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Conditional;
-import org.mule.devkit.model.code.JExpr;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
@@ -123,12 +123,14 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         List<Expression> parameters = new ArrayList<Expression>();
         for (VariableElement variable : executableElement.getParameters()) {
             if (variable.asType().toString().contains(SourceCallback.class.getName())) {
-                parameters.add(JExpr._this());
+                parameters.add(ExpressionFactory._this());
             } else {
                 String fieldName = variable.getSimpleName().toString();
-                if (SchemaTypeConversion.isSupported(fields.get(fieldName).getVariableElement().asType().toString()) || context.getTypeMirrorUtils().isXmlType(fields.get(fieldName).getVariableElement().asType())) {
-                    Variable transformed = callSource.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName), JExpr._null());
-                    Conditional notNull = callSource.body()._if(Op.ne(fields.get(fieldName).getField(), JExpr._null()));
+                if (SchemaTypeConversion.isSupported(fields.get(fieldName).getVariableElement().asType().toString()) ||
+                        context.getTypeMirrorUtils().isXmlType(fields.get(fieldName).getVariableElement().asType()) ||
+                        context.getTypeMirrorUtils().isEnum(fields.get(fieldName).getVariableElement().asType())) {
+                    Variable transformed = callSource.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName), ExpressionFactory._null());
+                    Conditional notNull = callSource.body()._if(Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()));
                     generateTransform(notNull._then(), transformed, fields.get(fieldName).getField(), fields.get(fieldName).getVariableElement().asType(), muleContext);
                     parameters.add(transformed);
                 } else {
@@ -144,16 +146,16 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
         callSource.body().add(methodCall);
 
-        CatchBlock swallowCatch = callSource._catch((JClass) ref(Exception.class));
+        CatchBlock swallowCatch = callSource._catch((TypeReference) ref(Exception.class));
     }
 
 
     private void generateStartMethod(DefinedClass messageSourceClass, FieldVariable thread) {
         Method start = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
         start._throws(ref(MuleException.class));
-        Conditional ifNoThread = start.body()._if(Op.eq(thread, JExpr._null()));
-        Invocation newThread = JExpr._new(ref(Thread.class));
-        newThread.arg(JExpr._this());
+        Conditional ifNoThread = start.body()._if(Op.eq(thread, ExpressionFactory._null()));
+        Invocation newThread = ExpressionFactory._new(ref(Thread.class));
+        newThread.arg(ExpressionFactory._this());
         newThread.arg("Receiving Thread");
         ifNoThread._then().assign(thread, newThread);
 
@@ -175,24 +177,24 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         DefinedClass dummyInboundEndpointClass = context.getClassForRole(DummyInboundEndpointGenerator.DUMMY_INBOUND_ENDPOINT_ROLE);
 
         Variable dummyImmutableEndpoint = process.body().decl(dummyInboundEndpointClass, "dummyImmutableEndpoint");
-        Invocation newDummyImmutableEndpoint = JExpr._new(dummyInboundEndpointClass);
+        Invocation newDummyImmutableEndpoint = ExpressionFactory._new(dummyInboundEndpointClass);
         newDummyImmutableEndpoint.arg(muleContext);
         process.body().assign(dummyImmutableEndpoint, newDummyImmutableEndpoint);
 
         Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage");
-        Invocation newMuleMessage = JExpr._new(ref(DefaultMuleMessage.class));
+        Invocation newMuleMessage = ExpressionFactory._new(ref(DefaultMuleMessage.class));
         newMuleMessage.arg(message);
         newMuleMessage.arg(muleContext);
         process.body().assign(muleMessage, newMuleMessage);
 
         Variable muleSession = process.body().decl(ref(MuleSession.class), "muleSession");
-        Invocation newMuleSession = JExpr._new(ref(DefaultMuleSession.class));
+        Invocation newMuleSession = ExpressionFactory._new(ref(DefaultMuleSession.class));
         newMuleSession.arg(flowConstruct);
         newMuleSession.arg(muleContext);
         process.body().assign(muleSession, newMuleSession);
 
         Variable muleEvent = process.body().decl(ref(MuleEvent.class), "muleEvent");
-        Invocation newMuleEvent = JExpr._new(ref(DefaultMuleEvent.class));
+        Invocation newMuleEvent = ExpressionFactory._new(ref(DefaultMuleEvent.class));
         newMuleEvent.arg(muleMessage);
         newMuleEvent.arg(dummyImmutableEndpoint);
         newMuleEvent.arg(muleSession);
@@ -204,19 +206,19 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         messageProcess.arg(muleEvent);
         tryBlock.body().assign(responseEvent, messageProcess);
         Conditional ifResponse = tryBlock.body()._if(
-                Op.cand(Op.ne(responseEvent, JExpr._null()),
-                        Op.ne(responseEvent.invoke("getMessage"), JExpr._null()))
+                Op.cand(Op.ne(responseEvent, ExpressionFactory._null()),
+                        Op.ne(responseEvent.invoke("getMessage"), ExpressionFactory._null()))
         );
         ifResponse._then()._return(responseEvent.invoke("getMessage").invoke("getPayload"));
 
         CatchBlock muleExceptionBlock = tryBlock._catch(ref(MuleException.class));
-        process.body()._return(JExpr._null());
+        process.body()._return(ExpressionFactory._null());
     }
 
     private Method generateSetListenerMethod(DefinedClass messageSourceClass, FieldVariable messageProcessor) {
         Method setListener = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setListener");
         Variable listener = setListener.param(ref(MessageProcessor.class), "listener");
-        setListener.body().assign(JExpr._this().ref(messageProcessor), listener);
+        setListener.body().assign(ExpressionFactory._this().ref(messageProcessor), listener);
 
         return setListener;
     }
@@ -224,7 +226,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
     private Method generateSetFlowConstructMethod(DefinedClass messageSourceClass, FieldVariable flowConstruct) {
         Method setFlowConstruct = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setFlowConstruct");
         Variable newFlowConstruct = setFlowConstruct.param(ref(FlowConstruct.class), "flowConstruct");
-        setFlowConstruct.body().assign(JExpr._this().ref(flowConstruct), newFlowConstruct);
+        setFlowConstruct.body().assign(ExpressionFactory._this().ref(flowConstruct), newFlowConstruct);
 
         return setFlowConstruct;
     }

@@ -40,8 +40,7 @@
 
 package org.mule.devkit.model.code.writer;
 
-import org.mule.devkit.model.code.CodeWriter;
-import org.mule.devkit.model.code.JPackage;
+import org.mule.devkit.model.code.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -77,7 +76,7 @@ public class PrologCodeWriter extends FilterCodeWriter {
     }
     
     
-    public Writer openSource(JPackage pkg, String fileName) throws IOException {
+    public Writer openSource(org.mule.devkit.model.code.Package pkg, String fileName) throws IOException {
         Writer w = super.openSource(pkg,fileName);
         
         PrintWriter out = new PrintWriter(w);

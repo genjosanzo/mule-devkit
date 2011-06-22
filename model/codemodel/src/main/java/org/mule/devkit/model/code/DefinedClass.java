@@ -57,7 +57,7 @@ import java.util.TreeSet;
  *
  * <p>
  * This class models a declaration, and since a declaration can be always
- * used as a reference, it inherits {@link JClass}.
+ * used as a reference, it inherits {@link TypeReference}.
  *
  * <h2>Where to go from here?</h2>
  * <p>
@@ -65,7 +65,7 @@ import java.util.TreeSet;
  * See {@link #method(int, Type, String)} and {@link #field(int, Type, String)}.
  */
 public class DefinedClass
-    extends JClass
+    extends TypeReference
     implements Declaration, ClassContainer, Generifiable, Annotable, DocCommentable {
 
     /** Name of this class. Null if anonymous. */
@@ -75,10 +75,10 @@ public class DefinedClass
     private Modifiers mods;
 
     /** Name of the super class of this class. */
-    private JClass superClass;
+    private TypeReference superClass;
 
     /** List of interfaces that this class implements */
-    private final Set<JClass> interfaces = new TreeSet<JClass>();
+    private final Set<TypeReference> interfaces = new TreeSet<TypeReference>();
 
     /** Fields keyed by their names. */
     /*package*/ final Map<String,FieldVariable> fields = new LinkedHashMap<String,FieldVariable>();
@@ -128,7 +128,7 @@ public class DefinedClass
     private String directBlock;
 
     /**
-     * If this is a package-member class, this is {@link JPackage}.
+     * If this is a package-member class, this is {@link Package}.
      * If this is a nested class, this is {@link DefinedClass}.
      * If this is an anonymous class, this constructor shouldn't be used.
      */
@@ -192,7 +192,7 @@ public class DefinedClass
     }
 
     /**
-     * JClass constructor
+     * TypeReference constructor
      *
      * @param mods
      *        Modifiers for this class declaration
@@ -210,11 +210,11 @@ public class DefinedClass
 
         if(name!=null) {
             if (name.trim().length() == 0)
-                throw new IllegalArgumentException("JClass name empty");
+                throw new IllegalArgumentException("TypeReference name empty");
     
             if (!Character.isJavaIdentifierStart(name.charAt(0))) {
                 String msg =
-                    "JClass name "
+                    "TypeReference name "
                         + name
                         + " contains illegal character"
                         + " for beginning of identifier: "
@@ -224,7 +224,7 @@ public class DefinedClass
             for (int i = 1; i < name.length(); i++) {
                 if (!Character.isJavaIdentifierPart(name.charAt(i))) {
                     String msg =
-                        "JClass name "
+                        "TypeReference name "
                             + name
                             + " contains illegal character "
                             + name.charAt(i);
@@ -259,7 +259,7 @@ public class DefinedClass
      *
      * @return This class
      */
-    public DefinedClass _extends(JClass superClass) {
+    public DefinedClass _extends(TypeReference superClass) {
         if (this.classType==ClassType.INTERFACE)
         	if(superClass.isInterface()){
         		return this._implements(superClass);
@@ -267,7 +267,7 @@ public class DefinedClass
         if (superClass == null)
             throw new NullPointerException();
         
-        for( JClass o=superClass.outer(); o!=null; o=o.outer() ){
+        for( TypeReference o=superClass.outer(); o!=null; o=o.outer() ){
             if(this==o){
                 throw new IllegalArgumentException("Illegal class inheritance loop." +
                 "  Outer class " + this.name + " may not subclass from inner class: " + o.name());
@@ -285,7 +285,7 @@ public class DefinedClass
     /**
      * Returns the class extended by this class.
      */
-    public JClass _extends() {
+    public TypeReference _extends() {
         if(superClass==null)
             superClass = owner().ref(Object.class);
         return superClass;
@@ -299,7 +299,7 @@ public class DefinedClass
      *
      * @return This class
      */
-    public DefinedClass _implements(JClass iface) {
+    public DefinedClass _implements(TypeReference iface) {
         interfaces.add(iface);
         return this;
     }
@@ -312,12 +312,12 @@ public class DefinedClass
      * Returns an iterator that walks the nested classes defined in this
      * class.
      */
-    public Iterator<JClass> _implements() {
+    public Iterator<TypeReference> _implements() {
         return interfaces.iterator();
     }
 
     /**
-     * JClass name accessor.
+     * TypeReference name accessor.
      * 
      * <p>
      * For example, for <code>java.util.List</code>, this method
@@ -355,7 +355,7 @@ public class DefinedClass
         if (outer instanceof DefinedClass)
             return ((DefinedClass) outer).fullName() + '.' + name();
 
-        JPackage p = _package();
+        Package p = _package();
         if (p.isUnnamed())
             return name();
         else
@@ -626,7 +626,7 @@ public class DefinedClass
     public boolean isPackage() {
         return false;
     }
-    public JPackage getPackage() { return parentContainer().getPackage(); }
+    public Package getPackage() { return parentContainer().getPackage(); }
 
     /**
      * Add a new nested class to this class.
@@ -753,17 +753,17 @@ public class DefinedClass
     /**
      * Returns all the nested classes defined in this class.
      */
-    public final JClass[] listClasses() {
+    public final TypeReference[] listClasses() {
         if(classes==null)
-            return new JClass[0];
+            return new TypeReference[0];
         else
-            return classes.values().toArray(new JClass[classes.values().size()]);
+            return classes.values().toArray(new TypeReference[classes.values().size()]);
     }
 
     @Override
-    public JClass outer() {
+    public TypeReference outer() {
         if (outer.isClass())
-            return (JClass) outer;
+            return (TypeReference) outer;
         else
             return null;
     }
@@ -842,11 +842,11 @@ public class DefinedClass
             directBlock += string;
     }
 
-    public final JPackage _package() {
+    public final Package _package() {
         ClassContainer p = outer;
-        while (!(p instanceof JPackage))
+        while (!(p instanceof Package))
             p = p.parentContainer();
-        return (JPackage) p;
+        return (Package) p;
     }
 
     public final ClassContainer parentContainer() {
@@ -859,7 +859,7 @@ public class DefinedClass
     public TypeVariable generify(String name, Class<?> bound) {
         return generifiable.generify(name, bound);
     }
-    public TypeVariable generify(String name, JClass bound) {
+    public TypeVariable generify(String name, TypeReference bound) {
         return generifiable.generify(name, bound);
     }
     @Override
@@ -867,9 +867,9 @@ public class DefinedClass
         return generifiable.typeParams();
     }
 
-    protected JClass substituteParams(
+    protected TypeReference substituteParams(
         TypeVariable[] variables,
-        List<JClass> bindings) {
+        List<TypeReference> bindings) {
         return this;
     }
 
@@ -885,7 +885,7 @@ public class DefinedClass
       * @param clazz
       *          The annotation class to annotate the class with
       */
-     public AnnotationUse annotate(JClass clazz){
+     public AnnotationUse annotate(TypeReference clazz){
         if(annotations==null)
            annotations = new ArrayList<AnnotationUse>();
         AnnotationUse a = new AnnotationUse(clazz);

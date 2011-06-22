@@ -40,8 +40,8 @@
 
 package org.mule.devkit.model.code.writer;
 
-import org.mule.devkit.model.code.CodeWriter;
-import org.mule.devkit.model.code.JPackage;
+import org.mule.devkit.model.code.*;
+import org.mule.devkit.model.code.Package;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -59,11 +59,11 @@ public class FilterCodeWriter extends CodeWriter {
         this.core = core;
     }
 
-    public OutputStream openBinary( JPackage pkg, String fileName ) throws IOException {
+    public OutputStream openBinary( org.mule.devkit.model.code.Package pkg, String fileName ) throws IOException {
         return core.openBinary(pkg, fileName);
     }
 
-    public Writer openSource( JPackage pkg, String fileName ) throws IOException {
+    public Writer openSource( Package pkg, String fileName ) throws IOException {
         return core.openSource(pkg, fileName);
     }
 

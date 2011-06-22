@@ -54,21 +54,21 @@ import java.util.List;
  * @author
  *     Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
-class NarrowedClass extends JClass {
+class NarrowedClass extends TypeReference {
     /**
      * A generic class with type parameters.
      */
-    final JClass basis;
+    final TypeReference basis;
     /**
      * Arguments to those parameters.
      */
-    private final List<JClass> args;
+    private final List<TypeReference> args;
 
-    NarrowedClass(JClass basis, JClass arg) {
+    NarrowedClass(TypeReference basis, TypeReference arg) {
         this(basis,Collections.singletonList(arg));
     }
     
-    NarrowedClass(JClass basis, List<JClass> args) {
+    NarrowedClass(TypeReference basis, List<TypeReference> args) {
         super(basis.owner());
         this.basis = basis;
         assert !(basis instanceof NarrowedClass);
@@ -76,15 +76,15 @@ class NarrowedClass extends JClass {
     }
 
     @Override
-    public JClass narrow( JClass clazz ) {
-        List<JClass> newArgs = new ArrayList<JClass>(args);
+    public TypeReference narrow( TypeReference clazz ) {
+        List<TypeReference> newArgs = new ArrayList<TypeReference>(args);
         newArgs.add(clazz);
         return new NarrowedClass(basis,newArgs);
     }
 
     @Override
-    public JClass narrow( JClass... clazz ) {
-        List<JClass> newArgs = new ArrayList<JClass>(args);
+    public TypeReference narrow( TypeReference... clazz ) {
+        List<TypeReference> newArgs = new ArrayList<TypeReference>(args);
         newArgs.addAll(Arrays.asList(clazz));
         return new NarrowedClass(basis,newArgs);
     }
@@ -94,7 +94,7 @@ class NarrowedClass extends JClass {
         buf.append(basis.name());
         buf.append('<');
         boolean first = true;
-        for (JClass c : args) {
+        for (TypeReference c : args) {
             if(first)
                 first = false;
             else
@@ -110,7 +110,7 @@ class NarrowedClass extends JClass {
         buf.append(basis.fullName());
         buf.append('<');
         boolean first = true;
-        for (JClass c : args) {
+        for (TypeReference c : args) {
             if(first)
                 first = false;
             else
@@ -127,7 +127,7 @@ class NarrowedClass extends JClass {
         buf.append(basis.binaryName());
         buf.append('<');
         boolean first = true;
-        for (JClass c : args) {
+        for (TypeReference c : args) {
             if(first)
                 first = false;
             else
@@ -148,7 +148,7 @@ class NarrowedClass extends JClass {
         basis.printLink(f);
         f.p("{@code <}");
         boolean first = true;
-        for( JClass c : args ) {
+        for( TypeReference c : args ) {
             if(first)
                 first = false;
             else
@@ -158,23 +158,23 @@ class NarrowedClass extends JClass {
         f.p("{@code >}");
     }
 
-    public JPackage _package() {
+    public Package _package() {
         return basis._package();
     }
 
-    public JClass _extends() {
-        JClass base = basis._extends();
+    public TypeReference _extends() {
+        TypeReference base = basis._extends();
         if(base==null)  return base;
         return base.substituteParams(basis.typeParams(),args);
     }
 
-    public Iterator<JClass> _implements() {
-        return new Iterator<JClass>() {
-            private final Iterator<JClass> core = basis._implements();
+    public Iterator<TypeReference> _implements() {
+        return new Iterator<TypeReference>() {
+            private final Iterator<TypeReference> core = basis._implements();
             public void remove() {
                 core.remove();
             }
-            public JClass next() {
+            public TypeReference next() {
                 return core.next().substituteParams(basis.typeParams(),args);
             }
             public boolean hasNext() {
@@ -184,7 +184,7 @@ class NarrowedClass extends JClass {
     }
 
     @Override
-    public JClass erasure() {
+    public TypeReference erasure() {
         return basis;
     }
 
@@ -209,7 +209,7 @@ class NarrowedClass extends JClass {
     @Override
     public boolean equals(Object obj) {
         if(!(obj instanceof NarrowedClass))   return false;
-        return fullName().equals(((JClass)obj).fullName());
+        return fullName().equals(((TypeReference)obj).fullName());
     }
 
     @Override
@@ -217,13 +217,13 @@ class NarrowedClass extends JClass {
         return fullName().hashCode();
     }
 
-    protected JClass substituteParams(TypeVariable[] variables, List<JClass> bindings) {
-        JClass b = basis.substituteParams(variables,bindings);
+    protected TypeReference substituteParams(TypeVariable[] variables, List<TypeReference> bindings) {
+        TypeReference b = basis.substituteParams(variables,bindings);
         boolean different = b!=basis;
         
-        List<JClass> clazz = new ArrayList<JClass>(args.size());
+        List<TypeReference> clazz = new ArrayList<TypeReference>(args.size());
         for( int i=0; i<clazz.size(); i++ ) {
-            JClass c = args.get(i).substituteParams(variables,bindings);
+            TypeReference c = args.get(i).substituteParams(variables,bindings);
             clazz.set(i,c);
             different |= c != args.get(i);
         }
@@ -235,7 +235,7 @@ class NarrowedClass extends JClass {
     }
 
     @Override
-    public List<JClass> getTypeParameters() {
+    public List<TypeReference> getTypeParameters() {
         return args;
     }
 }

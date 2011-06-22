@@ -98,7 +98,7 @@ public final class CodeModel {
     /**
      * The packages that this JCodeWriter contains.
      */
-    private HashMap<String, JPackage> packages = new HashMap<String, JPackage>();
+    private HashMap<String, Package> packages = new HashMap<String, Package>();
 
     /**
      * All JReferencedClasses are pooled here.
@@ -152,16 +152,16 @@ public final class CodeModel {
      * @param name Name of the package. Use "" to indicate the root package.
      * @return Newly generated package
      */
-    public JPackage _package(String name) {
-        JPackage p = packages.get(name);
+    public Package _package(String name) {
+        Package p = packages.get(name);
         if (p == null) {
-            p = new JPackage(name, this);
+            p = new Package(name, this);
             packages.put(name, p);
         }
         return p;
     }
 
-    public final JPackage rootPackage() {
+    public final Package rootPackage() {
         return _package("");
     }
 
@@ -169,7 +169,7 @@ public final class CodeModel {
      * Returns an iterator that walks the packages defined using this code
      * writer.
      */
-    public Iterator<JPackage> packages() {
+    public Iterator<Package> packages() {
         return packages.values().iterator();
     }
 
@@ -183,13 +183,13 @@ public final class CodeModel {
     }
 
     /**
-     * Creates a dummy, unknown {@link JClass} that represents a given name.
+     * Creates a dummy, unknown {@link TypeReference} that represents a given name.
      * <p/>
      * <p/>
      * This method is useful when the code generation needs to include the user-specified
      * class that may or may not exist, and only thing known about it is a class name.
      */
-    public JClass directClass(String name) {
+    public TypeReference directClass(String name) {
         return new DirectClass(this, name);
     }
 
@@ -220,7 +220,7 @@ public final class CodeModel {
      *
      * @return null
      *         If the class is not yet created.
-     * @see JPackage#_getClass(String)
+     * @see Package#_getClass(String)
      */
     public DefinedClass _getClass(String fullyQualifiedName) {
         int idx = fullyQualifiedName.lastIndexOf('.');
@@ -234,16 +234,16 @@ public final class CodeModel {
      * Creates a new anonymous class.
      *
      * @deprecated The naming convention doesn't match the rest of the CodeModel.
-     *             Use {@link #anonymousClass(JClass)} instead.
+     *             Use {@link #anonymousClass(TypeReference)} instead.
      */
-    public DefinedClass newAnonymousClass(JClass baseType) {
+    public DefinedClass newAnonymousClass(TypeReference baseType) {
         return new AnonymousClass(baseType);
     }
 
     /**
      * Creates a new anonymous class.
      */
-    public DefinedClass anonymousClass(JClass baseType) {
+    public DefinedClass anonymousClass(TypeReference baseType) {
         return new AnonymousClass(baseType);
     }
 
@@ -309,9 +309,9 @@ public final class CodeModel {
      * Generates Java source code.
      */
     private void build(CodeWriter source, CodeWriter resource) throws IOException {
-        JPackage[] pkgs = packages.values().toArray(new JPackage[packages.size()]);
+        Package[] pkgs = packages.values().toArray(new Package[packages.size()]);
         // avoid concurrent modification exception
-        for (JPackage pkg : pkgs)
+        for (Package pkg : pkgs)
             pkg.build(source, resource);
         source.close();
         resource.close();
@@ -323,9 +323,9 @@ public final class CodeModel {
      */
     public int countArtifacts() {
         int r = 0;
-        JPackage[] pkgs = packages.values().toArray(new JPackage[packages.size()]);
+        Package[] pkgs = packages.values().toArray(new Package[packages.size()]);
         // avoid concurrent modification exception
-        for (JPackage pkg : pkgs)
+        for (Package pkg : pkgs)
             r += pkg.countArtifacts();
         return r;
     }
@@ -342,13 +342,13 @@ public final class CodeModel {
      *
      * @see #_ref(Class) for the version that handles more cases.
      */
-    public JClass ref(Class<?> clazz) {
+    public TypeReference ref(Class<?> clazz) {
         ReferencedClass jrc = (ReferencedClass) refClasses.get(clazz);
         if (jrc == null) {
             if (clazz.isPrimitive())
                 throw new IllegalArgumentException(clazz + " is a primitive");
             if (clazz.isArray()) {
-                return new JArrayClass(this, _ref(clazz.getComponentType()));
+                return new ArrayClass(this, _ref(clazz.getComponentType()));
             } else {
                 jrc = new ReferencedClass(clazz);
                 refClasses.put(clazz, jrc);
@@ -371,7 +371,7 @@ public final class CodeModel {
      * <p/>
      * First, this method attempts to load the class of the given name.
      * If that fails, we assume that the class is derived straight from
-     * {@link Object}, and return a {@link JClass}.
+     * {@link Object}, and return a {@link TypeReference}.
      */
     public Type ref(String fullyQualifiedClassName) {
         try {
@@ -382,7 +382,7 @@ public final class CodeModel {
         return refClass(fullyQualifiedClassName);
     }
 
-    private JClass refClass(String fullyQualifiedClassName) {
+    private TypeReference refClass(String fullyQualifiedClassName) {
         try {
             // try the context class loader first
             return ref(Thread.currentThread().getContextClassLoader().loadClass(fullyQualifiedClassName));
@@ -403,13 +403,13 @@ public final class CodeModel {
     /**
      * Cached for {@link #wildcard()}.
      */
-    private JClass wildcard;
+    private TypeReference wildcard;
 
     /**
-     * Gets a {@link JClass} representation for "?",
+     * Gets a {@link TypeReference} representation for "?",
      * which is equivalent to "? extends Object".
      */
-    public JClass wildcard() {
+    public TypeReference wildcard() {
         if (wildcard == null)
             wildcard = ref(Object.class).wildcard();
         return wildcard;
@@ -453,7 +453,7 @@ public final class CodeModel {
          *
          * @return the index of the character next to T.
          */
-        JClass parseTypeName() throws ClassNotFoundException {
+        TypeReference parseTypeName() throws ClassNotFoundException {
             int start = idx;
 
             if (s.charAt(idx) == '?') {
@@ -483,7 +483,7 @@ public final class CodeModel {
                     break;
             }
 
-            JClass clazz = refClass(s.substring(start, idx));
+            TypeReference clazz = refClass(s.substring(start, idx));
 
             return parseSuffix(clazz);
         }
@@ -492,7 +492,7 @@ public final class CodeModel {
          * Parses additional left-associative suffixes, like type arguments
          * and array specifiers.
          */
-        private JClass parseSuffix(JClass clazz) throws ClassNotFoundException {
+        private TypeReference parseSuffix(TypeReference clazz) throws ClassNotFoundException {
             if (idx == s.length())
                 return clazz; // hit EOL
 
@@ -525,12 +525,12 @@ public final class CodeModel {
          *
          * @return the index of the character next to '>'
          */
-        private JClass parseArguments(JClass rawType) throws ClassNotFoundException {
+        private TypeReference parseArguments(TypeReference rawType) throws ClassNotFoundException {
             if (s.charAt(idx) != '<')
                 throw new IllegalArgumentException();
             idx++;
 
-            List<JClass> args = new ArrayList<JClass>();
+            List<TypeReference> args = new ArrayList<TypeReference>();
 
             while (true) {
                 args.add(parseTypeName());
@@ -538,7 +538,7 @@ public final class CodeModel {
                     throw new IllegalArgumentException("Missing '>' in " + s);
                 char ch = s.charAt(idx);
                 if (ch == '>')
-                    return rawType.narrow(args.toArray(new JClass[args.size()]));
+                    return rawType.narrow(args.toArray(new TypeReference[args.size()]));
 
                 if (ch != ',')
                     throw new IllegalArgumentException(s);
@@ -557,10 +557,10 @@ public final class CodeModel {
      * <p/>
      * <p/>
      * It is impossible to cache ReferencedClass globally only because
-     * there is the _package() method, which obtains the owner JPackage
+     * there is the _package() method, which obtains the owner Package
      * object, which is scoped to CodeModel.
      */
-    private class ReferencedClass extends JClass implements Declaration {
+    private class ReferencedClass extends TypeReference implements Declaration {
         private final Class<?> _class;
 
         ReferencedClass(Class<?> _clazz) {
@@ -581,13 +581,13 @@ public final class CodeModel {
             return _class.getName();
         }
 
-        public JClass outer() {
+        public TypeReference outer() {
             Class<?> p = _class.getDeclaringClass();
             if (p == null) return null;
             return ref(p);
         }
 
-        public JPackage _package() {
+        public Package _package() {
             String name = fullName();
 
             // this type is array
@@ -602,7 +602,7 @@ public final class CodeModel {
                 return CodeModel.this._package(name.substring(0, idx));
         }
 
-        public JClass _extends() {
+        public TypeReference _extends() {
             Class<?> sp = _class.getSuperclass();
             if (sp == null) {
                 if (isInterface())
@@ -612,16 +612,16 @@ public final class CodeModel {
                 return ref(sp);
         }
 
-        public Iterator<JClass> _implements() {
+        public Iterator<TypeReference> _implements() {
             final Class<?>[] interfaces = _class.getInterfaces();
-            return new Iterator<JClass>() {
+            return new Iterator<TypeReference>() {
                 private int idx = 0;
 
                 public boolean hasNext() {
                     return idx < interfaces.length;
                 }
 
-                public JClass next() {
+                public TypeReference next() {
                     return CodeModel.this.ref(interfaces[idx++]);
                 }
 
@@ -659,7 +659,7 @@ public final class CodeModel {
             return super.typeParams();
         }
 
-        protected JClass substituteParams(TypeVariable[] variables, List<JClass> bindings) {
+        protected TypeReference substituteParams(TypeVariable[] variables, List<TypeReference> bindings) {
             // TODO: does JDK 1.5 reflection provides these information?
             return this;
         }

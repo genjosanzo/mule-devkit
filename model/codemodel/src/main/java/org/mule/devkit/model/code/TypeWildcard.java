@@ -47,7 +47,7 @@ import java.util.List;
  * Represents a wildcard type like "? extends Foo".
  *
  * <p>
- * Instances of this class can be obtained from {@link JClass#wildcard()}
+ * Instances of this class can be obtained from {@link TypeReference#wildcard()}
  *
  * TODO: extend this to cover "? super Integer".
  *
@@ -58,11 +58,11 @@ import java.util.List;
  *
  * @author Kohsuke Kawaguchi
  */
-final class TypeWildcard extends JClass {
+final class TypeWildcard extends TypeReference {
 
-    private final JClass bound;
+    private final TypeReference bound;
 
-    TypeWildcard(JClass bound) {
+    TypeWildcard(TypeReference bound) {
         super(bound.owner());
         this.bound = bound;
     }
@@ -75,7 +75,7 @@ final class TypeWildcard extends JClass {
         return "? extends "+bound.fullName();
     }
 
-    public JPackage _package() {
+    public Package _package() {
         return null;
     }
 
@@ -85,7 +85,7 @@ final class TypeWildcard extends JClass {
      * <p>
      * If no bound is given, this method returns {@link Object}.
      */
-    public JClass _extends() {
+    public TypeReference _extends() {
         if(bound!=null)
             return bound;
         else
@@ -95,7 +95,7 @@ final class TypeWildcard extends JClass {
     /**
      * Returns the interface bounds of this variable.
      */
-    public Iterator<JClass> _implements() {
+    public Iterator<TypeReference> _implements() {
         return bound._implements();
     }
 
@@ -107,8 +107,8 @@ final class TypeWildcard extends JClass {
         return false;
     }
 
-    protected JClass substituteParams(TypeVariable[] variables, List<JClass> bindings) {
-        JClass nb = bound.substituteParams(variables,bindings);
+    protected TypeReference substituteParams(TypeVariable[] variables, List<TypeReference> bindings) {
+        TypeReference nb = bound.substituteParams(variables,bindings);
         if(nb==bound)
             return this;
         else

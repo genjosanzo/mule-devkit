@@ -40,99 +40,29 @@
 
 package org.mule.devkit.model.code;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 
 /**
- * Array class.
- * 
- * @author
- * 	Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
+ * ContinueStatement statement
  */
-final class JArrayClass extends JClass {
+class ContinueStatement implements Statement {
     
-    // array component type
-    private final Type componentType;
+    private final Label label;
     
-    
-    JArrayClass( CodeModel owner, Type component ) {
-        super(owner);
-        this.componentType = component;
-    }
-    
-    
-    public String name() {
-        return componentType.name()+"[]";
-    }
-    
-    public String fullName() {
-        return componentType.fullName()+"[]";
+    /**
+     * ContinueStatement constructor.
+     * 
+     * @param _label
+     *      a valid label or null.
+     */
+    ContinueStatement(Label _label) {
+        this.label = _label;
     }
 
-    public String binaryName() {
-        return componentType.binaryName()+"[]";
-    }
-
-    public void generate(Formatter f) {
-        f.g(componentType).p("[]");
-    }
-
-    public JPackage _package() {
-        return owner().rootPackage();
-    }
-
-    public JClass _extends() {
-        return owner().ref(Object.class);
-    }
-
-    public Iterator<JClass> _implements() {
-        return Collections.<JClass>emptyList().iterator();
-    }
-
-    public boolean isInterface() {
-        return false;
-    }
-
-    public boolean isAbstract() {
-        return false;
-    }
-
-    public Type elementType() {
-        return componentType;
-    }
-
-    public boolean isArray() {
-        return true;
-    }
-
-
-    //
-    // Equality is based on value
-    //
-
-    public boolean equals(Object obj) {
-        if(!(obj instanceof JArrayClass))   return false;
-        
-        if( componentType.equals( ((JArrayClass)obj).componentType ) )
-            return true;
-        
-        return false;
-    }
-
-    public int hashCode() {
-        return componentType.hashCode();
-    }
-
-    protected JClass substituteParams(TypeVariable[] variables, List<JClass> bindings) {
-        if( componentType.isPrimitive() )
-            return this;
-        
-        JClass c = ((JClass)componentType).substituteParams(variables,bindings);
-        if(c==componentType)
-            return this;
-        
-        return new JArrayClass(owner(),c);
+    public void state(Formatter f) {
+        if( label==null )
+            f.p("continue;").nl();
+        else
+            f.p("continue").p(label.label).p(';').nl();
     }
 
 }

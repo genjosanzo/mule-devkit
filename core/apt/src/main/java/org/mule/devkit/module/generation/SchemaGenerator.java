@@ -39,6 +39,7 @@ import org.mule.devkit.model.schema.FormChoice;
 import org.mule.devkit.model.schema.Import;
 import org.mule.devkit.model.schema.LocalComplexType;
 import org.mule.devkit.model.schema.LocalSimpleType;
+import org.mule.devkit.model.schema.NoFixedFacet;
 import org.mule.devkit.model.schema.NumFacet;
 import org.mule.devkit.model.schema.ObjectFactory;
 import org.mule.devkit.model.schema.Pattern;
@@ -62,6 +63,8 @@ import javax.lang.model.util.ElementFilter;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.math.BigInteger;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SchemaGenerator extends AbstractModuleGenerator {
     private Schema schema;
@@ -92,6 +95,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         registerConfigElement(element);
         registerProcessors(targetNamespace, element);
         registerTransformers(element);
+        registerEnums(element);
 
         String fileName = "META-INF/mule-" + module.name() + ".xsd";
 
@@ -105,6 +109,85 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         SchemaLocation schemaLocation = new SchemaLocation(schema, fileName, location, namespaceHandlerName);
 
         context.getSchemaModel().addSchemaLocation(schemaLocation);
+    }
+
+    private void registerEnums(javax.lang.model.element.Element type) {
+        Set<TypeMirror> registeredEnums = new HashSet<TypeMirror>();
+
+        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(type.getEnclosedElements());
+        for (VariableElement variable : variables) {
+            if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
+                if (!registeredEnums.contains(variable.asType())) {
+                    registerEnum(variable.asType());
+                    registeredEnums.add(variable.asType());
+                }
+            }
+        }
+
+        java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(type.getEnclosedElements());
+        for (ExecutableElement method : methods) {
+            Processor processor = method.getAnnotation(Processor.class);
+            if (processor == null)
+                continue;
+
+            for (VariableElement variable : method.getParameters()) {
+                if (!context.getTypeMirrorUtils().isEnum(variable.asType()))
+                    continue;
+
+                if (!registeredEnums.contains(variable.asType())) {
+                    registerEnum(variable.asType());
+                    registeredEnums.add(variable.asType());
+                }
+            }
+        }
+
+        for (ExecutableElement method : methods) {
+            Source source = method.getAnnotation(Source.class);
+            if (source == null)
+                continue;
+
+            for (VariableElement variable : method.getParameters()) {
+                if (!context.getTypeMirrorUtils().isEnum(variable.asType()))
+                    continue;
+
+                if (!registeredEnums.contains(variable.asType())) {
+                    registerEnum(variable.asType());
+                    registeredEnums.add(variable.asType());
+                }
+            }
+        }
+    }
+
+    private void registerEnum(TypeMirror enumType) {
+        javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(enumType);
+
+        TopLevelSimpleType enumSimpleType = new TopLevelSimpleType();
+        enumSimpleType.setName(enumElement.getSimpleName() + "EmumType");
+
+        Union union = new Union();
+        union.getSimpleType().add(createEnumSimpleType(enumElement));
+        union.getSimpleType().add(createExpressionSimpleType());
+        enumSimpleType.setUnion(union);
+
+        schema.getSimpleTypeOrComplexTypeOrGroup().add(enumSimpleType);
+    }
+
+    private LocalSimpleType createEnumSimpleType(javax.lang.model.element.Element enumElement) {
+        LocalSimpleType enumValues = new LocalSimpleType();
+        Restriction restriction = new Restriction();
+        enumValues.setRestriction(restriction);
+        restriction.setBase(SchemaConstants.STRING);
+
+        for (javax.lang.model.element.Element enclosed : enumElement.getEnclosedElements()) {
+            if (enclosed.getKind() == ElementKind.ENUM_CONSTANT) {
+                NoFixedFacet noFixedFacet = objectFactory.createNoFixedFacet();
+                noFixedFacet.setValue(enclosed.getSimpleName().toString());
+
+                JAXBElement<NoFixedFacet> enumeration = objectFactory.createEnumeration(noFixedFacet);
+                enumValues.getRestriction().getFacets().add(enumeration);
+            }
+        }
+        return enumValues;
     }
 
     private void registerTransformers(javax.lang.model.element.Element type) {
@@ -203,7 +286,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                     all.getParticle().add(objectFactory.createElement(generateXmlElement(variable.getSimpleName().toString(), targetNamespace)));
                 } else {
-                    if (context.getTypeMirrorUtils().isArrayOrList(context.getTypeUtils(), variable.asType())) {
+                    if (context.getTypeMirrorUtils().isArrayOrList(variable.asType())) {
                         generateParameterCollectionElement(all, variable);
                     } else {
                         complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(variable));
@@ -316,7 +399,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         java.util.List<VariableElement> variables = ElementFilter.fieldsIn(element.getEnclosedElements());
         for (VariableElement variable : variables) {
-            if (context.getTypeMirrorUtils().isArrayOrList(context.getTypeUtils(), variable.asType())) {
+            if (context.getTypeMirrorUtils().isArrayOrList(variable.asType())) {
                 generateConfigurableCollectionElement(all, variable);
             } else {
                 config.getAttributeOrAttributeGroup().add(createConfigurableAttribute(variable));
@@ -341,6 +424,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         if (isTypeSupported(variable.asType())) {
             attribute.setName(name);
             attribute.setType(SchemaTypeConversion.convertType(variable.asType().toString(), schema.getTargetNamespace()));
+        } else if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
+            attribute.setName(name);
+            javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(variable.asType());
+            attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + "EmumType"));
         } else {
             // non-supported types will get "-ref" so beans can be injected
             attribute.setName(name + "-ref");
@@ -374,6 +461,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         if (isTypeSupported(variable.asType())) {
             attribute.setName(name);
             attribute.setType(SchemaTypeConversion.convertType(variable.asType().toString(), schema.getTargetNamespace()));
+        } else if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
+            attribute.setName(name);
+            javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(variable.asType());
+            attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + "EmumType"));
         } else {
             // non-supported types will get "-ref" so beans can be injected
             attribute.setName(name + "-ref");

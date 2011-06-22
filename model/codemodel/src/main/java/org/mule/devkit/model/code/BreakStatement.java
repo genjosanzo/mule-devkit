@@ -42,27 +42,26 @@ package org.mule.devkit.model.code;
 
 
 /**
- * JContinue statement
+ * BreakStatement statement
  */
-class JContinue implements Statement {
+final class BreakStatement implements Statement {
     
     private final Label label;
     
     /**
-     * JContinue constructor.
+     * BreakStatement constructor
      * 
-     * @param _label
-     *      a valid label or null.
+     * @param   _label
+     *      break label or null.
      */
-    JContinue(Label _label) {
+    BreakStatement(Label _label) {
         this.label = _label;
     }
 
     public void state(Formatter f) {
         if( label==null )
-            f.p("continue;").nl();
+            f.p("break;").nl();
         else
-            f.p("continue").p(label.label).p(';').nl();
+            f.p("break").p(label.label).p(';').nl();
     }
-
 }

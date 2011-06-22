@@ -26,14 +26,6 @@ public class BasicModuleTest extends AbstractModuleTest
         return "basic.xml";
     }
 
-    // FIXME: NEED NON-EXISTENT TRANSFORMER
-    /*
-    public void testChar() throws Exception
-    {
-        runFlow("passthruCharFlow", 'c');
-    }
-    */
-
     public void testString() throws Exception
     {
         runFlow("passthruStringFlow", "mulesoft");
@@ -57,5 +49,10 @@ public class BasicModuleTest extends AbstractModuleTest
     public void testLong() throws Exception
     {
         runFlow("passthruLongFlow", 3456443463342345734L);
+    }
+
+    public void testEnum() throws Exception
+    {
+        runFlow("passthruEnumFlow", "In");
     }
 }

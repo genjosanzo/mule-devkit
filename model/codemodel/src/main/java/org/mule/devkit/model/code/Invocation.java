@@ -99,11 +99,11 @@ public final class Invocation extends AbstractExpression implements Statement {
     /**
      * Invokes a static method on a class.
      */
-    Invocation(JClass type, String name) {
+    Invocation(TypeReference type, String name) {
         this( (Generable)type, name );
     }
 
-    Invocation(JClass type, Method method) {
+    Invocation(TypeReference type, Method method) {
         this( (Generable)type, method );
     }
 
@@ -152,7 +152,7 @@ public final class Invocation extends AbstractExpression implements Statement {
      * Short for {@code arg(JExpr.lit(v))}
      */
     public Invocation arg(String v) {
-        return arg(JExpr.lit(v));
+        return arg(ExpressionFactory.lit(v));
     }
     
 	/**

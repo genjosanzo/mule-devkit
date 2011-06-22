@@ -125,7 +125,7 @@ public final class EnumConstant extends AbstractExpression implements Declaratio
      * @param clazz
      *          The annotation class to annotate the field with
      */
-    public AnnotationUse annotate(JClass clazz){
+    public AnnotationUse annotate(TypeReference clazz){
         if(annotations==null)
            annotations = new ArrayList<AnnotationUse>();
         AnnotationUse a = new AnnotationUse(clazz);

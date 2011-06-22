@@ -146,7 +146,7 @@ public interface ClassContainer {
      * <p>
      * If <tt>this.isPackage()</tt>, then return <tt>this</tt>.
      */
-    public JPackage getPackage();
+    public Package getPackage();
 
     /**
      * Get the root code model object.

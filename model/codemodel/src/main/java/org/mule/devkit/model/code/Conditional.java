@@ -98,11 +98,11 @@ public class Conditional implements Statement {
     }
 
     public void state(Formatter f) {
-        if(test==JExpr.TRUE) {
+        if(test== ExpressionFactory.TRUE) {
             _then.generateBody(f);
             return;
         }
-        if(test==JExpr.FALSE) {
+        if(test== ExpressionFactory.FALSE) {
             _else.generateBody(f);
             return;
         }

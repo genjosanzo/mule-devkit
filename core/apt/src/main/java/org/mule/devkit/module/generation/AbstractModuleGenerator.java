@@ -18,7 +18,7 @@
 package org.mule.devkit.module.generation;
 
 import org.mule.devkit.generation.AbstractGenerator;
-import org.mule.devkit.model.code.JClass;
+import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Type;
 
 import javax.lang.model.type.TypeMirror;
@@ -29,7 +29,7 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
         return this.context.getCodeModel().ref(typeMirror);
     }
 
-    public JClass ref(Class<?> clazz) {
+    public TypeReference ref(Class<?> clazz) {
         return this.context.getCodeModel().ref(clazz);
     }
 

@@ -25,6 +25,13 @@ import javax.xml.bind.annotation.XmlType;
 import java.util.List;
 
 public final class TypeMirrorUtils {
+    private Types types;
+
+    public TypeMirrorUtils(Types types)
+    {
+        this.types = types;
+    }
+
     public boolean isXmlType(TypeMirror type) {
         if (type.getKind() == TypeKind.DECLARED) {
 
@@ -40,7 +47,7 @@ public final class TypeMirrorUtils {
 
     }
 
-    public boolean isArrayOrList(Types types, TypeMirror type) {
+    public boolean isArrayOrList(TypeMirror type) {
         if (type.getKind() == TypeKind.ARRAY) {
             return true;
         }
@@ -51,7 +58,7 @@ public final class TypeMirrorUtils {
 
         List<? extends TypeMirror> inherits = types.directSupertypes(type);
         for (TypeMirror inherit : inherits) {
-            if (isArrayOrList(types, inherit)) {
+            if (isArrayOrList(inherit)) {
                 return true;
             }
         }
@@ -59,18 +66,34 @@ public final class TypeMirrorUtils {
         return false;
     }
 
-    public boolean isMap(Types types, TypeMirror type) {
+    public boolean isMap(TypeMirror type) {
         if (type.toString().contains(java.util.Map.class.getName())) {
             return true;
         }
 
         List<? extends TypeMirror> inherits = types.directSupertypes(type);
         for (TypeMirror inherit : inherits) {
-            if (isMap(types, inherit)) {
+            if (isMap( inherit)) {
                 return true;
             }
         }
 
         return false;
     }
+
+    public boolean isEnum(TypeMirror type) {
+        if (type.toString().contains(Enum.class.getName())) {
+            return true;
+        }
+
+        List<? extends TypeMirror> inherits = types.directSupertypes(type);
+        for (TypeMirror inherit : inherits) {
+            if (isEnum(inherit)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }

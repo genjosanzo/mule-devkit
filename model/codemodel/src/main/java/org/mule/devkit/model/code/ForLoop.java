@@ -66,7 +66,7 @@ public class ForLoop implements Statement {
     }
     
     public void init(Variable v, Expression e) {
-        inits.add(JExpr.assign(v, e));
+        inits.add(ExpressionFactory.assign(v, e));
     }
     
     public void test(Expression e) {

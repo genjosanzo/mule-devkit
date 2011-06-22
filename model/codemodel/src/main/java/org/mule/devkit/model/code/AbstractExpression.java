@@ -155,26 +155,26 @@ public abstract class AbstractExpression implements Expression
 
     //
     //
-    // from JExpr
+    // from ExpressionFactory
     //
     //
     public final Invocation invoke(Method method) {
-        return JExpr.invoke(this, method);
+        return ExpressionFactory.invoke(this, method);
     }
 
     public final Invocation invoke(String method) {
-        return JExpr.invoke(this, method);
+        return ExpressionFactory.invoke(this, method);
     }
 
     public final FieldRef ref(Variable field) {
-        return JExpr.ref(this, field);
+        return ExpressionFactory.ref(this, field);
     }
 
     public final FieldRef ref(String field) {
-        return JExpr.ref(this, field);
+        return ExpressionFactory.ref(this, field);
     }
 
     public final ArrayCompRef component(Expression index) {
-        return JExpr.component(this, index);
+        return ExpressionFactory.component(this, index);
     }
 }

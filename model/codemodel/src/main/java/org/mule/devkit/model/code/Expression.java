@@ -54,7 +54,7 @@ package org.mule.devkit.model.code;
  * which returns a complicated expression (by often taking other {@link Expression}s
  * as parameters.
  * For example, you can build "5+2" by
- * <tt>JExpr.lit(5).add(JExpr.lit(2))</tt>
+ * <tt>ExpressionFactory.lit(5).add(ExpressionFactory.lit(2))</tt>
  */
 public interface Expression extends Generable {
     /**

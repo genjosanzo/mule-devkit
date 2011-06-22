@@ -26,14 +26,14 @@ import org.mule.devkit.annotations.Transformer;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.CatchBlock;
+import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Invocation;
-import org.mule.devkit.model.code.JClass;
-import org.mule.devkit.model.code.JExpr;
+import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
-import org.mule.devkit.model.code.JPackage;
+import org.mule.devkit.model.code.Package;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
 import org.mule.transformer.AbstractTransformer;
@@ -66,7 +66,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             FieldVariable muleContext = generateFieldForMuleContext(transformerClass);
 
             // declare weight
-            FieldVariable weighting = transformerClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "weighting", Op.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), JExpr.lit(transformer.priorityWeighting())));
+            FieldVariable weighting = transformerClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "weighting", Op.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), ExpressionFactory.lit(transformer.priorityWeighting())));
 
             //generate constructor
             generateConstructor(transformerClass, executableElement);
@@ -95,7 +95,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
     private void generateSetPriorityWeighting(DefinedClass jaxbTransformerClass, FieldVariable weighting) {
         Method setPriorityWeighting = jaxbTransformerClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setPriorityWeighting");
         Variable localWeighting = setPriorityWeighting.param(context.getCodeModel().INT, "weighting");
-        setPriorityWeighting.body().assign(JExpr._this().ref(weighting), localWeighting);
+        setPriorityWeighting.body().assign(ExpressionFactory._this().ref(weighting), localWeighting);
     }
 
     private void generateGetPriorityWeighting(DefinedClass jaxbTransformerClass, FieldVariable weighting) {
@@ -109,7 +109,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         Variable src = doTransform.param(ref(Object.class), "src");
         Variable encoding = doTransform.param(ref(String.class), "encoding");
 
-        Variable result = doTransform.body().decl(ref(executableElement.getReturnType()).boxify(), "result", JExpr._null());
+        Variable result = doTransform.body().decl(ref(executableElement.getReturnType()).boxify(), "result", ExpressionFactory._null());
 
         TryStatement tryBlock = doTransform.body()._try();
 
@@ -126,14 +126,14 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         doTransform.body()._return(result);
     }
 
-    private void generateThrowTransformFailedException(CatchBlock catchBlock, Variable exception, Variable src, JClass target) {
+    private void generateThrowTransformFailedException(CatchBlock catchBlock, Variable exception, Variable src, TypeReference target) {
         Invocation transformFailedInvoke = ref(CoreMessages.class).staticInvoke("transformFailed");
         transformFailedInvoke.arg(src.invoke("getClass").invoke("getName"));
-        transformFailedInvoke.arg(JExpr.lit(target.fullName()));
+        transformFailedInvoke.arg(ExpressionFactory.lit(target.fullName()));
 
-        Invocation transformerException = JExpr._new(ref(TransformerException.class));
+        Invocation transformerException = ExpressionFactory._new(ref(TransformerException.class));
         transformerException.arg(transformFailedInvoke);
-        transformerException.arg(JExpr._this());
+        transformerException.arg(ExpressionFactory._this());
         transformerException.arg(exception);
         catchBlock.body()._throw(transformerException);
     }
@@ -151,9 +151,9 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         constructor.body().invoke("setName").arg(context.getNameUtils().generateClassName(executableElement, "Transformer"));
     }
 
-    private void registerDestinationType(Method constructor, JClass clazz) {
+    private void registerDestinationType(Method constructor, TypeReference clazz) {
         Invocation setReturnClass = constructor.body().invoke("setReturnClass");
-        setReturnClass.arg(JExpr.dotclass(clazz));
+        setReturnClass.arg(ExpressionFactory.dotclass(clazz));
     }
 
     private void registerSourceTypes(Method constructor, ExecutableElement executableElement) {
@@ -180,7 +180,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
 
     private DefinedClass getTransformerClass(ExecutableElement executableElement) {
         String transformerClassName = context.getNameUtils().generateClassName(executableElement, "Transformer");
-        JPackage pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(transformerClassName));
+        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(transformerClassName));
         DefinedClass transformer = pkg._class(context.getNameUtils().getClassName(transformerClassName), AbstractTransformer.class, new Class<?>[] {DiscoverableTransformer.class, MuleContextAware.class, Initialisable.class});
 
         return transformer;

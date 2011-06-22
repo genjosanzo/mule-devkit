@@ -58,6 +58,6 @@ public class StringLiteral extends AbstractExpression {
    
     
     public void generate(Formatter f) {
-    	f.p(JExpr.quotify('"', str));
+    	f.p(ExpressionFactory.quotify('"', str));
     }
 }
