@@ -47,6 +47,11 @@ public final class TypeMirrorUtils {
 
     }
 
+    public boolean isCollection(TypeMirror type)
+    {
+        return isArrayOrList(type) || isMap(type);
+    }
+
     public boolean isArrayOrList(TypeMirror type) {
         if (type.getKind() == TypeKind.ARRAY) {
             return true;

@@ -36,18 +36,32 @@
     </spring:bean>
 
     <collection:config name="configA">
-		<collection:strings>
-			<collection:string>MuleSoft</collection:string>
-			<collection:string>FTW</collection:string>
-		</collection:strings>
-	</collection:config>
-	
+        <collection:strings>
+            <collection:string>#[string:MuleSoft]</collection:string>
+            <collection:string>FTW</collection:string>
+        </collection:strings>
+    </collection:config>
+
     <collection:config name="configB">
-		<collection:items>
-			<collection:item ref="objectA"/>
-			<collection:item ref="objectB"/>
-		</collection:items>
-	</collection:config>	
+        <collection:items>
+            <collection:item value-ref="objectA"/>
+            <collection:item value-ref="objectB"/>
+        </collection:items>
+    </collection:config>
+
+    <collection:config name="configC">
+        <collection:map-strings>
+            <collection:map-string key="a">#[string:MuleSoft]</collection:map-string>
+            <collection:map-string key="b">FTW</collection:map-string>
+        </collection:map-strings>
+    </collection:config>
+
+    <collection:config name="configD">
+        <collection:map-items>
+            <collection:map-item key-ref="objectA" value-ref="objectA"/>
+            <collection:map-item key-ref="objectB" value-ref="objectB"/>
+        </collection:map-items>
+    </collection:config>
 
     <flow name="flowList">
         <collection:count-list-of-strings config-ref="configA">
@@ -64,6 +78,32 @@
 
     <flow name="flowConfigItems">
         <collection:count-config-items config-ref="configB"/>
+    </flow>
+
+    <flow name="flowMap">
+        <collection:count-map-of-strings config-ref="configC">
+            <collection:map-strings>
+                <collection:map-string key="a">mulesoft</collection:map-string>
+                <collection:map-string key="b">ftw</collection:map-string>
+            </collection:map-strings>
+        </collection:count-map-of-strings>
+    </flow>
+
+    <flow name="flowConfigMapStrings">
+        <collection:count-config-map-strings config-ref="configC"/>
+    </flow>
+
+    <flow name="flowConfigMapItems">
+        <collection:append-config-map-items config-ref="configD"/>
+    </flow>
+
+    <flow name="flowHasFirstName">
+        <collection:has-first-name config-ref="configC">
+            <collection:properties>
+                <FirstName>Emiliano</FirstName>
+                <LastName>Lesende</LastName>
+            </collection:properties>
+        </collection:has-first-name>
     </flow>
 
 </mule>

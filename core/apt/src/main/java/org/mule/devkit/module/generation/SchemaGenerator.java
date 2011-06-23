@@ -46,12 +46,15 @@ import org.mule.devkit.model.schema.Pattern;
 import org.mule.devkit.model.schema.Restriction;
 import org.mule.devkit.model.schema.Schema;
 import org.mule.devkit.model.schema.SchemaLocation;
+import org.mule.devkit.model.schema.SimpleContent;
+import org.mule.devkit.model.schema.SimpleExtensionType;
 import org.mule.devkit.model.schema.SimpleType;
 import org.mule.devkit.model.schema.TopLevelComplexType;
 import org.mule.devkit.model.schema.TopLevelElement;
 import org.mule.devkit.model.schema.TopLevelSimpleType;
 import org.mule.devkit.model.schema.Union;
 import org.mule.util.StringUtils;
+import sun.rmi.transport.ObjectTable;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -67,6 +70,20 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class SchemaGenerator extends AbstractModuleGenerator {
+    private static final String ATTRIBUTE_NAME_KEY = "key";
+    private static final String ATTRIBUTE_NAME_REF = "ref";
+    private static final String ATTRIBUTE_NAME_VALUE_REF = "value-ref";
+    private static final String XSD_EXTENSION = ".xsd";
+    private static final String NAMESPACE_HANDLER_SUFFIX = "NamespaceHandler";
+    private static final String EMUM_TYPE_SUFFIX = "EmumType";
+    private static final String TYPE_SUFFIX = "Type";
+    private static final String XML_TYPE_SUFFIX = "XmlType";
+    private static final String ATTRIBUTE_NAME_CONFIG_REF = "config-ref";
+    private static final String UNBOUNDED = "unbounded";
+    private static final String LAX = "lax";
+    private static final String ELEMENT_NAME_CONFIG = "config";
+    private static final String ATTRIBUTE_NAME_NAME = "name";
+    private static final String REF_SUFFIX = "-ref";
     private Schema schema;
     private ObjectFactory objectFactory;
 
@@ -97,14 +114,14 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         registerTransformers(element);
         registerEnums(element);
 
-        String fileName = "META-INF/mule-" + module.name() + ".xsd";
+        String fileName = "META-INF/mule-" + module.name() + XSD_EXTENSION;
 
         String location = module.schemaLocation();
         if (location == null || location.length() == 0) {
-            location = schema.getTargetNamespace() + "/" + module.version() + "/mule-" + module.name() + ".xsd";
+            location = schema.getTargetNamespace() + "/" + module.version() + "/mule-" + module.name() + XSD_EXTENSION;
         }
 
-        String namespaceHandlerName = context.getNameUtils().generateClassName((TypeElement) element, "NamespaceHandler");
+        String namespaceHandlerName = context.getNameUtils().generateClassName((TypeElement) element, NAMESPACE_HANDLER_SUFFIX);
 
         SchemaLocation schemaLocation = new SchemaLocation(schema, fileName, location, namespaceHandlerName);
 
@@ -162,7 +179,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(enumType);
 
         TopLevelSimpleType enumSimpleType = new TopLevelSimpleType();
-        enumSimpleType.setName(enumElement.getSimpleName() + "EmumType");
+        enumSimpleType.setName(enumElement.getSimpleName() + EMUM_TYPE_SUFFIX);
 
         Union union = new Union();
         union.getSimpleType().add(createEnumSimpleType(enumElement));
@@ -212,7 +229,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             String name = method.getSimpleName().toString();
             if (processor.name().length() > 0)
                 name = processor.name();
-            String typeName = StringUtils.capitalize(name) + "Type";
+            String typeName = StringUtils.capitalize(name) + TYPE_SUFFIX;
 
             registerProcessorElement(targetNamespace, name, typeName);
 
@@ -227,7 +244,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             String name = method.getSimpleName().toString();
             if (source.name().length() > 0)
                 name = source.name();
-            String typeName = StringUtils.capitalize(name) + "Type";
+            String typeName = StringUtils.capitalize(name) + TYPE_SUFFIX;
 
             registerSourceElement(targetNamespace, name, typeName);
 
@@ -272,7 +289,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         complexContentExtension.setBase(base);
         complexContent.setExtension(complexContentExtension);
 
-        Attribute configRefAttr = createAttribute("config-ref", true, SchemaConstants.STRING, "Specify which configuration to use for this invocation.");
+        Attribute configRefAttr = createAttribute(ATTRIBUTE_NAME_CONFIG_REF, true, SchemaConstants.STRING, "Specify which configuration to use for this invocation.");
         complexContentExtension.getAttributeOrAttributeGroup().add(configRefAttr);
 
         All all = new All();
@@ -286,7 +303,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                     all.getParticle().add(objectFactory.createElement(generateXmlElement(variable.getSimpleName().toString(), targetNamespace)));
                 } else {
-                    if (context.getTypeMirrorUtils().isArrayOrList(variable.asType())) {
+                    if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
                         generateParameterCollectionElement(all, variable);
                     } else {
                         complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(variable));
@@ -301,7 +318,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private void generateCollectionElement(All all, VariableElement variable, boolean optional) {
         TopLevelElement collectionElement = new TopLevelElement();
         all.getParticle().add(objectFactory.createElement(collectionElement));
-        collectionElement.setName(variable.getSimpleName().toString());
+        collectionElement.setName(context.getNameUtils().uncamel(variable.getSimpleName().toString()));
 
         if (optional) {
             collectionElement.setMinOccurs(BigInteger.valueOf(0L));
@@ -313,27 +330,99 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         LocalComplexType collectionComplexType = new LocalComplexType();
         collectionElement.setComplexType(collectionComplexType);
         ExplicitGroup sequence = new ExplicitGroup();
-        collectionComplexType.setSequence(sequence);
+        ExplicitGroup choice = new ExplicitGroup();
+
+        if (context.getTypeMirrorUtils().isMap(variable.asType())) {
+            collectionComplexType.setChoice(choice);
+            choice.getParticle().add(objectFactory.createSequence(sequence));
+
+            Any any = new Any();
+            any.setProcessContents(LAX);
+            any.setMinOccurs(new BigInteger("0"));
+            any.setMaxOccurs(UNBOUNDED);
+
+            ExplicitGroup anySequence = new ExplicitGroup();
+            anySequence.getParticle().add(any);
+            choice.getParticle().add(objectFactory.createSequence(anySequence));
+        }
+        else if (context.getTypeMirrorUtils().isArrayOrList(variable.asType())) {
+            collectionComplexType.setSequence(sequence);
+        }
 
         TopLevelElement collectionItemElement = new TopLevelElement();
         sequence.getParticle().add(objectFactory.createElement(collectionItemElement));
 
-        collectionItemElement.setName(context.getNameUtils().singularize(collectionElement.getName()));
+        collectionItemElement.setName(context.getNameUtils().uncamel(context.getNameUtils().singularize(collectionElement.getName())));
         collectionItemElement.setMinOccurs(BigInteger.valueOf(0L));
-        collectionItemElement.setMaxOccurs("unbounded");
+        collectionItemElement.setMaxOccurs(UNBOUNDED);
 
-        DeclaredType variableType = (DeclaredType) variable.asType();
-        java.util.List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
-        if (variableTypeParameters.size() != 0) {
-            TypeMirror genericType = variableTypeParameters.get(0);
+        if (context.getTypeMirrorUtils().isArrayOrList(variable.asType())) {
+            DeclaredType variableType = (DeclaredType) variable.asType();
+            java.util.List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
+            if (variableTypeParameters.size() != 0) {
+                TypeMirror genericType = variableTypeParameters.get(0);
 
-            if (isTypeSupported(genericType)) {
-                collectionItemElement.setType(SchemaTypeConversion.convertType(genericType.toString(), schema.getTargetNamespace()));
+                if (isTypeSupported(genericType)) {
+                    LocalComplexType complexType = new LocalComplexType();
+                    collectionItemElement.setComplexType(complexType);
+                    SimpleContent simpleContent = new SimpleContent();
+                    complexType.setSimpleContent(simpleContent);
+                    SimpleExtensionType simpleContentExtension = new SimpleExtensionType();
+                    simpleContentExtension.setBase(SchemaTypeConversion.convertType(genericType.toString(), schema.getTargetNamespace()));
+                    simpleContent.setExtension(simpleContentExtension);
+
+                    Attribute refAttribute = new Attribute();
+                    refAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+                    refAttribute.setName(ATTRIBUTE_NAME_VALUE_REF);
+                    refAttribute.setType(SchemaConstants.STRING);
+
+                    simpleContentExtension.getAttributeOrAttributeGroup().add(refAttribute);
+                } else {
+                    collectionItemElement.setComplexType(generateRefComplexType(ATTRIBUTE_NAME_VALUE_REF));
+                }
             } else {
-                collectionItemElement.setComplexType(generateRefComplexType());
+                collectionItemElement.setComplexType(generateRefComplexType(ATTRIBUTE_NAME_VALUE_REF));
             }
-        } else {
-            collectionItemElement.setComplexType(generateRefComplexType());
+        } else if (context.getTypeMirrorUtils().isMap(variable.asType())) {
+            DeclaredType variableType = (DeclaredType) variable.asType();
+            java.util.List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
+
+            LocalComplexType mapComplexType = new LocalComplexType();
+            Attribute keyAttribute = new Attribute();
+            if (variableTypeParameters.size() > 0 && isTypeSupported(variableTypeParameters.get(0))) {
+                keyAttribute.setName(ATTRIBUTE_NAME_KEY);
+                keyAttribute.setType(SchemaTypeConversion.convertType(variableTypeParameters.get(0).toString(), schema.getTargetNamespace()));
+            } else {
+                keyAttribute.setUse(SchemaConstants.USE_REQUIRED);
+                keyAttribute.setName("key-ref");
+                keyAttribute.setType(SchemaConstants.STRING);
+            }
+
+            if (variableTypeParameters.size() > 1 && isTypeSupported(variableTypeParameters.get(1))) {
+                SimpleContent simpleContent = new SimpleContent();
+                mapComplexType.setSimpleContent(simpleContent);
+                SimpleExtensionType complexContentExtension = new SimpleExtensionType();
+                complexContentExtension.setBase(SchemaTypeConversion.convertType(variableTypeParameters.get(1).toString(), schema.getTargetNamespace()));
+                simpleContent.setExtension(complexContentExtension);
+
+                Attribute refAttribute = new Attribute();
+                refAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+                refAttribute.setName(ATTRIBUTE_NAME_VALUE_REF);
+                refAttribute.setType(SchemaConstants.STRING);
+
+                complexContentExtension.getAttributeOrAttributeGroup().add(refAttribute);
+                complexContentExtension.getAttributeOrAttributeGroup().add(keyAttribute);
+            } else {
+                Attribute refAttribute = new Attribute();
+                refAttribute.setUse(SchemaConstants.USE_REQUIRED);
+                refAttribute.setName(ATTRIBUTE_NAME_VALUE_REF);
+                refAttribute.setType(SchemaConstants.STRING);
+
+                mapComplexType.getAttributeOrAttributeGroup().add(refAttribute);
+                mapComplexType.getAttributeOrAttributeGroup().add(keyAttribute);
+            }
+
+            collectionItemElement.setComplexType(mapComplexType);
         }
     }
 
@@ -354,11 +443,15 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     }
 
     private LocalComplexType generateRefComplexType() {
+        return generateRefComplexType(ATTRIBUTE_NAME_REF);
+    }
+
+    private LocalComplexType generateRefComplexType(String name) {
         LocalComplexType itemComplexType = new LocalComplexType();
 
         Attribute refAttribute = new Attribute();
         refAttribute.setUse(SchemaConstants.USE_REQUIRED);
-        refAttribute.setName("ref");
+        refAttribute.setName(name);
         refAttribute.setType(SchemaConstants.STRING);
 
         itemComplexType.getAttributeOrAttributeGroup().add(refAttribute);
@@ -368,30 +461,30 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private TopLevelElement generateXmlElement(String elementName, String targetNamespace) {
         TopLevelElement xmlElement = new TopLevelElement();
         xmlElement.setName(elementName);
-        xmlElement.setType(new QName(targetNamespace, "XmlType"));
+        xmlElement.setType(new QName(targetNamespace, XML_TYPE_SUFFIX));
         return xmlElement;
     }
 
     private ComplexType createAnyXmlType() {
         ComplexType xmlComplexType = new TopLevelComplexType();
-        xmlComplexType.setName("XmlType");
+        xmlComplexType.setName(XML_TYPE_SUFFIX);
         Any any = new Any();
-        any.setProcessContents("lax");
+        any.setProcessContents(LAX);
         any.setMinOccurs(new BigInteger("0"));
-        any.setMaxOccurs("unbounded");
+        any.setMaxOccurs(UNBOUNDED);
         ExplicitGroup all = new ExplicitGroup();
         all.getParticle().add(any);
         xmlComplexType.setSequence(all);
 
-        Attribute ref = createAttribute("ref", true, SchemaConstants.STRING, "The reference object for this parameter");
+        Attribute ref = createAttribute(ATTRIBUTE_NAME_REF, true, SchemaConstants.STRING, "The reference object for this parameter");
         xmlComplexType.getAttributeOrAttributeGroup().add(ref);
 
         return xmlComplexType;
     }
 
     private void registerConfigElement(javax.lang.model.element.Element element) {
-        ExtensionType config = registerExtension("config");
-        Attribute nameAttribute = createAttribute("name", true, SchemaConstants.STRING, "Give a name to this configuration so it can be later referenced by config-ref.");
+        ExtensionType config = registerExtension(ELEMENT_NAME_CONFIG);
+        Attribute nameAttribute = createAttribute(ATTRIBUTE_NAME_NAME, true, SchemaConstants.STRING, "Give a name to this configuration so it can be later referenced by config-ref.");
         config.getAttributeOrAttributeGroup().add(nameAttribute);
 
         All all = new All();
@@ -399,7 +492,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         java.util.List<VariableElement> variables = ElementFilter.fieldsIn(element.getEnclosedElements());
         for (VariableElement variable : variables) {
-            if (context.getTypeMirrorUtils().isArrayOrList(variable.asType())) {
+            if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
                 generateConfigurableCollectionElement(all, variable);
             } else {
                 config.getAttributeOrAttributeGroup().add(createConfigurableAttribute(variable));
@@ -427,10 +520,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         } else if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
             attribute.setName(name);
             javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(variable.asType());
-            attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + "EmumType"));
+            attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + EMUM_TYPE_SUFFIX));
         } else {
             // non-supported types will get "-ref" so beans can be injected
-            attribute.setName(name + "-ref");
+            attribute.setName(name + REF_SUFFIX);
             attribute.setType(SchemaConstants.STRING);
         }
 
@@ -457,17 +550,16 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             attribute.setUse(SchemaConstants.USE_REQUIRED);
         }
 
-
         if (isTypeSupported(variable.asType())) {
             attribute.setName(name);
             attribute.setType(SchemaTypeConversion.convertType(variable.asType().toString(), schema.getTargetNamespace()));
         } else if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
             attribute.setName(name);
             javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(variable.asType());
-            attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + "EmumType"));
+            attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + EMUM_TYPE_SUFFIX));
         } else {
             // non-supported types will get "-ref" so beans can be injected
-            attribute.setName(name + "-ref");
+            attribute.setName(name + REF_SUFFIX);
             attribute.setType(SchemaConstants.STRING);
         }
 

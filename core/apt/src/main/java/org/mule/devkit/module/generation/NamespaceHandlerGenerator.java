@@ -33,6 +33,7 @@ import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Package;
 import org.springframework.beans.factory.config.ListFactoryBean;
+import org.springframework.beans.factory.config.MapFactoryBean;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -88,21 +89,24 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
                 childDefinitionParser.arg(ExpressionFactory.lit(variable.getSimpleName().toString()));
                 childDefinitionParser.arg(ref(ListFactoryBean.class).dotclass());
 
-                init.body().invoke("registerMuleBeanDefinitionParser").arg(ExpressionFactory.lit(variable.getSimpleName().toString())).arg(childDefinitionParser);
+                init.body().invoke("registerMuleBeanDefinitionParser").arg(ExpressionFactory.lit(context.getNameUtils().uncamel(variable.getSimpleName().toString()))).arg(childDefinitionParser);
 
-                Invocation childListEntryDefinitionParser = ExpressionFactory._new(ref(ChildListEntryDefinitionParser.class));
-                childListEntryDefinitionParser.arg("sourceList");
+                DefinedClass listEntryChildDefinitionParser = context.getClassForRole(ListEntryChildDefinitionParserGenerator.ROLE);
+                Invocation childListEntryDefinitionParser = ExpressionFactory._new(listEntryChildDefinitionParser);
 
-                init.body().invoke("registerMuleBeanDefinitionParser").arg(ExpressionFactory.lit(context.getNameUtils().singularize(variable.getSimpleName().toString()))).arg(childListEntryDefinitionParser);
+                init.body().invoke("registerMuleBeanDefinitionParser").arg(ExpressionFactory.lit(context.getNameUtils().uncamel(context.getNameUtils().singularize(variable.getSimpleName().toString())))).arg(childListEntryDefinitionParser);
+            } else if (context.getTypeMirrorUtils().isMap(variable.asType())) {
+                DefinedClass freeFormChildDefinitionParser = context.getClassForRole(FreeFormMapChildDefinitionParserGenerator.ROLE);
+                Invocation childDefinitionParser = ExpressionFactory._new(freeFormChildDefinitionParser);
+                childDefinitionParser.arg(ExpressionFactory.lit(variable.getSimpleName().toString()));
+                childDefinitionParser.arg(ref(MapFactoryBean.class).dotclass());
 
+                init.body().invoke("registerMuleBeanDefinitionParser").arg(ExpressionFactory.lit(context.getNameUtils().uncamel(variable.getSimpleName().toString()))).arg(childDefinitionParser);
 
-                /*
-                registerMuleBeanDefinitionParser("${parameter.getName()}", new ChildDefinitionParser("${parameter.getName()}", ListFactoryBean.class));
-                registerMuleBeanDefinitionParser("<@singularize>${parameter.getName()}</@singularize>", new ChildListEntryDefinitionParser("sourceList"));
-                <#elseif parameter.getType().isMap()>
-                registerMuleBeanDefinitionParser("${parameter.getName()}", new ChildDefinitionParser("${parameter.getName()}", MapFactoryBean.class));
-                registerMuleBeanDefinitionParser("<@singularize>${parameter.getName()}</@singularize>", new ChildMapEntryDefinitionParser("sourceMap"));
-                */
+                DefinedClass mapEntryChildDefinitionParser = context.getClassForRole(MapEntryChildDefinitionParserGenerator.ROLE);
+                Invocation childMapEntryDefinitionParser = ExpressionFactory._new(mapEntryChildDefinitionParser);
+
+                init.body().invoke("registerMuleBeanDefinitionParser").arg(ExpressionFactory.lit(context.getNameUtils().uncamel(context.getNameUtils().singularize(variable.getSimpleName().toString())))).arg(childMapEntryDefinitionParser);
             }
         }
     }

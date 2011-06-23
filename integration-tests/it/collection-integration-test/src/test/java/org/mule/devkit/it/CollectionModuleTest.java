@@ -41,4 +41,23 @@ public class CollectionModuleTest extends AbstractModuleTest
         runFlow("flowConfigItems", 2);
     }
 
+    public void testMap() throws Exception
+    {
+        runFlow("flowMap", 2);
+    }
+
+    public void testConfigMapStrings() throws Exception
+    {
+        runFlow("flowConfigMapStrings", 2);
+    }
+
+    public void testConfigMapItems() throws Exception
+    {
+        runFlow("flowConfigMapItems", "ObjectAObjectB");
+    }
+
+    public void testHasFirstName() throws Exception
+    {
+        runFlow("flowHasFirstName");
+    }
 }

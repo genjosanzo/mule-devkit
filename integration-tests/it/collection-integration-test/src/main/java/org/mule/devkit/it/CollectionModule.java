@@ -22,6 +22,7 @@ import org.mule.devkit.annotations.Module;
 import org.mule.devkit.annotations.Processor;
 
 import java.util.List;
+import java.util.Map;
 
 @Module(name = "collection")
 public class CollectionModule
@@ -31,7 +32,13 @@ public class CollectionModule
 
 	@Configurable(optional=true)
 	private List items;
-	
+
+	@Configurable(optional=true)
+	private Map<String, String> mapStrings;
+
+	@Configurable(optional=true)
+	private Map mapItems;
+
     @Processor
     public int countListOfStrings(List<String> strings)
     {
@@ -50,6 +57,37 @@ public class CollectionModule
         return this.items.size();
     }
 
+    @Processor
+    public int countMapOfStrings(Map<String, String> mapStrings)
+    {
+        return mapStrings.size();
+    }
+
+    @Processor
+    public int countConfigMapStrings()
+    {
+        return this.mapStrings.size();
+    }
+
+    @Processor
+    public String appendConfigMapItems()
+    {
+        String result = "";
+        for( Object part : this.mapItems.keySet() )
+        {
+            result += this.mapItems.get(part);
+        }
+
+        return result;
+    }
+
+    @Processor
+    public void hasFirstName(Map properties)
+    {
+        if( !properties.containsKey("FirstName") )
+            throw new RuntimeException("Does not have a first name");
+    }
+
 	public void setStrings(List strings)
 	{
 		this.strings = strings;
@@ -59,5 +97,14 @@ public class CollectionModule
 	{
 		this.items = items;
 	}
-	
+
+	public void setMapStrings(Map mapStrings)
+	{
+		this.mapStrings = mapStrings;
+	}
+
+	public void setMapItems(Map<String, String> mapItems)
+	{
+		this.mapItems = mapItems;
+	}
 }

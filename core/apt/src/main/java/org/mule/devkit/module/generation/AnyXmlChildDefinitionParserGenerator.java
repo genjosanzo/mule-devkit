@@ -22,14 +22,15 @@ import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.devkit.annotations.Processor;
+import org.mule.devkit.annotations.Source;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.model.code.DefinedClass;
-import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
+import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
-import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.ForLoop;
+import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
@@ -44,6 +45,7 @@ import org.w3c.dom.NodeList;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 import javax.xml.transform.Transformer;
@@ -61,28 +63,32 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractModuleGenerato
     public static final String ANY_XML_CHILD_DEFINITION_PARSER_ROLE = "AnyXmlChildDefinitionParser";
 
     public void generate(Element type) throws GenerationException {
+        boolean shouldGenerate = false;
 
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(type.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Processor processor = executableElement.getAnnotation(Processor.class);
+            Source source = executableElement.getAnnotation(Source.class);
 
-            if (processor == null)
+            if (processor == null && source == null)
                 continue;
 
             // generate extra parser
             for (VariableElement variable : executableElement.getParameters()) {
                 if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
-                    DefinedClass anyXmlChildDefinitionParser = getAnyXmlChildDefinitionParserClass(variable);
-                    generateAnyXmlChildDefinitionParser(anyXmlChildDefinitionParser);
-
-                    break;
+                    shouldGenerate = true;
                 }
             }
         }
+
+        if (shouldGenerate) {
+            DefinedClass anyXmlChildDefinitionParser = getAnyXmlChildDefinitionParserClass((TypeElement)type);
+            generateAnyXmlChildDefinitionParser(anyXmlChildDefinitionParser);
+        }
     }
 
-    private DefinedClass getAnyXmlChildDefinitionParserClass(VariableElement variableElement) {
-        String anyXmlChildDefinitionParserClassName = context.getNameUtils().generateClassNameInPackage(variableElement, "AnyXmlChildDefinitionParser");
+    private DefinedClass getAnyXmlChildDefinitionParserClass(TypeElement type) {
+        String anyXmlChildDefinitionParserClassName = context.getNameUtils().generateClassNameInPackage(type, "AnyXmlChildDefinitionParser");
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(anyXmlChildDefinitionParserClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(anyXmlChildDefinitionParserClassName), ChildDefinitionParser.class);
 

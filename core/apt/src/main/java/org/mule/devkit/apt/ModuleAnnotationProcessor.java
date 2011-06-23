@@ -50,9 +50,6 @@ public class ModuleAnnotationProcessor extends AbstractProcessor {
     private GeneratorContext context;
     private List<Plugin> plugins;
 
-    public ModuleAnnotationProcessor() {
-    }
-
     /**
      * Gets all the {@link Plugin}s discovered so far.
      */
@@ -177,11 +174,4 @@ public class ModuleAnnotationProcessor extends AbstractProcessor {
     protected void error(String msg, Element element) {
         processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, msg, element);
     }
-
-    /*
-    @Override
-    public List<Generator> getCodeGenerators() {
-
-    }
-    */
 }

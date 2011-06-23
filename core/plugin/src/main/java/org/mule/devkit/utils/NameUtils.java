@@ -210,6 +210,14 @@ public class NameUtils {
 
     }
 
+    public String generateClassNameInPackage(TypeElement typeElement, String className) {
+        String packageName = getPackageName(elements.getBinaryName(typeElement).toString());
+
+        return packageName + "." + className;
+
+    }
+
+
     public String generateClassName(TypeElement typeElement, String append) {
         return elements.getBinaryName(typeElement).toString() + append;
     }

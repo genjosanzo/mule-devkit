@@ -23,8 +23,11 @@ import org.mule.devkit.module.generation.AnyXmlChildDefinitionParserGenerator;
 import org.mule.devkit.module.generation.BeanDefinitionParserGenerator;
 import org.mule.devkit.module.generation.DummyInboundEndpointGenerator;
 import org.mule.devkit.module.generation.EnumTransformerGenerator;
+import org.mule.devkit.module.generation.FreeFormMapChildDefinitionParserGenerator;
 import org.mule.devkit.module.generation.JaxbTransformerGenerator;
 import org.mule.devkit.module.generation.LifecycleWrapperGenerator;
+import org.mule.devkit.module.generation.ListEntryChildDefinitionParserGenerator;
+import org.mule.devkit.module.generation.MapEntryChildDefinitionParserGenerator;
 import org.mule.devkit.module.generation.MessageProcessorGenerator;
 import org.mule.devkit.module.generation.MessageSourceGenerator;
 import org.mule.devkit.module.generation.NamespaceHandlerGenerator;
@@ -46,9 +49,12 @@ public class ModulePlugin implements Plugin {
     public ModulePlugin() {
         this.generators = new ArrayList<Generator>();
         this.generators.add(new AnyXmlChildDefinitionParserGenerator());
+        this.generators.add(new ListEntryChildDefinitionParserGenerator());
+        this.generators.add(new MapEntryChildDefinitionParserGenerator());
+        this.generators.add(new SchemaGenerator());
+        this.generators.add(new FreeFormMapChildDefinitionParserGenerator());
         this.generators.add(new DummyInboundEndpointGenerator());
         this.generators.add(new LifecycleWrapperGenerator());
-        this.generators.add(new SchemaGenerator());
         this.generators.add(new JaxbTransformerGenerator());
         this.generators.add(new TransformerGenerator());
         this.generators.add(new EnumTransformerGenerator());
