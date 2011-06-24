@@ -4,21 +4,21 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.mule</groupId>
+        <groupId>org.mule.tools.devkit</groupId>
         <artifactId>mule-devkit-core</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
     <name>Mule DevKit Annotations Plugin</name>
 
-    <groupId>org.mule</groupId>
+    <groupId>org.mule.tools.devkit</groupId>
     <artifactId>mule-devkit-annotations-plugin</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.tools.devkit</groupId>
             <artifactId>mule-devkit-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
@@ -34,12 +34,12 @@
             <version>3.2</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.tools.devkit</groupId>
             <artifactId>mule-devkit-codemodel</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.tools.devkit</groupId>
             <artifactId>mule-devkit-schemamodel</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>

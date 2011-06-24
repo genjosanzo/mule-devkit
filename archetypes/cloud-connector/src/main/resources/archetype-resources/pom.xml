@@ -20,7 +20,7 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.mule</groupId>
+                    <groupId>org.mule.tools.devkit</groupId>
                     <artifactId>mule-devkit-maven-plugin</artifactId>
                     <version>${D}{mule.devkit.version}</version>
                     <extensions>true</extensions>
@@ -38,7 +38,7 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.mule</groupId>
+                <groupId>org.mule.tools.devkit</groupId>
                 <artifactId>mule-devkit-maven-plugin</artifactId>
                 <version>${D}{mule.devkit.version}</version>
             </plugin>
@@ -118,7 +118,7 @@
             <version>${D}{mule.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.tools.devkit</groupId>
             <artifactId>mule-devkit-api</artifactId>
             <version>${mule.devkit.version}</version>
             <scope>provided</scope>
