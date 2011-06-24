@@ -23,6 +23,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * This is a lifecycle annotation. The method annotated with @Dispose will be called during the
+ * {@link org.mule.api.lifecycle.Initialisable} phase of its lifecycle.
+ */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

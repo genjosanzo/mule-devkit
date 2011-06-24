@@ -23,6 +23,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * This annotation will mark a method as a Transformer. A {@link org.mule.api.transformer.Transformer} will be
+ * generated. The signature for the method must match the following:
+ *
+ * public Object method(Object payload)
+ *
+ * It can only have one argument and it must be {@link Object}.
+ */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

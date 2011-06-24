@@ -32,7 +32,8 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Processor {
     /**
-     * The xml name of the element that will invoke this processor
+     * The xml name of the element that will invoke this processor. This is optional and if it is not specified a name
+     * will be derived from the name of the method.
      */
     String name() default "";
 }

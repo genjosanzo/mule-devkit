@@ -17,6 +17,15 @@
 
 package org.mule.devkit.annotations;
 
+/**
+ * Callback interface used by {@link Source} annotated methods to dispatch messages.
+ */
 public interface SourceCallback {
+    /**
+     * Dispatch message to the flow
+     *
+     * @param payload The payload of the message
+     * @return The response of the flow
+     */
     Object process(Object payload);
 }

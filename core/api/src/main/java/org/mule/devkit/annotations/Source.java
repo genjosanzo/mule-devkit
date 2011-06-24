@@ -23,9 +23,20 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * This annotation marks a method inside a {@link Module} as a callable from within a Mule flow and capable of
+ * generating Mule events. Each marked method will have a {@link org.mule.api.source.MessageSource} generated.
+ *
+ * The method must receive a {@link SourceCallback} as one of its arguments. It does not matter which parameter it is
+ * as long it is there.
+ */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Source {
+    /**
+     * The xml name of the element that will invoke this source. This is optional and if it is not specified a name
+     * will be derived from the name of the method.
+     */
     String name() default "";
 }
