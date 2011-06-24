@@ -39,7 +39,7 @@
                 <phases>
                     <validate></validate>
                     <initialize></initialize>
-                    <generate-sources>org.mule:mule-devkit-maven-plugin:generate-sources
+                    <generate-sources>org.mule.tools.devkit:mule-devkit-maven-plugin:generate-sources
                     </generate-sources>
                     <process-sources>
                     </process-sources>
@@ -61,7 +61,7 @@
                     <process-test-classes>
                     </process-test-classes>
                     <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
-                    <package>org.mule:mule-devkit-maven-plugin:attach-schema,
+                    <package>org.mule.tools.devkit:mule-devkit-maven-plugin:attach-schema,
                         org.apache.maven.plugins:maven-jar-plugin:jar</package>
                     <pre-integration-test></pre-integration-test>
                     <integration-test>
