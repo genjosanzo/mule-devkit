@@ -68,6 +68,8 @@
                         <exclude>**/build-number.txt</exclude> 
                         <exclude>**/*.ftl</exclude>
 						<exclude>**/org/mule/devkit/model/code/**</exclude>
+						<exclude>**/org/mule/devkit/doclet/**</exclude>
+						<exclude>**/assets/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>

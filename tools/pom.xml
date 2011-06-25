@@ -18,5 +18,6 @@
 
 	<modules>
         <module>maven</module>
+		<module>doclet</module>
 	</modules>
 </project>
