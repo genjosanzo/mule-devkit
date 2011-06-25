@@ -33,6 +33,7 @@ import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
+import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
 import org.mule.util.StringUtils;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -142,7 +143,10 @@ public class ListEntryChildDefinitionParserGenerator extends AbstractMessageGene
 
         Invocation contains = assembler.invoke("getBean").invoke("getRawBeanDefinition").invoke("getPropertyValues").invoke("contains").arg("value");
         Conditional ifValue = postProcess.body()._if(Op.not(contains));
-        ifValue._then().add(extendBean);
+        TryStatement tryBlock = ifValue._then()._try();
+
+        tryBlock.body().add(extendBean);
+        tryBlock._catch(ref(IllegalStateException.class));
 
         Invocation sup = ExpressionFactory._super().invoke("postProcess");
         sup.arg(parserContext);
@@ -186,6 +190,7 @@ public class ListEntryChildDefinitionParserGenerator extends AbstractMessageGene
     private void generateConstructor(DefinedClass listEntryBeanDefinitionParser, DefinedClass listEntry) {
         Method constructor = listEntryBeanDefinitionParser.constructor(Modifier.PUBLIC);
         Invocation sup = constructor.body().invoke("super");
+        sup.arg("value");
         sup.arg("sourceList");
         sup.arg(ref(ChildListEntryDefinitionParser.ListEntry.class).dotclass());
 
@@ -193,9 +198,10 @@ public class ListEntryChildDefinitionParserGenerator extends AbstractMessageGene
     }
 
     private DefinedClass getListEntryChildDefinitionParserClass(TypeElement typeElement) {
+        DefinedClass freeForm = context.getClassForRole(FreeFormMapChildDefinitionParserGenerator.ROLE);
         String ListEntryChildDefinitionParserName = context.getNameUtils().generateClassNameInPackage(typeElement, "ListEntryChildDefinitionParser");
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(ListEntryChildDefinitionParserName));
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(ListEntryChildDefinitionParserName), ChildDefinitionParser.class);
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(ListEntryChildDefinitionParserName), freeForm);
 
         context.setClassRole(ROLE, clazz);
 

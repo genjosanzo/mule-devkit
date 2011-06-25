@@ -21,6 +21,7 @@ import org.mule.devkit.annotations.Configurable;
 import org.mule.devkit.annotations.Module;
 import org.mule.devkit.annotations.Processor;
 
+import java.lang.RuntimeException;
 import java.util.List;
 import java.util.Map;
 
@@ -86,6 +87,16 @@ public class CollectionModule
     {
         if( !properties.containsKey("FirstName") )
             throw new RuntimeException("Does not have a first name");
+    }
+
+    @Processor
+    public void acceptNested(List<Map<String, String>> objects)
+    {
+        for( Map<String, String> object : objects )
+        {
+            if( object.keySet().size() != 3 )
+                throw new RuntimeException("Invalid object");
+        }
     }
 
 	public void setStrings(List strings)

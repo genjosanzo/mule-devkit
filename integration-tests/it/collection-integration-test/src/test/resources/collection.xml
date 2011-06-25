@@ -49,18 +49,18 @@
         </collection:items>
     </collection:config>
 
-    <collection:config name="configC">
-        <collection:map-strings>
-            <collection:map-string key="a">#[string:MuleSoft]</collection:map-string>
-            <collection:map-string key="b">FTW</collection:map-string>
-        </collection:map-strings>
-    </collection:config>
-
     <collection:config name="configD">
         <collection:map-items>
             <collection:map-item key-ref="objectA" value-ref="objectA"/>
             <collection:map-item key-ref="objectB" value-ref="objectB"/>
         </collection:map-items>
+    </collection:config>
+
+    <collection:config name="configC">
+        <collection:map-strings>
+            <collection:map-string key="a">#[string:MuleSoft]</collection:map-string>
+            <collection:map-string key="b">FTW</collection:map-string>
+        </collection:map-strings>
     </collection:config>
 
     <flow name="flowList">
@@ -104,6 +104,18 @@
                 <LastName>Lesende</LastName>
             </collection:properties>
         </collection:has-first-name>
+    </flow>
+
+    <flow name="flowNested">
+        <collection:accept-nested config-ref="configC">
+            <collection:objects>
+                <collection:object>
+                    <Title>Mr.</Title>
+                    <FirstName>Emiliano</FirstName>
+                    <LastName>Lesende</LastName>
+                </collection:object>
+            </collection:objects>
+        </collection:accept-nested>
     </flow>
 
 </mule>

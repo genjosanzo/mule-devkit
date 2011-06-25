@@ -75,5 +75,15 @@ public class ModuleValidator implements Validator {
                 throw new ValidationException(variable, "Optional configurable fields can only be applied to non-primitive types without a default value");
             }
         }
+
+        // verify that every @Processor is public and non-static and non-generic
+
+        // verify that every @Source is public and non-static and non-generic
+        // verify that every @Source receives a SourceCallback
+
+        // verify that every @Transformer is public and non-static and non-generic
+        // verify that every @Transformer signature is Object x(Object);
+
+        // verify that every @Filter is public and non-static and non-generic
     }
 }

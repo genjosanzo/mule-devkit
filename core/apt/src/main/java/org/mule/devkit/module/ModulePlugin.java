@@ -48,11 +48,11 @@ public class ModulePlugin implements Plugin {
 
     public ModulePlugin() {
         this.generators = new ArrayList<Generator>();
+        this.generators.add(new SchemaGenerator());
         this.generators.add(new AnyXmlChildDefinitionParserGenerator());
+        this.generators.add(new FreeFormMapChildDefinitionParserGenerator());
         this.generators.add(new ListEntryChildDefinitionParserGenerator());
         this.generators.add(new MapEntryChildDefinitionParserGenerator());
-        this.generators.add(new SchemaGenerator());
-        this.generators.add(new FreeFormMapChildDefinitionParserGenerator());
         this.generators.add(new DummyInboundEndpointGenerator());
         this.generators.add(new LifecycleWrapperGenerator());
         this.generators.add(new JaxbTransformerGenerator());

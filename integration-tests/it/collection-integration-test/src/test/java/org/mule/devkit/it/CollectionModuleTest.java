@@ -60,4 +60,9 @@ public class CollectionModuleTest extends AbstractModuleTest
     {
         runFlow("flowHasFirstName");
     }
+
+    public void testNested() throws Exception
+    {
+        runFlow("flowNested");
+    }
 }

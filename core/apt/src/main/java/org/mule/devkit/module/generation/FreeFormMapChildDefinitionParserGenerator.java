@@ -18,7 +18,9 @@
 package org.mule.devkit.module.generation;
 
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
+import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.annotations.Source;
 import org.mule.devkit.generation.GenerationException;
@@ -26,11 +28,14 @@ import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
+import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.ForLoop;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Modifiers;
 import org.mule.devkit.model.code.Op;
+import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -63,7 +68,8 @@ public class FreeFormMapChildDefinitionParserGenerator extends AbstractMessageGe
 
             // generate extra parser
             for (VariableElement variable : executableElement.getParameters()) {
-                if (context.getTypeMirrorUtils().isMap(variable.asType())) {
+                if (context.getTypeMirrorUtils().isMap(variable.asType()) ||
+                    context.getTypeMirrorUtils().isArrayOrList(variable.asType())) {
                     shouldGenerate = true;
                 }
             }
@@ -77,35 +83,28 @@ public class FreeFormMapChildDefinitionParserGenerator extends AbstractMessageGe
 
     private void generateFreeFormMapChildDefinitionParser(DefinedClass freeFormMapChildDefinitionParser) {
 
-        Method constructor = freeFormMapChildDefinitionParser.constructor(Modifier.PUBLIC);
-        Variable setterMethod = constructor.param(String.class, "setterMethod");
-        Variable clazz = constructor.param(Class.class, "clazz");
+        FieldVariable propertyName = freeFormMapChildDefinitionParser.field(Modifier.PUBLIC, String.class, "propertyName");
+        FieldVariable isFreeForm = freeFormMapChildDefinitionParser.field(Modifier.PUBLIC, Boolean.class, "isFreeForm");
 
-        Invocation sup = constructor.body().invoke("super");
-        sup.arg(setterMethod);
-        sup.arg(clazz);
+        generateConstructor(freeFormMapChildDefinitionParser, propertyName, isFreeForm);
 
-        constructor.body().invoke("addIgnored").arg("xmlns");
+        generateParseInternal(freeFormMapChildDefinitionParser, isFreeForm);
 
-        Method parseInternal = freeFormMapChildDefinitionParser.method(Modifier.PROTECTED, AbstractBeanDefinition.class, "parseInternal");
-        Variable element = parseInternal.param(org.w3c.dom.Element.class, "element");
-        Variable parserContext = parseInternal.param(ParserContext.class, "parserContext");
+        generatePostProcessMethod(freeFormMapChildDefinitionParser, propertyName, isFreeForm);
+    }
 
-        Variable bd = parseInternal.body().decl(ref(AbstractBeanDefinition.class), "bd", ExpressionFactory._null());
-        Variable isFreeForm = parseInternal.body().decl(context.getCodeModel().BOOLEAN, "isFreeForm", ExpressionFactory.FALSE);
+    private void generatePostProcessMethod(DefinedClass freeFormMapChildDefinitionParser, FieldVariable propertyName, FieldVariable isFreeForm) {
+        Method postProcess = freeFormMapChildDefinitionParser.method(Modifier.PROTECTED, context.getCodeModel().VOID, "postProcess");
+        Variable parserContext = postProcess.param(ParserContext.class, "parserContext");
+        Variable assembler = postProcess.param(BeanAssembler.class, "assembler");
+        Variable element = postProcess.param(org.w3c.dom.Element.class, "element");
 
-        Invocation superParseInternal = ExpressionFactory._super().invoke("parseInternal");
-        superParseInternal.arg(element);
-        superParseInternal.arg(parserContext);
-        parseInternal.body().assign(bd, superParseInternal);
+        Conditional ifBlock3 = postProcess.body()._if(isFreeForm);
 
-        isFreeForm(parseInternal, element, isFreeForm);
+        Invocation contains = assembler.invoke("getBean").invoke("getRawBeanDefinition").invoke("getPropertyValues")
+                .invoke("contains").arg(ExpressionFactory._this().ref(propertyName));
 
-        Conditional ifBlock = parseInternal.body()._if(isFreeForm);
-        Invocation setAttribute = bd.invoke("setAttribute");
-        setAttribute.arg(ref(MuleHierarchicalBeanDefinitionParserDelegate.class).boxify().staticRef("MULE_NO_RECURSE"));
-        setAttribute.arg(ref(Boolean.class).boxify().staticRef("TRUE"));
-        ifBlock._then().add(setAttribute);
+        Conditional ifBlock = ifBlock3._then()._if(Op.not(contains));
 
         Variable map = ifBlock._then().decl(ref(Map.class), "map", ExpressionFactory._new(ref(HashMap.class)));
 
@@ -122,10 +121,56 @@ public class FreeFormMapChildDefinitionParserGenerator extends AbstractMessageGe
         put.arg(child.invoke("getLocalName"));
         put.arg(child.invoke("getTextContent"));
         ifBlock2._then().add(put);
+        ifBlock2._then().add(assembler.invoke("extendBean").
+                                arg(ExpressionFactory._this().ref(propertyName)).
+                                arg(map).
+                                arg(ExpressionFactory.FALSE));
 
-        ifBlock._then().add(bd.invoke("getPropertyValues").invoke("addPropertyValue").arg("sourceMap").arg(map));
+
+        Invocation sup = ExpressionFactory._super().invoke("postProcess");
+        sup.arg(parserContext);
+        sup.arg(assembler);
+        sup.arg(element);
+        postProcess.body().add(sup);
+    }
+
+    private void generateParseInternal(DefinedClass freeFormMapChildDefinitionParser, FieldVariable isFreeForm) {
+        Method parseInternal = freeFormMapChildDefinitionParser.method(Modifier.PROTECTED, AbstractBeanDefinition.class, "parseInternal");
+        Variable element = parseInternal.param(org.w3c.dom.Element.class, "element");
+        Variable parserContext = parseInternal.param(ParserContext.class, "parserContext");
+
+        Variable bd = parseInternal.body().decl(ref(AbstractBeanDefinition.class), "bd", ExpressionFactory._null());
+
+        isFreeForm(parseInternal, element, isFreeForm);
+
+        Invocation superParseInternal = ExpressionFactory._super().invoke("parseInternal");
+        superParseInternal.arg(element);
+        superParseInternal.arg(parserContext);
+        parseInternal.body().assign(bd, superParseInternal);
+
+        Conditional ifBlock = parseInternal.body()._if(isFreeForm);
+        Invocation setAttribute = bd.invoke("setAttribute");
+        setAttribute.arg(ref(MuleHierarchicalBeanDefinitionParserDelegate.class).boxify().staticRef("MULE_NO_RECURSE"));
+        setAttribute.arg(ref(Boolean.class).boxify().staticRef("TRUE"));
+        ifBlock._then().add(setAttribute);
 
         parseInternal.body()._return(bd);
+    }
+
+    private void generateConstructor(DefinedClass freeFormMapChildDefinitionParser, FieldVariable propertyName, FieldVariable isFreeForm) {
+        Method constructor = freeFormMapChildDefinitionParser.constructor(Modifier.PUBLIC);
+        Variable propName = constructor.param(String.class, "propertyName");
+        Variable setterMethod = constructor.param(String.class, "setterMethod");
+        Variable clazz = constructor.param(Class.class, "clazz");
+
+        Invocation sup = constructor.body().invoke("super");
+        sup.arg(setterMethod);
+        sup.arg(clazz);
+
+        constructor.body().invoke("addIgnored").arg("xmlns");
+
+        constructor.body().assign(ExpressionFactory._this().ref(propertyName), propName);
+        constructor.body().assign(ExpressionFactory._this().ref(isFreeForm), ExpressionFactory.FALSE);
     }
 
     private void isFreeForm(Method parseInternal, Variable element, Variable freeForm) {

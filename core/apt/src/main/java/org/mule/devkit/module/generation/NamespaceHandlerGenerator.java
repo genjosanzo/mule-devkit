@@ -98,6 +98,7 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
             } else if (context.getTypeMirrorUtils().isMap(variable.asType())) {
                 DefinedClass freeFormChildDefinitionParser = context.getClassForRole(FreeFormMapChildDefinitionParserGenerator.ROLE);
                 Invocation childDefinitionParser = ExpressionFactory._new(freeFormChildDefinitionParser);
+                childDefinitionParser.arg("sourceMap");
                 childDefinitionParser.arg(ExpressionFactory.lit(variable.getSimpleName().toString()));
                 childDefinitionParser.arg(ref(MapFactoryBean.class).dotclass());
 
