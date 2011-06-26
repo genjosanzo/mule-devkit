@@ -1,8 +1,8 @@
-/* file: doclava-developer-docs.css
+/* file: mule-developer-docs.css
    info: developer doc styles
 */
 
-@import url("doclava-developer-core.css");
+@import url("mule-developer-core.css");
 
 #title {
   border-bottom: 4px solid #ccc;
@@ -75,6 +75,7 @@
 }
 
 #side-nav li h2 {
+  font-family: Ubuntu, Arial, Helvetica;
   font-size:12px;
   font-weight: bold;
   margin:.5em 0 0 0;
@@ -237,11 +238,14 @@
 }
 
 #jd-header {
+  font-family: Monaco, monospace;
+  font-size: 12px;	
   background-color: #E2E2E2;
   padding: 7px 15px;
 }
 
 #jd-header h1 {
+  font-family: Ubuntu, Arial, Helvetica;
   margin: 0 0 10px;
   font-size:1.7em;
 }
@@ -476,6 +480,7 @@ div#naMessage strong {
 
 /* inheritance table */
 .jd-inheritance-table {
+  font-family: Monaco, monospace;
   border-spacing:0;
   margin:0;
   padding:0;
@@ -514,6 +519,7 @@ hr {
 }
 
 #jd-content h2 {
+  font-family: Ubuntu, Arial, Helvetica;
   font-size:1.45em;
   color:#111;
   border-top:2px solid #ccc;
@@ -529,7 +535,7 @@ hr {
 }
 
 #jd-content h4 {
-  font-size:1.1em;
+  font-size:12px;
   margin-bottom:.5em;
   color:#222;
 }
@@ -640,6 +646,7 @@ padding:0;
 the details section for constants,
 attrs, methods, etc. */
 h4.jd-details-title {
+  font-family: Monaco, monospace;
   font-size:1.15em;
   background-color: #E2E2E2;
   margin:1.5em 0 .6em;
@@ -658,6 +665,7 @@ h5.jd-tagtitle {
 }
 
 .jd-tagtable {
+  /* font-family: Monaco, monospace; */
   margin:0;
 }
 
@@ -1001,6 +1009,10 @@ table.download th {
 table.download th {
   background-color:#6d8293;
   color:#fff;
+}
+
+.subclasses-direct-list {
+    font-family: Monaco, monospace;
 }
 
 /* INLAY 180 COPY and 240PX EXTENSION */

@@ -30,7 +30,7 @@ import java.util.Collections;
 
 
 /**
- * Applies version information to the DroidDoc class model from apicheck XML files. Sample usage:
+ * Applies version information to the Doclava class model from apicheck XML files. Sample usage:
  * 
  * <pre>
  *   ClassInfo[] classInfos = ...

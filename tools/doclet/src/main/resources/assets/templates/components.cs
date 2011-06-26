@@ -6,5 +6,6 @@
 
 <?cs include:"components/masthead.cs" ?>
 <?cs include:"components/left_nav.cs" ?>
+<?cs include:"components/home_nav.cs" ?>
 
 <?cs include:"customizations.cs" ?>

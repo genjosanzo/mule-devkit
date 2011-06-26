@@ -1,3 +1,4 @@
+<?cs set:section = "guide" ?>
 <?cs include:"doctype.cs" ?>
 <?cs include:"macros.cs" ?>
 <html>

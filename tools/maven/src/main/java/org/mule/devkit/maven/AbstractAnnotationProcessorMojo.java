@@ -202,7 +202,7 @@ public abstract class AbstractAnnotationProcessorMojo extends AbstractMojo {
 
 
         for (String option : options) {
-            getLog().info("javac option: " + option);
+            getLog().debug("javac option: " + option);
         }
 
         DiagnosticListener<JavaFileObject> dl = null;

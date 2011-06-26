@@ -1,6 +1,16 @@
-/* file: doclava-developer-core.css
+/* file: mule-developer-core.css
    info: core developer styles
 */
+
+/* FONTS */
+
+@font-face {
+    font-family: 'Ubuntu';
+    src: url('fonts/ubuntu-r-webfont.otf');
+    src: url('fonts/ubuntu-r-webfont.woff') format('woff'), url('fonts/ubuntu-r-webfont.ttf') format('truetype'), url('fonts/ubuntu-r-webfont.svg#webfont28TUjpcg') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
 
 /* RESET STYLES */
 
@@ -63,7 +73,8 @@ p {
 
 code, pre {
   color:#007000;
-  font-family:monospace;
+  font-family: Monaco, monospace;
+  font-size: 12px;
   line-height:1em;
 }
 
@@ -190,6 +201,11 @@ blockquote {
   padding: 0 4em 0 1em;
   border-left:2px solid #eee;
 }
+
+nobr {
+    font-family: Monaco, monospace;
+}
+
 /* LAYOUT */
 
 #body-content {
@@ -201,7 +217,7 @@ blockquote {
 }
 
 #header {
-  height: 44px;
+  height: 88px;
   position:relative;
   z-index:100;
   min-width:675px; /* min width for the tabs, before they wrap */
@@ -213,7 +229,7 @@ blockquote {
   position:absolute;
   padding: 10px 0 0;
   left:8px;
-  bottom:3px;
+  bottom:0px;
 }
 
 #headerRight {
@@ -225,7 +241,8 @@ blockquote {
 }
 
 #masthead-title {
-  font-size:28px;
+  font-family: Ubuntu, Arial, Helvetica;
+  font-size: 28px;
   color: #2f74ae;
 }
 
@@ -233,7 +250,7 @@ blockquote {
 
 #header ul {
   list-style: none;
-  margin: 7px 0 0;
+  margin: 15px 0 0;
   padding: 0;
   height: 29px;
 }
@@ -245,6 +262,7 @@ blockquote {
 }
 
 #header li a {
+  font-family: "Ubuntu", Arial, Helvetica;
   text-decoration: none;
   display: block;
   background-image: url(images/bg_images_sprite.png);
@@ -277,14 +295,14 @@ blockquote {
 /* tab highlighting */
 
 .home #home-link a,
-.java-reference #java-reference a,
-.mule-xml-reference #mule-xml-reference a,
-.mule-dsl-reference #mule-dsl-reference a, 
-.guide #guide-link a,
+.java #java a,
+.mule #mule a,
+.guide #guide a,
 .reference #reference-link a,
 .sdk #sdk-link a,
 .resources #resources-link a,
 .videos #videos-link a {
+  font-family: "Ubuntu", Arial, Helvetica;
   background-image: url(images/bg_images_sprite.png);
   background-position: 0 0;
   background-repeat: no-repeat;
@@ -294,11 +312,10 @@ blockquote {
 }
 
 .home #home-link a:hover,
-.guide #guide-link a:hover,
+.guide #guide a:hover,
 .reference #reference-link a:hover,
-.java-reference #java-reference a:hover,
-.mule-xml-reference #mule-xml-reference a:hover,
-.mule-dsl-reference #mule-dsl-reference a:hover, 
+.java #java a:hover,
+.mule #mule a:hover,
 .sdk #sdk-link a:hover,
 .resources #resources-link a:hover,
 .videos #videos-link  a:hover {
@@ -328,6 +345,11 @@ blockquote {
 #search {
   margin:8px 10px 0 0;
 }
+
+#mulesoftlogo {
+  margin:0px 10px 0 0;
+}
+
 
 /* MAIN BODY */
 

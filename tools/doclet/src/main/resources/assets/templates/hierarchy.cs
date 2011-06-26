@@ -1,3 +1,4 @@
+<?cs set:section = "java" ?>
 <?cs include:"macros.cs" ?>
 <html>
 <style>

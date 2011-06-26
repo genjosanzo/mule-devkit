@@ -1,3 +1,4 @@
+<?cs set:section = "java" ?>
 <?cs include:"doctype.cs" ?>
 <?cs include:"macros.cs" ?>
 <?cs set:resources="true" ?>

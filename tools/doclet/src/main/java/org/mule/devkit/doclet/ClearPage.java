@@ -58,6 +58,7 @@ public class ClearPage {
         toroot = "./";
       }
     }
+      System.out.println("getPathToRoot -> " + path + " -> toroot = " + toroot);
     return toroot;
   }
 
@@ -99,7 +100,7 @@ public class ClearPage {
   }
 
   public static void write(Data data, String templ, String filename, boolean fullPath) {
-    write(data, templ, filename, false, Doclava.jSilver);
+    write(data, templ, filename, fullPath, Doclava.jSilver);
   }
 
   public static void write(Data data, String templ, String filename, boolean fullPath, JSilver cs) {

@@ -171,7 +171,7 @@ function init() {
   }
 
   if (devdocNav.length) { // only dev guide, resources, and sdk
-    tryPopulateResourcesNav();
+    //tryPopulateResourcesNav();
     highlightNav(location.href);
   }
 }
@@ -181,10 +181,10 @@ function highlightNav(fullPageName) {
   var firstSlashPos;
   if (fullPageName.indexOf("/guide/") != -1) {
       firstSlashPos = fullPageName.indexOf("/guide/");
-    } else if (fullPageName.indexOf("/sdk/") != -1) {
-      firstSlashPos = fullPageName.indexOf("/sdk/");
+    } else if (fullPageName.indexOf("/java/") != -1) {
+      firstSlashPos = fullPageName.indexOf("/java/");
     } else {
-      firstSlashPos = fullPageName.indexOf("/resources/");
+      firstSlashPos = fullPageName.indexOf("/mule/");
     }
   if (lastSlashPos == (fullPageName.length - 1)) { // if the url ends in slash (add 'index.html')
     fullPageName = fullPageName + "index.html";

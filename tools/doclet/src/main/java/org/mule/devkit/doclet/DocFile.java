@@ -110,32 +110,7 @@ public class DocFile {
 
     hdf.setValue("commentText", commentText);
 
-    // write the page using the appropriate root template, based on the
-    // whichdoc value supplied by build
-    String fromWhichmodule = hdf.getValue("android.whichmodule", "");
-    if (fromWhichmodule.equals("online-pdk")) {
-      // leaving this in just for temporary compatibility with pdk doc
-      hdf.setValue("online-pdk", "true");
-      // add any conditional login for root template here (such as
-      // for custom left nav based on tab etc.
-      ClearPage.write(hdf, "docpage.cs", outfile);
-    } else {
-      if (outfile.indexOf("sdk/") != -1) {
-        hdf.setValue("sdk", "true");
-        if ((outfile.indexOf("index.html") != -1) && (outfile.indexOf("preview/") == -1)) {
-          ClearPage.write(hdf, "sdkpage.cs", outfile);
-        } else {
-          ClearPage.write(hdf, "docpage.cs", outfile);
-        }
-      } else if (outfile.indexOf("guide/") != -1) {
-        hdf.setValue("guide", "true");
-        ClearPage.write(hdf, "docpage.cs", outfile);
-      } else if (outfile.indexOf("resources/") != -1) {
-        hdf.setValue("resources", "true");
-        ClearPage.write(hdf, "docpage.cs", outfile);
-      } else {
-        ClearPage.write(hdf, "nosidenavpage.cs", outfile);
-      }
-    }
+    ClearPage.write(hdf, "docpage.cs", outfile);
+
   } // writePage
 }
