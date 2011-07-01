@@ -513,6 +513,11 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         java.util.List<VariableElement> variables = ElementFilter.fieldsIn(element.getEnclosedElements());
         for (VariableElement variable : variables) {
+            Configurable configurable = variable.getAnnotation(Configurable.class);
+
+            if( configurable == null )
+                continue;
+
             if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
                 generateConfigurableCollectionElement(all, variable);
             } else {

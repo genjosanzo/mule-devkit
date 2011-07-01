@@ -462,10 +462,17 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
     }
 
     public void gatherFields(ClassInfo owner, ClassInfo cl, HashMap<String, FieldInfo> fields) {
+        gatherFields(owner, cl, fields, false);
+    }
+    public void gatherFields(ClassInfo owner, ClassInfo cl, HashMap<String, FieldInfo> fields, boolean ignoreVisibility) {
         FieldInfo[] flds = cl.selfFields();
         for (FieldInfo f : flds) {
-            if (f.checkLevel()) {
+            if( ignoreVisibility ) {
                 fields.put(f.name(), f.cloneForClass(owner));
+            } else {
+                if (f.checkLevel()) {
+                    fields.put(f.name(), f.cloneForClass(owner));
+                }
             }
         }
     }
@@ -674,6 +681,12 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
         return s;
     }
 
+    public String modulePath() {
+        String s = name();
+        s += ".html";
+        return s;
+    }
+
     public String relativePath(String suffix) {
         String s = containingPackage().name();
         s = s.replace('.', '/');
@@ -847,6 +860,21 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
         setFederatedReferences(data, base);
     }
 
+    public void makeModuleShortDescrHDF(Data data, String base) {
+        mTypeInfo.makeHDF(data, base + ".type");
+        data.setValue(base + ".kind", this.kind());
+        data.setValue(base + ".name", this.moduleName());
+        data.setValue(base + ".version", this.moduleVersion());
+        data.setValue(base + ".namespace", this.moduleNamespace());
+        data.setValue(base + ".schemaloc", this.moduleSchemaLocation());
+        data.setValue(base + ".link", this.modulePath());
+        TagInfo.makeHDF(data, base + ".shortDescr", this.firstSentenceTags());
+        TagInfo.makeHDF(data, base + ".deprecated", deprecatedTags());
+        data.setValue(base + ".since.key", SinceTagger.keyForName(getSince()));
+        data.setValue(base + ".since.name", getSince());
+        setFederatedReferences(data, base);
+    }
+
     /**
      * Turns into the main class page
      */
@@ -880,6 +908,12 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
         if (isAbstract() && !isInterface()) {
             data.setValue("class.abstract", "abstract");
         }
+
+        // module info
+        data.setValue("class.moduleName", this.moduleName());
+        data.setValue("class.moduleNamespace", this.moduleNamespace());
+        data.setValue("class.moduleSchemaLocation", this.moduleSchemaLocation());
+        data.setValue("class.moduleVersion", this.moduleVersion());
 
         // class info
         String kind = kind();
@@ -989,6 +1023,16 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
             }
         }
 
+        // constants
+        i = 0;
+        for (FieldInfo field : mAllSelfFields) {
+            if (field.isConfigurable()) {
+                field.makeHDF(data, "class.config." + i);
+                i++;
+            }
+        }
+
+
         // public constructors
         i = 0;
         for (MethodInfo ctor : ctors) {
@@ -1079,13 +1123,14 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
             if (method.isProcessor()) {
                 method.makeHDF(data, "class.methods.processor." + i);
                 i++;
+
             }
         }
 
         // source
         i = 0;
         for (MethodInfo method : methods) {
-            if (method.isProcessor()) {
+            if (method.isSource()) {
                 method.makeHDF(data, "class.methods.source." + i);
                 i++;
             }
@@ -1094,7 +1139,7 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
         // transformer
         i = 0;
         for (MethodInfo method : methods) {
-            if (method.isProcessor()) {
+            if (method.isTransformer()) {
                 method.makeHDF(data, "class.methods.transformer." + i);
                 i++;
             }
@@ -1382,6 +1427,9 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
     }
 
     public String kind() {
+        //if (isModule()) {
+        //    return "module";
+        // else
         if (isOrdinaryClass()) {
             return "class";
         } else if (isInterface()) {
@@ -1450,6 +1498,12 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
     private boolean mIsAnnotation;
     private boolean mIsFinal;
     private boolean mIsIncluded;
+    private boolean mIsModule;
+    private boolean mModuleKnown;
+    private String mModuleName;
+    private String mModuleVersion;
+    private String mModuleNamespace;
+    private String mModuleSchemaLocation;
     private String mName;
     private String mQualifiedName;
     private String mQualifiedTypeName;
@@ -1760,6 +1814,22 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
         return false;
     }
 
+    public String moduleName() {
+        return mModuleName;
+    }
+
+    public String moduleVersion() {
+        return mModuleVersion;
+    }
+
+    public String moduleNamespace() {
+        return mModuleNamespace;
+    }
+
+    public String moduleSchemaLocation() {
+        return mModuleSchemaLocation;
+    }
+
     public void setTypeInfo(TypeInfo typeInfo) {
         mTypeInfo = typeInfo;
     }
@@ -1786,4 +1856,43 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
 
         return stringBuffer.toString();
     }
+
+    public boolean isModule() {
+        if (!mModuleKnown) {
+            boolean annotationPresent = false;
+            for (AnnotationInstanceInfo annotation : annotations()) {
+                if (annotation.type().qualifiedName().equals("org.mule.devkit.annotations.Module")) {
+                    for (AnnotationValueInfo value : annotation.elementValues()) {
+                        if ("name".equals(value.element().name())) {
+                            mModuleName = value.valueString().replace("\"", "");
+                        }
+                    }
+                    mModuleVersion = "1.0";
+                    for (AnnotationValueInfo value : annotation.elementValues()) {
+                        if ("version".equals(value.element().name())) {
+                            mModuleVersion = value.valueString().replace("\"", "");
+                        }
+                    }
+                    mModuleNamespace = "http://www.mulesoft.org/schema/mule/" + mModuleName;
+                    for (AnnotationValueInfo value : annotation.elementValues()) {
+                        if ("namespace".equals(value.element().name())) {
+                            mModuleNamespace = value.valueString().replace("\"", "");
+                        }
+                    }
+                    mModuleSchemaLocation = mModuleNamespace + "/" + mModuleVersion + "/mule-" + mModuleName + ".xsd";
+                    for (AnnotationValueInfo value : annotation.elementValues()) {
+                        if ("schemaLocation".equals(value.element().name())) {
+                            mModuleSchemaLocation = value.valueString().replace("\"", "");
+                        }
+                    }
+                    annotationPresent = true;
+                    break;
+                }
+            }
+            mIsModule = annotationPresent;
+            mModuleKnown = true;
+        }
+        return mIsModule;
+    }
+
 }

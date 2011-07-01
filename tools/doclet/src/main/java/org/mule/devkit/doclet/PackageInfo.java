@@ -128,13 +128,8 @@ public class PackageInfo extends DocInfo implements ContainerInfo {
         ArrayList<ClassInfo> out = new ArrayList<ClassInfo>();
 
         for (ClassInfo cl : classes) {
-            AnnotationInstanceInfo[] annotations = cl.annotations();
-            if (annotations.length > 0) {
-                for (AnnotationInstanceInfo annotation : annotations) {
-                    if ("org.mule.devkit.annotations.Module".equals(annotation.type().qualifiedName())) {
-                        out.add(cl);
-                    }
-                }
+            if(cl.isModule()) {
+                out.add(cl);
             }
         }
 

@@ -3,6 +3,11 @@ def:package_link(pkg) ?>
   <a href="<?cs var:toroot ?><?cs var:pkg.link ?>"><?cs var:pkg.name ?></a><?cs 
 /def ?>
 
+<?cs # A link to a module ?><?cs
+def:module_link(mod) ?>
+  <a href="<?cs var:toroot ?><?cs var:mod.link ?>"><?cs var:mod.name ?></a><?cs
+/def ?>
+
 <?cs # A link to a type, or not if it's a primitive type
         link: whether to create a link at the top level, always creates links in
               recursive invocations.
@@ -53,6 +58,15 @@ def:cond_link(text, root, path, condition) ?><?cs
 
 <?cs # A comma separated parameter list ?><?cs 
 def:parameter_list(params) ?><?cs
+  each:param = params ?><?cs
+      call:type_link(param.type)?> <?cs
+      var:param.name ?><?cs
+      if: name(param)!=subcount(params)-1?>, <?cs /if ?><?cs
+  /each ?><?cs
+/def ?>
+
+<?cs # A comma separated parameter list ?><?cs
+def:xml_attribute_list(params) ?><?cs
   each:param = params ?><?cs
       call:type_link(param.type)?> <?cs
       var:param.name ?><?cs
@@ -203,6 +217,48 @@ def:description(obj) ?><?cs
       </table>
   </div><?cs 
   /if ?><?cs 
+  call:see_also_tags(obj.seeAlso) ?><?cs
+/def ?>
+
+<?cs # Print the long-form description for something.
+       Uses the following fields: deprecated descr seeAlso since ?><?cs
+def:op_description(obj) ?><?cs
+  call:deprecated_warning(obj) ?>
+  <div class="jd-tagdata jd-tagdescr"><p><?cs call:tag_list(obj.descr) ?></p></div>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Attributes</h5>
+      <table class="jd-tagtable">
+        <tr>
+          <th>config-ref</td>
+          <td><i>Optional.&nbsp;</i>Specify which configuration to use for this invocation.</td>
+        </tr><?cs
+      each:tag=obj.paramTags ?>
+        <tr>
+          <th><?cs var:tag.attributeName ?></td>
+          <td><?cs if:tag.optional=="true" ?><i>Optional.&nbsp;</i><?cs /if ?><?cs call:tag_list(tag.comment) ?></td>
+        </tr><?cs
+      /each ?>
+      </table>
+  </div><?cs
+  if:subcount(obj.returns) ?>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Return Payload</h5>
+      <ul class="nolist"><li><?cs call:tag_list(obj.returns) ?></li></ul>
+  </div><?cs
+  /if ?><?cs
+  if:subcount(obj.throws) ?>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Exception Payload</h5>
+      <table class="jd-tagtable"><?cs
+      each:tag=obj.throws ?>
+        <tr>
+            <th><?cs call:type_link(tag.type) ?></td>
+            <td><?cs call:tag_list(tag.comment) ?></td>
+        </tr><?cs
+      /each ?>
+      </table>
+  </div><?cs
+  /if ?><?cs
   call:see_also_tags(obj.seeAlso) ?><?cs
 /def ?>
 

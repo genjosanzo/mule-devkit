@@ -58,7 +58,6 @@ public class ClearPage {
         toroot = "./";
       }
     }
-      System.out.println("getPathToRoot -> " + path + " -> toroot = " + toroot);
     return toroot;
   }
 

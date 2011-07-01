@@ -11,7 +11,7 @@
     	<li id="java"><a href="<?cs var:toroot ?>../java/index.html">
 	    	<span class="en">Java API</span>
     	</a></li>
-    	<li id="mule"><a href="<?cs var:toroot ?>../mule/index.html">
+    	<li id="mule"><a href="<?cs var:toroot ?>../mule/modules.html">
 	    	<span class="en">Mule XML</span>
     	</a></li>
     </ul>

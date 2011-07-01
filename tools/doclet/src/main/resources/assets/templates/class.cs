@@ -1,4 +1,3 @@
-<?cs set:section = "java" ?>
 <?cs include:"doctype.cs" ?>
 <?cs include:"macros.cs" ?>
 <html>
@@ -131,11 +130,11 @@ Summary:
     <tr>
         <?cs loop:i = 1, (subcount(class.inheritance)-colspan), 1 ?>
             <td class="jd-inheritance-space">&nbsp;<?cs if:(subcount(class.inheritance)-colspan) == i ?>&nbsp;&nbsp;&#x21b3;<?cs /if ?></td>
-        <?cs /loop ?> 	
+        <?cs /loop ?>
         <td colspan="<?cs var:colspan ?>" class="jd-inheritance-class-cell"><?cs
             if:colspan == 1
-                ?><?cs call:class_name(class.qualifiedType) ?><?cs 
-            else 
+                ?><?cs call:class_name(class.qualifiedType) ?><?cs
+            else
                 ?><?cs call:type_link(supr.class) ?><?cs
             /if ?></td>
     </tr>
@@ -250,8 +249,8 @@ Summary:
     <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:cl.since.key ?>" >
       <td class="jd-typecol"><nobr>
         <?cs var:cl.scope ?>
-        <?cs var:cl.static ?> 
-        <?cs var:cl.final ?> 
+        <?cs var:cl.static ?>
+        <?cs var:cl.final ?>
         <?cs var:cl.abstract ?>
         <?cs var:cl.kind ?></nobr></td>
       <td class="jd-linkcol"><?cs call:type_link(cl.type) ?></td>

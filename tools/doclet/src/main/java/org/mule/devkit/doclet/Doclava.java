@@ -346,7 +346,7 @@ public class Doclava {
             //writeGuideInstallation(guideDir + "/installation" + htmlExtension);
 
             // Mule
-            //writeModules(muleXmlDir + "modules" + htmlExtension);
+            writeModules(muleXmlDir + "modules" + htmlExtension);
 
             // Packages Pages
             writePackages(javadocDir + "packages" + htmlExtension);
@@ -949,6 +949,35 @@ public class Doclava {
         return sVisiblePackages;
     }
 
+    public static PackageInfo[] chooseModulePackages() {
+        ClassInfo[] classes = Converter.rootClasses();
+        SortedMap<String, PackageInfo> sorted = new TreeMap<String, PackageInfo>();
+        for (ClassInfo cl : classes) {
+            if( !cl.isModule() )
+                continue;
+
+            PackageInfo pkg = cl.containingPackage();
+            String name;
+            if (pkg == null) {
+                name = "";
+            } else {
+                name = pkg.name();
+            }
+            sorted.put(name, pkg);
+        }
+
+        ArrayList<PackageInfo> result = new ArrayList<PackageInfo>();
+
+        for (String s : sorted.keySet()) {
+            PackageInfo pkg = sorted.get(s);
+
+            result.add(pkg);
+        }
+
+        return result.toArray(new PackageInfo[result.size()]);
+    }
+
+
     public static void writePackages(String filename) {
         Data data = makePackageHDF();
 
@@ -972,6 +1001,45 @@ public class Doclava {
 
         Proofread.writePackages(filename, Converter.convertTags(root.inlineTags(), null));
     }
+
+    public static void writeModules(String filename) {
+        Data data = makeHDF();
+
+        int i = 0;
+        for (PackageInfo pkg : chooseModulePackages()) {
+
+            data.setValue("reference", "1");
+            data.setValue("reference.apilevels", sinceTagger.hasVersions() ? "1" : "0");
+            data.setValue("docs.packages." + i + ".name", pkg.name());
+            makeModuleListHDF(data, "docs.packages." + i + ".modules", pkg.modules());
+
+            for (int j = 0; j < pkg.modules().length; j++) {
+                Data classData = makeHDF();
+                ClassInfo mod = pkg.modules()[j];
+                writeModule(mod, classData);
+            }
+
+            i++;
+        }
+
+        setPageTitle(data, "Module Index");
+
+        TagInfo.makeHDF(data, "root.descr", Converter.convertTags(root.inlineTags(), null));
+
+        ClearPage.write(data, "modules.cs", filename);
+
+        Proofread.writePackages(filename, Converter.convertTags(root.inlineTags(), null));
+    }
+
+    public static void writeModule(ClassInfo cl, Data data) {
+        cl.makeHDF(data);
+
+        setPageTitle(data, cl.name());
+        ClearPage.write(data, "module.cs", Doclava.muleXmlDir + cl.modulePath());
+
+        //Proofread.writeClass(cl.modulePath(), cl);
+    }
+
 
     public static void writePackage(PackageInfo pkg) {
         // these this and the description are in the same directory,
@@ -1145,6 +1213,15 @@ public class Doclava {
             ClassInfo cl = classes[i];
             if (!cl.isHidden()) {
                 cl.makeShortDescrHDF(data, base + "." + i);
+            }
+        }
+    }
+
+    public static void makeModuleListHDF(Data data, String base, ClassInfo[] classes) {
+        for (int i = 0; i < classes.length; i++) {
+            ClassInfo cl = classes[i];
+            if (!cl.isHidden()) {
+                cl.makeModuleShortDescrHDF(data, base + "." + i);
             }
         }
     }

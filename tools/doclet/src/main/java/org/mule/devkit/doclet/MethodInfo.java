@@ -47,6 +47,10 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
         }
     }
 
+    public String relativeModulePath() {
+      return mContainingClass.relativePath() + "#" + elementName();
+    }
+
     private static void addInterfaces(ClassInfo[] ifaces, ArrayList<ClassInfo> queue) {
         for (ClassInfo i : ifaces) {
             queue.add(i);
@@ -234,11 +238,28 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
         return mIsDeprecated;
     }
 
+    public String uncamel(String camelCaseName) {
+        String result = "";
+        String[] parts = camelCaseName.split("(?<!^)(?=[A-Z])");
+
+        for (int i = 0; i < parts.length; i++)
+            result += parts[i].toLowerCase() + (i < parts.length - 1 ? "-" : "");
+
+        return result;
+    }
+
+
     public boolean isProcessor() {
         if (!mProcessorKnown) {
             boolean annotationPresent = false;
             for (AnnotationInstanceInfo annotation : annotations()) {
                 if (annotation.type().qualifiedName().equals("org.mule.devkit.annotations.Processor")) {
+                    mElementName = uncamel(name());
+                    for (AnnotationValueInfo value : annotation.elementValues()) {
+                        if ("name".equals(value.element().name())) {
+                            mElementName = value.valueString().replace("\"", "");
+                        }
+                    }
                     annotationPresent = true;
                     break;
                 }
@@ -254,6 +275,12 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
             boolean annotationPresent = false;
             for (AnnotationInstanceInfo annotation : annotations()) {
                 if (annotation.type().qualifiedName().equals("org.mule.devkit.annotations.Source")) {
+                    mElementName = uncamel(name());
+                    for (AnnotationValueInfo value : annotation.elementValues()) {
+                        if ("name".equals(value.element().name())) {
+                            mElementName = value.valueString().replace("\"", "");
+                        }
+                    }
                     annotationPresent = true;
                     break;
                 }
@@ -269,6 +296,12 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
             boolean annotationPresent = false;
             for (AnnotationInstanceInfo annotation : annotations()) {
                 if (annotation.type().qualifiedName().equals("org.mule.devkit.annotations.Transformer")) {
+                    mElementName = uncamel(name());
+                    for (AnnotationValueInfo value : annotation.elementValues()) {
+                        if ("name".equals(value.element().name())) {
+                            mElementName = value.valueString().replace("\"", "");
+                        }
+                    }
                     annotationPresent = true;
                     break;
                 }
@@ -352,6 +385,10 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
 
     public String flatSignature() {
         return mFlatSignature;
+    }
+
+    public String elementName() {
+        return mElementName;
     }
 
     public InheritedTags inlineTags() {
@@ -461,12 +498,40 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
             final int N = mParameters.length;
 
             String[] names = new String[N];
+            boolean[] optional = new boolean[N];
+            String[] defaultValue = new String[N];
+            String[] attributeName = new String[N];
             String[] comments = new String[N];
             SourcePositionInfo[] positions = new SourcePositionInfo[N];
 
             // get the right names so we can handle our names being different from
             // our parent's names.
             for (int i = 0; i < N; i++) {
+                attributeName[i] = mParameters[i].name();
+                for (AnnotationInstanceInfo annotation : mParameters[i].annotations()) {
+                    if (annotation.type().qualifiedName().equals("org.mule.devkit.annotations.Parameter")) {
+                        for (AnnotationValueInfo value : annotation.elementValues()) {
+                            if ("name".equals(value.element().name())) {
+                                attributeName[i] = value.valueString().replace("\"", "");
+                            }
+                        }
+                        optional[i] = false;
+                        for (AnnotationValueInfo value : annotation.elementValues()) {
+                            if ("optional".equals(value.element().name())) {
+                                optional[i] = Boolean.valueOf(value.valueString().replace("\"", ""));
+                            }
+                        }
+                        defaultValue[i] = "";
+                        for (AnnotationValueInfo value : annotation.elementValues()) {
+                            if ("defaultValue".equals(value.element().name())) {
+                                defaultValue[i] = value.valueString().replace("\"", "");
+                            }
+                        }
+                        break;
+                    }
+                }
+
+
                 names[i] = mParameters[i].name();
                 comments[i] = "";
                 positions[i] = mParameters[i].position();
@@ -501,8 +566,8 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
             mParamTags = new ParamTagInfo[N];
             for (int i = 0; i < N; i++) {
                 mParamTags[i] =
-                        new ParamTagInfo("@param", "@param", names[i] + " " + comments[i], parent(),
-                                positions[i]);
+                        new ParamTagInfo("@param", "@param", names[i] + " " + comments[i], attributeName[i],
+                                optional[i], defaultValue[i], parent(), positions[i]);
 
                 // while we're here, if we find any parameters that are still undocumented at this
                 // point, complain. (this warning is off by default, because it's really, really
@@ -585,7 +650,9 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
     public void makeHDF(Data data, String base) {
         data.setValue(base + ".kind", kind());
         data.setValue(base + ".name", name());
+        data.setValue(base + ".elementName", elementName());
         data.setValue(base + ".href", htmlPage());
+        data.setValue(base + ".modhref", relativeModulePath());
         data.setValue(base + ".anchor", anchor());
 
         if (mReturnType != null) {
@@ -737,6 +804,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
     private boolean mIsSource;
     private boolean mTransformerKnown;
     private boolean mIsTransformer;
+    private String mElementName;
     private ParameterInfo[] mParameters;
     private ClassInfo[] mThrownExceptions;
     private String[] mParamStrings;

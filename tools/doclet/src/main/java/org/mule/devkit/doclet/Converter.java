@@ -161,7 +161,7 @@ public class Converter {
     if (p == null) return null;
     ParameterInfo pi =
         new ParameterInfo(p.name(), p.typeName(), Converter.obtainType(p.type()), isVarArg,
-          Converter.convertSourcePosition(pos));
+          Converter.convertSourcePosition(pos), Converter.convertAnnotationInstances(p.annotations()));
     return pi;
   }
 
@@ -377,9 +377,9 @@ public class Converter {
     int N = fields.length;
     for (int i = 0; i < N; i++) {
       FieldInfo f = Converter.obtainField(fields[i]);
-      if (f.checkLevel()) {
+      //if (f.checkLevel()) {
         out.add(f);
-      }
+      //}
     }
     return out.toArray(new FieldInfo[out.size()]);
   }

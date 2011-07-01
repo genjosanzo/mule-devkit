@@ -19,5 +19,6 @@
 	<modules>
         <module>maven</module>
 		<module>doclet</module>
+        <module>idea</module>
 	</modules>
 </project>
