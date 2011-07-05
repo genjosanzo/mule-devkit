@@ -35,6 +35,10 @@
         <spring:constructor-arg value="ObjectB"/>
     </spring:bean>
 
+    <spring:bean id="objectC" class="java.lang.String">
+        <spring:constructor-arg value="ObjectC"/>
+    </spring:bean>
+
     <collection:config name="configA">
         <collection:strings>
             <collection:string>#[string:MuleSoft]</collection:string>
