@@ -10,12 +10,46 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <properties>
+        <idea.lib.path>/Applications/IntelliJ IDEA 10.app/lib</idea.lib.path>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.8.2</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- IntelliJ -->
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>idea</artifactId>
+            <version>10.5</version>
+            <scope>system</scope>
+            <systemPath>${idea.lib.path}/idea.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>idea-annotations</artifactId>
+            <version>10.5</version>
+            <scope>system</scope>
+            <systemPath>${idea.lib.path}/annotations.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>idea-util</artifactId>
+            <version>10.5</version>
+            <scope>system</scope>
+            <systemPath>${idea.lib.path}/util.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>idea-openapi</artifactId>
+            <version>10.5</version>
+            <scope>system</scope>
+            <systemPath>${idea.lib.path}/openapi.jar</systemPath>
         </dependency>
     </dependencies>
 

@@ -31,7 +31,7 @@
         <requiredProperty key="muleModuleName"/>
         <requiredProperty key="muleModulePackage"/>
         <requiredProperty key="muleVersion">
-            <defaultValue>3.1</defaultValue>
+            <defaultValue>3.1.0</defaultValue>
         </requiredProperty>
     </requiredProperties>
 
