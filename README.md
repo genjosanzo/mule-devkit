@@ -9,7 +9,7 @@ Creating a Cloud Connector
 Creating a cloud connector using the development kit is extremely easy. Just invoke our archetype as follows:
 
 	mvn archetype:generate -DinteractiveMode=false
-	                       -DarchetypeGroupId=org.mule -DarchetypeArtifactId=mule-devkit-archetype-cloud-connector -DarchetypeVersion=1.0-SNAPSHOT
+	                       -DarchetypeGroupId=org.mule.tools.devkit -DarchetypeArtifactId=mule-devkit-archetype-cloud-connector -DarchetypeVersion=1.0-SNAPSHOT
 						   -DgroupId=org.mule.devkit.it -DartifactId=mule-test-module -Dversion=1.0-SNAPSHOT
 						   -DmuleVersion=3.1.2 -DmuleModuleName=Test -DmuleModulePackage=org.mule.devkit.it
 						
@@ -35,7 +35,7 @@ Here is the command line and a brief description on how to create a transformer 
 Creating a cloud connector using the development kit is extremely easy. Just invoke our archetype as follows:
 
 	mvn archetype:generate -DinteractiveMode=false
-	                       -DarchetypeGroupId=org.mule -DarchetypeArtifactId=mule-devkit-archetype-transformer -DarchetypeVersion=1.0-SNAPSHOT
+	                       -DarchetypeGroupId=org.mule.tools.devkit -DarchetypeArtifactId=mule-devkit-archetype-transformer -DarchetypeVersion=1.0-SNAPSHOT
 						   -DgroupId=org.mule.devkit.it -DartifactId=mule-test-module -Dversion=1.0-SNAPSHOT
 						   -DmuleVersion=3.1.2 -DmuleModuleName=Test -DmuleModulePackage=org.mule.devkit.it
 						

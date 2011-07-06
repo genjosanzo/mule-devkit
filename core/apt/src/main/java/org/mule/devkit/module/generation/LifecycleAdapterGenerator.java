@@ -37,9 +37,9 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import java.util.List;
 
-public class LifecycleWrapperGenerator extends AbstractModuleGenerator {
+public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
     public void generate(Element element) throws GenerationException {
-        DefinedClass lifecycleWrapper = getLifecycleWrapperClass(element);
+        DefinedClass lifecycleWrapper = getLifecycleAdapterClass(element);
 
         ExecutableElement startElement = getStartElement(element);
         if (startElement != null) {
@@ -70,12 +70,12 @@ public class LifecycleWrapperGenerator extends AbstractModuleGenerator {
         }
     }
 
-    private DefinedClass getLifecycleWrapperClass(Element typeElement) {
-        String namespaceHandlerName = context.getNameUtils().generateClassName((TypeElement) typeElement, "LifecycleWrapper");
+    private DefinedClass getLifecycleAdapterClass(Element typeElement) {
+        String namespaceHandlerName = context.getNameUtils().generateClassName((TypeElement) typeElement, ".config", "LifecycleAdapter");
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(namespaceHandlerName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(namespaceHandlerName), (TypeReference)ref(typeElement.asType()));
 
-        context.setClassRole(context.getNameUtils().generateClassName((TypeElement) typeElement, "Pojo"), clazz);
+        context.setClassRole(context.getNameUtils().generatePojoRoleKey((TypeElement) typeElement), clazz);
 
         return clazz;
     }

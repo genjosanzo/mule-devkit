@@ -25,7 +25,7 @@ import org.mule.devkit.module.generation.DummyInboundEndpointGenerator;
 import org.mule.devkit.module.generation.EnumTransformerGenerator;
 import org.mule.devkit.module.generation.FreeFormMapChildDefinitionParserGenerator;
 import org.mule.devkit.module.generation.JaxbTransformerGenerator;
-import org.mule.devkit.module.generation.LifecycleWrapperGenerator;
+import org.mule.devkit.module.generation.LifecycleAdapterGenerator;
 import org.mule.devkit.module.generation.ListEntryChildDefinitionParserGenerator;
 import org.mule.devkit.module.generation.MapEntryChildDefinitionParserGenerator;
 import org.mule.devkit.module.generation.MessageProcessorGenerator;
@@ -54,7 +54,7 @@ public class ModulePlugin implements Plugin {
         this.generators.add(new ListEntryChildDefinitionParserGenerator());
         this.generators.add(new MapEntryChildDefinitionParserGenerator());
         this.generators.add(new DummyInboundEndpointGenerator());
-        this.generators.add(new LifecycleWrapperGenerator());
+        this.generators.add(new LifecycleAdapterGenerator());
         this.generators.add(new JaxbTransformerGenerator());
         this.generators.add(new TransformerGenerator());
         this.generators.add(new EnumTransformerGenerator());

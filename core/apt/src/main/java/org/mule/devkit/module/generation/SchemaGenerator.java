@@ -121,7 +121,8 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             location = schema.getTargetNamespace() + "/" + module.version() + "/mule-" + module.name() + XSD_EXTENSION;
         }
 
-        String namespaceHandlerName = context.getNameUtils().generateClassName((TypeElement) element, NAMESPACE_HANDLER_SUFFIX);
+        // TODO: replace with a class role
+        String namespaceHandlerName = context.getNameUtils().generateClassName((TypeElement) element, ".config.spring", NAMESPACE_HANDLER_SUFFIX);
 
         SchemaLocation schemaLocation = new SchemaLocation(schema, fileName, location, namespaceHandlerName);
 

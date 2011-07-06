@@ -88,7 +88,7 @@ public class AnyXmlChildDefinitionParserGenerator extends AbstractModuleGenerato
     }
 
     private DefinedClass getAnyXmlChildDefinitionParserClass(TypeElement type) {
-        String anyXmlChildDefinitionParserClassName = context.getNameUtils().generateClassNameInPackage(type, "AnyXmlChildDefinitionParser");
+        String anyXmlChildDefinitionParserClassName = context.getNameUtils().generateClassNameInPackage(type, ".config.spring", "AnyXmlChildDefinitionParser");
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(anyXmlChildDefinitionParserClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(anyXmlChildDefinitionParserClassName), ChildDefinitionParser.class);
 

@@ -210,16 +210,28 @@ public class NameUtils {
 
     }
 
-    public String generateClassNameInPackage(TypeElement typeElement, String className) {
+    public String generateClassNameInPackage(TypeElement typeElement, String extraPackage, String className) {
         String packageName = getPackageName(elements.getBinaryName(typeElement).toString());
 
-        return packageName + "." + className;
+        return packageName + extraPackage + "." + className;
 
     }
 
+    public String generatePojoRoleKey(TypeElement typeElement) {
+        String typeFullName = elements.getBinaryName(typeElement).toString();
+        String pkg = getPackageName(typeFullName);
+        String className = getClassName(typeFullName);
 
-    public String generateClassName(TypeElement typeElement, String append) {
-        return elements.getBinaryName(typeElement).toString() + append;
+        return pkg + "." + className + "Pojo";
+    }
+
+
+    public String generateClassName(TypeElement typeElement, String extraPackage, String classNameAppend) {
+        String typeFullName = elements.getBinaryName(typeElement).toString();
+        String pkg = getPackageName(typeFullName);
+        String className = getClassName(typeFullName);
+
+        return pkg + extraPackage + "." + className + classNameAppend;
     }
 
     private static class Inflection {

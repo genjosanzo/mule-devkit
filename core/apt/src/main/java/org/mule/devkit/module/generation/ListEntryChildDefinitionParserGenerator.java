@@ -199,7 +199,7 @@ public class ListEntryChildDefinitionParserGenerator extends AbstractMessageGene
 
     private DefinedClass getListEntryChildDefinitionParserClass(TypeElement typeElement) {
         DefinedClass freeForm = context.getClassForRole(FreeFormMapChildDefinitionParserGenerator.ROLE);
-        String ListEntryChildDefinitionParserName = context.getNameUtils().generateClassNameInPackage(typeElement, "ListEntryChildDefinitionParser");
+        String ListEntryChildDefinitionParserName = context.getNameUtils().generateClassNameInPackage(typeElement, ".config.spring", "ListEntryChildDefinitionParser");
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(ListEntryChildDefinitionParserName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(ListEntryChildDefinitionParserName), freeForm);
 

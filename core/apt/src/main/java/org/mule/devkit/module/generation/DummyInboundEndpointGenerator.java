@@ -156,7 +156,7 @@ public class DummyInboundEndpointGenerator extends AbstractModuleGenerator {
 
     private DefinedClass getDummyInboundEndpointClass(ExecutableElement executableElement, GeneratorContext context) {
         TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
-        String packageName = context.getNameUtils().getPackageName(context.getElementsUtils().getBinaryName(parentClass).toString());
+        String packageName = context.getNameUtils().getPackageName(context.getElementsUtils().getBinaryName(parentClass).toString()) + ".config";
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(packageName);
         DefinedClass dummyInboundEndpoint = pkg._class("DummyInboundEndpoint");
         dummyInboundEndpoint._implements(ImmutableEndpoint.class);

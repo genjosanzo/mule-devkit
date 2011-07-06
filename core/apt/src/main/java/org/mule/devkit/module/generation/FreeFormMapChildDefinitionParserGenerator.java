@@ -194,7 +194,7 @@ public class FreeFormMapChildDefinitionParserGenerator extends AbstractMessageGe
     }
 
     private DefinedClass getFreeFormMapChildDefinitionParserClass(TypeElement typeElement) {
-        String ListEntryChildDefinitionParserName = context.getNameUtils().generateClassNameInPackage(typeElement, "FreeFormMapChildDefinitionParser");
+        String ListEntryChildDefinitionParserName = context.getNameUtils().generateClassNameInPackage(typeElement, ".config.spring", "FreeFormMapChildDefinitionParser");
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(ListEntryChildDefinitionParserName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(ListEntryChildDefinitionParserName), ChildDefinitionParser.class);
 

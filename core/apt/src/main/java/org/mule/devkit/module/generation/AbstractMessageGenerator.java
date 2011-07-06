@@ -34,8 +34,21 @@ import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.devkit.annotations.SourceCallback;
-import org.mule.devkit.model.code.*;
+import org.mule.devkit.model.code.Block;
+import org.mule.devkit.model.code.CatchBlock;
+import org.mule.devkit.model.code.Conditional;
+import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.Expression;
+import org.mule.devkit.model.code.ExpressionFactory;
+import org.mule.devkit.model.code.FieldVariable;
+import org.mule.devkit.model.code.Invocation;
+import org.mule.devkit.model.code.Method;
+import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.Package;
+import org.mule.devkit.model.code.TryStatement;
+import org.mule.devkit.model.code.TypeReference;
+import org.mule.devkit.model.code.Variable;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.TemplateParser;
 
@@ -62,14 +75,14 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected FieldVariable generateFieldForPojo(DefinedClass messageProcessorClass, Element typeElement) {
-        DefinedClass pojo = context.getClassForRole(context.getNameUtils().generateClassName((TypeElement) typeElement, "Pojo"));
+        DefinedClass pojo = context.getClassForRole(context.getNameUtils().generatePojoRoleKey((TypeElement) typeElement));
 
         return messageProcessorClass.field(Modifier.PRIVATE, pojo, "object");
     }
 
     protected DefinedClass getBeanDefinitionParserClass(ExecutableElement executableElement) {
-        String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, "BeanDefinitionParser");
-        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName));
+        String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, "DefinitionParser");
+        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + ".config.spring");
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), ChildDefinitionParser.class);
 
         return clazz;
@@ -77,7 +90,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
     protected DefinedClass getMessageProcessorClass(ExecutableElement executableElement) {
         String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, "MessageProcessor");
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName));
+        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + ".config");
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), new Class[]{Initialisable.class, MessageProcessor.class, MuleContextAware.class});
 
         return clazz;
@@ -85,7 +98,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
     protected DefinedClass getMessageSourceClass(ExecutableElement executableElement) {
         String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, "MessageSource");
-        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName));
+        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + ".config");
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), new Class[]{
                 MuleContextAware.class,
                 Startable.class,
@@ -121,7 +134,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected Method generateInitialiseMethod(DefinedClass messageProcessorClass, Element typeElement, FieldVariable muleContext, FieldVariable expressionManager, FieldVariable patternInfo, FieldVariable object) {
-        DefinedClass pojoClass = context.getClassForRole(context.getNameUtils().generateClassName((TypeElement) typeElement, "Pojo"));
+        DefinedClass pojoClass = context.getClassForRole(context.getNameUtils().generatePojoRoleKey((TypeElement) typeElement));
 
         Method initialise = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "initialise");
         initialise._throws(InitialisationException.class);

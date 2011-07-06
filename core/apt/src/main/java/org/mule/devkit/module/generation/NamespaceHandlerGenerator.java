@@ -18,9 +18,9 @@
 package org.mule.devkit.module.generation;
 
 import org.mule.config.spring.handlers.AbstractPojoNamespaceHandler;
-import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.devkit.annotations.Module;
 import org.mule.devkit.annotations.Processor;
 import org.mule.devkit.annotations.Source;
 import org.mule.devkit.annotations.Transformer;
@@ -28,10 +28,10 @@ import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.Invocation;
-import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Package;
+import org.mule.devkit.model.code.TypeReference;
 import org.springframework.beans.factory.config.ListFactoryBean;
 import org.springframework.beans.factory.config.MapFactoryBean;
 
@@ -47,6 +47,7 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
         DefinedClass namespaceHandlerClass = getNamespaceHandlerClass(type);
 
         Method init = namespaceHandlerClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "init");
+        init.javadoc().add("Invoked by the {@link DefaultBeanDefinitionDocumentReader} after construction but before any custom elements are parsed. \n@see NamespaceHandlerSupport#registerBeanDefinitionParser(String, BeanDefinitionParser)");
 
         registerConfig(init, type);
         registerBeanDefinitionParserForEachProcessor(type, init);
@@ -55,9 +56,16 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getNamespaceHandlerClass(Element typeElement) {
-        String namespaceHandlerName = context.getNameUtils().generateClassName((TypeElement) typeElement, "NamespaceHandler");
+        String namespaceHandlerName = context.getNameUtils().generateClassName((TypeElement) typeElement, ".config.spring", "NamespaceHandler");
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(namespaceHandlerName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(namespaceHandlerName), AbstractPojoNamespaceHandler.class);
+
+        Module module = typeElement.getAnnotation(Module.class);
+        String targetNamespace = module.namespace();
+        if (targetNamespace == null || targetNamespace.length() == 0) {
+            targetNamespace = SchemaConstants.BASE_NAMESPACE + module.name();
+        }
+        clazz.javadoc().add("Registers bean definitions parsers for handling elements in <code>" + targetNamespace + "</code>.");
 
         return clazz;
     }
@@ -65,7 +73,7 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
     private void registerConfig(Method init, Element pojo) {
         Invocation registerPojo = ExpressionFactory.invoke("registerPojo");
         registerPojo.arg("config");
-        DefinedClass pojoClass = context.getClassForRole(context.getNameUtils().generateClassName((TypeElement) pojo, "Pojo"));
+        DefinedClass pojoClass = context.getClassForRole(context.getNameUtils().generatePojoRoleKey((TypeElement) pojo));
         registerPojo.arg(pojoClass.dotclass());
         init.body().add(registerPojo);
 

@@ -202,7 +202,7 @@ public class MapEntryChildDefinitionParserGenerator extends AbstractMessageGener
     }
 
     private DefinedClass getMapEntryChildDefinitionParserClass(TypeElement typeElement) {
-        String ListEntryChildDefinitionParserName = context.getNameUtils().generateClassNameInPackage(typeElement, "MapEntryChildDefinitionParser");
+        String ListEntryChildDefinitionParserName = context.getNameUtils().generateClassNameInPackage(typeElement, ".config.spring", "MapEntryChildDefinitionParser");
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(ListEntryChildDefinitionParserName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(ListEntryChildDefinitionParserName), ChildDefinitionParser.class);
 
