@@ -135,7 +135,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         Variable parserContext = parseChild.param(ref(ParserContext.class), "parserContext");
         Variable beanDefinitionBuilder = parseChild.param(ref(BeanDefinitionBuilder.class), "beanDefinitionBuilder");
 
-        generateSetObjectIfConfigRefNotEmpty(parseChild, element, beanDefinitionBuilder);
+        generateSetPojoIfConfigRefNotEmpty(parseChild, element, beanDefinitionBuilder);
 
         for (VariableElement variable : executableElement.getParameters()) {
             if (variable.asType().toString().contains(SourceCallback.class.getName()))
@@ -151,10 +151,10 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         generatePostProcessCall(parseChild, element, assembler);
     }
 
-    private void generateSetObjectIfConfigRefNotEmpty(Method parseChild, Variable element, Variable beanDefinitionBuilder) {
+    private void generateSetPojoIfConfigRefNotEmpty(Method parseChild, Variable element, Variable beanDefinitionBuilder) {
         Conditional isConfigRefEmpty = parseChild.body()._if(Op.not(generateIsEmptyConfigRef(element)));
         Invocation addPropertyReference = beanDefinitionBuilder.invoke("addPropertyReference");
-        addPropertyReference.arg("object");
+        addPropertyReference.arg("pojo");
         Invocation getAttributeAlias = generateGetAttributeConfigRef();
         Invocation getAttribute = element.invoke("getAttribute");
         getAttribute.arg(getAttributeAlias);

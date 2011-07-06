@@ -178,7 +178,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private DefinedClass getTransformerClass(ExecutableElement executableElement) {
+    public DefinedClass getTransformerClass(ExecutableElement executableElement) {
         String transformerClassName = context.getNameUtils().generateClassName(executableElement, "Transformer");
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(transformerClassName) + ".config");
         DefinedClass transformer = pkg._class(context.getNameUtils().getClassName(transformerClassName), AbstractTransformer.class, new Class<?>[] {DiscoverableTransformer.class, MuleContextAware.class, Initialisable.class});

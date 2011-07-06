@@ -85,8 +85,8 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
 
     private void registerMuleBeanDefinitionParserFor(Method init, VariableElement variable, TypeReference parentClass) {
         if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
-            String anyXmlChildDefinitionParserClassName = context.getNameUtils().generateClassNameInPackage(variable, "AnyXmlChildDefinitionParser");
-            Invocation newAnyXmlChildDefinitionParser = ExpressionFactory._new(ref(anyXmlChildDefinitionParserClassName));
+            DefinedClass anyXmlChildDefinitionParserClass = context.getClassForRole(AnyXmlChildDefinitionParserGenerator.ANY_XML_CHILD_DEFINITION_PARSER_ROLE);
+            Invocation newAnyXmlChildDefinitionParser = ExpressionFactory._new(anyXmlChildDefinitionParserClass);
             newAnyXmlChildDefinitionParser.arg(ExpressionFactory.lit(variable.getSimpleName().toString()));
             newAnyXmlChildDefinitionParser.arg(ExpressionFactory.dotclass(parentClass));
 
@@ -155,6 +155,7 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
             Invocation registerMuleBeanDefinitionParser = init.body().invoke("registerMuleBeanDefinitionParser");
             registerMuleBeanDefinitionParser.arg(ExpressionFactory.lit(context.getNameUtils().uncamel(executableElement.getSimpleName().toString())));
             String transformerClassName = context.getNameUtils().generateClassName(executableElement, "Transformer");
+            transformerClassName = context.getNameUtils().getPackageName(transformerClassName) + ".config." + context.getNameUtils().getClassName(transformerClassName);
             registerMuleBeanDefinitionParser.arg(ExpressionFactory._new(ref(MessageProcessorDefinitionParser.class)).arg(ref(transformerClassName).boxify().dotclass()));
         }
     }
