@@ -46,6 +46,7 @@ import org.mule.session.DefaultMuleSession;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 import java.util.ArrayList;
@@ -71,6 +72,22 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         // get class
         DefinedClass messageSourceClass = getMessageSourceClass(executableElement);
 
+        messageSourceClass.javadoc().add(messageSourceClass.name() + " wraps ");
+        messageSourceClass.javadoc().add("{@link " + ((TypeElement)executableElement.getEnclosingElement()).getQualifiedName().toString() + "#");
+        messageSourceClass.javadoc().add(executableElement.getSimpleName().toString() + "(");
+        boolean first = true;
+        for (VariableElement variable : executableElement.getParameters()) {
+            if( !first ) {
+                messageSourceClass.javadoc().add(", ");
+            }
+            messageSourceClass.javadoc().add(variable.asType().toString().replaceAll("<[a-zA-Z\\-\\.\\<\\>\\s\\,]*>", ""));
+            first = false;
+        }
+        messageSourceClass.javadoc().add(")} method in ");
+        messageSourceClass.javadoc().add(ref(executableElement.getEnclosingElement().asType()));
+        messageSourceClass.javadoc().add(" as a message source capable of generating Mule events. ");
+        messageSourceClass.javadoc().add(" The POJO's method is invoked in its own thread.");
+
         // add a field for each argument of the method
         Map<String, FieldVariableElement> fields = generateFieldForEachParameter(messageSourceClass, executableElement);
 
@@ -78,8 +95,11 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         FieldVariable object = generateFieldForPojo(messageSourceClass, typeElement);
         FieldVariable muleContext = generateFieldForMuleContext(messageSourceClass);
         FieldVariable flowConstruct = messageSourceClass.field(Modifier.PRIVATE, ref(FlowConstruct.class), "flowConstruct");
+        flowConstruct.javadoc().add("Flow construct");
         FieldVariable messageProcessor = messageSourceClass.field(Modifier.PRIVATE, ref(MessageProcessor.class), "messageProcessor");
+        messageProcessor.javadoc().add("Message processor that will get called for processing incoming events");
         FieldVariable thread = messageSourceClass.field(Modifier.PRIVATE, ref(Thread.class), "thread");
+        thread.javadoc().add("Thread under which this message source will execute");
 
         // add initialise
         generateInitialiseMethod(messageSourceClass, typeElement, muleContext, null, null, object);
@@ -88,7 +108,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         generateSetMuleContextMethod(messageSourceClass, muleContext);
 
         // add setobject
-        generateSetObjectMethod(messageSourceClass, object);
+        generateSetPojoMethod(messageSourceClass, object);
 
         // add setlistener
         generateSetListenerMethod(messageSourceClass, messageProcessor);
@@ -116,6 +136,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
     private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, FieldVariable object, FieldVariable muleContext) {
         Method run = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "run");
+        run.javadoc().add("Implementation {@link Runnable#run()} that will invoke the method on the pojo that this message source wraps.");
         TryStatement callSource = run.body()._try();
 
         String methodName = executableElement.getSimpleName().toString();
@@ -152,6 +173,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
     private void generateStartMethod(DefinedClass messageSourceClass, FieldVariable thread) {
         Method start = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
+        start.javadoc().add("Method to be called when Mule instance gets started.");
         start._throws(ref(MuleException.class));
         Conditional ifNoThread = start.body()._if(Op.eq(thread, ExpressionFactory._null()));
         Invocation newThread = ExpressionFactory._new(ref(Thread.class));
@@ -164,6 +186,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
     private void generateStopMethod(DefinedClass messageSourceClass, FieldVariable thread) {
         Method stop = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "stop");
+        stop.javadoc().add("Method to be called when Mule instance gets stopped.");
         stop._throws(ref(MuleException.class));
 
         stop.body().add(thread.invoke("interrupt"));
@@ -172,6 +195,8 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
     private void generateSourceCallbackMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, FieldVariable messageProcessor, FieldVariable muleContext, FieldVariable flowConstruct) {
         Method process = messageSourceClass.method(Modifier.PUBLIC, ref(Object.class), "process");
+        process.javadoc().add("Implements {@link SourceCallback#process(org.mule.api.MuleEvent)}. This message source will be passed on to ");
+        process.javadoc().add("the actual pojo's method as a callback mechanism.");
         Variable message = process.param(ref(Object.class), "message");
 
         DefinedClass dummyInboundEndpointClass = context.getClassForRole(DummyInboundEndpointGenerator.DUMMY_INBOUND_ENDPOINT_ROLE);
@@ -217,6 +242,8 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
     private Method generateSetListenerMethod(DefinedClass messageSourceClass, FieldVariable messageProcessor) {
         Method setListener = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setListener");
+        setListener.javadoc().add("Sets the message processor that will \"listen\" the events generated by this message source");
+        setListener.javadoc().addParam("listener Message processor");
         Variable listener = setListener.param(ref(MessageProcessor.class), "listener");
         setListener.body().assign(ExpressionFactory._this().ref(messageProcessor), listener);
 
@@ -225,6 +252,8 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
     private Method generateSetFlowConstructMethod(DefinedClass messageSourceClass, FieldVariable flowConstruct) {
         Method setFlowConstruct = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setFlowConstruct");
+        setFlowConstruct.javadoc().add("Sets flow construct");
+        setFlowConstruct.javadoc().addParam("flowConstruct Flow construct to set");
         Variable newFlowConstruct = setFlowConstruct.param(ref(FlowConstruct.class), "flowConstruct");
         setFlowConstruct.body().assign(ExpressionFactory._this().ref(flowConstruct), newFlowConstruct);
 

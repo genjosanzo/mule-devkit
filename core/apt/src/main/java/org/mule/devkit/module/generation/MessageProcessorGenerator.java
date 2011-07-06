@@ -46,6 +46,7 @@ import org.mule.transport.NullPayload;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 import java.util.ArrayList;
@@ -69,6 +70,9 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         // get class
         DefinedClass messageProcessorClass = getMessageProcessorClass(executableElement);
 
+        // add javadoc
+        generateMessageProcessorClassDoc(executableElement, messageProcessorClass);
+
         // add a field for each argument of the method
         Map<String, AbstractMessageGenerator.FieldVariableElement> fields = generateFieldForEachParameter(messageProcessorClass, executableElement);
 
@@ -85,7 +89,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         generateSetMuleContextMethod(messageProcessorClass, muleContext);
 
         // add setobject
-        generateSetObjectMethod(messageProcessorClass, object);
+        generateSetPojoMethod(messageProcessorClass, object);
 
         // generate setters for all parameters
         for (String fieldName : fields.keySet()) {
@@ -94,6 +98,25 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         // add process method
         generateProcessMethod(executableElement, messageProcessorClass, fields, muleContext, object, expressionManager, patternInfo);
+    }
+
+    private void generateMessageProcessorClassDoc(ExecutableElement executableElement, DefinedClass messageProcessorClass) {
+        messageProcessorClass.javadoc().add(messageProcessorClass.name() + " invokes the ");
+        messageProcessorClass.javadoc().add("{@link " + ((TypeElement)executableElement.getEnclosingElement()).getQualifiedName().toString() + "#");
+        messageProcessorClass.javadoc().add(executableElement.getSimpleName().toString() + "(");
+        boolean first = true;
+        for (VariableElement variable : executableElement.getParameters()) {
+            if( !first ) {
+                messageProcessorClass.javadoc().add(", ");
+            }
+            messageProcessorClass.javadoc().add(variable.asType().toString().replaceAll("<[a-zA-Z\\-\\.\\<\\>\\s\\,]*>", ""));
+            first = false;
+        }
+        messageProcessorClass.javadoc().add(")} method in ");
+        messageProcessorClass.javadoc().add(ref(executableElement.getEnclosingElement().asType()));
+        messageProcessorClass.javadoc().add(". For each argument there is a field in this processor to match it. ");
+        messageProcessorClass.javadoc().add(" Before invoking the actual method the processor will evaluate and transform");
+        messageProcessorClass.javadoc().add(" where possible to the expected argument type.");
     }
 
     private Invocation generateNullPayload(FieldVariable muleContext, Variable event) {
@@ -112,8 +135,11 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         String methodName = executableElement.getSimpleName().toString();
         Type muleEvent = ref(MuleEvent.class);
 
-
         Method process = messageProcessorClass.method(Modifier.PUBLIC, muleEvent, "process");
+        process.javadoc().add("Invokes the MessageProcessor.");
+        process.javadoc().addParam("event MuleEvent to be processed");
+        process.javadoc().addThrows(ref(MuleException.class));
+
         process._throws(MuleException.class);
         Variable event = process.param(muleEvent, "event");
         Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage");

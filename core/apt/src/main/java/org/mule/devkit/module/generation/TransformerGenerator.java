@@ -78,7 +78,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             generateSetMuleContextMethod(transformerClass, muleContext);
 
             // add setobject
-            generateSetObjectMethod(transformerClass, object);
+            generateSetPojoMethod(transformerClass, object);
 
             // doTransform
             generateDoTransform(transformerClass, executableElement, object);

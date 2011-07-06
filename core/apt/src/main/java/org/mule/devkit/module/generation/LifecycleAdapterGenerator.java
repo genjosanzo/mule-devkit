@@ -40,6 +40,9 @@ import java.util.List;
 public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
     public void generate(Element element) throws GenerationException {
         DefinedClass lifecycleWrapper = getLifecycleAdapterClass(element);
+        lifecycleWrapper.javadoc().add("A <code>" + lifecycleWrapper.name() + "</code> is a wrapper around ");
+        lifecycleWrapper.javadoc().add(ref(element.asType()));
+        lifecycleWrapper.javadoc().add(" that adds lifecycle methods to the pojo.");
 
         ExecutableElement startElement = getStartElement(element);
         if (startElement != null) {

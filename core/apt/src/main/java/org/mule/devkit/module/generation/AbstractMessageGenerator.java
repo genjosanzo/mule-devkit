@@ -63,21 +63,30 @@ import java.util.Map;
 public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
     protected FieldVariable generateFieldForPatternInfo(DefinedClass messageProcessorClass) {
-        return messageProcessorClass.field(Modifier.PRIVATE, ref(TemplateParser.PatternInfo.class), "patternInfo");
+        FieldVariable patternInfo =  messageProcessorClass.field(Modifier.PRIVATE, ref(TemplateParser.PatternInfo.class), "patternInfo");
+        patternInfo.javadoc().add("Mule Pattern Info");
+        return patternInfo;
     }
 
     protected FieldVariable generateFieldForExpressionManager(DefinedClass messageProcessorClass) {
-        return messageProcessorClass.field(Modifier.PRIVATE, ref(ExpressionManager.class), "expressionManager");
+        FieldVariable expressionManager =  messageProcessorClass.field(Modifier.PRIVATE, ref(ExpressionManager.class), "expressionManager");
+        expressionManager.javadoc().add("Mule Expression Manager");
+        return expressionManager;
     }
 
     protected FieldVariable generateFieldForMuleContext(DefinedClass messageProcessorClass) {
-        return messageProcessorClass.field(Modifier.PRIVATE, ref(MuleContext.class), "muleContext");
+        FieldVariable muleContext =  messageProcessorClass.field(Modifier.PRIVATE, ref(MuleContext.class), "muleContext");
+        muleContext.javadoc().add("Mule Context");
+
+        return muleContext;
     }
 
     protected FieldVariable generateFieldForPojo(DefinedClass messageProcessorClass, Element typeElement) {
         DefinedClass pojo = context.getClassForRole(context.getNameUtils().generatePojoRoleKey((TypeElement) typeElement));
+        FieldVariable fieldPojo = messageProcessorClass.field(Modifier.PRIVATE, pojo, "pojo");
+        fieldPojo.javadoc().add("Plain old java object");
 
-        return messageProcessorClass.field(Modifier.PRIVATE, pojo, "object");
+        return fieldPojo;
     }
 
     protected DefinedClass getBeanDefinitionParserClass(ExecutableElement executableElement) {
@@ -137,6 +146,9 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         DefinedClass pojoClass = context.getClassForRole(context.getNameUtils().generatePojoRoleKey((TypeElement) typeElement));
 
         Method initialise = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "initialise");
+        initialise.javadoc().add("Obtains the expression manager from the Mule context and initialises the connector. If a target object ");
+        initialise.javadoc().add(" has not been set already it will search the Mule registry for a default one.");
+        initialise.javadoc().addThrows(ref(InitialisationException.class));
         initialise._throws(InitialisationException.class);
 
         if (expressionManager != null) {
@@ -164,9 +176,11 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
 
-    protected Method generateSetObjectMethod(DefinedClass messageProcessorClass, FieldVariable object) {
-        Method setObject = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setObject");
-        Variable objectParam = setObject.param(object.type(), "object");
+    protected Method generateSetPojoMethod(DefinedClass messageProcessorClass, FieldVariable object) {
+        Method setObject = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setPojo");
+        setObject.javadoc().add("Sets the instance of the object under which the processor will execute");
+        setObject.javadoc().addParam("pojo Instace of the POJO");
+        Variable objectParam = setObject.param(object.type(), "pojo");
         setObject.body().assign(ExpressionFactory._this().ref(object), objectParam);
 
         return setObject;
@@ -175,6 +189,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
     protected Method generateSetMuleContextMethod(DefinedClass messageProcessorClass, FieldVariable muleContext) {
         Method setMuleContext = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setMuleContext");
+        setMuleContext.javadoc().add("Set the Mule context");
+        setMuleContext.javadoc().addParam("context Mule context to set");
         Variable muleContextParam = setMuleContext.param(ref(MuleContext.class), "context");
         setMuleContext.body().assign(ExpressionFactory._this().ref(muleContext), muleContextParam);
 
@@ -222,6 +238,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
     protected Method generateSetter(DefinedClass messageProcessorClass, FieldVariable field) {
         Method setter = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "set" + StringUtils.capitalize(field.name()));
+        setter.javadoc().add("Sets " + field.name());
+        setter.javadoc().addParam("value Value to set");
         Variable value = setter.param(field.type(), "value");
         setter.body().assign(ExpressionFactory._this().ref(field), value);
 
