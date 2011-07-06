@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <idea.lib.path>/Applications/IntelliJ IDEA 10.app/lib</idea.lib.path>
+        <idea.lib.path>${basedir}/lib</idea.lib.path>
     </properties>
 
     <dependencies>
@@ -20,6 +20,11 @@
             <artifactId>junit</artifactId>
             <version>4.8.2</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.4</version>
         </dependency>
 
         <!-- IntelliJ -->
@@ -50,6 +55,27 @@
             <version>10.5</version>
             <scope>system</scope>
             <systemPath>${idea.lib.path}/openapi.jar</systemPath>
+        </dependency>
+		<dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>idea-maven</artifactId>
+            <version>10.5</version>
+            <scope>system</scope>
+            <systemPath>${idea.lib.path}/maven.jar</systemPath>
+        </dependency>
+		<dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>idea-maven-server-api</artifactId>
+            <version>10.5</version>
+            <scope>system</scope>
+            <systemPath>${idea.lib.path}/maven-server-api.jar</systemPath>
+        </dependency>
+		<dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>idea-extensions</artifactId>
+            <version>10.5</version>
+            <scope>system</scope>
+            <systemPath>${idea.lib.path}/extensions.jar</systemPath>
         </dependency>
     </dependencies>
 

@@ -1,11 +1,13 @@
-<idea-plugin version="2">
+<idea-plugin version="2" url="http://www.mulesoft.org/devkit">
     <name>Mule DevKit</name>
-    <description>Development Kit for Mule</description>
+    <description>The Mule Development Kit allows the development of Mule Modules using a simple annotation-based system. This kit includes archetypes for cloud connectors, transformers and even transports to accelerate your development.</description>
     <version>1.0</version>
-    <vendor>MuleSoft Inc.</vendor>
+    <vendor email="info@mulesoft.com" url="http://www.mulesoft.org">MuleSoft Inc.</vendor>
     <idea-version since-build="8000"/>
 
-    <resource-bundle xmlns="">org.mule.devkit.idea.MuleDevKitBundle</resource-bundle>
+    <resource-bundle xmlns="">org.mule.devkit.org.mule.devkit.idea.MuleDevKitBundle</resource-bundle>
+
+    <depends>org.jetbrains.idea.maven</depends>
 
     <application-components>
         <component>
@@ -24,7 +26,10 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>
-        <moduleType id="MULE_MODULE" implementationClass="org.mule.devkit.idea.module.MuleModuleType" classpathProvider="true"/>
+        <moduleBuilder builderClass="org.mule.devkit.idea.module.MuleCloudConnectorBuilder"/>
+        <moduleBuilder builderClass="org.mule.devkit.idea.module.MuleTransformerBuilder"/>
         <iconProvider implementation="org.mule.devkit.idea.MuleDevKitIconProvider"/>
+        <xml.schemaProvider implementation="org.mule.devkit.idea.MuleSchemaProvider"/>
+        <compiler implementation="org.mule.devkit.idea.MuleAptCompiler"/>
     </extensions>
 </idea-plugin>
