@@ -19,6 +19,7 @@ package org.mule.devkit.module.generation;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
+import org.mule.api.annotations.Source;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -30,7 +31,6 @@ import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
-import org.mule.devkit.annotations.Source;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.GeneratorContext;
 import org.mule.devkit.model.code.*;

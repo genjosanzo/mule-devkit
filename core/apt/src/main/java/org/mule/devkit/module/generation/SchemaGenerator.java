@@ -17,13 +17,14 @@
 
 package org.mule.devkit.module.generation;
 
-import org.mule.devkit.annotations.Configurable;
-import org.mule.devkit.annotations.Module;
-import org.mule.devkit.annotations.Parameter;
-import org.mule.devkit.annotations.Processor;
-import org.mule.devkit.annotations.Source;
-import org.mule.devkit.annotations.SourceCallback;
-import org.mule.devkit.annotations.Transformer;
+import org.mule.api.annotations.Configurable;
+import org.mule.api.annotations.Module;
+import org.mule.api.annotations.Parameter;
+import org.mule.api.annotations.Source;
+import org.mule.api.annotations.Transformer;
+import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.SourceCallback;
+import org.mule.api.annotations.param.Optional;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.schema.All;
 import org.mule.devkit.model.schema.Annotation;
@@ -454,18 +455,16 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     private void generateParameterCollectionElement(All all, VariableElement variable) {
         Parameter parameter = variable.getAnnotation(Parameter.class);
-        boolean optional = true;
+        Optional optional = variable.getAnnotation(Optional.class);
 
-        if (parameter != null)
-            optional = parameter.optional();
-
-        generateCollectionElement(all, variable, optional);
+        generateCollectionElement(all, variable, optional != null);
     }
 
     private void generateConfigurableCollectionElement(All all, VariableElement variable) {
         Configurable configurable = variable.getAnnotation(Configurable.class);
+        Optional optional = variable.getAnnotation(Optional.class);
 
-        generateCollectionElement(all, variable, configurable.optional());
+        generateCollectionElement(all, variable, optional != null);
     }
 
     private LocalComplexType generateRefComplexType(String name) {
@@ -532,6 +531,8 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         if (configurable == null)
             return null;
 
+        Optional optional = variable.getAnnotation(Optional.class);
+
         String name = variable.getSimpleName().toString();
         if (configurable.name().length() > 0)
             name = configurable.name();
@@ -539,7 +540,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         Attribute attribute = new Attribute();
 
         // set whenever or not is optional
-        attribute.setUse(configurable.optional() ? SchemaConstants.USE_OPTIONAL : SchemaConstants.USE_REQUIRED);
+        attribute.setUse(optional != null ? SchemaConstants.USE_OPTIONAL : SchemaConstants.USE_REQUIRED);
 
         if (isTypeSupported(variable.asType())) {
             attribute.setName(name);
@@ -563,6 +564,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     private Attribute createParameterAttribute(VariableElement variable) {
         Parameter parameter = variable.getAnnotation(Parameter.class);
+        Optional optional = variable.getAnnotation(Optional.class);
 
         String name = variable.getSimpleName().toString();
         if (parameter != null && parameter.name().length() > 0)
@@ -572,7 +574,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         // set whenever or not is optional
         if (parameter != null) {
-            attribute.setUse(parameter.optional() ? SchemaConstants.USE_OPTIONAL : SchemaConstants.USE_REQUIRED);
+            attribute.setUse(optional != null ? SchemaConstants.USE_OPTIONAL : SchemaConstants.USE_REQUIRED);
         } else {
             attribute.setUse(SchemaConstants.USE_REQUIRED);
         }

@@ -1861,7 +1861,7 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
         if (!mModuleKnown) {
             boolean annotationPresent = false;
             for (AnnotationInstanceInfo annotation : annotations()) {
-                if (annotation.type().qualifiedName().equals("org.mule.devkit.annotations.Module")) {
+                if (annotation.type().qualifiedName().equals("org.mule.api.annotations.Module")) {
                     for (AnnotationValueInfo value : annotation.elementValues()) {
                         if ("name".equals(value.element().name())) {
                             mModuleName = value.valueString().replace("\"", "");

@@ -15,27 +15,20 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.it;
+package org.mule.api.annotations.param;
 
-import org.mule.api.annotations.Configurable;
-import org.mule.api.annotations.Module;
-import org.mule.api.annotations.Processor;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.util.jar.Manifest;
-
-@Module(name = "jar")
-public class JarModule
-{
-	@Configurable
-	private Manifest manifest;
-	
-    @Processor
-    public void updateManifest(Manifest manifest)
-    {
-    }
-
-	public void setManifest(Manifest manifest)
-	{
-		this.manifest = manifest;
-	}
+/**
+ * Marks a {@link org.mule.api.annotations.Configurable} field or a
+ * {@link org.mule.api.annotations.Processor}/{@link org.mule.api.annotations.Source} parameters as optional.
+ */
+@Target(value={ElementType.PARAMETER, ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface Optional {
 }

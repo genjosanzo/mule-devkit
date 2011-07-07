@@ -377,11 +377,12 @@ public class FieldInfo extends MemberInfo {
         if (!mConfigurableKnown) {
             boolean annotationPresent = false;
             for (AnnotationInstanceInfo annotation : annotations()) {
-                if (annotation.type().qualifiedName().equals("org.mule.devkit.annotations.Configurable")) {
+                if (annotation.type().qualifiedName().equals("org.mule.api.annotations.Configurable")) {
                     annotationPresent = true;
-                    for (AnnotationValueInfo value : annotation.elementValues()) {
-                        if ("optional".equals(value.element().name())) {
-                            mIsOptional = Boolean.valueOf(value.valueString().replace("\"", ""));
+                    mIsOptional = false;
+                    for (AnnotationInstanceInfo secondAnnotation : annotations()) {
+                        if (secondAnnotation.type().qualifiedName().equals("org.mule.api.annotations.param.Optional")) {
+                            mIsOptional = true;
                         }
                     }
                     mDefaultValue = "";

@@ -19,6 +19,7 @@ package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleContext;
+import org.mule.api.annotations.SourceCallback;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionManager;
@@ -33,7 +34,6 @@ import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.devkit.annotations.SourceCallback;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;

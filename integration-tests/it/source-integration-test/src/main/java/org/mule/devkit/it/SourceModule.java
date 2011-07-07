@@ -17,9 +17,9 @@
 
 package org.mule.devkit.it;
 
-import org.mule.devkit.annotations.Module;
-import org.mule.devkit.annotations.Source;
-import org.mule.devkit.annotations.SourceCallback;
+import org.mule.api.annotations.Module;
+import org.mule.api.annotations.Source;
+import org.mule.api.annotations.SourceCallback;
 
 @Module(name = "source")
 public class SourceModule

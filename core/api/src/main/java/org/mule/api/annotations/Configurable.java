@@ -14,8 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.mule.devkit.annotations.lifecycle;
+package org.mule.api.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -24,11 +23,24 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This is a lifecycle annotation. The method annotated with @Dispose will be called during the
- * {@link org.mule.api.lifecycle.Startable} phase of its lifecycle.
+ * Marks a field inside a {@link Module} as being configurable. A user will be able to use XML attributes to set this
+ * bean properties when using the Module.
+ *
+ * The field must have setter and getters.
  */
-@Target(ElementType.METHOD)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Start {
+public @interface Configurable {
+    /**
+     * The name that the user of the module will use to configure this field.
+     *
+     * @return The name of the XML attribute
+     */
+    String name() default "";
+
+    /**
+     * Default value for this field
+     */
+    String defaultValue() default "";
 }

@@ -17,9 +17,9 @@
 
 package org.mule.devkit.it;
 
-import org.mule.devkit.annotations.Configurable;
-import org.mule.devkit.annotations.Module;
-import org.mule.devkit.annotations.Processor;
+import org.mule.api.annotations.Configurable;
+import org.mule.api.annotations.Module;
+import org.mule.api.annotations.Processor;
 
 @Module(name = "schemaloc",
         schemaLocation = "http://repository.mulesoft.org/releases/org/mule/modules/mule-module-schemaloc/1.0-SNAPSHOT/mule-schemaloc.xsd",

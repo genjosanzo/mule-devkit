@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.annotations;
+package org.mule.api.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

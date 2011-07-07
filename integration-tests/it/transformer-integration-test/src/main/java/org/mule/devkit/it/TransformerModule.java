@@ -17,8 +17,8 @@
 
 package org.mule.devkit.it;
 
-import org.mule.devkit.annotations.Module;
-import org.mule.devkit.annotations.Transformer;
+import org.mule.api.annotations.Module;
+import org.mule.api.annotations.Transformer;
 
 @Module(name = "transformer")
 public class TransformerModule

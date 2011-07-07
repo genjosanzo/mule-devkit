@@ -17,12 +17,12 @@
 
 package org.mule.devkit.module.generation;
 
+import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.Source;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.devkit.annotations.Processor;
-import org.mule.devkit.annotations.Source;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
@@ -31,7 +31,6 @@ import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
-import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.transformer.AbstractTransformer;

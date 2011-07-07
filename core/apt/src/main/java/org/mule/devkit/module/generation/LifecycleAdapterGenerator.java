@@ -18,15 +18,15 @@
 package org.mule.devkit.module.generation;
 
 import org.mule.api.MuleException;
+import org.mule.api.annotations.lifecycle.Dispose;
+import org.mule.api.annotations.lifecycle.Initialise;
+import org.mule.api.annotations.lifecycle.Start;
+import org.mule.api.annotations.lifecycle.Stop;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-import org.mule.devkit.annotations.lifecycle.Dispose;
-import org.mule.devkit.annotations.lifecycle.Initialise;
-import org.mule.devkit.annotations.lifecycle.Start;
-import org.mule.devkit.annotations.lifecycle.Stop;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.*;
 

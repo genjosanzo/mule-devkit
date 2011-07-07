@@ -21,7 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.devkit.annotations.Processor;
+import org.mule.api.annotations.Processor;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.CatchBlock;

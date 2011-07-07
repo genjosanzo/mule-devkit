@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.annotations.lifecycle;
+package org.mule.api.annotations.lifecycle;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -25,11 +25,11 @@ import java.lang.annotation.Target;
 
 /**
  * This is a lifecycle annotation. The method annotated with @Dispose will be called during the
- * {@link org.mule.api.lifecycle.Stoppable} phase of its lifecycle.
+ * {@link org.mule.api.lifecycle.Disposable} phase of its lifecycle.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Stop {
+public @interface Dispose {
 }
 

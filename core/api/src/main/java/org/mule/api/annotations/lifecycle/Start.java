@@ -15,17 +15,20 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.annotations;
+package org.mule.api.annotations.lifecycle;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Callback interface used by {@link Source} annotated methods to dispatch messages.
+ * This is a lifecycle annotation. The method annotated with @Dispose will be called during the
+ * {@link org.mule.api.lifecycle.Startable} phase of its lifecycle.
  */
-public interface SourceCallback {
-    /**
-     * Dispatch message to the flow
-     *
-     * @param payload The payload of the message
-     * @return The response of the flow
-     */
-    Object process(Object payload);
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface Start {
 }

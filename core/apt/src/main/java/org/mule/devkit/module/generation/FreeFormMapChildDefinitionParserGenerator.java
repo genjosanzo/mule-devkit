@@ -17,12 +17,11 @@
 
 package org.mule.devkit.module.generation;
 
+import org.mule.api.annotations.Source;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.util.SpringXMLUtils;
-import org.mule.devkit.annotations.Processor;
-import org.mule.devkit.annotations.Source;
+import org.mule.api.annotations.Processor;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
@@ -33,9 +32,7 @@ import org.mule.devkit.model.code.ForLoop;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
-import org.mule.devkit.model.code.Modifiers;
 import org.mule.devkit.model.code.Op;
-import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;

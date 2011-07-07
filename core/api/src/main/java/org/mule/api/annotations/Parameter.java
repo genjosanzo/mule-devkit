@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.annotations;
+package org.mule.api.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -23,38 +23,19 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * This annotation defines a class that will export its functionality as a Mule module.
- *
- * There are a few restrictions as to which types as valid for this annotation:
- * - It cannot be an interface
- * - It must be public
- * - It cannot have a typed parameter (no generic)
- */
-@Target(ElementType.TYPE)
+@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Module {
+public @interface Parameter {
     /**
-     * The name of the module.
+     * The name that the user of the module will use to configure this parameter.
+     *
+     * @return The name of the XML attribute
      */
-    String name();
-
-    /**
-     * The version of the module. Defaults to 1.0.
-     */
-    String version() default DEFAULT_VERSION;
+    String name() default "";
 
     /**
-     * Namespace of the module
+     * Default value for this parameter
      */
-    String namespace() default "";
-
-    /**
-     * Location URI for the schema
-     */
-    String schemaLocation() default "";
-
-    String DEFAULT_VERSION = "1.0";
-
+    String defaultValue() default "";
 }

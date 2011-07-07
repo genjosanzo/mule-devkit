@@ -48,7 +48,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
     }
 
     public String relativeModulePath() {
-      return mContainingClass.relativePath() + "#" + elementName();
+        return mContainingClass.relativePath() + "#" + elementName();
     }
 
     private static void addInterfaces(ClassInfo[] ifaces, ArrayList<ClassInfo> queue) {
@@ -253,7 +253,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
         if (!mProcessorKnown) {
             boolean annotationPresent = false;
             for (AnnotationInstanceInfo annotation : annotations()) {
-                if (annotation.type().qualifiedName().equals("org.mule.devkit.annotations.Processor")) {
+                if (annotation.type().qualifiedName().equals("org.mule.api.annotations.Processor")) {
                     mElementName = uncamel(name());
                     for (AnnotationValueInfo value : annotation.elementValues()) {
                         if ("name".equals(value.element().name())) {
@@ -274,7 +274,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
         if (!mSourceKnown) {
             boolean annotationPresent = false;
             for (AnnotationInstanceInfo annotation : annotations()) {
-                if (annotation.type().qualifiedName().equals("org.mule.devkit.annotations.Source")) {
+                if (annotation.type().qualifiedName().equals("org.mule.api.annotations.Source")) {
                     mElementName = uncamel(name());
                     for (AnnotationValueInfo value : annotation.elementValues()) {
                         if ("name".equals(value.element().name())) {
@@ -295,7 +295,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
         if (!mTransformerKnown) {
             boolean annotationPresent = false;
             for (AnnotationInstanceInfo annotation : annotations()) {
-                if (annotation.type().qualifiedName().equals("org.mule.devkit.annotations.Transformer")) {
+                if (annotation.type().qualifiedName().equals("org.mule.api.annotations.Transformer")) {
                     mElementName = uncamel(name());
                     for (AnnotationValueInfo value : annotation.elementValues()) {
                         if ("name".equals(value.element().name())) {
@@ -509,16 +509,16 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
             for (int i = 0; i < N; i++) {
                 attributeName[i] = mParameters[i].name();
                 for (AnnotationInstanceInfo annotation : mParameters[i].annotations()) {
-                    if (annotation.type().qualifiedName().equals("org.mule.devkit.annotations.Parameter")) {
+                    if (annotation.type().qualifiedName().equals("org.mule.api.annotations.Parameter")) {
                         for (AnnotationValueInfo value : annotation.elementValues()) {
                             if ("name".equals(value.element().name())) {
                                 attributeName[i] = value.valueString().replace("\"", "");
                             }
                         }
                         optional[i] = false;
-                        for (AnnotationValueInfo value : annotation.elementValues()) {
-                            if ("optional".equals(value.element().name())) {
-                                optional[i] = Boolean.valueOf(value.valueString().replace("\"", ""));
+                        for (AnnotationInstanceInfo secondAnnotation : annotations()) {
+                            if (secondAnnotation.type().qualifiedName().equals("org.mule.api.annotations.param.Optional")) {
+                                optional[i] = true;
                             }
                         }
                         defaultValue[i] = "";

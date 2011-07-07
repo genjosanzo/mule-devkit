@@ -23,9 +23,9 @@
 #set($moduleGroupIdPath = $groupId.replace(".", "/"))
 package ${muleModulePackage};
 
-import org.mule.devkit.annotations.Module;
-import org.mule.devkit.annotations.Configurable;
-import org.mule.devkit.annotations.Processor;
+import org.mule.api.annotations.Module;
+import org.mule.api.annotations.Configurable;
+import org.mule.api.annotations.Processor;
 
 @Module(name="${moduleNameLower}",
         namespace="http://repository.mulesoft.org/releases/${moduleGroupIdPath}/${artifactId}",

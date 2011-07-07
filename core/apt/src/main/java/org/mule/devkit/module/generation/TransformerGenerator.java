@@ -22,7 +22,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.devkit.annotations.Transformer;
+import org.mule.api.annotations.Transformer;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.CatchBlock;

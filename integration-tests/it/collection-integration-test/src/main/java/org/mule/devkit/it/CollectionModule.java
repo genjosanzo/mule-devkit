@@ -17,9 +17,10 @@
 
 package org.mule.devkit.it;
 
-import org.mule.devkit.annotations.Configurable;
-import org.mule.devkit.annotations.Module;
-import org.mule.devkit.annotations.Processor;
+import org.mule.api.annotations.Configurable;
+import org.mule.api.annotations.Module;
+import org.mule.api.annotations.param.Optional;
+import org.mule.api.annotations.Processor;
 
 import java.lang.RuntimeException;
 import java.util.List;
@@ -28,16 +29,20 @@ import java.util.Map;
 @Module(name = "collection")
 public class CollectionModule
 {
-	@Configurable(optional=true)
+	@Configurable
+    @Optional
 	private List<String> strings;
 
-	@Configurable(optional=true)
+	@Configurable
+    @Optional
 	private List items;
 
-	@Configurable(optional=true)
+	@Configurable
+    @Optional
 	private Map<String, String> mapStrings;
 
-	@Configurable(optional=true)
+	@Configurable
+    @Optional
 	private Map mapItems;
 
     @Processor

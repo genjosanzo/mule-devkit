@@ -18,11 +18,11 @@
 package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.UnhandledException;
+import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.Source;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.devkit.annotations.Processor;
-import org.mule.devkit.annotations.Source;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;

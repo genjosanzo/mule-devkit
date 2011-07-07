@@ -17,19 +17,21 @@
 
 package org.mule.devkit.it;
 
-import org.mule.devkit.annotations.Configurable;
-import org.mule.devkit.annotations.Module;
-import org.mule.devkit.annotations.Parameter;
-import org.mule.devkit.annotations.Processor;
+import org.mule.api.annotations.Configurable;
+import org.mule.api.annotations.Module;
+import org.mule.api.annotations.Parameter;
+import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.param.Optional;
 
 @Module(name = "optional")
 public class OptionalModule
 {
-    @Configurable(optional = true, defaultValue="10")
+    @Configurable(defaultValue="10")
+    @Optional
     private int base;
 
     @Processor
-    public int sumMultiplyAndDivide(int sum1, int sum2, @Parameter(optional=true, defaultValue="1") int multiply)
+    public int sumMultiplyAndDivide(int sum1, int sum2, @Optional @Parameter(defaultValue="1") int multiply)
     {
         return ((sum1 + sum2) * multiply ) / base;
     }

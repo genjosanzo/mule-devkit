@@ -17,12 +17,12 @@
 
 package org.mule.devkit.module.generation;
 
+import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.Source;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.util.SpringXMLUtils;
-import org.mule.devkit.annotations.Processor;
-import org.mule.devkit.annotations.Source;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.ClassAlreadyExistsException;
 import org.mule.devkit.model.code.Conditional;

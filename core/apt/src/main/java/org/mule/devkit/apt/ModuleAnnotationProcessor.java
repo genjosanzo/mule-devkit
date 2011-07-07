@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-@SupportedAnnotationTypes(value = {"org.mule.devkit.annotations.Module"})
+@SupportedAnnotationTypes(value = {"org.mule.api.annotations.Module"})
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class ModuleAnnotationProcessor extends AbstractProcessor {
     private GeneratorContext context;

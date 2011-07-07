@@ -14,7 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mule.devkit.annotations;
+
+package org.mule.api.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -23,34 +24,37 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a field inside a {@link Module} as being configurable. A user will be able to use XML attributes to set this
- * bean properties when using the Module.
+ * This annotation defines a class that will export its functionality as a Mule module.
  *
- * The field must have setter and getters.
+ * There are a few restrictions as to which types as valid for this annotation:
+ * - It cannot be an interface
+ * - It must be public
+ * - It cannot have a typed parameter (no generic)
  */
-@Target(ElementType.FIELD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Configurable {
+public @interface Module {
     /**
-     * The name that the user of the module will use to configure this field.
-     *
-     * @return The name of the XML attribute
+     * The name of the module.
      */
-    String name() default "";
+    String name();
 
     /**
-     * Denotes if this field is optional or not. If it is not optional then the user
-     * of the module must provide a value for this field before they can use the module.
-     *
-     * Defaults to false.
-     *
-     * @return True if optional, false otherwise
+     * The version of the module. Defaults to 1.0.
      */
-    boolean optional() default false;
+    String version() default DEFAULT_VERSION;
 
     /**
-     * Default value for this field
+     * Namespace of the module
      */
-    String defaultValue() default "";
+    String namespace() default "";
+
+    /**
+     * Location URI for the schema
+     */
+    String schemaLocation() default "";
+
+    String DEFAULT_VERSION = "1.0";
+
 }

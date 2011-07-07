@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.annotations;
+package org.mule.api.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -23,30 +23,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.PARAMETER)
+/**
+ * This annotation marks a method inside a {@link Module} as a callable from within a Mule flow. Each
+ * parameter on this method will be featured as an attribute on the Mule XML invocation.
+ */
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Parameter {
+public @interface Processor {
     /**
-     * The name that the user of the module will use to configure this parameter.
-     *
-     * @return The name of the XML attribute
+     * The xml name of the element that will invoke this processor. This is optional and if it is not specified a name
+     * will be derived from the name of the method.
      */
     String name() default "";
-
-    /**
-     * Denotes if this field is optional or not. If it is not optional then the user
-     * of the module must provide a value for this parameter before they can invoke
-     * the processor.
-     *
-     * Defaults to false.
-     *
-     * @return True if optional, false otherwise
-     */
-    boolean optional() default false;
-
-    /**
-     * Default value for this parameter
-     */
-    String defaultValue() default "";
 }

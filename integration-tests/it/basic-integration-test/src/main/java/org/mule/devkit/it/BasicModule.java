@@ -17,8 +17,8 @@
 
 package org.mule.devkit.it;
 
-import org.mule.devkit.annotations.Module;
-import org.mule.devkit.annotations.Processor;
+import org.mule.api.annotations.Module;
+import org.mule.api.annotations.Processor;
 
 @Module(name = "basic")
 public class BasicModule

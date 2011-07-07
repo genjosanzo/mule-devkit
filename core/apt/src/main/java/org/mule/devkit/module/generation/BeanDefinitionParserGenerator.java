@@ -18,10 +18,10 @@
 package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.StringUtils;
+import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.Source;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.devkit.annotations.Processor;
-import org.mule.devkit.annotations.Source;
-import org.mule.devkit.annotations.SourceCallback;
+import org.mule.api.annotations.SourceCallback;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.Block;

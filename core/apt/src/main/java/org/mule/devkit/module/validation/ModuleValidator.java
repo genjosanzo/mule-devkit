@@ -17,8 +17,9 @@
 
 package org.mule.devkit.module.validation;
 
-import org.mule.devkit.annotations.Configurable;
-import org.mule.devkit.annotations.Module;
+import org.mule.api.annotations.Configurable;
+import org.mule.api.annotations.Module;
+import org.mule.api.annotations.param.Optional;
 import org.mule.devkit.validation.ValidationException;
 import org.mule.devkit.validation.Validator;
 
@@ -59,6 +60,7 @@ public class ModuleValidator implements Validator {
             Configurable configurable = variable.getAnnotation(Configurable.class);
             if( configurable == null )
                 continue;
+            Optional optional = variable.getAnnotation(Optional.class);
 
             if( variable.getModifiers().contains(Modifier.FINAL) )
             {
@@ -70,7 +72,7 @@ public class ModuleValidator implements Validator {
                 throw new ValidationException(variable, "@Configurable cannot be applied to field with static modifier");
             }
 
-            if( variable.asType().getKind().isPrimitive() && configurable.optional() && configurable.defaultValue().length() == 0 )
+            if( variable.asType().getKind().isPrimitive() && optional != null && configurable.defaultValue().length() == 0 )
             {
                 throw new ValidationException(variable, "Optional configurable fields can only be applied to non-primitive types without a default value");
             }
