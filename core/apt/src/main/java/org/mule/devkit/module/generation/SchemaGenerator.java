@@ -329,7 +329,8 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         collectionElement.setMaxOccurs("1");
 
         String collectionName = context.getNameUtils().uncamel(context.getNameUtils().singularize(collectionElement.getName()));
-        collectionElement.setComplexType(generateCollectionComplexType(collectionName, variable.asType()));
+        LocalComplexType collectionComplexType = generateCollectionComplexType(collectionName, variable.asType());
+        collectionElement.setComplexType(collectionComplexType);
     }
 
     private LocalComplexType generateCollectionComplexType(String name, TypeMirror type) {
@@ -364,6 +365,9 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         collectionItemElement.setMaxOccurs(UNBOUNDED);
 
         collectionItemElement.setComplexType(generateComplexType(name, type));
+
+        Attribute ref = createAttribute(ATTRIBUTE_NAME_REF, true, SchemaConstants.STRING, "The reference object for this parameter");
+        collectionComplexType.getAttributeOrAttributeGroup().add(ref);
 
         return collectionComplexType;
     }
@@ -462,10 +466,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         Configurable configurable = variable.getAnnotation(Configurable.class);
 
         generateCollectionElement(all, variable, configurable.optional());
-    }
-
-    private LocalComplexType generateRefComplexType() {
-        return generateRefComplexType(ATTRIBUTE_NAME_REF);
     }
 
     private LocalComplexType generateRefComplexType(String name) {

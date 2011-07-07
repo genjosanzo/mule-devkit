@@ -39,6 +39,16 @@
         <spring:constructor-arg value="ObjectC"/>
     </spring:bean>
 
+    <spring:bean id="list" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <spring:property name="sourceList">
+            <spring:list>
+                <spring:ref bean="objectA"/>
+                <spring:ref bean="objectB"/>
+                <spring:ref bean="objectC"/>
+            </spring:list>
+        </spring:property>
+    </spring:bean>
+
     <collection:config name="configA">
         <collection:strings>
             <collection:string>#[string:MuleSoft]</collection:string>
@@ -65,6 +75,10 @@
             <collection:map-string key="a">#[string:MuleSoft]</collection:map-string>
             <collection:map-string key="b">FTW</collection:map-string>
         </collection:map-strings>
+    </collection:config>
+
+    <collection:config name="configE">
+        <collection:items ref="list"/>
     </collection:config>
 
     <flow name="flowList">
@@ -120,6 +134,10 @@
                 </collection:object>
             </collection:objects>
         </collection:accept-nested>
+    </flow>
+
+    <flow name="flowConfigItemsRefList">
+        <collection:count-config-items config-ref="configE"/>
     </flow>
 
 </mule>

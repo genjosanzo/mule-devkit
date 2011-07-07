@@ -17,52 +17,46 @@
 
 package org.mule.devkit.it;
 
-public class CollectionModuleTest extends AbstractModuleTest
-{
+public class CollectionModuleTest extends AbstractModuleTest {
 
     @Override
-    protected String getConfigResources()
-    {
+    protected String getConfigResources() {
         return "collection.xml";
     }
 
-    public void testList() throws Exception
-    {
+    public void testList() throws Exception {
         runFlow("flowList", 2);
     }
 
-    public void testConfigStrings() throws Exception
-    {
+    public void testConfigStrings() throws Exception {
         runFlow("flowConfigStrings", 2);
     }
 
-    public void testConfigItems() throws Exception
-    {
+    public void testConfigItems() throws Exception {
         runFlow("flowConfigItems", 2);
     }
 
-    public void testMap() throws Exception
-    {
+    public void testMap() throws Exception {
         runFlow("flowMap", 2);
     }
 
-    public void testConfigMapStrings() throws Exception
-    {
+    public void testConfigMapStrings() throws Exception {
         runFlow("flowConfigMapStrings", 2);
     }
 
-    public void testConfigMapItems() throws Exception
-    {
+    public void testConfigMapItems() throws Exception {
         runFlow("flowConfigMapItems", "ObjectAObjectB");
     }
 
-    public void testHasFirstName() throws Exception
-    {
+    public void testHasFirstName() throws Exception {
         runFlow("flowHasFirstName");
     }
 
-    public void testNested() throws Exception
-    {
+    public void testNested() throws Exception {
         runFlow("flowNested");
+    }
+
+    public void testConfigItemsRefList() throws Exception {
+        runFlow("flowConfigItemsRefList", 3);
     }
 }

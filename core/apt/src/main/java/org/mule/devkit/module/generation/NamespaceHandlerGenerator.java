@@ -32,6 +32,7 @@ import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Package;
 import org.mule.devkit.model.code.TypeReference;
+import org.mule.devkit.model.code.Variable;
 import org.springframework.beans.factory.config.ListFactoryBean;
 import org.springframework.beans.factory.config.MapFactoryBean;
 
@@ -43,6 +44,8 @@ import javax.lang.model.util.ElementFilter;
 import java.util.List;
 
 public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
+    private int counter;
+
     public void generate(Element type) throws GenerationException {
         DefinedClass namespaceHandlerClass = getNamespaceHandlerClass(type);
 
@@ -93,9 +96,14 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
             init.body().invoke("registerMuleBeanDefinitionParser").arg(ExpressionFactory.lit(variable.getSimpleName().toString())).arg(newAnyXmlChildDefinitionParser);
         } else {
             if (context.getTypeMirrorUtils().isArrayOrList(variable.asType())) {
-                Invocation childDefinitionParser = ExpressionFactory._new(ref(ChildDefinitionParser.class));
-                childDefinitionParser.arg(ExpressionFactory.lit(variable.getSimpleName().toString()));
-                childDefinitionParser.arg(ref(ListFactoryBean.class).dotclass());
+                Invocation childDefinitionParserNew = ExpressionFactory._new(ref(ChildDefinitionParser.class));
+                childDefinitionParserNew.arg(ExpressionFactory.lit(variable.getSimpleName().toString()));
+                childDefinitionParserNew.arg(ref(ListFactoryBean.class).dotclass());
+
+                Variable childDefinitionParser = init.body().decl(ref(ChildDefinitionParser.class), "x_" + counter, childDefinitionParserNew);
+                counter++;
+                Invocation addAlias = childDefinitionParser.invoke("addAlias").arg("ref").arg("sourceList");
+                init.body().add(addAlias);
 
                 init.body().invoke("registerMuleBeanDefinitionParser").arg(ExpressionFactory.lit(context.getNameUtils().uncamel(variable.getSimpleName().toString()))).arg(childDefinitionParser);
 
@@ -105,10 +113,15 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
                 init.body().invoke("registerMuleBeanDefinitionParser").arg(ExpressionFactory.lit(context.getNameUtils().uncamel(context.getNameUtils().singularize(variable.getSimpleName().toString())))).arg(childListEntryDefinitionParser);
             } else if (context.getTypeMirrorUtils().isMap(variable.asType())) {
                 DefinedClass freeFormChildDefinitionParser = context.getClassForRole(FreeFormMapChildDefinitionParserGenerator.ROLE);
-                Invocation childDefinitionParser = ExpressionFactory._new(freeFormChildDefinitionParser);
-                childDefinitionParser.arg("sourceMap");
-                childDefinitionParser.arg(ExpressionFactory.lit(variable.getSimpleName().toString()));
-                childDefinitionParser.arg(ref(MapFactoryBean.class).dotclass());
+                Invocation childDefinitionParserNew = ExpressionFactory._new(freeFormChildDefinitionParser);
+                childDefinitionParserNew.arg("sourceMap");
+                childDefinitionParserNew.arg(ExpressionFactory.lit(variable.getSimpleName().toString()));
+                childDefinitionParserNew.arg(ref(MapFactoryBean.class).dotclass());
+
+                Variable childDefinitionParser = init.body().decl(freeFormChildDefinitionParser, "x_" + counter, childDefinitionParserNew);
+                counter++;
+                Invocation addAlias = childDefinitionParser.invoke("addAlias").arg("ref").arg("sourceMap");
+                init.body().add(addAlias);
 
                 init.body().invoke("registerMuleBeanDefinitionParser").arg(ExpressionFactory.lit(context.getNameUtils().uncamel(variable.getSimpleName().toString()))).arg(childDefinitionParser);
 
