@@ -18,8 +18,6 @@
 package org.mule.devkit.module.generation;
 
 import org.mule.api.MuleException;
-import org.mule.api.annotations.lifecycle.Dispose;
-import org.mule.api.annotations.lifecycle.Initialise;
 import org.mule.api.annotations.lifecycle.Start;
 import org.mule.api.annotations.lifecycle.Stop;
 import org.mule.api.lifecycle.Disposable;
@@ -30,6 +28,8 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.*;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -58,18 +58,18 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
             generateLifecycleInvocation(lifecycleWrapper, stopElement, "stop", MuleException.class, false);
         }
 
-        ExecutableElement initialiseElement = getInitialiseElement(element);
-        if (initialiseElement != null) {
+        ExecutableElement postConstructElement = getPostConstructElement(element);
+        if (postConstructElement != null) {
             lifecycleWrapper._implements(Initialisable.class);
 
-            generateLifecycleInvocation(lifecycleWrapper, initialiseElement, "initialise", InitialisationException.class, true);
+            generateLifecycleInvocation(lifecycleWrapper, postConstructElement, "initialise", InitialisationException.class, true);
         }
 
-        ExecutableElement disposeElement = getDisposeElement(element);
-        if (disposeElement != null) {
+        ExecutableElement preDestroyElement = getPreDestroyElement(element);
+        if (preDestroyElement != null) {
             lifecycleWrapper._implements(Disposable.class);
 
-            generateLifecycleInvocation(lifecycleWrapper, disposeElement, "dispose", null, false);
+            generateLifecycleInvocation(lifecycleWrapper, preDestroyElement, "dispose", null, false);
         }
     }
 
@@ -142,12 +142,12 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         return null;
     }
 
-    private ExecutableElement getInitialiseElement(Element element) {
+    private ExecutableElement getPostConstructElement(Element element) {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(element.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
-            Initialise initialise = executableElement.getAnnotation(Initialise.class);
+            PostConstruct postConstruct = executableElement.getAnnotation(PostConstruct.class);
 
-            if (initialise != null) {
+            if (postConstruct != null) {
                 return executableElement;
             }
         }
@@ -155,12 +155,12 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         return null;
     }
 
-    private ExecutableElement getDisposeElement(Element element) {
+    private ExecutableElement getPreDestroyElement(Element element) {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(element.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
-            Dispose dispose = executableElement.getAnnotation(Dispose.class);
+            PreDestroy preDestroy = executableElement.getAnnotation(PreDestroy.class);
 
-            if (dispose != null) {
+            if (preDestroy != null) {
                 return executableElement;
             }
         }
