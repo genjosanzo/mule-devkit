@@ -25,7 +25,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.annotations.Processor;
-import org.mule.api.annotations.SourceCallback;
+import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.transformer.Transformer;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;

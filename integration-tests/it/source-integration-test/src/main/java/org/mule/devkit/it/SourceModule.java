@@ -19,7 +19,7 @@ package org.mule.devkit.it;
 
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Source;
-import org.mule.api.annotations.SourceCallback;
+import org.mule.api.annotations.callback.SourceCallback;
 
 @Module(name = "source")
 public class SourceModule

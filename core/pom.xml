@@ -17,7 +17,7 @@
     <packaging>pom</packaging>
 
 	<modules>
-        <module>api</module>
+        <module>annotations</module>
         <module>plugin</module>
 		<module>apt</module>
 	</modules>

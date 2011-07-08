@@ -12,7 +12,7 @@
     <name>Mule DevKit Annotations</name>
 
     <groupId>org.mule.tools.devkit</groupId>
-    <artifactId>mule-devkit-api</artifactId>
+    <artifactId>mule-devkit-annotations</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 

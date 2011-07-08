@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package org.mule.api.annotations;
+package org.mule.api.annotations.callback;
 
 /**
- * Callback interface used by {@link Source} annotated methods to dispatch messages.
+ * Callback interface used by {@link org.mule.api.annotations.Source} annotated methods to dispatch messages.
  */
 public interface SourceCallback {
     /**
