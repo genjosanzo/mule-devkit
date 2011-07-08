@@ -33,9 +33,4 @@ public @interface Parameter {
      * @return The name of the XML attribute
      */
     String name() default "";
-
-    /**
-     * Default value for this parameter
-     */
-    String defaultValue() default "";
 }

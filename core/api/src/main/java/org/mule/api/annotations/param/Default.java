@@ -14,7 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mule.api.annotations;
+
+package org.mule.api.annotations.param;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -23,19 +24,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a field inside a {@link Module} as being configurable. A user will be able to use XML attributes to set this
- * bean properties when using the Module.
- *
- * The field must have setter and getters.
+ * Specifies a default value to a {@link org.mule.api.annotations.Configurable} field or a
+ * {@link org.mule.api.annotations.Processor}/{@link org.mule.api.annotations.Source} parameter.
  */
-@Target(ElementType.FIELD)
+@Target(value={ElementType.PARAMETER, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Configurable {
-    /**
-     * The name that the user of the module will use to configure this field.
-     *
-     * @return The name of the XML attribute
-     */
-    String name() default "";
+public @interface Default {
+    String value();
 }

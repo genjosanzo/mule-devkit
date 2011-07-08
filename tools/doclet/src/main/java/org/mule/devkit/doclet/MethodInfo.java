@@ -522,9 +522,9 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
                             }
                         }
                         defaultValue[i] = "";
-                        for (AnnotationValueInfo value : annotation.elementValues()) {
-                            if ("defaultValue".equals(value.element().name())) {
-                                defaultValue[i] = value.valueString().replace("\"", "");
+                        for (AnnotationInstanceInfo secondAnnotation : annotations()) {
+                            if (secondAnnotation.type().qualifiedName().equals("org.mule.api.annotations.param.Optional")) {
+                                defaultValue[i] = secondAnnotation.elementValues()[0].valueString().replace("\"", "");
                             }
                         }
                         break;

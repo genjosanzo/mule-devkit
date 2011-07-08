@@ -24,6 +24,7 @@ import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.SourceCallback;
+import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.schema.All;
@@ -532,6 +533,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             return null;
 
         Optional optional = variable.getAnnotation(Optional.class);
+        Default def = variable.getAnnotation(Default.class);
 
         String name = variable.getSimpleName().toString();
         if (configurable.name().length() > 0)
@@ -556,8 +558,8 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
 
         // add default value
-        if (configurable.defaultValue().length() > 0) {
-            attribute.setDefault(configurable.defaultValue());
+        if (def != null && def.value().length() > 0) {
+            attribute.setDefault(def.value());
         }
         return attribute;
     }
@@ -565,6 +567,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private Attribute createParameterAttribute(VariableElement variable) {
         Parameter parameter = variable.getAnnotation(Parameter.class);
         Optional optional = variable.getAnnotation(Optional.class);
+        Default def = variable.getAnnotation(Default.class);
 
         String name = variable.getSimpleName().toString();
         if (parameter != null && parameter.name().length() > 0)
@@ -573,11 +576,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         Attribute attribute = new Attribute();
 
         // set whenever or not is optional
-        if (parameter != null) {
-            attribute.setUse(optional != null ? SchemaConstants.USE_OPTIONAL : SchemaConstants.USE_REQUIRED);
-        } else {
-            attribute.setUse(SchemaConstants.USE_REQUIRED);
-        }
+        attribute.setUse(optional != null ? SchemaConstants.USE_OPTIONAL : SchemaConstants.USE_REQUIRED);
 
         if (isTypeSupported(variable.asType())) {
             attribute.setName(name);
@@ -593,8 +592,8 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
 
         // add default value
-        if (parameter != null && parameter.defaultValue().length() > 0) {
-            attribute.setDefault(parameter.defaultValue());
+        if (def != null && def.value().length() > 0) {
+            attribute.setDefault(def.value());
         }
         return attribute;
     }

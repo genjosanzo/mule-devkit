@@ -386,9 +386,9 @@ public class FieldInfo extends MemberInfo {
                         }
                     }
                     mDefaultValue = "";
-                    for (AnnotationValueInfo value : annotation.elementValues()) {
-                        if ("defaultValue".equals(value.element().name())) {
-                            mDefaultValue = value.valueString().replace("\"", "");
+                    for (AnnotationInstanceInfo secondAnnotation : annotations()) {
+                        if (secondAnnotation.type().qualifiedName().equals("org.mule.api.annotations.param.Optional")) {
+                            mDefaultValue = secondAnnotation.elementValues()[0].valueString().replace("\"", "");
                         }
                     }
                     break;
