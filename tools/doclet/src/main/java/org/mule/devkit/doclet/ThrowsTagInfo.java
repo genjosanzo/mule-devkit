@@ -18,8 +18,8 @@ package org.mule.devkit.doclet;
 
 import com.google.clearsilver.jsilver.data.Data;
 
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ThrowsTagInfo extends ParsedTagInfo {
   static final Pattern PATTERN = Pattern.compile("(\\S+)\\s+(.*)", Pattern.DOTALL);

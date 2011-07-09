@@ -18,9 +18,7 @@ package org.mule.devkit.doclet;
 
 import com.google.clearsilver.jsilver.data.Data;
 
-import java.util.*;
-import com.google.common.collect.Ordering;
-import java.util.List;
+import java.util.Arrays;
 import java.util.TreeMap;
 
 public class TodoFile {

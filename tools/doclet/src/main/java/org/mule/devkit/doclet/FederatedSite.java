@@ -20,7 +20,6 @@ import org.mule.devkit.doclet.apicheck.ApiCheck;
 import org.mule.devkit.doclet.apicheck.ApiInfo;
 import org.mule.devkit.doclet.apicheck.ApiParseException;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 

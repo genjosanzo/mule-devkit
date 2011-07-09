@@ -14,26 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.mule.devkit.nexus;
 
-package org.mule.devkit.module.generation;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.mule.devkit.generation.AbstractGenerator;
-import org.mule.devkit.model.code.Type;
-import org.mule.devkit.model.code.TypeReference;
+public class ModuleCatalog {
+    private List<Module> modules;
 
-import javax.lang.model.type.TypeMirror;
-
-public abstract class AbstractModuleGenerator extends AbstractGenerator {
-
-    public Type ref(TypeMirror typeMirror) {
-        return this.context.getCodeModel().ref(typeMirror);
+    public ModuleCatalog() {
+        modules = new ArrayList<Module>();
     }
 
-    public TypeReference ref(Class<?> clazz) {
-        return this.context.getCodeModel().ref(clazz);
-    }
-
-    public Type ref(String fullyQualifiedClassName) {
-        return this.context.getCodeModel().ref(fullyQualifiedClassName);
+    public void addModule(Module module) {
+        this.modules.add(module);
     }
 }

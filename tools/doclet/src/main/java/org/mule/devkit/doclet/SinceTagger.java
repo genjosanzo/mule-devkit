@@ -21,12 +21,11 @@ import org.mule.devkit.doclet.apicheck.ApiCheck;
 import org.mule.devkit.doclet.apicheck.ApiInfo;
 import org.mule.devkit.doclet.apicheck.ApiParseException;
 
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
 
 
 /**

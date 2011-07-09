@@ -33,7 +33,13 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.GeneratorContext;
-import org.mule.devkit.model.code.*;
+import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.ExpressionFactory;
+import org.mule.devkit.model.code.FieldVariable;
+import org.mule.devkit.model.code.Invocation;
+import org.mule.devkit.model.code.Method;
+import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Variable;
 import org.mule.transaction.MuleTransactionConfig;
 
 import javax.lang.model.element.Element;

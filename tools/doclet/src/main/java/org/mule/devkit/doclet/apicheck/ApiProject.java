@@ -17,7 +17,6 @@
 package org.mule.devkit.doclet.apicheck;
 
 import org.mule.devkit.doclet.TypeInfo;
-import org.mule.devkit.doclet.TypeInfo;
 
 import java.util.HashMap;
 import java.util.Map;

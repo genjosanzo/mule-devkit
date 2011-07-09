@@ -16,10 +16,10 @@
 
 package org.mule.devkit.doclet;
 
-import java.io.IOException;
 import java.io.FileWriter;
-import java.util.regex.Pattern;
+import java.io.IOException;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Proofread {
   static FileWriter out = null;

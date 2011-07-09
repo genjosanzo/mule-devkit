@@ -16,6 +16,7 @@
 
 package org.mule.devkit.doclet.apicheck;
 
+import com.sun.javadoc.ClassDoc;
 import org.mule.devkit.doclet.AnnotationInstanceInfo;
 import org.mule.devkit.doclet.ClassInfo;
 import org.mule.devkit.doclet.ConstructorInfo;
@@ -28,7 +29,12 @@ import org.mule.devkit.doclet.PackageInfo;
 import org.mule.devkit.doclet.ParameterInfo;
 import org.mule.devkit.doclet.SourcePositionInfo;
 import org.mule.devkit.doclet.TypeInfo;
-import com.sun.javadoc.ClassDoc;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.helpers.XMLReaderFactory;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,23 +42,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Stack;
-
-import org.mule.devkit.doclet.AnnotationInstanceInfo;
-import org.mule.devkit.doclet.ClassInfo;
-import org.mule.devkit.doclet.ConstructorInfo;
-import org.mule.devkit.doclet.Converter;
-import org.mule.devkit.doclet.ErrorReport;
-import org.mule.devkit.doclet.Errors;
-import org.mule.devkit.doclet.MethodInfo;
-import org.mule.devkit.doclet.PackageInfo;
-import org.mule.devkit.doclet.ParameterInfo;
-import org.mule.devkit.doclet.SourcePositionInfo;
-import org.mule.devkit.doclet.TypeInfo;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 public class ApiCheck {
   // parse out and consume the -whatever command line flags

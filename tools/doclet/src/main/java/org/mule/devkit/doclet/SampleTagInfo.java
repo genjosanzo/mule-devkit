@@ -18,12 +18,12 @@ package org.mule.devkit.doclet;
 
 import com.google.clearsilver.jsilver.data.Data;
 
-import java.io.Reader;
-import java.io.IOException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.LineNumberReader;
-import java.util.regex.Pattern;
+import java.io.Reader;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*
  * SampleTagInfo copies text from a given file into the javadoc comment.

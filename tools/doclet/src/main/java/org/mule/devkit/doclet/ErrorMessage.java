@@ -16,8 +16,6 @@
 
 package org.mule.devkit.doclet;
 
-import org.mule.devkit.doclet.ErrorCode;
-
 public final class ErrorMessage implements Comparable<ErrorMessage> {
     private ErrorCode error;
     private SourcePositionInfo pos;

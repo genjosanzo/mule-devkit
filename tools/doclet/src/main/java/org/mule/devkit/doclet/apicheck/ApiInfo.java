@@ -19,8 +19,6 @@ package org.mule.devkit.doclet.apicheck;
 import org.mule.devkit.doclet.ClassInfo;
 import org.mule.devkit.doclet.Errors;
 import org.mule.devkit.doclet.PackageInfo;
-import org.mule.devkit.doclet.Errors;
-import org.mule.devkit.doclet.PackageInfo;
 
 import java.util.ArrayList;
 import java.util.HashMap;

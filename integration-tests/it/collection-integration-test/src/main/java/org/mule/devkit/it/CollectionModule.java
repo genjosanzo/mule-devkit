@@ -19,10 +19,9 @@ package org.mule.devkit.it;
 
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
-import org.mule.api.annotations.param.Optional;
 import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.param.Optional;
 
-import java.lang.RuntimeException;
 import java.util.List;
 import java.util.Map;
 

@@ -20,5 +20,6 @@
         <module>maven</module>
 		<module>doclet</module>
         <module>idea</module>
+        <module>nexus</module>
 	</modules>
 </project>

@@ -18,9 +18,12 @@ package org.mule.devkit.doclet;
 
 import com.google.clearsilver.jsilver.data.Data;
 
-import java.io.*;
-import java.util.regex.Pattern;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class DocFile {

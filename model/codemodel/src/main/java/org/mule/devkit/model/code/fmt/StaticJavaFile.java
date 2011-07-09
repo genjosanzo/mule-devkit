@@ -40,8 +40,10 @@
 
 package org.mule.devkit.model.code.fmt;
 
-import org.mule.devkit.model.code.*;
 import org.mule.devkit.model.code.Package;
+import org.mule.devkit.model.code.ResourceFile;
+import org.mule.devkit.model.code.TypeReference;
+import org.mule.devkit.model.code.TypeVariable;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

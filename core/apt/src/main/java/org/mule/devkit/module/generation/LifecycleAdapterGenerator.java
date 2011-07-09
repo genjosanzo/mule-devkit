@@ -26,7 +26,15 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.model.code.*;
+import org.mule.devkit.model.code.CatchBlock;
+import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.ExpressionFactory;
+import org.mule.devkit.model.code.Invocation;
+import org.mule.devkit.model.code.Method;
+import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.TryStatement;
+import org.mule.devkit.model.code.TypeReference;
+import org.mule.devkit.model.code.Variable;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

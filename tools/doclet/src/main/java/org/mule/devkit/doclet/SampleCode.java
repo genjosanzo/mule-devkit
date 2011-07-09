@@ -18,8 +18,8 @@ package org.mule.devkit.doclet;
 
 import com.google.clearsilver.jsilver.data.Data;
 
-import java.util.*;
-import java.io.*;
+import java.io.File;
+import java.util.TreeSet;
 
 
 public class SampleCode {

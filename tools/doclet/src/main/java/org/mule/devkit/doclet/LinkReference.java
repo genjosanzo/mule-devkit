@@ -16,9 +16,9 @@
 
 package org.mule.devkit.doclet;
 
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class that represents what you see in an link or see tag. This is factored out of SeeTagInfo so

@@ -17,7 +17,7 @@
 
 package org.mule.devkit.model.code.writer;
 
-import org.mule.devkit.model.code.*;
+import org.mule.devkit.model.code.CodeWriter;
 import org.mule.devkit.model.code.Package;
 
 import javax.annotation.processing.Filer;

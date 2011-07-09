@@ -18,7 +18,8 @@ package org.mule.devkit.doclet;
 
 import org.mule.devkit.doclet.apicheck.AbstractMethodInfo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConstructorInfo implements AbstractMethodInfo {
 
