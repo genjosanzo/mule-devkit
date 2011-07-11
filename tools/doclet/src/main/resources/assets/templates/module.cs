@@ -16,6 +16,17 @@
 <a href="<?cs var:class.moduleName ?>-schema.html">View Schema</a>
 </div>
 <?cs /if ?>
+Summary:
+<a href="#lconfig">Configuration</a>
+<?cs if:subcount(class.methods.processor) ?>
+  &#124; <a href="#promethods">Message Processors</a>
+<?cs /if ?>
+<?cs if:subcount(class.methods.source) ?>
+  &#124; <a href="#soumethods">Message Sources</a>
+<?cs /if ?>
+<?cs if:subcount(class.methods.transformer) ?>
+  &#124; <a href="#trnasmethods">Transformers</a>
+<?cs /if ?>
 </div><!-- end sum-details-links -->
 
 <div class="api-level">

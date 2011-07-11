@@ -387,7 +387,7 @@ public class FieldInfo extends MemberInfo {
                     }
                     mDefaultValue = "";
                     for (AnnotationInstanceInfo secondAnnotation : annotations()) {
-                        if (secondAnnotation.type().qualifiedName().equals("org.mule.api.annotations.param.Optional")) {
+                        if (secondAnnotation.type().qualifiedName().equals("org.mule.api.annotations.param.Default")) {
                             mDefaultValue = secondAnnotation.elementValues()[0].valueString().replace("\"", "");
                         }
                     }
