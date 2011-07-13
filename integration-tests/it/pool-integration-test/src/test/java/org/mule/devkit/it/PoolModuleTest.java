@@ -31,4 +31,9 @@ public class PoolModuleTest extends AbstractModuleTest {
     public void testSource() throws Exception {
         runFlow("count");
     }
+
+        public void testTransformer() throws Exception
+    {
+        runFlowWithPayload("transform", 'm', "mulesoft");
+    }
 }

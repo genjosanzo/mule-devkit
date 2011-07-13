@@ -17,6 +17,7 @@
 
 package org.mule.devkit.module.generation;
 
+import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Transformer;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
@@ -24,6 +25,7 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -43,6 +45,7 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import java.util.List;
@@ -80,8 +83,16 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             // add setobject
             generateSetPojoMethod(transformerClass, object);
 
-            // doTransform
-            generateDoTransform(transformerClass, executableElement, object);
+            // get pool object if poolable
+            if (type.getAnnotation(Module.class).poolable()) {
+                DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey((TypeElement) type));
+
+                // doTransform
+                generateDoTransform(transformerClass, executableElement, object, poolObjectClass);
+            } else {
+                // doTransform
+                generateDoTransform(transformerClass, executableElement, object);
+            }
 
             // set and get weight
             generateGetPriorityWeighting(transformerClass, weighting);
@@ -103,18 +114,35 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         getPriorityWeighting.body()._return(weighting);
     }
 
-    private void generateDoTransform(DefinedClass jaxbTransformerClass, ExecutableElement executableElement, FieldVariable object) {
-        Method doTransform = jaxbTransformerClass.method(Modifier.PROTECTED, ref(Object.class), "doTransform");
+    private void generateDoTransform(DefinedClass transformerClass, ExecutableElement executableElement, FieldVariable object) {
+        generateDoTransform(transformerClass, executableElement, object, null);
+
+    }
+
+    private void generateDoTransform(DefinedClass transformerClass, ExecutableElement executableElement, FieldVariable object, DefinedClass poolObjectClass) {
+        Method doTransform = transformerClass.method(Modifier.PROTECTED, ref(Object.class), "doTransform");
         doTransform._throws(TransformerException.class);
         Variable src = doTransform.param(ref(Object.class), "src");
         Variable encoding = doTransform.param(ref(String.class), "encoding");
+
+        Variable poolObject = null;
+        if (poolObjectClass != null) {
+            poolObject = doTransform.body().decl(poolObjectClass, "poolObject", ExpressionFactory._null());
+        }
 
         Variable result = doTransform.body().decl(ref(executableElement.getReturnType()).boxify(), "result", ExpressionFactory._null());
 
         TryStatement tryBlock = doTransform.body()._try();
 
         // do something
-        Invocation invoke = object.invoke(executableElement.getSimpleName().toString());
+        Invocation invoke = null;
+        if (poolObject != null) {
+            tryBlock.body().assign(poolObject, ExpressionFactory.cast(poolObject.type(), object.invoke("getLifecyleEnabledObjectPool").invoke("borrowObject")));
+            invoke = poolObject.invoke(executableElement.getSimpleName().toString());
+        } else {
+            invoke = object.invoke(executableElement.getSimpleName().toString());
+        }
+
         invoke.arg(src);
         tryBlock.body().assign(result, invoke);
 
@@ -124,6 +152,12 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         generateThrowTransformFailedException(exceptionCatch, exception, src, ref(executableElement.getReturnType()).boxify());
 
         doTransform.body()._return(result);
+
+        if (poolObjectClass != null) {
+            Block fin = tryBlock._finally();
+            Block poolObjectNotNull = fin._if(Op.ne(poolObject, ExpressionFactory._null()))._then();
+            poolObjectNotNull.add(object.invoke("getLifecyleEnabledObjectPool").invoke("returnObject").arg(poolObject));
+        }
     }
 
     private void generateThrowTransformFailedException(CatchBlock catchBlock, Variable exception, Variable src, TypeReference target) {
@@ -181,7 +215,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
     public DefinedClass getTransformerClass(ExecutableElement executableElement) {
         String transformerClassName = context.getNameUtils().generateClassName(executableElement, "Transformer");
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(transformerClassName) + ".config");
-        DefinedClass transformer = pkg._class(context.getNameUtils().getClassName(transformerClassName), AbstractTransformer.class, new Class<?>[] {DiscoverableTransformer.class, MuleContextAware.class, Initialisable.class});
+        DefinedClass transformer = pkg._class(context.getNameUtils().getClassName(transformerClassName), AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class, MuleContextAware.class, Initialisable.class});
 
         return transformer;
     }

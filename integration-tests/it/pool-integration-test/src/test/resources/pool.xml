@@ -41,4 +41,7 @@
         <logger level="INFO"/>
     </flow>
 
+    <flow name="transform">
+        <pool:transform-string-to-char/>
+    </flow>
 </mule>

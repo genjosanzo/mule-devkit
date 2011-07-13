@@ -21,41 +21,46 @@ import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
+import org.mule.api.annotations.Transformer;
+import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
-import org.mule.api.annotations.callback.SourceCallback;
 
 @Module(name = "pool", poolable = true)
-public class PoolModule
-{
+public class PoolModule {
     @Configurable
     @Optional
     @Default("10")
     private int base;
 
     @Processor
-    public int sumMultiplyAndDivide(int sum1, int sum2, @Optional @Default("1") int multiply)
-    {
-        return ((sum1 + sum2) * multiply ) / base;
+    public int sumMultiplyAndDivide(int sum1, int sum2, @Optional @Default("1") int multiply) {
+        return ((sum1 + sum2) * multiply) / base;
     }
 
-    public void setBase(int value)
-    {
+    public void setBase(int value) {
         this.base = value;
     }
 
     @Source
-    public void count(int startAt, int endAt, int step, SourceCallback callback) throws InterruptedException
-    {
-		int count = startAt;
-        while(true)
-        {
-            if(Thread.interrupted() || count == endAt)
+    public void count(int startAt, int endAt, int step, SourceCallback callback) throws InterruptedException {
+        int count = startAt;
+        while (true) {
+            if (Thread.interrupted() || count == endAt)
                 throw new InterruptedException();
 
             callback.process(count);
 
-			count += step;
+            count += step;
         }
+    }
+
+    @Transformer(sourceTypes = {String.class})
+    public Character transformStringToChar(Object payload) {
+        if (payload != null) {
+            return ((String) payload).charAt(0);
+        }
+
+        return null;
     }
 }
