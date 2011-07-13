@@ -30,10 +30,15 @@
     <pool:config name="poolConfig">
         <pooling-profile maxActive="10" maxIdle="5" initialisationPolicy="INITIALISE_ALL"
                          exhaustedAction="WHEN_EXHAUSTED_FAIL" maxWait="60"/>
-	</pool:config>
+    </pool:config>
 
     <flow name="sumMultiplyAndDivide">
         <pool:sum-multiply-and-divide config-ref="poolConfig" sum1="40" sum2="10"/>
+    </flow>
+
+    <flow name="count">
+        <pool:count startAt="1" endAt="100" step="1"/>
+        <logger level="INFO"/>
     </flow>
 
 </mule>

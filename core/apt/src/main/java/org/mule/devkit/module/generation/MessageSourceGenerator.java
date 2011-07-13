@@ -24,11 +24,12 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.callback.SourceCallback;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
@@ -73,11 +74,11 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         DefinedClass messageSourceClass = getMessageSourceClass(executableElement);
 
         messageSourceClass.javadoc().add(messageSourceClass.name() + " wraps ");
-        messageSourceClass.javadoc().add("{@link " + ((TypeElement)executableElement.getEnclosingElement()).getQualifiedName().toString() + "#");
+        messageSourceClass.javadoc().add("{@link " + ((TypeElement) executableElement.getEnclosingElement()).getQualifiedName().toString() + "#");
         messageSourceClass.javadoc().add(executableElement.getSimpleName().toString() + "(");
         boolean first = true;
         for (VariableElement variable : executableElement.getParameters()) {
-            if( !first ) {
+            if (!first) {
                 messageSourceClass.javadoc().add(", ");
             }
             messageSourceClass.javadoc().add(variable.asType().toString().replaceAll("<[a-zA-Z\\-\\.\\<\\>\\s\\,]*>", ""));
@@ -129,13 +130,31 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         // add stop method
         generateStopMethod(messageSourceClass, thread);
 
-        // add run method
-        generateRunMethod(messageSourceClass, executableElement, fields, object, muleContext);
+        // get pool object if poolable
+        if (typeElement.getAnnotation(Module.class).poolable()) {
+            DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey((TypeElement) typeElement));
+
+            // add run method
+            generateRunMethod(messageSourceClass, executableElement, fields, object, muleContext, poolObjectClass);
+        } else {
+            // add run method
+            generateRunMethod(messageSourceClass, executableElement, fields, object, muleContext);
+        }
     }
 
     private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, FieldVariable object, FieldVariable muleContext) {
+        generateRunMethod(messageSourceClass, executableElement, fields, object, muleContext, null);
+    }
+
+    private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass) {
         Method run = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "run");
         run.javadoc().add("Implementation {@link Runnable#run()} that will invoke the method on the pojo that this message source wraps.");
+
+        Variable poolObject = null;
+        if (poolObjectClass != null) {
+            poolObject = run.body().decl(poolObjectClass, "poolObject", ExpressionFactory._null());
+        }
+
         TryStatement callSource = run.body()._try();
 
         String methodName = executableElement.getSimpleName().toString();
@@ -159,7 +178,14 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
             }
         }
 
-        Invocation methodCall = object.invoke(methodName);
+        Invocation methodCall = null;
+        if (poolObject != null) {
+            callSource.body().assign(poolObject, ExpressionFactory.cast(poolObject.type(), object.invoke("getLifecyleEnabledObjectPool").invoke("borrowObject")));
+            methodCall = poolObject.invoke(methodName);
+        } else {
+            methodCall = object.invoke(methodName);
+        }
+
         for (int i = 0; i < parameters.size(); i++) {
             methodCall.arg(parameters.get(i));
         }
@@ -167,6 +193,12 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         callSource.body().add(methodCall);
 
         CatchBlock swallowCatch = callSource._catch((TypeReference) ref(Exception.class));
+
+        if (poolObjectClass != null) {
+            Block fin = callSource._finally();
+            Block poolObjectNotNull = fin._if(Op.ne(poolObject, ExpressionFactory._null()))._then();
+            poolObjectNotNull.add(object.invoke("getLifecyleEnabledObjectPool").invoke("returnObject").arg(poolObject));
+        }
     }
 
 

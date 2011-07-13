@@ -20,8 +20,10 @@ package org.mule.devkit.it;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.Source;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
+import org.mule.api.annotations.callback.SourceCallback;
 
 @Module(name = "pool", poolable = true)
 public class PoolModule
@@ -42,4 +44,18 @@ public class PoolModule
         this.base = value;
     }
 
+    @Source
+    public void count(int startAt, int endAt, int step, SourceCallback callback) throws InterruptedException
+    {
+		int count = startAt;
+        while(true)
+        {
+            if(Thread.interrupted() || count == endAt)
+                throw new InterruptedException();
+
+            callback.process(count);
+
+			count += step;
+        }
+    }
 }

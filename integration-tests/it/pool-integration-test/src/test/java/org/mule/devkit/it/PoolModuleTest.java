@@ -17,18 +17,18 @@
 
 package org.mule.devkit.it;
 
-public class PoolModuleTest extends AbstractModuleTest
-{
+public class PoolModuleTest extends AbstractModuleTest {
 
     @Override
-    protected String getConfigResources()
-    {
+    protected String getConfigResources() {
         return "pool.xml";
     }
 
-    public void testPool() throws Exception
-    {
+    public void testProcessor() throws Exception {
         runFlow("sumMultiplyAndDivide", 5);
     }
 
+    public void testSource() throws Exception {
+        runFlow("count");
+    }
 }

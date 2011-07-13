@@ -31,6 +31,14 @@ public abstract class AbstractModuleTest extends FunctionalTestCase
         return (SimpleFlowConstruct) AbstractMuleTestCase.muleContext.getRegistry().lookupFlowConstruct(name);
     }
 
+    protected <T> void runFlow(String flowName) throws Exception
+    {
+        String payload = EMPTY_PAYLOAD;
+        SimpleFlowConstruct flow = lookupFlowConstruct(flowName);
+        MuleEvent event = AbstractMuleTestCase.getTestEvent(payload);
+        MuleEvent responseEvent = flow.process(event);
+    }
+
     protected <T> void runFlow(String flowName, T expect) throws Exception
     {
         String payload = EMPTY_PAYLOAD;
