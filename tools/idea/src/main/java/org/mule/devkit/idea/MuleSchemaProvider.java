@@ -56,7 +56,7 @@ public class MuleSchemaProvider extends XmlSchemaProvider {
     @NotNull
     public Map<String, XmlFile> getSupportedSchemasByUrl(@NotNull final Module module) {
         CachedValuesManager manager = CachedValuesManager.getManager(module.getProject());
-        return manager.getCachedValue(module, SCHEMAS_BUNDLE_KEY, new CachedValueProvider() {
+        return manager.getCachedValue(module, SCHEMAS_BUNDLE_KEY, new CachedValueProvider<Map<String, XmlFile>>() {
                     public CachedValueProvider.Result<Map<String, XmlFile>> compute() {
                         return computeSchemas(module);
                     }
