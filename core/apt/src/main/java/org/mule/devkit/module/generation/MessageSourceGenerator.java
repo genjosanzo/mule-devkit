@@ -94,8 +94,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         // add standard fields
         FieldVariable object = generateFieldForPojo(messageSourceClass, typeElement);
         FieldVariable muleContext = generateFieldForMuleContext(messageSourceClass);
-        FieldVariable flowConstruct = messageSourceClass.field(Modifier.PRIVATE, ref(FlowConstruct.class), "flowConstruct");
-        flowConstruct.javadoc().add("Flow construct");
+        FieldVariable flowConstruct = generateFieldForFlowConstruct(messageSourceClass);
         FieldVariable messageProcessor = messageSourceClass.field(Modifier.PRIVATE, ref(MessageProcessor.class), "messageProcessor");
         messageProcessor.javadoc().add("Message processor that will get called for processing incoming events");
         FieldVariable thread = messageSourceClass.field(Modifier.PRIVATE, ref(Thread.class), "thread");
@@ -248,15 +247,5 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         setListener.body().assign(ExpressionFactory._this().ref(messageProcessor), listener);
 
         return setListener;
-    }
-
-    private Method generateSetFlowConstructMethod(DefinedClass messageSourceClass, FieldVariable flowConstruct) {
-        Method setFlowConstruct = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setFlowConstruct");
-        setFlowConstruct.javadoc().add("Sets flow construct");
-        setFlowConstruct.javadoc().addParam("flowConstruct Flow construct to set");
-        Variable newFlowConstruct = setFlowConstruct.param(ref(FlowConstruct.class), "flowConstruct");
-        setFlowConstruct.body().assign(ExpressionFactory._this().ref(flowConstruct), newFlowConstruct);
-
-        return setFlowConstruct;
     }
 }

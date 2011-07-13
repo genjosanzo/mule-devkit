@@ -55,6 +55,11 @@ public @interface Module {
      */
     String schemaLocation() default "";
 
+    /**
+     * Defined the module itself as being poolable
+     */
+    boolean poolable() default false;
+
     String DEFAULT_VERSION = "1.0";
 
 }

@@ -525,6 +525,21 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 config.getAttributeOrAttributeGroup().add(createConfigurableAttribute(variable));
             }
         }
+
+        if( element.getAnnotation(Module.class).poolable() ) {
+            TopLevelElement abstractPoolingProfile = new TopLevelElement();
+            abstractPoolingProfile.setRef(SchemaConstants.MULE_ABSTRACT_POOLING_PROFILE);
+            abstractPoolingProfile.setMinOccurs(BigInteger.valueOf(0L));
+
+            Annotation annotation = new Annotation();
+            Documentation doc = new Documentation();
+            doc.setSource("Characteristics of the object pool.");
+            annotation.getAppinfoOrDocumentation().add(doc);
+
+            abstractPoolingProfile.setAnnotation(annotation);
+
+            all.getParticle().add(objectFactory.createElement(abstractPoolingProfile));
+        }
     }
 
     private Attribute createConfigurableAttribute(VariableElement variable) {

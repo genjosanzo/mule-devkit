@@ -48,7 +48,10 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
     }
 
     public String relativeModulePath() {
-        return mContainingClass.relativePath() + "#" + elementName();
+        String s = mContainingClass.name();
+        s += ".html";
+        s += "#" + elementName();
+        return s;
     }
 
     private static void addInterfaces(ClassInfo[] ifaces, ArrayList<ClassInfo> queue) {

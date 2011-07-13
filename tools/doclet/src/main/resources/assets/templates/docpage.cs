@@ -4,7 +4,39 @@
 <html>
 <?cs include:"head_tag.cs" ?>
 <body class="gc-documentation">
-<?cs include:"header.cs" ?>
+<?cs call:custom_masthead() ?>
+<div class="g-section g-tpl-240" id="body-content">
+    <div class="g-unit g-first side-nav-resizable" id="side-nav">
+      <div id="devdoc-nav"><ul>
+  <li>
+    <h2><span class="en">Getting Started</span>
+    </h2>
+    <ul>
+      <li class="toggle-list">
+        <div><a href="guide/installation.html">
+            <span class="en">Installation</span>
+          </a></div>
+        <ul id="devdoc-nav-sample-list">
+          <li><a href="guide/installation/maven.html">
+                <span class="en">Single Application</span>
+              </a></li>
+          <li><a href="guide/installation/maven.html">
+                <span class="en">All Applications</span>
+              </a></li>
+        </ul>
+      </li>
+      <li class="toggle-list">
+        <div><a href="/resources/browser.html?tag=article">
+               <span class="en">Articles</span>
+             </a></div>
+        <ul id="devdoc-nav-article-list">
+        </ul>
+      </li>
+    </ul>
+  </li>
+  </div> <!-- devdoc-nav -->
+  </div>
+ </div>
 
 <div class="g-unit" id="doc-content"><a name="top"></a>
 

@@ -5,22 +5,8 @@
 <?cs include:"head_tag.cs" ?>
 <body class="gc-documentation">
 <?cs call:custom_masthead() ?>
-<?cs # The default side navigation for the reference docs ?><?cs
-def:custom_left_nav() ?>
-  <div class="g-section g-tpl-240" id="body-content">
-    <div class="g-unit g-first side-nav-resizable" id="side-nav">
-      <div id="swapper">
-        <div id="nav-panels">
-          <div id="classes-nav">
-              <p style="padding:10px">Select a module to view its members</p><br/>
-          </div><!-- end classes -->
-        </div><!-- end nav-panels -->
-      </div><!-- end swapper -->
-    </div> <!-- end side-nav -->
-    <?cs
-/def ?>
 
-<div class="g-unit" id="doc-content">
+<div class="g-unit" id="all-content">
 
 <div id="jd-header">
 <h1><?cs var:page.title ?></h1>

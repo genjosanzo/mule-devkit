@@ -270,7 +270,7 @@ nobr {
   background-repeat: no-repeat;
   color: #666;
   font-size: 13px;
-  font-weight: bold;
+  font-weight: normal;
   width: 94px;
   height: 29px;
   text-align: center;
@@ -307,7 +307,7 @@ nobr {
   background-position: 0 0;
   background-repeat: no-repeat;
   color: #fff;
-  font-weight: bold;
+  font-weight: normal;
   cursor:default;
 }
 

@@ -74,13 +74,6 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return expressionManager;
     }
 
-    protected FieldVariable generateFieldForMuleContext(DefinedClass messageProcessorClass) {
-        FieldVariable muleContext =  messageProcessorClass.field(Modifier.PRIVATE, ref(MuleContext.class), "muleContext");
-        muleContext.javadoc().add("Mule Context");
-
-        return muleContext;
-    }
-
     protected FieldVariable generateFieldForPojo(DefinedClass messageProcessorClass, Element typeElement) {
         DefinedClass pojo = context.getClassForRole(context.getNameUtils().generatePojoRoleKey((TypeElement) typeElement));
         FieldVariable fieldPojo = messageProcessorClass.field(Modifier.PRIVATE, pojo, "pojo");
@@ -186,17 +179,6 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return setObject;
     }
 
-
-    protected Method generateSetMuleContextMethod(DefinedClass messageProcessorClass, FieldVariable muleContext) {
-        Method setMuleContext = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setMuleContext");
-        setMuleContext.javadoc().add("Set the Mule context");
-        setMuleContext.javadoc().addParam("context Mule context to set");
-        Variable muleContextParam = setMuleContext.param(ref(MuleContext.class), "context");
-        setMuleContext.body().assign(ExpressionFactory._this().ref(muleContext), muleContextParam);
-
-        return setMuleContext;
-    }
-
     protected void generateExpressionEvaluator(Block block, Variable evaluatedField, FieldVariable field, FieldVariable patternInfo, FieldVariable expressionManager, Variable muleMessage) {
         Conditional conditional = block._if(Op._instanceof(field, ref(String.class)));
         Block trueBlock = conditional._then();
@@ -234,16 +216,6 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
         Block notAssignable = ifIsAssignableFrom._else();
         notAssignable.assign(transformedField, ExpressionFactory.cast(ref(expectedType).boxify(), evaluatedField));
-    }
-
-    protected Method generateSetter(DefinedClass messageProcessorClass, FieldVariable field) {
-        Method setter = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "set" + StringUtils.capitalize(field.name()));
-        setter.javadoc().add("Sets " + field.name());
-        setter.javadoc().addParam("value Value to set");
-        Variable value = setter.param(field.type(), "value");
-        setter.body().assign(ExpressionFactory._this().ref(field), value);
-
-        return setter;
     }
 
 

@@ -47,44 +47,38 @@ import java.util.List;
 
 public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
     public void generate(Element element) throws GenerationException {
-        DefinedClass lifecycleWrapper = getLifecycleAdapterClass(element);
-        lifecycleWrapper.javadoc().add("A <code>" + lifecycleWrapper.name() + "</code> is a wrapper around ");
-        lifecycleWrapper.javadoc().add(ref(element.asType()));
-        lifecycleWrapper.javadoc().add(" that adds lifecycle methods to the pojo.");
+        DefinedClass lifecycleAdapter = getLifecycleAdapterClass(element);
+        lifecycleAdapter.javadoc().add("A <code>" + lifecycleAdapter.name() + "</code> is a wrapper around ");
+        lifecycleAdapter.javadoc().add(ref(element.asType()));
+        lifecycleAdapter.javadoc().add(" that adds lifecycle methods to the pojo.");
 
         ExecutableElement startElement = getStartElement(element);
-        if (startElement != null) {
-            lifecycleWrapper._implements(Startable.class);
-
-            generateLifecycleInvocation(lifecycleWrapper, startElement, "start", MuleException.class, false);
-        }
+        lifecycleAdapter._implements(Startable.class);
+        generateLifecycleInvocation(lifecycleAdapter, startElement, "start", MuleException.class, false);
 
         ExecutableElement stopElement = getStopElement(element);
-        if (stopElement != null) {
-            lifecycleWrapper._implements(Stoppable.class);
-
-            generateLifecycleInvocation(lifecycleWrapper, stopElement, "stop", MuleException.class, false);
-        }
+        lifecycleAdapter._implements(Stoppable.class);
+        generateLifecycleInvocation(lifecycleAdapter, stopElement, "stop", MuleException.class, false);
 
         ExecutableElement postConstructElement = getPostConstructElement(element);
         if (postConstructElement != null) {
-            lifecycleWrapper._implements(Initialisable.class);
+            lifecycleAdapter._implements(Initialisable.class);
 
-            generateLifecycleInvocation(lifecycleWrapper, postConstructElement, "initialise", InitialisationException.class, true);
+            generateLifecycleInvocation(lifecycleAdapter, postConstructElement, "initialise", InitialisationException.class, true);
         }
 
         ExecutableElement preDestroyElement = getPreDestroyElement(element);
         if (preDestroyElement != null) {
-            lifecycleWrapper._implements(Disposable.class);
+            lifecycleAdapter._implements(Disposable.class);
 
-            generateLifecycleInvocation(lifecycleWrapper, preDestroyElement, "dispose", null, false);
+            generateLifecycleInvocation(lifecycleAdapter, preDestroyElement, "dispose", null, false);
         }
     }
 
     private DefinedClass getLifecycleAdapterClass(Element typeElement) {
-        String namespaceHandlerName = context.getNameUtils().generateClassName((TypeElement) typeElement, ".config", "LifecycleAdapter");
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(namespaceHandlerName));
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(namespaceHandlerName), (TypeReference)ref(typeElement.asType()));
+        String lifecycleAdapterName = context.getNameUtils().generateClassName((TypeElement) typeElement, ".config", "LifecycleAdapter");
+        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(lifecycleAdapterName));
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(lifecycleAdapterName), (TypeReference) ref(typeElement.asType()));
 
         context.setClassRole(context.getNameUtils().generatePojoRoleKey((TypeElement) typeElement), clazz);
 
@@ -98,29 +92,32 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
             startMethod._throws(ref(catchException));
         }
 
-        Invocation startInvocation = ExpressionFactory._super().invoke(superExecutableElement.getSimpleName().toString());
+        if (superExecutableElement != null) {
 
-        if (catchException != null) {
-            TryStatement tryBlock = startMethod.body()._try();
-            tryBlock.body().add(startInvocation);
+            Invocation startInvocation = ExpressionFactory._super().invoke(superExecutableElement.getSimpleName().toString());
 
-            int i = 0;
-            for (TypeMirror exception : superExecutableElement.getThrownTypes()) {
-                CatchBlock catchBlock = tryBlock._catch(ref(exception).boxify());
-                Variable catchedException = catchBlock.param("e" + i);
+            if (catchException != null) {
+                TryStatement tryBlock = startMethod.body()._try();
+                tryBlock.body().add(startInvocation);
 
-                Invocation newMuleException = ExpressionFactory._new(ref(catchException));
-                newMuleException.arg(catchedException);
+                int i = 0;
+                for (TypeMirror exception : superExecutableElement.getThrownTypes()) {
+                    CatchBlock catchBlock = tryBlock._catch(ref(exception).boxify());
+                    Variable catchedException = catchBlock.param("e" + i);
 
-                if (addThis) {
-                    newMuleException.arg(ExpressionFactory._this());
+                    Invocation newMuleException = ExpressionFactory._new(ref(catchException));
+                    newMuleException.arg(catchedException);
+
+                    if (addThis) {
+                        newMuleException.arg(ExpressionFactory._this());
+                    }
+
+                    catchBlock.body().add(newMuleException);
+                    i++;
                 }
-
-                catchBlock.body().add(newMuleException);
-                i++;
+            } else {
+                startMethod.body().add(startInvocation);
             }
-        } else {
-            startMethod.body().add(startInvocation);
         }
     }
 

@@ -24,6 +24,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.transformer.Transformer;
@@ -96,17 +97,27 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             generateSetter(messageProcessorClass, fields.get(fieldName).getField());
         }
 
-        // add process method
-        generateProcessMethod(executableElement, messageProcessorClass, fields, muleContext, object, expressionManager, patternInfo);
+        // get pool object if poolable
+        if( typeElement.getAnnotation(Module.class).poolable() ) {
+            DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey((TypeElement) typeElement));
+
+            // add process method
+            generateProcessMethod(executableElement, messageProcessorClass, fields, muleContext, object, expressionManager, patternInfo, poolObjectClass);
+        } else {
+            // add process method
+            generateProcessMethod(executableElement, messageProcessorClass, fields, muleContext, object, expressionManager, patternInfo);
+        }
+
+
     }
 
     private void generateMessageProcessorClassDoc(ExecutableElement executableElement, DefinedClass messageProcessorClass) {
         messageProcessorClass.javadoc().add(messageProcessorClass.name() + " invokes the ");
-        messageProcessorClass.javadoc().add("{@link " + ((TypeElement)executableElement.getEnclosingElement()).getQualifiedName().toString() + "#");
+        messageProcessorClass.javadoc().add("{@link " + ((TypeElement) executableElement.getEnclosingElement()).getQualifiedName().toString() + "#");
         messageProcessorClass.javadoc().add(executableElement.getSimpleName().toString() + "(");
         boolean first = true;
         for (VariableElement variable : executableElement.getParameters()) {
-            if( !first ) {
+            if (!first) {
                 messageProcessorClass.javadoc().add(", ");
             }
             messageProcessorClass.javadoc().add(variable.asType().toString().replaceAll("<[a-zA-Z\\-\\.\\<\\>\\s\\,]*>", ""));
@@ -132,6 +143,10 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
     }
 
     private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, FieldVariable muleContext, FieldVariable object, FieldVariable expressionManager, FieldVariable patternInfo) {
+        generateProcessMethod(executableElement, messageProcessorClass, fields, muleContext, object, expressionManager, patternInfo, null);
+    }
+
+    private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, FieldVariable muleContext, FieldVariable object, FieldVariable expressionManager, FieldVariable patternInfo, DefinedClass poolObjectClass) {
         String methodName = executableElement.getSimpleName().toString();
         Type muleEvent = ref(MuleEvent.class);
 
@@ -144,6 +159,11 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         Variable event = process.param(muleEvent, "event");
         Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage");
         process.body().assign(muleMessage, event.invoke("getMessage"));
+
+        Variable poolObject = null;
+        if (poolObjectClass != null) {
+            poolObject = process.body().decl(poolObjectClass, "poolObject", ExpressionFactory._null());
+        }
 
         TryStatement callProcessor = process.body()._try();
 
@@ -173,16 +193,30 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
 
         Type returnType = ref(executableElement.getReturnType());
-        generateMethodCall(callProcessor.body(), object, methodName, parameters, muleContext, event, returnType);
+        generateMethodCall(callProcessor.body(), object, methodName, parameters, muleContext, event, returnType, poolObject);
         generateThrow("failedToInvoke", MessagingException.class, callProcessor._catch((TypeReference) ref(Exception.class)), event, methodName);
+
+        if (poolObjectClass != null) {
+            Block fin = callProcessor._finally();
+            Block poolObjectNotNull = fin._if(Op.ne(poolObject, ExpressionFactory._null()))._then();
+            poolObjectNotNull.add(object.invoke("getLifecyleEnabledObjectPool").invoke("returnObject").arg(poolObject));
+        }
     }
 
-    private Variable generateMethodCall(Block body, FieldVariable object, String methodName, List<Variable> parameters, FieldVariable muleContext, Variable event, Type returnType) {
+    private Variable generateMethodCall(Block body, FieldVariable object, String methodName, List<Variable> parameters, FieldVariable muleContext, Variable event, Type returnType, Variable poolObject) {
         Variable resultPayload = null;
         if (returnType != context.getCodeModel().VOID) {
             resultPayload = body.decl(ref(Object.class), "resultPayload");
         }
-        Invocation methodCall = object.invoke(methodName);
+
+        Invocation methodCall = null;
+        if (poolObject != null) {
+            body.assign(poolObject, ExpressionFactory.cast(poolObject.type(), object.invoke("getLifecyleEnabledObjectPool").invoke("borrowObject")));
+            methodCall = poolObject.invoke(methodName);
+        } else {
+            methodCall = object.invoke(methodName);
+        }
+
         for (int i = 0; i < parameters.size(); i++) {
             methodCall.arg(parameters.get(i));
         }

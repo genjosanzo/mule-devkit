@@ -225,6 +225,22 @@ public class NameUtils {
         return pkg + "." + className + "Pojo";
     }
 
+    public String generatePojoFactoryKey(TypeElement typeElement) {
+        String typeFullName = elements.getBinaryName(typeElement).toString();
+        String pkg = getPackageName(typeFullName);
+        String className = getClassName(typeFullName);
+
+        return pkg + "." + className + "Factory";
+    }
+
+    public String generatePoolObjectRoleKey(TypeElement typeElement) {
+        String typeFullName = elements.getBinaryName(typeElement).toString();
+        String pkg = getPackageName(typeFullName);
+        String className = getClassName(typeFullName);
+
+        return pkg + "." + className + "PoolObject";
+    }
+
 
     public String generateClassName(TypeElement typeElement, String extraPackage, String classNameAppend) {
         String typeFullName = elements.getBinaryName(typeElement).toString();

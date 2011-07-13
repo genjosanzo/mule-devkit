@@ -4,9 +4,9 @@
 <html>
 <?cs include:"head_tag.cs" ?>
 <body class="<?cs var:class.since.key ?>">
-<?cs include:"header.cs" ?>
+<?cs call:custom_masthead() ?>
 
-<div class="g-unit" id="doc-content">
+<div class="g-unit" id="all-content">
 
 <div id="api-info-block">
 
@@ -201,6 +201,14 @@ specify which configuration to use.</p>
 <?cs if:subcount(class.methods.processor) ?>
 <h2>Message Processors</h2>
 <?cs call:write_op_details(class.methods.processor) ?>
+<?cs /if ?>
+
+<?cs # this next line must be exactly like this to be parsed by eclipse ?>
+<!-- ========= MESSAGE SOURCES DETAIL ======== -->
+<!-- Message Processors -->
+<?cs if:subcount(class.methods.source) ?>
+<h2>Message Sources</h2>
+<?cs call:write_op_details(class.methods.source) ?>
 <?cs /if ?>
 
 

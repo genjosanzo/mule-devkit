@@ -167,7 +167,8 @@
 }
 
 #index-links {
-  padding:7px 0 4px 10px;
+  padding:7px 0 4px 18px;
+  font-size: 10px;
 }
 
 /* nav tree */
@@ -237,6 +238,10 @@
   overflow:auto;
 }
 
+#all-content {
+  overflow:auto;
+}
+
 #jd-header {
   font-family: Monaco, monospace;
   font-size: 12px;	
@@ -278,7 +283,7 @@
 }
 
 #jd-header.guide-header {
-  background-color:#fff;
+  /* background-color:#fff; */
   color:#435a6e;
   height:50px;
 }
