@@ -17,7 +17,6 @@
 
 package org.mule.devkit.module.generation;
 
-import com.sun.tools.internal.ws.processor.model.java.JavaArrayType;
 import org.apache.commons.lang.StringUtils;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -171,9 +170,9 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         Block isGenericMap = isExpectedMap._then()._if(Op._instanceof(expectedType, ref(ParameterizedType.class)))._then();
 
         isGenericMap.assign(keyType, ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).
-                        invoke("getActualTypeArguments").component(ExpressionFactory.lit(0)));
+                invoke("getActualTypeArguments").component(ExpressionFactory.lit(0)));
         isGenericMap.assign(valueType, ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).
-                        invoke("getActualTypeArguments").component(ExpressionFactory.lit(1)));
+                invoke("getActualTypeArguments").component(ExpressionFactory.lit(1)));
 
         Cast mapCast = ExpressionFactory.cast(ref(Map.class), source);
 
@@ -183,7 +182,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         Variable value = keyLoop.body().decl(ref(Object.class), "value", mapCast.invoke("get").arg(entryCast.invoke("getKey")));
         keyLoop.body().add(entryCast.invoke("setValue").arg(
-            ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(valueType).arg(value)
+                ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(valueType).arg(value)
         ));
 
         isMap._then().assign(target, source);
@@ -201,7 +200,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 ref(DataTypeFactory.class).staticInvoke("create").arg(target.invoke("getClass")));
         Variable targetDataType = shouldTransform._then().decl(ref(DataType.class), "targetDataType",
                 ref(DataTypeFactory.class).staticInvoke("create").arg(
-                        ExpressionFactory.cast(ref(Class.class),expectedType)));
+                        ExpressionFactory.cast(ref(Class.class), expectedType)));
 
         Variable transformer = shouldTransform._then().decl(ref(Transformer.class), "t",
                 muleContext.invoke("getRegistry").invoke("lookupTransformer").arg(sourceDataType).arg(targetDataType));
@@ -225,9 +224,9 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 Op._instanceof(expectedType, ref(ParameterizedType.class)))._then();
         isParameterizedType._return(
                 ExpressionFactory.invoke("isAssignableFrom").arg(
-                    ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).invoke("getRawType")
+                        ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).invoke("getRawType")
                 ).arg(
-                    clazz
+                        clazz
                 )
         );
 
@@ -235,7 +234,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 Op._instanceof(expectedType, ref(WildcardType.class)))._then();
         Variable upperBounds = isWildcardType.decl(ref(java.lang.reflect.Type.class).array(), "upperBounds",
                 ExpressionFactory.cast(ref(WildcardType.class), expectedType).invoke("getUpperBounds"));
-        Block ifHasUpperBounds = isWildcardType._if(Op.ne(upperBounds.ref("length"),ExpressionFactory.lit(0)))._then();
+        Block ifHasUpperBounds = isWildcardType._if(Op.ne(upperBounds.ref("length"), ExpressionFactory.lit(0)))._then();
         ifHasUpperBounds._return(
                 ExpressionFactory.invoke("isAssignableFrom").arg(
                         upperBounds.component(ExpressionFactory.lit(0))).arg(clazz));
@@ -431,31 +430,31 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                     context.getTypeMirrorUtils().isEnum(fields.get(fieldName).getVariableElement().asType())) {
                     */
 
-                Variable transformed = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(),
-                        "transformed" + StringUtils.capitalize(fieldName),
-                        ExpressionFactory.cast(ref(fields.get(fieldName).getVariableElement().asType()).boxify(),
-                        ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(
-                                messageProcessorClass.dotclass().invoke("getDeclaredField").arg(
-                                        ExpressionFactory.lit(fields.get(fieldName).getFieldType().name())
-                                ).invoke("getGenericType")
-                        ).arg(fields.get(fieldName).getField())
-                                ));
+            Variable transformed = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(),
+                    "transformed" + StringUtils.capitalize(fieldName),
+                    ExpressionFactory.cast(ref(fields.get(fieldName).getVariableElement().asType()).boxify(),
+                            ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(
+                                    messageProcessorClass.dotclass().invoke("getDeclaredField").arg(
+                                            ExpressionFactory.lit(fields.get(fieldName).getFieldType().name())
+                                    ).invoke("getGenericType")
+                            ).arg(fields.get(fieldName).getField())
+                    ));
 
-                /*
-            List<Map<String, String>> transformerObjects1 = (List<Map<String, String>>) evaluateAndTransform(muleMessage,
-                    AcceptNestedMessageProcessor.class.getDeclaredField("objectsType").getGenericType(), objects);
+            /*
+List<Map<String, String>> transformerObjects1 = (List<Map<String, String>>) evaluateAndTransform(muleMessage,
+AcceptNestedMessageProcessor.class.getDeclaredField("objectsType").getGenericType(), objects);
 
-                                 */
+            */
 
-                //Variable evaluated = callProcessor.body().decl(ref(Object.class), "evaluated" + StringUtils.capitalize(fieldName), ExpressionFactory._null());
-                //Variable transformed = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName), ExpressionFactory._null());
+            //Variable evaluated = callProcessor.body().decl(ref(Object.class), "evaluated" + StringUtils.capitalize(fieldName), ExpressionFactory._null());
+            //Variable transformed = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName), ExpressionFactory._null());
 
-                //Conditional notNull = callProcessor.body()._if(Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()));
+            //Conditional notNull = callProcessor.body()._if(Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()));
 
-                //generateExpressionEvaluator(notNull._then(), evaluated, fields.get(fieldName).getField(), patternInfo, expressionManager, muleMessage);
-                //generateTransform(notNull._then(), transformed, evaluated, fields.get(fieldName).getVariableElement().asType(), muleContext);
+            //generateExpressionEvaluator(notNull._then(), evaluated, fields.get(fieldName).getField(), patternInfo, expressionManager, muleMessage);
+            //generateTransform(notNull._then(), transformed, evaluated, fields.get(fieldName).getVariableElement().asType(), muleContext);
 
-                parameters.add(transformed);
+            parameters.add(transformed);
             /*
             } else {
                 //Variable ref = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "ref" + StringUtils.capitalize(fieldName));
