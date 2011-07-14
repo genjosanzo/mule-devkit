@@ -18,7 +18,6 @@
 
 	<modules>
         <module>annotations</module>
-        <module>plugin</module>
 		<module>apt</module>
 	</modules>
 </project>
