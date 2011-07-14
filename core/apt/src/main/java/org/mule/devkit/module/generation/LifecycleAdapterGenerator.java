@@ -96,7 +96,7 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
 
             Invocation startInvocation = ExpressionFactory._super().invoke(superExecutableElement.getSimpleName().toString());
 
-            if (catchException != null) {
+            if (superExecutableElement.getThrownTypes().size() > 0) {
                 TryStatement tryBlock = startMethod.body()._try();
                 tryBlock.body().add(startInvocation);
 
