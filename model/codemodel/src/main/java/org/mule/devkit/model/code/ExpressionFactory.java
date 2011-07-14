@@ -116,8 +116,8 @@ public abstract class ExpressionFactory {
         return new ArrayCompRef(lhs, index);
     }
 
-    public static JCast cast(Type type, Expression expr) {
-        return new JCast(type, expr);
+    public static Cast cast(Type type, Expression expr) {
+        return new Cast(type, expr);
     }
 
     public static JArray newArray(Type type) {

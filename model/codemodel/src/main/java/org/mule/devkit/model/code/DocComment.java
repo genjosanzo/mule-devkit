@@ -124,7 +124,7 @@ public class DocComment extends CommentPart implements Generable {
     /**
      * Appends a text to @return tag.
      */
-    public CommentPart addReturn() {
+    public CommentPart addReturn( String ret) {
         if(atReturn==null)
             atReturn = new CommentPart();
         return atReturn;

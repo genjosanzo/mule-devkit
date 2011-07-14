@@ -120,17 +120,21 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             if (variable.asType().toString().contains(SourceCallback.class.getName()))
                 continue;
 
-            if (SchemaTypeConversion.isSupported(variable.asType().toString()) ||
+            /* if (SchemaTypeConversion.isSupported(variable.asType().toString()) ||
                     context.getTypeMirrorUtils().isXmlType(variable.asType()) ||
-                    context.getTypeMirrorUtils().isEnum(variable.asType())) {
+                    context.getTypeMirrorUtils().isEnum(variable.asType())) { */
                 String fieldName = variable.getSimpleName().toString();
                 FieldVariable field = messageProcessorClass.field(Modifier.PRIVATE, ref(Object.class), fieldName);
-                fields.put(variable.getSimpleName().toString(), new AbstractMessageGenerator.FieldVariableElement(field, variable));
+                FieldVariable fieldType = messageProcessorClass.field(Modifier.PRIVATE, ref(variable.asType()), fieldName + "Type");
+                fields.put(variable.getSimpleName().toString(), new AbstractMessageGenerator.FieldVariableElement(field, fieldType, variable));
+            /*
             } else {
                 String fieldName = variable.getSimpleName().toString();
-                FieldVariable field = messageProcessorClass.field(Modifier.PRIVATE, ref(variable.asType()), fieldName);
-                fields.put(variable.getSimpleName().toString(), new AbstractMessageGenerator.FieldVariableElement(field, variable));
+                FieldVariable field = messageProcessorClass.field(Modifier.PRIVATE, ref(Object.asType()), fieldName);
+                FieldVariable fieldType = messageProcessorClass.field(Modifier.PRIVATE, ref(variable.asType()), fieldName + "Type");
+                fields.put(variable.getSimpleName().toString(), new AbstractMessageGenerator.FieldVariableElement(field, fieldType, variable));
             }
+            */
         }
         return fields;
     }
@@ -237,10 +241,12 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
     protected class FieldVariableElement {
         private final FieldVariable field;
+        private final FieldVariable fieldType;
         private final VariableElement variableElement;
 
-        public FieldVariableElement(FieldVariable field, VariableElement variableElement) {
+        public FieldVariableElement(FieldVariable field, FieldVariable fieldType, VariableElement variableElement) {
             this.field = field;
+            this.fieldType = fieldType;
             this.variableElement = variableElement;
         }
 
@@ -249,6 +255,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             final int prime = 31;
             int result = 1;
             result = prime * result + ((field == null) ? 0 : field.hashCode());
+            result = prime * result + ((fieldType == null) ? 0 : fieldType.hashCode());
             result = prime * result + ((variableElement == null) ? 0 : variableElement.hashCode());
             return result;
         }
@@ -267,6 +274,11 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                     return false;
             } else if (!field.equals(other.field))
                 return false;
+            if (fieldType == null) {
+                if (other.fieldType != null)
+                    return false;
+            } else if (!fieldType.equals(other.fieldType))
+                return false;
             if (variableElement == null) {
                 if (other.variableElement != null)
                     return false;
@@ -277,6 +289,10 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
         public FieldVariable getField() {
             return field;
+        }
+
+        public FieldVariable getFieldType() {
+            return fieldType;
         }
 
         public VariableElement getVariableElement() {

@@ -130,7 +130,7 @@
                 <collection:object>
                     <Title>Mr.</Title>
                     <FirstName>Emiliano</FirstName>
-                    <LastName>Lesende</LastName>
+                    <LastName>#[string:Lesende]</LastName>
                 </collection:object>
             </collection:objects>
         </collection:accept-nested>
