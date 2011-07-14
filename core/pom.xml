@@ -18,6 +18,6 @@
 
 	<modules>
         <module>annotations</module>
-		<module>apt</module>
+		<module>annotations-processor</module>
 	</modules>
 </project>
