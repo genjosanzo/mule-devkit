@@ -112,4 +112,12 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>jboss</id>
+            <name>JBoss</name>
+            <url>http://repository.jboss.com/</url>
+        </repository>
+    </repositories>
+
 </project>  
