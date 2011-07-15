@@ -39,6 +39,7 @@ public final class SchemaConstants {
     public static final QName MULE_ABSTRACT_INBOUND_ENDPOINT = new QName(MULE_NAMESPACE, "abstract-inbound-endpoint", "mule");
     public static final QName MULE_ABSTRACT_INBOUND_ENDPOINT_TYPE = new QName(MULE_NAMESPACE, "abstractInboundEndpointType", "mule");
     public static final QName MULE_ABSTRACT_POOLING_PROFILE = new QName(MULE_NAMESPACE, "abstract-pooling-profile", "mule");
+    public static final QName MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE = new QName(MULE_NAMESPACE, "messageProcessorOrOutboundEndpoint", "mule");
     public static final QName STRING = new QName(XSD_NAMESPACE, "string", "xs");
     public static final QName DECIMAL = new QName(XSD_NAMESPACE, "decimal", "xs");
     public static final QName FLOAT = new QName(XSD_NAMESPACE, "float", "xs");

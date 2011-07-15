@@ -28,5 +28,5 @@ public interface ProcessorCallback {
      * @param payload The payload of the message
      * @return The return payload for the processor chain
      */
-    Object process(Object payload);
+    Object process(Object payload) throws Exception;
 }

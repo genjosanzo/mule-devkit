@@ -26,6 +26,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
@@ -424,43 +425,32 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 continue;
 
             String fieldName = variable.getSimpleName().toString();
-            /*
-            if (SchemaTypeConversion.isSupported(fields.get(fieldName).getVariableElement().asType().toString()) ||
-                    context.getTypeMirrorUtils().isXmlType(fields.get(fieldName).getVariableElement().asType()) ||
-                    context.getTypeMirrorUtils().isEnum(fields.get(fieldName).getVariableElement().asType())) {
-                    */
 
-            Variable transformed = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(),
-                    "transformed" + StringUtils.capitalize(fieldName),
-                    ExpressionFactory.cast(ref(fields.get(fieldName).getVariableElement().asType()).boxify(),
-                            ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(
-                                    messageProcessorClass.dotclass().invoke("getDeclaredField").arg(
-                                            ExpressionFactory.lit(fields.get(fieldName).getFieldType().name())
-                                    ).invoke("getGenericType")
-                            ).arg(fields.get(fieldName).getField())
-                    ));
+            if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
 
-            /*
-List<Map<String, String>> transformerObjects1 = (List<Map<String, String>>) evaluateAndTransform(muleMessage,
-AcceptNestedMessageProcessor.class.getDeclaredField("objectsType").getGenericType(), objects);
+                DefinedClass callbackClass = context.getClassForRole(ProcessorCallbackFactoryGenerator.CALLBACK_ROLE);
 
-            */
+                Variable transformed = callProcessor.body().decl(callbackClass, "transformed" + StringUtils.capitalize(fieldName),
+                        ExpressionFactory.cast(callbackClass,
+                                ExpressionFactory.cast(callbackClass,fields.get(fieldName).getField()).invoke("clone")));
 
-            //Variable evaluated = callProcessor.body().decl(ref(Object.class), "evaluated" + StringUtils.capitalize(fieldName), ExpressionFactory._null());
-            //Variable transformed = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName), ExpressionFactory._null());
+                callProcessor.body().add(transformed.invoke("setEvent").arg(event));
+                callProcessor.body().add(transformed.invoke("setMuleContext").arg(muleContext));
 
-            //Conditional notNull = callProcessor.body()._if(Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()));
-
-            //generateExpressionEvaluator(notNull._then(), evaluated, fields.get(fieldName).getField(), patternInfo, expressionManager, muleMessage);
-            //generateTransform(notNull._then(), transformed, evaluated, fields.get(fieldName).getVariableElement().asType(), muleContext);
-
-            parameters.add(transformed);
-            /*
+                parameters.add(transformed);
             } else {
-                //Variable ref = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "ref" + StringUtils.capitalize(fieldName));
-                parameters.add(fields.get(fieldName).getField());
+
+                Variable transformed = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(),
+                        "transformed" + StringUtils.capitalize(fieldName),
+                        ExpressionFactory.cast(ref(fields.get(fieldName).getVariableElement().asType()).boxify(),
+                                ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(
+                                        messageProcessorClass.dotclass().invoke("getDeclaredField").arg(
+                                                ExpressionFactory.lit(fields.get(fieldName).getFieldType().name())
+                                        ).invoke("getGenericType")
+                                ).arg(fields.get(fieldName).getField())
+                        ));
+                parameters.add(transformed);
             }
-            */
         }
 
         Type returnType = ref(executableElement.getReturnType());

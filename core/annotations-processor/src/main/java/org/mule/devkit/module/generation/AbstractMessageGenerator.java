@@ -17,8 +17,6 @@
 
 package org.mule.devkit.module.generation;
 
-import org.apache.commons.lang.StringUtils;
-import org.mule.api.MuleContext;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;

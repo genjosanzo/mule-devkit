@@ -23,6 +23,7 @@ import org.mule.api.annotations.Parameter;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
+import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
@@ -38,6 +39,7 @@ import org.mule.devkit.model.schema.Element;
 import org.mule.devkit.model.schema.ExplicitGroup;
 import org.mule.devkit.model.schema.ExtensionType;
 import org.mule.devkit.model.schema.FormChoice;
+import org.mule.devkit.model.schema.GroupRef;
 import org.mule.devkit.model.schema.Import;
 import org.mule.devkit.model.schema.LocalComplexType;
 import org.mule.devkit.model.schema.LocalSimpleType;
@@ -303,11 +305,13 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 if (variable.asType().toString().contains(SourceCallback.class.getName()))
                     continue;
 
-                if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
+                if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
+                    generateProcessorCallbackElement(all, variable);
+                } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                     all.getParticle().add(objectFactory.createElement(generateXmlElement(variable.getSimpleName().toString(), targetNamespace)));
                 } else {
                     if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
-                        generateParameterCollectionElement(all, variable);
+                        generateCollectionElement(all, variable);
                     } else {
                         complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(variable));
                     }
@@ -316,6 +320,34 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
+    }
+
+    private void generateProcessorCallbackElement(All all, VariableElement variable) {
+        Optional optional = variable.getAnnotation(Optional.class);
+
+        TopLevelElement collectionElement = new TopLevelElement();
+        all.getParticle().add(objectFactory.createElement(collectionElement));
+        collectionElement.setName(context.getNameUtils().uncamel(variable.getSimpleName().toString()));
+
+        if (optional != null) {
+            collectionElement.setMinOccurs(BigInteger.valueOf(0L));
+        } else {
+            collectionElement.setMinOccurs(BigInteger.valueOf(1L));
+        }
+        collectionElement.setMaxOccurs("1");
+
+        LocalComplexType collectionComplexType = new LocalComplexType();
+        GroupRef group = new GroupRef();
+        group.setRef(SchemaConstants.MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE);
+        if (optional != null) {
+            group.setMinOccurs(BigInteger.valueOf(0L));
+        } else {
+            group.setMinOccurs(BigInteger.valueOf(1L));
+        }
+        group.setMaxOccurs("unbounded");
+
+        collectionComplexType.setGroup(group);
+        collectionElement.setComplexType(collectionComplexType);
     }
 
     private void generateCollectionElement(All all, VariableElement variable, boolean optional) {
@@ -454,15 +486,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return complexType;
     }
 
-    private void generateParameterCollectionElement(All all, VariableElement variable) {
-        Parameter parameter = variable.getAnnotation(Parameter.class);
-        Optional optional = variable.getAnnotation(Optional.class);
-
-        generateCollectionElement(all, variable, optional != null);
-    }
-
-    private void generateConfigurableCollectionElement(All all, VariableElement variable) {
-        Configurable configurable = variable.getAnnotation(Configurable.class);
+    private void generateCollectionElement(All all, VariableElement variable) {
         Optional optional = variable.getAnnotation(Optional.class);
 
         generateCollectionElement(all, variable, optional != null);
@@ -516,17 +540,17 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         for (VariableElement variable : variables) {
             Configurable configurable = variable.getAnnotation(Configurable.class);
 
-            if( configurable == null )
+            if (configurable == null)
                 continue;
 
             if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
-                generateConfigurableCollectionElement(all, variable);
+                generateCollectionElement(all, variable);
             } else {
                 config.getAttributeOrAttributeGroup().add(createConfigurableAttribute(variable));
             }
         }
 
-        if( element.getAnnotation(Module.class).poolable() ) {
+        if (element.getAnnotation(Module.class).poolable()) {
             TopLevelElement abstractPoolingProfile = new TopLevelElement();
             abstractPoolingProfile.setRef(SchemaConstants.MULE_ABSTRACT_POOLING_PROFILE);
             abstractPoolingProfile.setMinOccurs(BigInteger.valueOf(0L));

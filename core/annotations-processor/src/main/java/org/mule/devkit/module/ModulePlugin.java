@@ -33,6 +33,7 @@ import org.mule.devkit.module.generation.MessageProcessorGenerator;
 import org.mule.devkit.module.generation.MessageSourceGenerator;
 import org.mule.devkit.module.generation.NamespaceHandlerGenerator;
 import org.mule.devkit.module.generation.PoolAdapterGenerator;
+import org.mule.devkit.module.generation.ProcessorCallbackFactoryGenerator;
 import org.mule.devkit.module.generation.RegistryBootstrapGenerator;
 import org.mule.devkit.module.generation.SchemaGenerator;
 import org.mule.devkit.module.generation.SpringNamespaceHandlerGenerator;
@@ -63,6 +64,7 @@ public class ModulePlugin implements Plugin {
         this.generators.add(new TransformerGenerator());
         this.generators.add(new EnumTransformerGenerator());
         this.generators.add(new BeanDefinitionParserGenerator());
+        this.generators.add(new ProcessorCallbackFactoryGenerator());
         this.generators.add(new MessageSourceGenerator());
         this.generators.add(new MessageProcessorGenerator());
         this.generators.add(new NamespaceHandlerGenerator());

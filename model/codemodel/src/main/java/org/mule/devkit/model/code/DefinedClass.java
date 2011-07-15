@@ -675,9 +675,13 @@ public class DefinedClass
     /**
      * Add a new public nested class to this class.
      */
-    public DefinedClass _class(String name)
-        throws ClassAlreadyExistsException {
-        return _class(Modifier.PUBLIC, name);
+    public DefinedClass _class(String name) {
+        try
+        {
+            return _class(Modifier.PUBLIC, name);
+        } catch( ClassAlreadyExistsException caee ) {
+            return caee.getExistingClass();
+        }
     }
 
     /**
