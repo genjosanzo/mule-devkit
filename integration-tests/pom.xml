@@ -64,6 +64,10 @@
                             <token>@project.version@</token>
                             <value>${project.version}</value>
                         </replacement>
+                        <replacement>
+                            <token>@mule.version@</token>
+                            <value>${mule.version}</value>
+                        </replacement>
                     </replacements>
                 </configuration>
             </plugin>
