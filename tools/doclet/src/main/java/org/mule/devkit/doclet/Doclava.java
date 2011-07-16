@@ -714,7 +714,8 @@ public class Doclava {
         return data;
     }
 
-    private static void writeDirectory(File dir, String relative, JSilver js, String out) {
+    private static Map<String, List<TocInfo>> generateToc(File dir, String relative, String out) {
+        Map<String, List<TocInfo>> toc = new HashMap<String, List<TocInfo>>();
         File[] files = dir.listFiles();
         int i, count = files.length;
         for (i = 0; i < count; i++) {
@@ -722,19 +723,61 @@ public class Doclava {
             if (f.isFile()) {
                 String templ = ensureSlash(relative) + f.getName();
                 int len = templ.length();
-                if (len > 3 && ".cs".equals(templ.substring(len - 3))) {
+                if (len > 3 && ".jd".equals(templ.substring(len - 3))) {
+                    String filename = out + templ.substring(0, len - 3) + htmlExtension;
+                    String topic = DocFile.getProperty(f.getAbsolutePath(), "page.group");
+                    String title = DocFile.getProperty(f.getAbsolutePath(), "page.title");
+
+                    if (!toc.containsKey(topic)) {
+                        toc.put(topic, new ArrayList<TocInfo>());
+                    }
+
+                    toc.get(topic).add(new TocInfo(title, filename));
+                }
+            } else if (f.isDirectory()) {
+                toc.putAll(generateToc(f, ensureSlash(relative) + f.getName() + "/", out));
+            }
+        }
+
+        return toc;
+    }
+
+    private static void writeDirectory(Map<String, List<TocInfo>> toc, File dir, String relative, JSilver js, String out) {
+        File[] files = dir.listFiles();
+        int i, count = files.length;
+        for (i = 0; i < count; i++) {
+            File f = files[i];
+            if (f.isFile()) {
+                String templ = ensureSlash(relative) + f.getName();
+                int len = templ.length();
+                /* if (len > 3 && ".cs".equals(templ.substring(len - 3))) {
                     Data data = makeHDF();
+                    makeTocHDF(toc, data);
                     String filename = out + templ.substring(0, len - 3) + htmlExtension;
-                    ClearPage.write(data, templ, filename, js);
-                } else if (len > 3 && ".jd".equals(templ.substring(len - 3))) {
+                    ClearPage.write(data, templ, filename, js); */
+                if (len > 3 && ".jd".equals(templ.substring(len - 3))) {
                     String filename = out + templ.substring(0, len - 3) + htmlExtension;
-                    DocFile.writePage(f.getAbsolutePath(), relative, filename);
+                    DocFile.writePage(toc, f.getAbsolutePath(), relative, filename);
                 } else {
                     ClearPage.copyFile(f, new File(ensureSlash(out) + templ));
                 }
             } else if (f.isDirectory()) {
-                writeDirectory(f, ensureSlash(relative) + f.getName() + "/", js, out);
+                writeDirectory(toc, f, ensureSlash(relative) + f.getName() + "/", js, out);
             }
+        }
+    }
+
+    private static void makeTocHDF(Map<String, List<TocInfo>> toc, Data data) {
+        int i = 0;
+        for( String topic : toc.keySet() ) {
+            data.setValue("topics." + i + ".title", topic == null ? "Root" : topic);
+            int j = 0;
+            for( TocInfo page : toc.get(topic) ) {
+                data.setValue("topics." + i + ".topics." + j + ".title", page.getTitle());
+                data.setValue("topics." + i + ".topics." + j + ".link", "../" + page.getFilename());
+                j++;
+            }
+            i++;
         }
     }
 
@@ -745,7 +788,8 @@ public class Doclava {
 
         ResourceLoader loader = new FileSystemResourceLoader(dir);
         JSilver js = new JSilver(loader);
-        writeDirectory(dir, "", js, guideDir);
+        Map<String, List<TocInfo>> toc = generateToc(dir, "", guideDir);
+        writeDirectory(toc, dir, "", js, guideDir);
     }
 
     public static void writeAssets() {
@@ -769,7 +813,7 @@ public class Doclava {
         for (String templateDir : templateDirs) {
             File assets = new File(ensureSlash(templateDir) + "assets");
             if (assets.isDirectory()) {
-                writeDirectory(assets, assetsOutputDir, null, "");
+                writeDirectory(null, assets, assetsOutputDir, null, "");
             }
         }
     }
@@ -953,7 +997,7 @@ public class Doclava {
         ClassInfo[] classes = Converter.rootClasses();
         SortedMap<String, PackageInfo> sorted = new TreeMap<String, PackageInfo>();
         for (ClassInfo cl : classes) {
-            if( !cl.isModule() )
+            if (!cl.isModule())
                 continue;
 
             PackageInfo pkg = cl.containingPackage();

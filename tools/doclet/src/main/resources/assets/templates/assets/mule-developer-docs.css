@@ -109,13 +109,13 @@
 }
 
 #side-nav .selected {
-  background-color: #435a6e;
-  color: #fff;
+  background-color: #ddd;
+  color: #000;
   font-weight:bold;
 }
 
 #side-nav .selected a {
-  color: #fff;
+  color: #000;
   text-decoration:none;
 }
 
@@ -245,14 +245,16 @@
 #jd-header {
   font-family: Monaco, monospace;
   font-size: 12px;	
-  background-color: #E2E2E2;
+  background-color: #3572A6;
   padding: 7px 15px;
+  color: #fff;
 }
 
 #jd-header h1 {
   font-family: Ubuntu, Arial, Helvetica;
   margin: 0 0 10px;
   font-size:1.7em;
+  color: #fff;
 }
 
 #jd-header .crumb {
@@ -284,7 +286,8 @@
 
 #jd-header.guide-header {
   /* background-color:#fff; */
-  color:#435a6e;
+  /* color:#435a6e; */
+  color: #000;
   height:50px;
 }
 
@@ -352,7 +355,7 @@ links to summary tables) */
   font-weight:normal;
   float:right;
   text-align:right;
-  color:#999;
+  color:#ddd;
   max-width:70%;
 }
 
@@ -476,6 +479,7 @@ div#naMessage strong {
 
 .sum-details-links a {
   text-decoration:none;
+  color: #fff;
 }
 
 .sum-details-links a:hover {

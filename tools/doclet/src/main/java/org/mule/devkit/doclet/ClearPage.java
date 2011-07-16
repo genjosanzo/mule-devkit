@@ -50,12 +50,12 @@ public class ClearPage {
     } else {
       int slashcount = countSlashes(path) - 1;
       if (slashcount > 0) {
-        toroot = "";
+        toroot = "../";
         for (int i = 0; i < slashcount; i++) {
           toroot += "../";
         }
       } else {
-        toroot = "./";
+        toroot = "../";
       }
     }
     return toroot;
@@ -108,8 +108,9 @@ public class ClearPage {
     }
 
     String rootPath = getPathToRoot(filename);
+
     data.setValue("toroot", rootPath);
-    data.setValue("toassets", rootPath + "../" + Doclava.assetsOutputDir + "/");
+    data.setValue("toassets", rootPath + Doclava.assetsOutputDir + "/");
     data.setValue("filename", filename);
 
     if (!fullPath) {

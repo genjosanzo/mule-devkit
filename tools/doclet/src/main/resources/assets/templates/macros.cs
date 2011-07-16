@@ -1,11 +1,11 @@
 <?cs # A link to a package ?><?cs 
 def:package_link(pkg) ?>
-  <a href="<?cs var:toroot ?><?cs var:pkg.link ?>"><?cs var:pkg.name ?></a><?cs 
+  <a href="<?cs var:toroot ?>java/<?cs var:pkg.link ?>"><?cs var:pkg.name ?></a><?cs
 /def ?>
 
 <?cs # A link to a module ?><?cs
 def:module_link(mod) ?>
-  <a href="<?cs var:toroot ?><?cs var:mod.link ?>"><?cs var:mod.name ?></a><?cs
+  <a href="<?cs var:toroot ?>mule/<?cs var:mod.link ?>"><?cs var:mod.name ?></a><?cs
 /def ?>
 
 <?cs # A link to a type, or not if it's a primitive type
@@ -23,7 +23,7 @@ def:type_link_impl(type, link) ?><?cs
   if:type.link && link=="true" ?><?cs
     if:type.federated ?><a href="<?cs var:type.link ?>"><?cs
       var:type.label ?></a><?cs 
-    else ?><a href="<?cs var:toroot ?><?cs var:type.link ?>"><?cs var:type.label ?></a><?cs
+    else ?><a href="<?cs var:toroot ?>java/<?cs var:type.link ?>"><?cs var:type.label ?></a><?cs
     /if ?><?cs
   else ?><?cs var:type.label ?><?cs
   /if ?><?cs if:subcount(type.extendsBounds) ?><?cs
@@ -80,7 +80,7 @@ def:tag_list(tags) ?><?cs
       if:tag.name == "Text" ?><?cs var:tag.text?><?cs
       elif:tag.kind == "@more" ?><p><?cs
       elif:tag.kind == "@see" ?><code><a href="<?cs
-        if:tag.isLocal?><?cs var:toroot ?><?cs /if ?><?cs
+        if:tag.isLocal?><?cs var:toroot ?>java/<?cs /if ?><?cs
         var:tag.href ?>"><?cs var:tag.label ?></a></code><?cs
       elif:tag.kind == "@seeHref" ?><a href="<?cs var:tag.href ?>"><?cs var:tag.label ?></a><?cs
       elif:tag.kind == "@seeJustLabel" ?><?cs var:tag.label ?><?cs
@@ -89,18 +89,6 @@ def:tag_list(tags) ?><?cs
       elif:tag.name == "@sample" ?><pre><?cs var:tag.text ?></pre><?cs
       elif:tag.name == "@include" ?><?cs var:tag.text ?><?cs
       elif:tag.kind == "@docRoot" ?><?cs var:toroot ?><?cs
-      elif:tag.kind == "@sdkCurrent" ?><?cs var:sdk.current ?><?cs
-      elif:tag.kind == "@sdkCurrentVersion" ?><?cs var:sdk.version ?><?cs
-      elif:tag.kind == "@sdkCurrentRelId" ?><?cs var:sdk.rel.id ?><?cs
-      elif:tag.kind == "@sdkPlatformVersion" ?><?cs var:sdk.platform.version ?><?cs
-      elif:tag.kind == "@sdkPlatformApiLevel" ?><?cs var:sdk.platform.apiLevel ?><?cs
-      elif:tag.kind == "@sdkPlatformMajorMinor" ?><?cs var:sdk.platform.majorMinor ?><?cs
-      elif:tag.kind == "@sdkPlatformReleaseDate" ?><?cs var:sdk.platform.releaseDate ?><?cs
-      elif:tag.kind == "@sdkPlatformDeployableDate" ?><?cs var:sdk.platform.deployableDate ?><?cs
-      elif:tag.kind == "@adtZipVersion" ?><?cs var:adt.zip.version ?><?cs
-      elif:tag.kind == "@adtZipDownload" ?><?cs var:adt.zip.download ?><?cs
-      elif:tag.kind == "@adtZipBytes" ?><?cs var:adt.zip.bytes ?><?cs
-      elif:tag.kind == "@adtZipChecksum" ?><?cs var:adt.zip.checksum ?><?cs
       elif:tag.kind == "@inheritDoc" ?><?cs # This is the case when @inheritDoc is in something
                                               that doesn't inherit from anything?><?cs
       elif:tag.kind == "@attr" ?><?cs

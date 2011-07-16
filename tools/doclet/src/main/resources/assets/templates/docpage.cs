@@ -8,33 +8,19 @@
 <div class="g-section g-tpl-240" id="body-content">
     <div class="g-unit g-first side-nav-resizable" id="side-nav">
       <div id="devdoc-nav"><ul>
+    <?cs each:topic = topics ?>
   <li>
-    <h2><span class="en">Getting Started</span>
-    </h2>
-    <ul>
-      <li class="toggle-list">
-        <div><a href="guide/installation.html">
-            <span class="en">Installation</span>
-          </a></div>
-        <ul id="devdoc-nav-sample-list">
-          <li><a href="guide/installation/maven.html">
-                <span class="en">Single Application</span>
-              </a></li>
-          <li><a href="guide/installation/maven.html">
-                <span class="en">All Applications</span>
-              </a></li>
-        </ul>
-      </li>
-      <li class="toggle-list">
-        <div><a href="/resources/browser.html?tag=article">
-               <span class="en">Articles</span>
-             </a></div>
-        <ul id="devdoc-nav-article-list">
-        </ul>
-      </li>
-    </ul>
+    <h2><span class="en"><?cs var:topic.title ?></span></h2>
+        <?cs each:subtopic = topic.topics ?>
+        <li class="toggle-list"><div>
+           <a href="<?cs var:subtopic.link ?>"><span class="en"><?cs var:subtopic.title ?></span></a></div>
+         <ul id="devdoc-nav-article-list">
+         </ul>
+         </li>
+        <?cs /each ?>
   </li>
-  </div> <!-- devdoc-nav -->
+    <?cs /each ?>
+ </ul> </div> <!-- devdoc-nav -->
   </div>
  </div>
 

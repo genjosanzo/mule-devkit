@@ -182,7 +182,7 @@ td,th {
 }
 
 th {
-  background-color:#dee8f1;
+  background-color:#ddd;
 }
 
 td > p:last-child {
@@ -222,7 +222,7 @@ nobr {
   z-index:100;
   min-width:675px; /* min width for the tabs, before they wrap */
   padding:0 10px;
-  border-bottom:3px solid #94b922;
+  border-bottom:3px solid #3572A6;
 }
 
 #headerLeft{

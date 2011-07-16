@@ -60,7 +60,7 @@ function mobileSetup() {
 addLoadEvent(function() {
     var lists = document.createElement("script");
     lists.setAttribute("type", "text/javascript");
-    lists.setAttribute("src", toRoot + "lists.js");
+    lists.setAttribute("src", toRoot + "java/lists.js");
     document.getElementsByTagName("head")[0].appendChild(lists);
 });
 

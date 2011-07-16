@@ -81,7 +81,7 @@ Summary:
 	 <?cs # The apilevel-N class MUST BE LAST in the sequence of class names ?>
     <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:method.since.key ?>" >
         <td class="jd-linkcol" width="100%"><nobr>
-        <span class="sympad"><?cs call:cond_link("&lt;" + class.moduleName + ":" + method.elementName + "&gt;", toroot, method.modhref, included) ?></nobr>
+        <span class="sympad"><?cs call:cond_link("&lt;" + class.moduleName + ":" + method.elementName + "&gt;", toroot + "mule/", method.modhref, included) ?></nobr>
         <?cs if:subcount(method.shortDescr) || subcount(method.deprecated) ?>
         <div class="jd-descrdiv"><?cs call:short_descr(method) ?></div>
         <?cs /if ?>

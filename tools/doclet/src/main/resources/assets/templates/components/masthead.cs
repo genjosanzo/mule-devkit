@@ -5,14 +5,14 @@
       <span id="masthead-title"><?cs var:project.name ?></span>
     <?cs /if ?>
     <ul id="header-tabs" class="<?cs var:section ?>">
-    	<li id="guide"><a href="<?cs var:toroot ?>../guide/index.html">
+    	<li id="guide"><a href="<?cs var:toroot ?>guide/index.html">
 	    	<span class="en">User Guide</span>
     	</a></li>
-    	<li id="java"><a href="<?cs var:toroot ?>../java/index.html">
+    	<li id="java"><a href="<?cs var:toroot ?>java/index.html">
 	    	<span class="en">Java API</span>
     	</a></li>
-    	<li id="mule"><a href="<?cs var:toroot ?>../mule/modules.html">
-	    	<span class="en">Mule XML</span>
+    	<li id="mule"><a href="<?cs var:toroot ?>mule/modules.html">
+	    	<span class="en">Mule API</span>
     	</a></li>
     </ul>
     </div>

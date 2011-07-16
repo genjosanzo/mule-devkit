@@ -24,7 +24,7 @@
   setToRoot("<?cs var:toroot ?>", "<?cs var:toassets ?>");
 </script><?cs 
 if:reference ?>
-<script src="<?cs var:toassets ?> mule-developer-reference.js" type="text/javascript"></script>
+<script src="<?cs var:toassets ?>mule-developer-reference.js" type="text/javascript"></script>
 <script src="<?cs var:toassets ?>navtree_data.js" type="text/javascript"></script><?cs 
 /if ?>
 <script src="<?cs var:toassets ?>customizations.js" type="text/javascript"></script>
