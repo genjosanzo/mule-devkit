@@ -837,6 +837,12 @@ public class Doclava {
                 name = pkg.name();
             }
             sorted.put(name, pkg);
+            for (MethodInfo method : cl.methods()) {
+                if (method.isProcessor() || method.isSource() ||
+                    method.isTransformer()) {
+                    sorted.put(method.elementName(), method);
+                }
+            }
         }
 
         int i = 0;
@@ -847,12 +853,17 @@ public class Doclava {
             Object o = sorted.get(s);
             if (o instanceof PackageInfo) {
                 PackageInfo pkg = (PackageInfo) o;
-                data.setValue("docs.pages." + i + ".link", pkg.htmlPage());
+                data.setValue("docs.pages." + i + ".link", "java/" + pkg.htmlPage());
                 data.setValue("docs.pages." + i + ".type", "package");
             } else if (o instanceof ClassInfo) {
                 ClassInfo cl = (ClassInfo) o;
-                data.setValue("docs.pages." + i + ".link", cl.htmlPage());
+                data.setValue("docs.pages." + i + ".link", "java/" + cl.htmlPage());
                 data.setValue("docs.pages." + i + ".type", "class");
+            } else if (o instanceof MethodInfo) {
+                MethodInfo mi = (MethodInfo) o;
+                data.setValue("docs.pages." + i + ".id", "" + i);
+                data.setValue("docs.pages." + i + ".link", "mule/" + mi.relativeModulePath());
+                data.setValue("docs.pages." + i + ".type", "method");
             }
             i++;
         }
