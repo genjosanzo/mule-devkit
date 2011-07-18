@@ -109,7 +109,7 @@
 }
 
 #side-nav .selected {
-  background-color: #ddd;
+  /* background-color: #ddd; */
   color: #000;
   font-weight:bold;
 }
@@ -159,16 +159,23 @@
   display:block;
 }
 
+#index-links a {
+    color: #ddd;
+}
+
 #index-links .selected {
-  background-color: #fff;
-  color: #000;
-  font-weight:normal;
-  text-decoration:none;
+  /* background-color: #fff; */
+  color: #fff;
+  font-weight:bold;
+  text-decoration:underline;
 }
 
 #index-links {
   padding:7px 0 4px 18px;
   font-size: 10px;
+  height: 31px;
+  background-color: #3572A6;
+  color: #ddd;
 }
 
 /* nav tree */

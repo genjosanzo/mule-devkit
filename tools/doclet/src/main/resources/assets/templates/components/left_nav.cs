@@ -7,8 +7,8 @@ def:custom_left_nav() ?>
           <div id="resize-packages-nav">
             <div id="packages-nav">
               <div id="index-links"><nobr>
-                <a href="<?cs var:toroot ?>packages.html" <?cs if:(page.title == "Package Index") ?>class="selected"<?cs /if ?> >Package Index</a> | 
-                <a href="<?cs var:toroot ?>classes.html" <?cs if:(page.title == "Class Index") ?>class="selected"<?cs /if ?>>Class Index</a></nobr>
+                <a href="<?cs var:toroot ?>java/packages.html" <?cs if:(page.title == "Package Index") ?>class="selected"<?cs /if ?> >Package Index</a> |
+                <a href="<?cs var:toroot ?>java/classes.html" <?cs if:(page.title == "Class Index") ?>class="selected"<?cs /if ?>>Class Index</a></nobr>
               </div>
               <ul>
                 <?cs call:package_link_list(docs.packages) ?>
