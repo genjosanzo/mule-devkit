@@ -32,7 +32,9 @@ public class SpringSchemaGenerator extends AbstractModuleGenerator {
             OutputStreamWriter springSchemasOut = new OutputStreamWriter(springSchemasStream, "UTF-8");
 
             for (SchemaLocation schemaLocation : context.getSchemaModel().getSchemaLocations()) {
-                springSchemasOut.write(schemaLocation.getLocation().replace("://", "\\://") + "=" + schemaLocation.getFileName() + "\n");
+                if( schemaLocation.getFileName() != null && schemaLocation.getLocation() != null ) {
+                    springSchemasOut.write(schemaLocation.getLocation().replace("://", "\\://") + "=" + schemaLocation.getFileName() + "\n");
+                }
             }
 
             springSchemasOut.flush();

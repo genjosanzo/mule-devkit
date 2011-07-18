@@ -31,6 +31,7 @@ import org.mule.devkit.module.generation.ListEntryChildDefinitionParserGenerator
 import org.mule.devkit.module.generation.MapEntryChildDefinitionParserGenerator;
 import org.mule.devkit.module.generation.MessageProcessorGenerator;
 import org.mule.devkit.module.generation.MessageSourceGenerator;
+import org.mule.devkit.module.generation.MuleSchemaGenerator;
 import org.mule.devkit.module.generation.NamespaceHandlerGenerator;
 import org.mule.devkit.module.generation.PoolAdapterGenerator;
 import org.mule.devkit.module.generation.ProcessorCallbackFactoryGenerator;
@@ -68,6 +69,7 @@ public class ModulePlugin implements Plugin {
         this.generators.add(new MessageSourceGenerator());
         this.generators.add(new MessageProcessorGenerator());
         this.generators.add(new NamespaceHandlerGenerator());
+        this.generators.add(new MuleSchemaGenerator());
         this.generators.add(new SpringNamespaceHandlerGenerator());
         this.generators.add(new SpringSchemaGenerator());
         this.generators.add(new RegistryBootstrapGenerator());

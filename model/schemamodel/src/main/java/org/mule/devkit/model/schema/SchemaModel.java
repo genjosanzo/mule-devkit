@@ -46,6 +46,9 @@ public final class SchemaModel {
 
         try {
             for (SchemaLocation schemaLocation : this.schemas) {
+                if( schemaLocation.getSchema() == null )
+                    continue;
+
                 JAXBContext jaxbContext = JAXBContext.newInstance(Schema.class);
                 Marshaller marshaller = jaxbContext.createMarshaller();
                 NamespaceFilter outFilter = new NamespaceFilter("mule", "http://www.mulesoft.org/schema/mule/core", true);

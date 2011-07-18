@@ -33,7 +33,9 @@ public class SpringNamespaceHandlerGenerator extends AbstractModuleGenerator {
             OutputStreamWriter springNamespaceHandlersOut = new OutputStreamWriter(springNamespaceHandlersStream, "UTF-8");
 
             for (SchemaLocation schemaLocation : context.getSchemaModel().getSchemaLocations()) {
-                springNamespaceHandlersOut.write(schemaLocation.getSchema().getTargetNamespace().replace("://", "\\://") + "=" + schemaLocation.getNamespaceHandler() + "\n");
+                if( schemaLocation.getNamespaceHandler() != null ) {
+                    springNamespaceHandlersOut.write(schemaLocation.getSchema().getTargetNamespace().replace("://", "\\://") + "=" + schemaLocation.getNamespaceHandler() + "\n");
+                }
             }
 
             springNamespaceHandlersOut.flush();
