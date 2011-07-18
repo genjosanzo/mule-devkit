@@ -143,7 +143,9 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             invoke = object.invoke(executableElement.getSimpleName().toString());
         }
 
-        invoke.arg(src);
+        TypeMirror expectedType = executableElement.getParameters().get(0).asType();
+
+        invoke.arg(ExpressionFactory.cast(ref(expectedType), src));
         tryBlock.body().assign(result, invoke);
 
         CatchBlock exceptionCatch = tryBlock._catch(ref(Exception.class));
@@ -206,9 +208,14 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             }
         }
 
-        for (AnnotationValue sourceType : sourceTypes) {
-            Invocation registerSourceType = constructor.body().invoke("registerSourceType");
-            registerSourceType.arg(ref(DataTypeFactory.class).staticInvoke("create").arg(ref((TypeMirror) sourceType.getValue()).boxify().dotclass()));
+        Invocation registerSourceType = constructor.body().invoke("registerSourceType");
+        registerSourceType.arg(ref(DataTypeFactory.class).staticInvoke("create").arg(ref((TypeMirror) executableElement.getParameters().get(0).asType()).boxify().dotclass()));
+
+        if (sourceTypes != null) {
+            for (AnnotationValue sourceType : sourceTypes) {
+                registerSourceType = constructor.body().invoke("registerSourceType");
+                registerSourceType.arg(ref(DataTypeFactory.class).staticInvoke("create").arg(ref((TypeMirror) sourceType.getValue()).boxify().dotclass()));
+            }
         }
     }
 

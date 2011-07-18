@@ -44,7 +44,6 @@ public final class TypeMirrorUtils {
         }
 
         return false;
-
     }
 
     public boolean isCollection(TypeMirror type)

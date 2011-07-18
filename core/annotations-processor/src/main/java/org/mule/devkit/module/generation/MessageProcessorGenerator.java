@@ -28,6 +28,7 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
+import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -48,6 +49,9 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Type;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
+import org.mule.expression.MessageHeaderExpressionEvaluator;
+import org.mule.expression.MessageHeadersExpressionEvaluator;
+import org.mule.expression.MessageHeadersListExpressionEvaluator;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
@@ -432,36 +436,60 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
                 Variable transformed = callProcessor.body().decl(callbackClass, "transformed" + StringUtils.capitalize(fieldName),
                         ExpressionFactory.cast(callbackClass,
-                                ExpressionFactory.cast(callbackClass,fields.get(fieldName).getField()).invoke("clone")));
+                                ExpressionFactory.cast(callbackClass, fields.get(fieldName).getField()).invoke("clone")));
 
                 callProcessor.body().add(transformed.invoke("setEvent").arg(event));
                 callProcessor.body().add(transformed.invoke("setMuleContext").arg(muleContext));
 
                 parameters.add(transformed);
             } else {
+                InboundHeaders inboundHeaders = variable.getAnnotation(InboundHeaders.class);
 
-                Variable transformed = callProcessor.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(),
-                        "transformed" + StringUtils.capitalize(fieldName),
-                        ExpressionFactory.cast(ref(fields.get(fieldName).getVariableElement().asType()).boxify(),
-                                ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(
-                                        messageProcessorClass.dotclass().invoke("getDeclaredField").arg(
-                                                ExpressionFactory.lit(fields.get(fieldName).getFieldType().name())
-                                        ).invoke("getGenericType")
-                                ).arg(fields.get(fieldName).getField())
-                        ));
+                Type type = ref(fields.get(fieldName).getVariableElement().asType()).boxify();
+                String name = "transformed" + StringUtils.capitalize(fieldName);
+                Invocation getGenericType = messageProcessorClass.dotclass().invoke("getDeclaredField").arg(
+                        ExpressionFactory.lit(fields.get(fieldName).getFieldType().name())
+                ).invoke("getGenericType");
+                Invocation evaluateAndTransform = ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(getGenericType);
+
+                if( inboundHeaders != null ) {
+                    //Invocation getInboundHeader = muleMessage.invoke("getInboundProperty").arg(inboundHeaders.value());
+                    if( context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
+                        evaluateAndTransform.arg("#[" + MessageHeadersListExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
+                    } else if (context.getTypeMirrorUtils().isMap(fields.get(fieldName).getVariableElement().asType())) {
+                        evaluateAndTransform.arg("#[" + MessageHeadersExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
+                    } else {
+                        evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
+                    }
+                } else {
+                    evaluateAndTransform.arg(fields.get(fieldName).getField());
+                }
+
+                Cast cast = ExpressionFactory.cast(type, evaluateAndTransform);
+
+                Variable transformed = callProcessor.body().decl(type, name, cast);
                 parameters.add(transformed);
             }
         }
 
         Type returnType = ref(executableElement.getReturnType());
-        generateMethodCall(callProcessor.body(), object, methodName, parameters, muleContext, event, returnType, poolObject);
-        generateThrow("failedToInvoke", MessagingException.class, callProcessor._catch((TypeReference) ref(Exception.class)), event, methodName);
 
-        if (poolObjectClass != null) {
+        generateMethodCall(callProcessor.body(), object, methodName, parameters, muleContext, event, returnType, poolObject
+
+        );
+
+        generateThrow("failedToInvoke", MessagingException.class, callProcessor._catch((TypeReference) ref
+
+                (Exception.class)), event, methodName);
+
+        if (poolObjectClass != null)
+
+        {
             Block fin = callProcessor._finally();
             Block poolObjectNotNull = fin._if(Op.ne(poolObject, ExpressionFactory._null()))._then();
             poolObjectNotNull.add(object.invoke("getLifecyleEnabledObjectPool").invoke("returnObject").arg(poolObject));
         }
+
     }
 
     private Variable generateMethodCall(Block body, FieldVariable object, String methodName, List<Variable> parameters, FieldVariable muleContext, Variable event, Type returnType, Variable poolObject) {

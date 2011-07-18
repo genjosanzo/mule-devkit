@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Mule Development Kit
+    Copyright 2010-2011 (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:headers="http://www.mulesoft.org/schema/mule/headers"
+      xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+        http://www.mulesoft.org/schema/mule/headers http://www.mulesoft.org/schema/mule/headers/1.0/mule-headers.xsd">
+
+    <headers:config/>
+
+    <flow name="processHeader">
+        <headers:process-header/>
+    </flow>
+
+    <flow name="processHeaderOptional">
+        <headers:process-header-optional/>
+    </flow>
+
+    <flow name="processHeaderWithType">
+        <headers:process-header-with-type/>
+    </flow>
+
+    <flow name="processHeaders">
+        <headers:process-headers/>
+    </flow>
+
+    <flow name="processHeadersAll">
+        <headers:process-headers-all/>
+    </flow>
+
+    <flow name="processHeadersWildcard">
+        <headers:process-headers-wildcard/>
+    </flow>
+
+    <flow name="processHeadersMultiWildcard">
+        <headers:process-headers-multi-wildcard/>
+    </flow>
+
+    <flow name="processSingleMapHeader">
+        <headers:process-single-map-header/>
+    </flow>
+
+    <flow name="processHeadersOptional">
+        <headers:process-headers-optional/>
+    </flow>
+
+    <flow name="processHeadersAllOptional">
+        <headers:process-headers-all-optional/>
+    </flow>
+
+    <flow name="processHeadersList">
+        <headers:process-headers-list/>
+    </flow>
+
+    <flow name="processHeadersListAll">
+        <headers:process-headers-list-all/>
+    </flow>
+
+    <flow name="processSingleHeaderList">
+        <headers:process-single-header-list/>
+    </flow>
+
+    <flow name="processHeadersListOptional">
+        <headers:process-headers-list-optional/>
+    </flow>
+
+    <flow name="processHeadersListAllOptional">
+        <headers:process-headers-list-all-optional/>
+    </flow>
+
+    <flow name="processHeadersListWildcard">
+        <headers:process-headers-list-wildcard/>
+    </flow>
+
+    <flow name="processHeadersListMultiWildcard">
+        <headers:process-headers-list-multi-wildcard/>
+    </flow>
+
+</mule>

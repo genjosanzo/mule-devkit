@@ -18,6 +18,7 @@
 package org.mule.devkit.module.generation;
 
 import org.mule.api.annotations.callback.SourceCallback;
+import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionManager;
@@ -61,13 +62,13 @@ import java.util.Map;
 public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
     protected FieldVariable generateFieldForPatternInfo(DefinedClass messageProcessorClass) {
-        FieldVariable patternInfo =  messageProcessorClass.field(Modifier.PRIVATE, ref(TemplateParser.PatternInfo.class), "patternInfo");
+        FieldVariable patternInfo = messageProcessorClass.field(Modifier.PRIVATE, ref(TemplateParser.PatternInfo.class), "patternInfo");
         patternInfo.javadoc().add("Mule Pattern Info");
         return patternInfo;
     }
 
     protected FieldVariable generateFieldForExpressionManager(DefinedClass messageProcessorClass) {
-        FieldVariable expressionManager =  messageProcessorClass.field(Modifier.PRIVATE, ref(ExpressionManager.class), "expressionManager");
+        FieldVariable expressionManager = messageProcessorClass.field(Modifier.PRIVATE, ref(ExpressionManager.class), "expressionManager");
         expressionManager.javadoc().add("Mule Expression Manager");
         return expressionManager;
     }
@@ -118,21 +119,10 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             if (variable.asType().toString().contains(SourceCallback.class.getName()))
                 continue;
 
-            /* if (SchemaTypeConversion.isSupported(variable.asType().toString()) ||
-                    context.getTypeMirrorUtils().isXmlType(variable.asType()) ||
-                    context.getTypeMirrorUtils().isEnum(variable.asType())) { */
-                String fieldName = variable.getSimpleName().toString();
-                FieldVariable field = messageProcessorClass.field(Modifier.PRIVATE, ref(Object.class), fieldName);
-                FieldVariable fieldType = messageProcessorClass.field(Modifier.PRIVATE, ref(variable.asType()), fieldName + "Type");
-                fields.put(variable.getSimpleName().toString(), new AbstractMessageGenerator.FieldVariableElement(field, fieldType, variable));
-            /*
-            } else {
-                String fieldName = variable.getSimpleName().toString();
-                FieldVariable field = messageProcessorClass.field(Modifier.PRIVATE, ref(Object.asType()), fieldName);
-                FieldVariable fieldType = messageProcessorClass.field(Modifier.PRIVATE, ref(variable.asType()), fieldName + "Type");
-                fields.put(variable.getSimpleName().toString(), new AbstractMessageGenerator.FieldVariableElement(field, fieldType, variable));
-            }
-            */
+            String fieldName = variable.getSimpleName().toString();
+            FieldVariable field = messageProcessorClass.field(Modifier.PRIVATE, ref(Object.class), fieldName);
+            FieldVariable fieldType = messageProcessorClass.field(Modifier.PRIVATE, ref(variable.asType()), fieldName + "Type");
+            fields.put(variable.getSimpleName().toString(), new AbstractMessageGenerator.FieldVariableElement(field, fieldType, variable));
         }
         return fields;
     }

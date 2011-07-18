@@ -469,7 +469,8 @@ public final class CodeModel {
                     throw new UnsupportedOperationException("? super T not implemented");
                 } else {
                     // not supported
-                    throw new IllegalArgumentException("only extends/super can follow ?, but found " + s.substring(idx));
+                    //throw new IllegalArgumentException("only extends/super can follow ?, but found " + s.substring(idx));
+                    return refClass("java.lang.Object").wildcard();
                 }
             }
 
