@@ -19,7 +19,6 @@ package org.mule.devkit.module.generation;
 
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
-import org.mule.api.annotations.Parameter;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
@@ -59,6 +58,7 @@ import org.mule.devkit.model.schema.TopLevelSimpleType;
 import org.mule.devkit.model.schema.Union;
 import org.mule.util.StringUtils;
 
+import javax.inject.Named;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -571,12 +571,13 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         if (configurable == null)
             return null;
 
+        Named named = variable.getAnnotation(Named.class);
         Optional optional = variable.getAnnotation(Optional.class);
         Default def = variable.getAnnotation(Default.class);
 
         String name = variable.getSimpleName().toString();
-        if (configurable.name().length() > 0)
-            name = configurable.name();
+        if (named != null && named.value().length() > 0)
+            name = named.value();
 
         Attribute attribute = new Attribute();
 
@@ -604,13 +605,13 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     }
 
     private Attribute createParameterAttribute(VariableElement variable) {
-        Parameter parameter = variable.getAnnotation(Parameter.class);
+        Named named = variable.getAnnotation(Named.class);
         Optional optional = variable.getAnnotation(Optional.class);
         Default def = variable.getAnnotation(Default.class);
 
         String name = variable.getSimpleName().toString();
-        if (parameter != null && parameter.name().length() > 0)
-            name = parameter.name();
+        if (named != null && named.value().length() > 0)
+            name = named.value();
 
         Attribute attribute = new Attribute();
 
