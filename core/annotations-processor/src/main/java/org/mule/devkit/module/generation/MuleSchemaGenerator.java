@@ -17,7 +17,6 @@
 package org.mule.devkit.module.generation;
 
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.model.schema.SchemaLocation;
 
 import javax.lang.model.element.Element;
 

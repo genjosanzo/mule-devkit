@@ -21,7 +21,6 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
-import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
@@ -30,7 +29,6 @@ import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Package;
-import org.mule.devkit.model.code.Variable;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 import javax.lang.model.element.Element;

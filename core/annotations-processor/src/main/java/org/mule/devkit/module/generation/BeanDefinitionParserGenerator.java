@@ -42,7 +42,6 @@ import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
