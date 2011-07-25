@@ -114,10 +114,11 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         importMuleSchemaDocNamespace();
 
         registerTypes();
-        registerConfigElement(element);
-        registerProcessors(targetNamespace, element);
+        registerConfigElement(targetNamespace, element);
+        registerProcessorsAndSources(targetNamespace, element);
         registerTransformers(element);
         registerEnums(element);
+        registerPojos(element);
 
         String fileName = "META-INF/mule-" + module.name() + XSD_EXTENSION;
 
@@ -181,6 +182,83 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
     }
 
+    private void registerPojos(javax.lang.model.element.Element type) {
+        Set<TypeMirror> registeredPojos = new HashSet<TypeMirror>();
+
+        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(type.getEnclosedElements());
+        for (VariableElement variable : variables) {
+            if (isTypeSupported(variable.asType()))
+                continue;
+
+            if (context.getTypeMirrorUtils().isPojo(variable.asType())) {
+                if (!registeredPojos.contains(variable.asType())) {
+                    registerPojo(variable.asType());
+                    registeredPojos.add(variable.asType());
+                }
+            }
+        }
+
+        java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(type.getEnclosedElements());
+        for (ExecutableElement method : methods) {
+            Processor processor = method.getAnnotation(Processor.class);
+            if (processor == null)
+                continue;
+
+            for (VariableElement variable : method.getParameters()) {
+                if (isTypeSupported(variable.asType()))
+                    continue;
+
+                if (!context.getTypeMirrorUtils().isPojo(variable.asType()))
+                    continue;
+
+                if (!registeredPojos.contains(variable.asType())) {
+                    registerPojo(variable.asType());
+                    registeredPojos.add(variable.asType());
+                }
+            }
+        }
+
+        for (ExecutableElement method : methods) {
+            Source source = method.getAnnotation(Source.class);
+            if (source == null)
+                continue;
+
+            for (VariableElement variable : method.getParameters()) {
+                if (isTypeSupported(variable.asType()))
+                    continue;
+
+                if (!context.getTypeMirrorUtils().isPojo(variable.asType()))
+                    continue;
+
+                if (!registeredPojos.contains(variable.asType())) {
+                    registerPojo(variable.asType());
+                    registeredPojos.add(variable.asType());
+                }
+            }
+        }
+    }
+
+    private void registerPojo(TypeMirror pojoType) {
+        javax.lang.model.element.Element pojoElement = context.getTypeUtils().asElement(pojoType);
+
+        TopLevelComplexType pojoComplexType = new TopLevelComplexType();
+        pojoComplexType.setName(pojoElement.getSimpleName() + "PojoType");
+
+        All all = new All();
+        pojoComplexType.setAll(all);
+
+        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(pojoElement.getEnclosedElements());
+        for (VariableElement variable : variables) {
+            if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
+                generateCollectionElement(schema.getTargetNamespace(), all, variable);
+            } else {
+                pojoComplexType.getAttributeOrAttributeGroup().add(createAttribute(variable));
+            }
+        }
+
+        schema.getSimpleTypeOrComplexTypeOrGroup().add(pojoComplexType);
+    }
+
     private void registerEnum(TypeMirror enumType) {
         javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(enumType);
 
@@ -225,7 +303,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
     }
 
-    private void registerProcessors(String targetNamespace, javax.lang.model.element.Element type) {
+    private void registerProcessorsAndSources(String targetNamespace, javax.lang.model.element.Element type) {
         java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(type.getEnclosedElements());
         for (ExecutableElement method : methods) {
             Processor processor = method.getAnnotation(Processor.class);
@@ -307,24 +385,28 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                     continue;
 
                 InboundHeaders inboundHeaders = variable.getAnnotation(InboundHeaders.class);
-                if( inboundHeaders != null )
+                if (inboundHeaders != null)
                     continue;
 
                 if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
                     generateProcessorCallbackElement(all, variable);
                 } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                     all.getParticle().add(objectFactory.createElement(generateXmlElement(variable.getSimpleName().toString(), targetNamespace)));
+                } else if (context.getTypeMirrorUtils().isPojo(variable.asType())) {
+                    TopLevelElement xmlElement = new TopLevelElement();
+                    xmlElement.setName(variable.getSimpleName().toString());
+                    xmlElement.setType(new QName(targetNamespace, ref(variable.asType()).name() + "PojoType"));
+                    all.getParticle().add(objectFactory.createElement(xmlElement));
+                } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
+                    generateCollectionElement(targetNamespace, all, variable);
                 } else {
-                    if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
-                        generateCollectionElement(all, variable);
-                    } else {
-                        complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(variable));
-                    }
+                    complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(variable));
                 }
             }
         }
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
+
     }
 
     private void generateProcessorCallbackElement(All all, VariableElement variable) {
@@ -355,7 +437,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         collectionElement.setComplexType(collectionComplexType);
     }
 
-    private void generateCollectionElement(All all, VariableElement variable, boolean optional) {
+    private void generateCollectionElement(String targetNamespace, All all, VariableElement variable, boolean optional) {
         TopLevelElement collectionElement = new TopLevelElement();
         all.getParticle().add(objectFactory.createElement(collectionElement));
         collectionElement.setName(context.getNameUtils().uncamel(variable.getSimpleName().toString()));
@@ -368,11 +450,11 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         collectionElement.setMaxOccurs("1");
 
         String collectionName = context.getNameUtils().uncamel(context.getNameUtils().singularize(collectionElement.getName()));
-        LocalComplexType collectionComplexType = generateCollectionComplexType(collectionName, variable.asType());
+        LocalComplexType collectionComplexType = generateCollectionComplexType(targetNamespace, collectionName, variable.asType());
         collectionElement.setComplexType(collectionComplexType);
     }
 
-    private LocalComplexType generateCollectionComplexType(String name, TypeMirror type) {
+    private LocalComplexType generateCollectionComplexType(String targetNamespace, String name, TypeMirror type) {
         LocalComplexType collectionComplexType = new LocalComplexType();
         ExplicitGroup sequence = new ExplicitGroup();
         ExplicitGroup choice = new ExplicitGroup();
@@ -403,7 +485,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         collectionItemElement.setMinOccurs(BigInteger.valueOf(0L));
         collectionItemElement.setMaxOccurs(UNBOUNDED);
 
-        collectionItemElement.setComplexType(generateComplexType(name, type));
+        collectionItemElement.setComplexType(generateComplexType(targetNamespace, name, type));
 
         Attribute ref = createAttribute(ATTRIBUTE_NAME_REF, true, SchemaConstants.STRING, "The reference object for this parameter");
         collectionComplexType.getAttributeOrAttributeGroup().add(ref);
@@ -411,7 +493,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return collectionComplexType;
     }
 
-    private LocalComplexType generateComplexType(String name, TypeMirror typeMirror) {
+    private LocalComplexType generateComplexType(String targetNamespace, String name, TypeMirror typeMirror) {
         if (context.getTypeMirrorUtils().isArrayOrList(typeMirror)) {
             DeclaredType variableType = (DeclaredType) typeMirror;
             java.util.List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
@@ -422,7 +504,9 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                     return generateComplexTypeWithRef(genericType);
                 } else if (context.getTypeMirrorUtils().isArrayOrList(genericType) ||
                         context.getTypeMirrorUtils().isMap(genericType)) {
-                    return generateCollectionComplexType("inner-" + name, genericType);
+                    return generateCollectionComplexType(targetNamespace, "inner-" + name, genericType);
+                } else if (context.getTypeMirrorUtils().isPojo(genericType)) {
+                    return generatePojoComplexTypeWithRef(targetNamespace, genericType);
                 } else {
                     return generateRefComplexType(ATTRIBUTE_NAME_VALUE_REF);
                 }
@@ -458,6 +542,22 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
                 complexContentExtension.getAttributeOrAttributeGroup().add(refAttribute);
                 complexContentExtension.getAttributeOrAttributeGroup().add(keyAttribute);
+            } else if (variableTypeParameters.size() > 1 && context.getTypeMirrorUtils().isPojo(variableTypeParameters.get(1))) {
+                ComplexContent simpleContent = new ComplexContent();
+                mapComplexType.setComplexContent(simpleContent);
+                ExtensionType complexContentExtension = new ExtensionType();
+                QName qname = new QName(targetNamespace, ref(variableTypeParameters.get(1)).name() + "PojoType");
+                complexContentExtension.setBase(qname);
+                simpleContent.setExtension(complexContentExtension);
+
+                Attribute refAttribute = new Attribute();
+                refAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+                refAttribute.setName(ATTRIBUTE_NAME_VALUE_REF);
+                refAttribute.setType(SchemaConstants.STRING);
+
+                complexContentExtension.getAttributeOrAttributeGroup().add(refAttribute);
+                complexContentExtension.getAttributeOrAttributeGroup().add(keyAttribute);
+
             } else {
                 Attribute refAttribute = new Attribute();
                 refAttribute.setUse(SchemaConstants.USE_REQUIRED);
@@ -472,6 +572,24 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
 
         return null;
+    }
+
+    private LocalComplexType generatePojoComplexTypeWithRef(String targetNamespace, TypeMirror genericType) {
+        LocalComplexType complexType = new LocalComplexType();
+        ComplexContent simpleContent = new ComplexContent();
+        complexType.setComplexContent(simpleContent);
+        ExtensionType simpleContentExtension = new ExtensionType();
+        QName qname = new QName(targetNamespace, ref(genericType).name() + "PojoType");
+        simpleContentExtension.setBase(qname);
+        simpleContent.setExtension(simpleContentExtension);
+
+        Attribute refAttribute = new Attribute();
+        refAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+        refAttribute.setName(ATTRIBUTE_NAME_VALUE_REF);
+        refAttribute.setType(SchemaConstants.STRING);
+
+        simpleContentExtension.getAttributeOrAttributeGroup().add(refAttribute);
+        return complexType;
     }
 
     private LocalComplexType generateComplexTypeWithRef(TypeMirror genericType) {
@@ -491,10 +609,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return complexType;
     }
 
-    private void generateCollectionElement(All all, VariableElement variable) {
+    private void generateCollectionElement(String targetNamespace, All all, VariableElement variable) {
         Optional optional = variable.getAnnotation(Optional.class);
 
-        generateCollectionElement(all, variable, optional != null);
+        generateCollectionElement(targetNamespace, all, variable, optional != null);
     }
 
     private LocalComplexType generateRefComplexType(String name) {
@@ -533,7 +651,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return xmlComplexType;
     }
 
-    private void registerConfigElement(javax.lang.model.element.Element element) {
+    private void registerConfigElement(String targetNamespace, javax.lang.model.element.Element element) {
         ExtensionType config = registerExtension(ELEMENT_NAME_CONFIG);
         Attribute nameAttribute = createAttribute(ATTRIBUTE_NAME_NAME, true, SchemaConstants.STRING, "Give a name to this configuration so it can be later referenced by config-ref.");
         config.getAttributeOrAttributeGroup().add(nameAttribute);
@@ -549,9 +667,9 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 continue;
 
             if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
-                generateCollectionElement(all, variable);
+                generateCollectionElement(targetNamespace, all, variable);
             } else {
-                config.getAttributeOrAttributeGroup().add(createConfigurableAttribute(variable));
+                config.getAttributeOrAttributeGroup().add(createAttribute(variable));
             }
         }
 
@@ -571,11 +689,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
     }
 
-    private Attribute createConfigurableAttribute(VariableElement variable) {
-        Configurable configurable = variable.getAnnotation(Configurable.class);
-        if (configurable == null)
-            return null;
-
+    private Attribute createAttribute(VariableElement variable) {
         Named named = variable.getAnnotation(Named.class);
         Optional optional = variable.getAnnotation(Optional.class);
         Default def = variable.getAnnotation(Default.class);

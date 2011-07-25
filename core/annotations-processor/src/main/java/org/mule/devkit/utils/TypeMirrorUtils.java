@@ -17,6 +17,13 @@
 
 package org.mule.devkit.utils;
 
+import org.mule.devkit.module.generation.SchemaTypeConversion;
+
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -27,9 +34,58 @@ import java.util.List;
 public final class TypeMirrorUtils {
     private Types types;
 
-    public TypeMirrorUtils(Types types)
-    {
+    public TypeMirrorUtils(Types types) {
         this.types = types;
+    }
+
+    public boolean isPojo(TypeMirror type) {
+        if (SchemaTypeConversion.isSupported(type.toString())) {
+            return false;
+        }
+
+        if (isXmlType(type)) {
+            return false;
+        }
+
+        if (type.getKind() == TypeKind.DECLARED) {
+            DeclaredType declaredType = (DeclaredType) type;
+            TypeElement typeElement = (TypeElement) ((DeclaredType) type).asElement();
+
+            // a generic is not a pojo
+            if (typeElement.getTypeParameters().size() > 0) {
+                return false;
+            }
+
+            // if it implements interface then its no pojo
+            if (typeElement.getInterfaces().size() > 0) {
+                return false;
+            }
+
+            // if its no public cannot be used
+            if (!typeElement.getModifiers().contains(Modifier.PUBLIC)) {
+                return false;
+            }
+
+            // if it doesn't inherit directly from Object then its no pojo
+            if (!typeElement.getSuperclass().toString().equals("java.lang.Object")) {
+                return false;
+            }
+
+            // verify that it has a public constructor
+            for (Element element : typeElement.getEnclosedElements()) {
+                if (element.getKind() != ElementKind.CONSTRUCTOR)
+                    continue;
+
+                if (!element.getModifiers().contains(Modifier.PUBLIC))
+                    continue;
+
+                ExecutableElement executableElement = (ExecutableElement) element;
+                if (executableElement.getParameters().size() == 0)
+                    return true;
+            }
+        }
+
+        return true;
     }
 
     public boolean isXmlType(TypeMirror type) {
@@ -46,8 +102,7 @@ public final class TypeMirrorUtils {
         return false;
     }
 
-    public boolean isCollection(TypeMirror type)
-    {
+    public boolean isCollection(TypeMirror type) {
         return isArrayOrList(type) || isMap(type);
     }
 
@@ -77,7 +132,7 @@ public final class TypeMirrorUtils {
 
         List<? extends TypeMirror> inherits = types.directSupertypes(type);
         for (TypeMirror inherit : inherits) {
-            if (isMap( inherit)) {
+            if (isMap(inherit)) {
                 return true;
             }
         }

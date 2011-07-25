@@ -61,18 +61,12 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         generateLifecycleInvocation(lifecycleAdapter, stopElement, "stop", MuleException.class, false);
 
         ExecutableElement postConstructElement = getPostConstructElement(element);
-        if (postConstructElement != null) {
-            lifecycleAdapter._implements(Initialisable.class);
-
-            generateLifecycleInvocation(lifecycleAdapter, postConstructElement, "initialise", InitialisationException.class, true);
-        }
+        lifecycleAdapter._implements(Initialisable.class);
+        generateLifecycleInvocation(lifecycleAdapter, postConstructElement, "initialise", InitialisationException.class, true);
 
         ExecutableElement preDestroyElement = getPreDestroyElement(element);
-        if (preDestroyElement != null) {
-            lifecycleAdapter._implements(Disposable.class);
-
-            generateLifecycleInvocation(lifecycleAdapter, preDestroyElement, "dispose", null, false);
-        }
+        lifecycleAdapter._implements(Disposable.class);
+        generateLifecycleInvocation(lifecycleAdapter, preDestroyElement, "dispose", null, false);
     }
 
     private DefinedClass getLifecycleAdapterClass(Element typeElement) {

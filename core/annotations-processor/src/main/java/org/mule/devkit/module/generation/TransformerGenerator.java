@@ -75,7 +75,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             generateConstructor(transformerClass, executableElement);
 
             // generate initialise
-            generateInitialiseMethod(transformerClass, executableElement.getEnclosingElement(), muleContext, null, null, object);
+            generateInitialiseMethod(transformerClass, null, executableElement.getEnclosingElement(), muleContext, null, null, object);
 
             // add setmulecontext
             generateSetMuleContextMethod(transformerClass, muleContext);

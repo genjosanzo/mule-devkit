@@ -29,6 +29,10 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.param.InboundHeaders;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -98,7 +102,16 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         FieldVariable patternInfo = generateFieldForPatternInfo(messageProcessorClass);
 
         // add initialise
-        generateInitialiseMethod(messageProcessorClass, typeElement, muleContext, expressionManager, patternInfo, object);
+        generateInitialiseMethod(messageProcessorClass, fields, typeElement, muleContext, expressionManager, patternInfo, object);
+
+        // add start
+        generateStartMethod(messageProcessorClass, fields);
+
+        // add stop
+        generateStopMethod(messageProcessorClass, fields);
+
+        // add dispose
+        generateDiposeMethod(messageProcessorClass, fields);
 
         // add setmulecontext
         generateSetMuleContextMethod(messageProcessorClass, muleContext);
@@ -130,6 +143,56 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         } else {
             // add process method
             generateProcessMethod(executableElement, messageProcessorClass, fields, muleContext, object, expressionManager, patternInfo);
+        }
+    }
+
+    private void generateStartMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields) {
+        Method startMethod = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
+        startMethod._throws(ref(MuleException.class));
+
+        for (String fieldName : fields.keySet()) {
+            FieldVariableElement variableElement = fields.get(fieldName);
+
+            if (variableElement.getVariableElement().asType().toString().contains(ProcessorCallback.class.getName())) {
+                ForEach forEach = startMethod.body().forEach(ref(MessageProcessor.class), "messageProcessor", variableElement.getField().invoke("getMessageProcessors"));
+                Conditional ifStartable = forEach.body()._if(Op._instanceof(forEach.var(), ref(Startable.class)));
+                ifStartable._then().add(
+                        ExpressionFactory.cast(ref(Startable.class), forEach.var()).invoke("start")
+                );
+            }
+        }
+    }
+
+    private void generateStopMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields) {
+        Method stopMethod = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "stop");
+        stopMethod._throws(ref(MuleException.class));
+
+        for (String fieldName : fields.keySet()) {
+            FieldVariableElement variableElement = fields.get(fieldName);
+
+            if (variableElement.getVariableElement().asType().toString().contains(ProcessorCallback.class.getName())) {
+                ForEach forEach = stopMethod.body().forEach(ref(MessageProcessor.class), "messageProcessor", variableElement.getField().invoke("getMessageProcessors"));
+                Conditional ifStartable = forEach.body()._if(Op._instanceof(forEach.var(), ref(Stoppable.class)));
+                ifStartable._then().add(
+                        ExpressionFactory.cast(ref(Stoppable.class), forEach.var()).invoke("stop")
+                );
+            }
+        }
+    }
+
+    private void generateDiposeMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields) {
+        Method diposeMethod = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "dispose");
+
+        for (String fieldName : fields.keySet()) {
+            FieldVariableElement variableElement = fields.get(fieldName);
+
+            if (variableElement.getVariableElement().asType().toString().contains(ProcessorCallback.class.getName())) {
+                ForEach forEach = diposeMethod.body().forEach(ref(MessageProcessor.class), "messageProcessor", variableElement.getField().invoke("getMessageProcessors"));
+                Conditional ifStartable = forEach.body()._if(Op._instanceof(forEach.var(), ref(Disposable.class)));
+                ifStartable._then().add(
+                        ExpressionFactory.cast(ref(Disposable.class), forEach.var()).invoke("dispose")
+                );
+            }
         }
     }
 
@@ -432,14 +495,13 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
             if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
 
-                DefinedClass callbackClass = context.getClassForRole(ProcessorCallbackFactoryGenerator.CALLBACK_ROLE);
+                DefinedClass callbackClass = context.getClassForRole(ProcessorCallbackGenerator.CALLBACK_ROLE);
 
                 Variable transformed = callProcessor.body().decl(callbackClass, "transformed" + StringUtils.capitalize(fieldName),
-                        ExpressionFactory.cast(callbackClass,
-                                ExpressionFactory.cast(callbackClass, fields.get(fieldName).getField()).invoke("clone")));
+                        ExpressionFactory._new(callbackClass).arg(event).arg(muleContext).arg(fields.get(fieldName).getField()));
 
-                callProcessor.body().add(transformed.invoke("setEvent").arg(event));
-                callProcessor.body().add(transformed.invoke("setMuleContext").arg(muleContext));
+                //callProcessor.body().add(transformed.invoke("setEvent").arg(event));
+                //callProcessor.body().add(transformed.invoke("setMuleContext").arg(muleContext));
 
                 parameters.add(transformed);
             } else {

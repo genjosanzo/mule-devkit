@@ -17,22 +17,23 @@
 
 package org.mule.devkit.module.generation;
 
+import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
-import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionManager;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -40,6 +41,7 @@ import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
+import org.mule.devkit.model.code.ForEach;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
@@ -50,6 +52,7 @@ import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.TemplateParser;
+import org.springframework.beans.factory.xml.BeanDefinitionParser;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -84,15 +87,32 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     protected DefinedClass getBeanDefinitionParserClass(ExecutableElement executableElement) {
         String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, "DefinitionParser");
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + ".config.spring");
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), ChildDefinitionParser.class);
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), new Class[]{BeanDefinitionParser.class});
 
         return clazz;
     }
 
+    protected DefinedClass getConfigBeanDefinitionParserClass(Element typeElement) {
+        String poolAdapterName = context.getNameUtils().generateClassName((TypeElement) typeElement, ".config.spring", "ConfigDefinitionParser");
+        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(poolAdapterName));
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(poolAdapterName), new Class[]{BeanDefinitionParser.class});
+
+        context.setClassRole(context.getNameUtils().generateConfigDefParserRoleKey((TypeElement) typeElement), clazz);
+
+        return clazz;
+    }
+
+
     protected DefinedClass getMessageProcessorClass(ExecutableElement executableElement) {
         String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, "MessageProcessor");
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + ".config");
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), new Class[]{Initialisable.class, MessageProcessor.class, MuleContextAware.class});
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), new Class[]{
+                Initialisable.class,
+                Startable.class,
+                Disposable.class,
+                Stoppable.class,
+                MessageProcessor.class,
+                MuleContextAware.class});
 
         return clazz;
     }
@@ -120,14 +140,19 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                 continue;
 
             String fieldName = variable.getSimpleName().toString();
-            FieldVariable field = messageProcessorClass.field(Modifier.PRIVATE, ref(Object.class), fieldName);
+            FieldVariable field = null;
+            if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
+                field = messageProcessorClass.field(Modifier.PRIVATE, ref(MessageProcessorChain.class), fieldName);
+            } else {
+                field = messageProcessorClass.field(Modifier.PRIVATE, ref(Object.class), fieldName);
+            }
             FieldVariable fieldType = messageProcessorClass.field(Modifier.PRIVATE, ref(variable.asType()), fieldName + "Type");
             fields.put(variable.getSimpleName().toString(), new AbstractMessageGenerator.FieldVariableElement(field, fieldType, variable));
         }
         return fields;
     }
 
-    protected Method generateInitialiseMethod(DefinedClass messageProcessorClass, Element typeElement, FieldVariable muleContext, FieldVariable expressionManager, FieldVariable patternInfo, FieldVariable object) {
+    protected Method generateInitialiseMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, Element typeElement, FieldVariable muleContext, FieldVariable expressionManager, FieldVariable patternInfo, FieldVariable object) {
         DefinedClass pojoClass = context.getClassForRole(context.getNameUtils().generatePojoRoleKey((TypeElement) typeElement));
 
         Method initialise = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "initialise");
@@ -157,6 +182,21 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         messageException.arg(ExpressionFactory._this());
         catchBlock.body()._throw(messageException);
 
+        if (fields != null) {
+            for (String fieldName : fields.keySet()) {
+                FieldVariableElement variableElement = fields.get(fieldName);
+
+                if (variableElement.getVariableElement().asType().toString().contains(ProcessorCallback.class.getName())) {
+                    ForEach forEach = initialise.body().forEach(ref(MessageProcessor.class), "messageProcessor", variableElement.getField().invoke("getMessageProcessors"));
+                    Conditional ifStartable = forEach.body()._if(Op._instanceof(forEach.var(), ref(Initialisable.class)));
+                    ifStartable._then().add(
+                            ExpressionFactory.cast(ref(Initialisable.class), forEach.var()).invoke("initialise")
+                    );
+                }
+            }
+        }
+
+
         return initialise;
     }
 
@@ -169,24 +209,6 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         setObject.body().assign(ExpressionFactory._this().ref(object), objectParam);
 
         return setObject;
-    }
-
-    protected void generateExpressionEvaluator(Block block, Variable evaluatedField, FieldVariable field, FieldVariable patternInfo, FieldVariable expressionManager, Variable muleMessage) {
-        Conditional conditional = block._if(Op._instanceof(field, ref(String.class)));
-        Block trueBlock = conditional._then();
-        Conditional isPattern = trueBlock._if(Op.cand(
-                ExpressionFactory.invoke(ExpressionFactory.cast(ref(String.class), field), "startsWith").arg(patternInfo.invoke("getPrefix")),
-                ExpressionFactory.invoke(ExpressionFactory.cast(ref(String.class), field), "endsWith").arg(patternInfo.invoke("getSuffix"))));
-        Invocation evaluate = expressionManager.invoke("evaluate");
-        evaluate.arg(ExpressionFactory.cast(ref(String.class), field));
-        evaluate.arg(muleMessage);
-        isPattern._then().assign(evaluatedField, evaluate);
-        Invocation parse = expressionManager.invoke("parse");
-        parse.arg(ExpressionFactory.cast(ref(String.class), field));
-        parse.arg(muleMessage);
-        isPattern._else().assign(evaluatedField, parse);
-        Block falseBlock = conditional._else();
-        falseBlock.assign(evaluatedField, field);
     }
 
     protected void generateTransform(Block block, Variable transformedField, Variable evaluatedField, TypeMirror expectedType, FieldVariable muleContext) {

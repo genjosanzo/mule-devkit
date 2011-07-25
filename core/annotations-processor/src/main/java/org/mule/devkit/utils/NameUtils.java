@@ -225,6 +225,14 @@ public class NameUtils {
         return pkg + "." + className + "Pojo";
     }
 
+    public String generateConfigDefParserRoleKey(TypeElement typeElement) {
+        String typeFullName = elements.getBinaryName(typeElement).toString();
+        String pkg = getPackageName(typeFullName);
+        String className = getClassName(typeFullName);
+
+        return pkg + "." + className + "ConfigDefinitionParser";
+    }
+
     public String generatePojoFactoryKey(TypeElement typeElement) {
         String typeFullName = elements.getBinaryName(typeElement).toString();
         String pkg = getPackageName(typeFullName);

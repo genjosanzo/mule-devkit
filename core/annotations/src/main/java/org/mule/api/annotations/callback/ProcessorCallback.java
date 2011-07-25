@@ -18,8 +18,11 @@
 package org.mule.api.annotations.callback;
 
 /**
- * Callback interface used by {@link org.mule.api.annotations.Processor} annotated methods if they want to
- * receive nested processors within them.
+ * Callback interface used by {@link org.mule.api.annotations.Processor} annotated methods.
+ *
+ * The method paremeters of type {@link ProcessorCallback} will be able to receive other
+ * message processors. The {@link org.mule.api.annotations.Processor} annotated method
+ * can use the process method to execute them.
  */
 public interface ProcessorCallback {
     /**
@@ -29,4 +32,12 @@ public interface ProcessorCallback {
      * @return The return payload for the processor chain
      */
     Object process(Object payload) throws Exception;
+
+    /**
+     * Dispatch message to the processor chain using
+     * the same payload used to execute
+     *
+     * @return The return payload for the processor chain
+     */
+    Object process() throws Exception;
 }
