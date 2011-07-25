@@ -47,42 +47,44 @@ public final class TypeMirrorUtils {
             return false;
         }
 
-        if (type.getKind() == TypeKind.DECLARED) {
-            DeclaredType declaredType = (DeclaredType) type;
-            TypeElement typeElement = (TypeElement) ((DeclaredType) type).asElement();
+        if (type.getKind() != TypeKind.DECLARED) {
+            return false;
+        }
 
-            // a generic is not a pojo
-            if (typeElement.getTypeParameters().size() > 0) {
-                return false;
-            }
+        DeclaredType declaredType = (DeclaredType) type;
+        TypeElement typeElement = (TypeElement) ((DeclaredType) type).asElement();
 
-            // if it implements interface then its no pojo
-            if (typeElement.getInterfaces().size() > 0) {
-                return false;
-            }
+        // a generic is not a pojo
+        if (typeElement.getTypeParameters().size() > 0) {
+            return false;
+        }
 
-            // if its no public cannot be used
-            if (!typeElement.getModifiers().contains(Modifier.PUBLIC)) {
-                return false;
-            }
+        // if it implements interface then its no pojo
+        if (typeElement.getInterfaces().size() > 0) {
+            return false;
+        }
 
-            // if it doesn't inherit directly from Object then its no pojo
-            if (!typeElement.getSuperclass().toString().equals("java.lang.Object")) {
-                return false;
-            }
+        // if its no public cannot be used
+        if (!typeElement.getModifiers().contains(Modifier.PUBLIC)) {
+            return false;
+        }
 
-            // verify that it has a public constructor
-            for (Element element : typeElement.getEnclosedElements()) {
-                if (element.getKind() != ElementKind.CONSTRUCTOR)
-                    continue;
+        // if it doesn't inherit directly from Object then its no pojo
+        if (!typeElement.getSuperclass().toString().equals("java.lang.Object")) {
+            return false;
+        }
 
-                if (!element.getModifiers().contains(Modifier.PUBLIC))
-                    continue;
+        // verify that it has a public constructor
+        for (Element element : typeElement.getEnclosedElements()) {
+            if (element.getKind() != ElementKind.CONSTRUCTOR)
+                continue;
 
-                ExecutableElement executableElement = (ExecutableElement) element;
-                if (executableElement.getParameters().size() == 0)
-                    return true;
-            }
+            if (!element.getModifiers().contains(Modifier.PUBLIC))
+                continue;
+
+            ExecutableElement executableElement = (ExecutableElement) element;
+            if (executableElement.getParameters().size() == 0)
+                return true;
         }
 
         return true;
