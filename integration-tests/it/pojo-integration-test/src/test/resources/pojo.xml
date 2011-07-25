@@ -46,4 +46,14 @@
             </pojo:apples>
         </pojo:are-all-bitten>
     </flow>
+
+    <flow name="areAllBittenMap">
+        <pojo:are-all-bitten-map>
+            <pojo:apples>
+                <pojo:apple key="a" isBitten="true"/>
+                <pojo:apple key="b" isBitten="false"/>
+                <pojo:apple key="c" isBitten="true"/>
+            </pojo:apples>
+        </pojo:are-all-bitten-map>
+    </flow>
 </mule>

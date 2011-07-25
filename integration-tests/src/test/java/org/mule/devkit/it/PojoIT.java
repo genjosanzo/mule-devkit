@@ -17,23 +17,28 @@
 
 package org.mule.devkit.it;
 
-public class PojoModuleTest extends AbstractModuleTest {
+import java.io.File;
 
-    @Override
-    protected String getConfigResources() {
-        return "pojo.xml";
+public class PojoIT extends AbstractMavenIT
+{
+
+    protected String getArtifactVersion()
+    {
+        return "1.0";
     }
 
-    public void testIsBitten() throws Exception {
-        runFlow("isBitten", true);
+    protected String getArtifactId()
+    {
+        return "pojo-integration-test";
     }
 
-    public void testAreAllBitten() throws Exception {
-        runFlow("areAllBitten", false);
+    protected String getGroupId()
+    {
+        return "org.mule.devkit.it";
     }
 
-
-    public void testAreAllBittenMap() throws Exception {
-        runFlow("areAllBittenMap", false);
+    protected File getRoot()
+    {
+        return new File("target/integration-tests/" + getArtifactId());
     }
 }
