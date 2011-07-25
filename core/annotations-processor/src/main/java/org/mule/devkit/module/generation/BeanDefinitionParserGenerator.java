@@ -351,21 +351,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         DeclaredType variableType = (DeclaredType) typeMirror;
         java.util.List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
 
-        /*
-        Variable listElement = body.decl(ref(org.w3c.dom.Element.class),
-                fieldName + "ListElement",
-                ExpressionFactory._null());
-                */
-
         Variable listChilds = body.decl(ref(List.class).narrow(ref(org.w3c.dom.Element.class)),
                 fieldName.replace("-", "") + "ListChilds",
                 ExpressionFactory._null());
-
-        /*
-        body.assign(listElement, ref(DomUtils.class).staticInvoke("getChildElementByTagName")
-                .arg(element)
-                .arg(context.getNameUtils().uncamel(fieldName)));
-                */
 
         Conditional listElementNotNull = body._if(Op.ne(listElement, ExpressionFactory._null()));
 
@@ -382,10 +370,6 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         Variable managedMap = ifRef._else().decl(ref(ManagedMap.class), fieldName.replace("-", ""),
                 ExpressionFactory._new(ref(ManagedMap.class)));
-
-        /*
-        ifRef._else().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedMap));
-        */
 
         ifRef._else().assign(listChilds,
                 ref(DomUtils.class).staticInvoke("getChildElementsByTagName")
@@ -423,7 +407,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(valueRef));
 
         ifValueRef._else().assign(valueObject,
-                forEach.var().invoke("getAttribute").arg("key"));
+                forEach.var().invoke("getTextContent"));
 
 
         Conditional ifKeyRef = forEach.body()._if(Op.cand(Op.ne(keyRef, ExpressionFactory._null()),
