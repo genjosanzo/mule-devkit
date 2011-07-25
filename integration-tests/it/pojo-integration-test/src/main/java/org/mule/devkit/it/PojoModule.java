@@ -37,8 +37,8 @@ public class PojoModule {
     }
 
     @Processor
-    public boolean areAllBitten(List<Apple> fruits) {
-        for (Apple apple : fruits) {
+    public boolean areAllBitten(List<Apple> apples) {
+        for (Apple apple : apples) {
             if (!apple.isBitten()) {
                 return false;
             }
@@ -48,9 +48,9 @@ public class PojoModule {
     }
 
     @Processor
-    public boolean areAllBittenMap(Map<String, Apple> basket) {
-        for (String key : basket.keySet()) {
-            if (!basket.get(key).isBitten()) {
+    public boolean areAllBittenMap(Map<String, Apple> apples) {
+        for (String key : apples.keySet()) {
+            if (!apples.get(key).isBitten()) {
                 return false;
             }
         }

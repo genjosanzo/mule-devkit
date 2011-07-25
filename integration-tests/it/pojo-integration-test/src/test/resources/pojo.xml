@@ -27,9 +27,9 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
         http://www.mulesoft.org/schema/mule/pojo http://www.mulesoft.org/schema/mule/pojo/1.0/mule-pojo.xsd">
 
+    <!-- <pojo:apple isBitten="false"/> -->
     <pojo:config/>
-        <!-- <pojo:apple isBitten="false"/>
-    </pojo:config>                          -->
+    <!-- </pojo:config> -->
 
     <flow name="isBitten">
         <pojo:is-bitten>
@@ -37,7 +37,6 @@
         </pojo:is-bitten>
     </flow>
 
-    <!--
     <flow name="areAllBitten">
         <pojo:are-all-bitten>
             <pojo:apples>
@@ -47,5 +46,4 @@
             </pojo:apples>
         </pojo:are-all-bitten>
     </flow>
-    -->
 </mule>
