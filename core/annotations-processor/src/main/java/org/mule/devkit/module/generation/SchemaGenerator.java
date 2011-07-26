@@ -111,7 +111,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         importXmlNamespace();
         importSpringFrameworkNamespace();
         importMuleNamespace();
-        importMuleSchemaDocNamespace();
+        //importMuleSchemaDocNamespace();
 
         registerTypes();
         registerConfigElement(targetNamespace, element);
@@ -249,7 +249,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         java.util.List<VariableElement> variables = ElementFilter.fieldsIn(pojoElement.getEnclosedElements());
         for (VariableElement variable : variables) {
-            if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
+
+            if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
+                generateProcessorCallbackElement(all, variable);
+            } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
                 generateCollectionElement(schema.getTargetNamespace(), all, variable);
             } else {
                 pojoComplexType.getAttributeOrAttributeGroup().add(createAttribute(variable));

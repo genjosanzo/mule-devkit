@@ -167,6 +167,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
                 String fieldName = variable.getSimpleName().toString();
                 if (SchemaTypeConversion.isSupported(fields.get(fieldName).getVariableElement().asType().toString()) ||
                         context.getTypeMirrorUtils().isXmlType(fields.get(fieldName).getVariableElement().asType()) ||
+                        context.getTypeMirrorUtils().isCollection(fields.get(fieldName).getVariableElement().asType()) ||
                         context.getTypeMirrorUtils().isEnum(fields.get(fieldName).getVariableElement().asType())) {
                     Variable transformed = callSource.body().decl(ref(fields.get(fieldName).getVariableElement().asType()).boxify(), "transformed" + StringUtils.capitalize(fieldName), ExpressionFactory._null());
                     Conditional notNull = callSource.body()._if(Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()));

@@ -76,6 +76,7 @@
                         <exclude>**/org/mule/devkit/model/code/**</exclude>
                         <exclude>**/org/mule/devkit/doclet/**</exclude>
                         <exclude>**/assets/**</exclude>
+                        <exclude>**/*.xsd</exclude>
                     </excludes>
                 </configuration>
                 <executions>

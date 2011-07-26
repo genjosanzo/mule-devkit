@@ -37,6 +37,16 @@
         </pojo:is-bitten>
     </flow>
 
+    <flow name="bite">
+        <pojo:bite>
+            <pojo:apple>
+                <pojo:when-bitten>
+                    <pojo:set-payload payload="delicious"/>
+                </pojo:when-bitten>
+            </pojo:apple>
+        </pojo:bite>
+    </flow>
+
     <flow name="areAllBitten">
         <pojo:are-all-bitten>
             <pojo:apples>

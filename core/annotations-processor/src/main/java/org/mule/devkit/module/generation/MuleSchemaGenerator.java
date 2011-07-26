@@ -17,14 +17,49 @@
 package org.mule.devkit.module.generation;
 
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.model.schema.SchemaLocation;
 
 import javax.lang.model.element.Element;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class MuleSchemaGenerator extends AbstractModuleGenerator {
     public void generate(Element element) throws GenerationException {
-        //SchemaLocation schemaLocation = new SchemaLocation(null, "META-INF/mule.xsd", "http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd", null);
 
-        //context.getSchemaModel().addSchemaLocation(schemaLocation);
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
 
+        try {
+            inputStream = getClass().getClassLoader().getResourceAsStream("mule-3.1.2.xsd");
+            outputStream = context.getCodeModel().getCodeWriter().openBinary(null, "META-INF/mule.xsd");
+
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = inputStream.read(buf)) > 0) {
+                outputStream.write(buf, 0, len);
+            }
+        } catch (IOException e) {
+            throw new GenerationException(e);
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    throw new GenerationException(e);
+                }
+            }
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    throw new GenerationException(e);
+                }
+            }
+
+        }
+
+        SchemaLocation schemaLocation = new SchemaLocation(null, "META-INF/mule.xsd", "http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd", null);
+        context.getSchemaModel().addSchemaLocation(schemaLocation);
     }
 }

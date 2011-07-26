@@ -36,4 +36,8 @@ public class PojoModuleTest extends AbstractModuleTest {
     public void testAreAllBittenMap() throws Exception {
         runFlow("areAllBittenMap", false);
     }
+
+    public void testBite() throws Exception {
+        runFlow("bite", "delicious");
+    }
 }

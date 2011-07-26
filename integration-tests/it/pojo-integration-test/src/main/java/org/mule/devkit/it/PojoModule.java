@@ -32,6 +32,18 @@ public class PojoModule {
     private Apple apple;
 
     @Processor
+    public void bite(Apple apple) throws Exception {
+        apple.setIsBitten(true);
+
+        apple.getWhenBitten().process();
+    }
+
+    @Processor
+    public String setPayload(String payload) {
+        return payload;
+    }
+
+    @Processor
     public boolean isBitten(Apple apple) {
         return apple.isBitten();
     }

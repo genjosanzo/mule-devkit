@@ -17,8 +17,18 @@
 
 package org.mule.devkit.it;
 
+import org.mule.api.annotations.callback.ProcessorCallback;
+import org.mule.api.annotations.param.Optional;
+
 public class Apple {
+    @Optional
     private boolean isBitten;
+
+    @Optional
+    private int weight;
+
+    @Optional
+    private ProcessorCallback whenBitten;
 
     public boolean isBitten() {
         return isBitten;
@@ -26,5 +36,27 @@ public class Apple {
 
     public void setIsBitten(boolean bitten) {
         isBitten = bitten;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+
+        try {
+            whenBitten.process(this.weight);
+        } catch(Exception e) {
+            // do nothing
+        }
+    }
+
+    public ProcessorCallback getWhenBitten() {
+        return whenBitten;
+    }
+
+    public void setWhenBitten(ProcessorCallback whenBitten) {
+        this.whenBitten = whenBitten;
     }
 }

@@ -82,7 +82,10 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
     private void generateLifecycleInvocation(DefinedClass lifecycleWrapper, ExecutableElement superExecutableElement, String name, Class<?> catchException, boolean addThis) {
         Method startMethod = lifecycleWrapper.method(Modifier.PUBLIC, context.getCodeModel().VOID, name);
 
-        if (catchException != null) {
+        if (catchException != null &&
+            superExecutableElement != null &&
+            superExecutableElement.getThrownTypes() != null &&
+            superExecutableElement.getThrownTypes().size() > 0) {
             startMethod._throws(ref(catchException));
         }
 
