@@ -30,4 +30,10 @@ public class LifecycleModuleTest extends AbstractModuleTest
     {
         runFlow("isStarted", true);
     }
+
+    public void testHasBeenInitialized() throws Exception
+    {
+        runFlow("hasBeenInitialized", true);
+    }
+
 }

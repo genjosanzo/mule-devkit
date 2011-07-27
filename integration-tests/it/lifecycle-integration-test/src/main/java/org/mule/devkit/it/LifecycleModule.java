@@ -21,10 +21,18 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.lifecycle.Start;
 
+import javax.annotation.PostConstruct;
+
 @Module(name = "lifecycle")
 public class LifecycleModule
 {
     private boolean isStarted = false;
+    private boolean hasBeenInitialized = false;
+
+    @PostConstruct
+    public void init() {
+        hasBeenInitialized = true;
+    }
 
     @Start
     public void startMeUp() {
@@ -34,5 +42,10 @@ public class LifecycleModule
     @Processor
     public boolean isStarted() {
         return isStarted;
+    }
+
+    @Processor
+    public boolean hasBeenInitialized() {
+        return hasBeenInitialized;
     }
 }

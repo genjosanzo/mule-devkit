@@ -33,4 +33,8 @@
         <lifecycle:is-started/>
     </flow>
 
+    <flow name="hasBeenInitialized">
+        <lifecycle:has-been-initialized/>
+    </flow>
+
 </mule>
