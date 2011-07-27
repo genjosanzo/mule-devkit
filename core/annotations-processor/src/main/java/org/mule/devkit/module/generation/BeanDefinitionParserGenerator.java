@@ -24,6 +24,8 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
@@ -105,6 +107,14 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         Variable builder = parse.body().decl(ref(BeanDefinitionBuilder.class), "builder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition").arg(pojo.dotclass().invoke("getName")));
+
+        Conditional isInitialisable = parse.body()._if(ref(Initialisable.class).dotclass()
+                .invoke("isAssignableFrom").arg(pojo.dotclass()));
+        isInitialisable._then().add(builder.invoke("setInitMethodName").arg(ref(Initialisable.class).staticRef("PHASE_NAME")));
+
+        Conditional isDisposable = parse.body()._if(ref(Disposable.class).dotclass()
+                .invoke("isAssignableFrom").arg(pojo.dotclass()));
+        isDisposable._then().add(builder.invoke("setDestroyMethodName").arg(ref(Disposable.class).staticRef("PHASE_NAME")));
 
         java.util.List<VariableElement> variables = ElementFilter.fieldsIn(type.getEnclosedElements());
         for (VariableElement variable : variables) {
@@ -210,6 +220,14 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     private Variable generateParseCommon(DefinedClass messageProcessorClass, ExecutableElement executableElement, Method parse, Variable element, Variable parserContext) {
         Variable builder = parse.body().decl(ref(BeanDefinitionBuilder.class), "builder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition").arg(messageProcessorClass.dotclass().invoke("getName")));
+
+        Conditional isInitialisable = parse.body()._if(ref(Initialisable.class).dotclass()
+                .invoke("isAssignableFrom").arg(messageProcessorClass.dotclass()));
+        isInitialisable._then().add(builder.invoke("setInitMethodName").arg(ref(Initialisable.class).staticRef("PHASE_NAME")));
+
+        Conditional isDisposable = parse.body()._if(ref(Disposable.class).dotclass()
+                .invoke("isAssignableFrom").arg(messageProcessorClass.dotclass()));
+        isDisposable._then().add(builder.invoke("setDestroyMethodName").arg(ref(Disposable.class).staticRef("PHASE_NAME")));
 
         Variable configRef = parse.body().decl(ref(String.class), "configRef", element.invoke("getAttribute").arg("config-ref"));
         Conditional ifConfigRef = parse.body()._if(Op.cand(Op.ne(configRef, ExpressionFactory._null()),
