@@ -19,19 +19,14 @@ package org.mule.devkit.module;
 
 import org.mule.devkit.Plugin;
 import org.mule.devkit.generation.Generator;
-import org.mule.devkit.module.generation.AnyXmlChildDefinitionParserGenerator;
 import org.mule.devkit.module.generation.BeanDefinitionParserGenerator;
 import org.mule.devkit.module.generation.DummyInboundEndpointGenerator;
 import org.mule.devkit.module.generation.EnumTransformerGenerator;
-import org.mule.devkit.module.generation.FreeFormMapChildDefinitionParserGenerator;
 import org.mule.devkit.module.generation.JaxbTransformerGenerator;
 import org.mule.devkit.module.generation.LifecycleAdapterFactoryGenerator;
 import org.mule.devkit.module.generation.LifecycleAdapterGenerator;
-import org.mule.devkit.module.generation.ListEntryChildDefinitionParserGenerator;
-import org.mule.devkit.module.generation.MapEntryChildDefinitionParserGenerator;
 import org.mule.devkit.module.generation.MessageProcessorGenerator;
 import org.mule.devkit.module.generation.MessageSourceGenerator;
-import org.mule.devkit.module.generation.MuleSchemaGenerator;
 import org.mule.devkit.module.generation.NamespaceHandlerGenerator;
 import org.mule.devkit.module.generation.PoolAdapterGenerator;
 import org.mule.devkit.module.generation.ProcessorCallbackGenerator;
@@ -53,10 +48,6 @@ public class ModulePlugin implements Plugin {
     public ModulePlugin() {
         this.generators = new ArrayList<Generator>();
         this.generators.add(new SchemaGenerator());
-        this.generators.add(new AnyXmlChildDefinitionParserGenerator());
-        this.generators.add(new FreeFormMapChildDefinitionParserGenerator());
-        this.generators.add(new ListEntryChildDefinitionParserGenerator());
-        this.generators.add(new MapEntryChildDefinitionParserGenerator());
         this.generators.add(new DummyInboundEndpointGenerator());
         this.generators.add(new LifecycleAdapterGenerator());
         this.generators.add(new LifecycleAdapterFactoryGenerator());
@@ -69,11 +60,9 @@ public class ModulePlugin implements Plugin {
         this.generators.add(new MessageSourceGenerator());
         this.generators.add(new MessageProcessorGenerator());
         this.generators.add(new NamespaceHandlerGenerator());
-        //this.generators.add(new MuleSchemaGenerator());
         this.generators.add(new SpringNamespaceHandlerGenerator());
         this.generators.add(new SpringSchemaGenerator());
         this.generators.add(new RegistryBootstrapGenerator());
-        //return generators;
 
         this.validators = new ArrayList<Validator>();
         this.validators.add(new ModuleValidator());
