@@ -41,7 +41,6 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
-import java.util.List;
 import java.util.Map;
 
 public class ProcessorCallbackGenerator extends AbstractModuleGenerator {
