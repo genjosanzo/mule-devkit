@@ -26,6 +26,7 @@ import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.InboundHeaders;
+import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.Optional;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.schema.All;
@@ -396,7 +397,13 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                     continue;
 
                 InboundHeaders inboundHeaders = variable.getAnnotation(InboundHeaders.class);
+
                 if (inboundHeaders != null)
+                    continue;
+
+                InvocationHeaders invocationHeaders = variable.getAnnotation(InvocationHeaders.class);
+
+                if (invocationHeaders != null)
                     continue;
 
                 if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {

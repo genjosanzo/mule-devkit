@@ -17,6 +17,8 @@
 
 package org.mule.api.annotations.callback;
 
+import java.util.Map;
+
 /**
  * Callback interface used by {@link org.mule.api.annotations.Processor} annotated methods.
  *
@@ -25,6 +27,15 @@ package org.mule.api.annotations.callback;
  * can use the process method to execute them.
  */
 public interface ProcessorCallback {
+    /**
+     * Dispatch message to the processor chain
+     *
+     * @param payload The payload of the message
+     * @param properties Additional invocation properties
+     * @return The return payload for the processor chain
+     */
+    Object process(Object payload, Map<String, Object> properties) throws Exception;
+
     /**
      * Dispatch message to the processor chain
      *

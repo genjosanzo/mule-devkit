@@ -29,6 +29,7 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.param.InboundHeaders;
+import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
@@ -525,6 +526,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
             } else {
                 InboundHeaders inboundHeaders = variable.getAnnotation(InboundHeaders.class);
+                InvocationHeaders invocationHeaders = variable.getAnnotation(InvocationHeaders.class);
 
                 Type type = ref(fields.get(fieldName).getVariableElement().asType()).boxify();
                 String name = "transformed" + StringUtils.capitalize(fieldName);
@@ -541,6 +543,14 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                     } else {
                         evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
                     }
+                } else if( invocationHeaders != null ) {
+                        if( context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
+                            evaluateAndTransform.arg("#[" + MessageHeadersListExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
+                        } else if (context.getTypeMirrorUtils().isMap(fields.get(fieldName).getVariableElement().asType())) {
+                            evaluateAndTransform.arg("#[" + MessageHeadersExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
+                        } else {
+                            evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
+                        }
                 } else {
                     evaluateAndTransform.arg(fields.get(fieldName).getField());
                 }
