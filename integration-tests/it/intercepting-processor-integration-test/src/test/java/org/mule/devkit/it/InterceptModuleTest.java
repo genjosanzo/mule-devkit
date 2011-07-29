@@ -17,23 +17,24 @@
 
 package org.mule.devkit.it;
 
-import org.mule.api.annotations.callback.ProcessorCallback;
-import org.mule.api.annotations.param.Optional;
+import org.mule.transport.NullPayload;
 
-public interface Apple {
+public class InterceptModuleTest extends AbstractModuleTest
+{
 
-    boolean getIsBitten();
+    @Override
+    protected String getConfigResources()
+    {
+        return "intercept.xml";
+    }
 
-    @Optional
-    void setIsBitten(boolean bitten);
+    public void testShouldContinue() throws Exception
+    {
+        runFlow("shouldContinue", "itDidContinue");
+    }
 
-    int getWeight();
-
-    @Optional
-    void setWeight(int weight);
-
-    ProcessorCallback getWhenBitten();
-
-    @Optional
-    public void setWhenBitten(ProcessorCallback whenBitten);
+    public void testShouldNotContinue() throws Exception
+    {
+        runFlow("shouldNotContinue", NullPayload.getInstance());
+    }
 }

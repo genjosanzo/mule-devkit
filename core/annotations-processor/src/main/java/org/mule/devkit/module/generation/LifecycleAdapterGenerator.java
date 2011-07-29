@@ -74,7 +74,7 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(lifecycleAdapterName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(lifecycleAdapterName), (TypeReference) ref(typeElement.asType()));
 
-        context.setClassRole(context.getNameUtils().generatePojoRoleKey((TypeElement) typeElement), clazz);
+        context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey((TypeElement) typeElement), clazz);
 
         return clazz;
     }

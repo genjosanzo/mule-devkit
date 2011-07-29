@@ -65,7 +65,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             DefinedClass transformerClass = getTransformerClass(executableElement);
 
             // declare object
-            FieldVariable object = generateFieldForPojo(transformerClass, type);
+            FieldVariable object = generateFieldForModuleObject(transformerClass, type);
             FieldVariable muleContext = generateFieldForMuleContext(transformerClass);
 
             // declare weight
@@ -81,7 +81,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             generateSetMuleContextMethod(transformerClass, muleContext);
 
             // add setobject
-            generateSetPojoMethod(transformerClass, object);
+            generateSetModuleObjectMethod(transformerClass, object);
 
             // get pool object if poolable
             if (type.getAnnotation(Module.class).poolable()) {

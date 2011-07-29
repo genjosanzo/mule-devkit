@@ -36,4 +36,12 @@ public @interface Processor {
      * will be derived from the name of the method.
      */
     String name() default "";
+
+    /**
+     * Setting this value to true will trigger the generation of an {@link InterceptingMessageProcessor} rather than
+     * a {@link MessageProcessor}. An intercepting processor must receive a {@link SourceCallback} to trigger the
+     * next portion of the chain.
+     * @return
+     */
+    boolean intercepting() default false;
 }

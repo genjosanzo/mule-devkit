@@ -217,12 +217,12 @@ public class NameUtils {
 
     }
 
-    public String generatePojoRoleKey(TypeElement typeElement) {
+    public String generateModuleObjectRoleKey(TypeElement typeElement) {
         String typeFullName = elements.getBinaryName(typeElement).toString();
         String pkg = getPackageName(typeFullName);
         String className = getClassName(typeFullName);
 
-        return pkg + "." + className + "Pojo";
+        return pkg + "." + className + "ModuleObject";
     }
 
     public String generateConfigDefParserRoleKey(TypeElement typeElement) {

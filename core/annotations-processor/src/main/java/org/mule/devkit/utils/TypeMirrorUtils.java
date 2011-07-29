@@ -38,7 +38,7 @@ public final class TypeMirrorUtils {
         this.types = types;
     }
 
-    public boolean isPojo(TypeMirror type) {
+    public boolean isTransferObject(TypeMirror type) {
         if (SchemaTypeConversion.isSupported(type.toString())) {
             return false;
         }
@@ -54,12 +54,17 @@ public final class TypeMirrorUtils {
         DeclaredType declaredType = (DeclaredType) type;
         TypeElement typeElement = (TypeElement) ((DeclaredType) type).asElement();
 
-        // a generic is not a pojo
+        // only interfaces can be transfer objects
+        if( typeElement.getKind() != ElementKind.INTERFACE ) {
+            return false;
+        }
+
+        // generic interfaces not supported
         if (typeElement.getTypeParameters().size() > 0) {
             return false;
         }
 
-        // if it implements interface then its no pojo
+        // we do not support interfaces that extend other interfaces
         if (typeElement.getInterfaces().size() > 0) {
             return false;
         }
@@ -67,24 +72,6 @@ public final class TypeMirrorUtils {
         // if its no public cannot be used
         if (!typeElement.getModifiers().contains(Modifier.PUBLIC)) {
             return false;
-        }
-
-        // if it doesn't inherit directly from Object then its no pojo
-        if (!typeElement.getSuperclass().toString().equals("java.lang.Object")) {
-            return false;
-        }
-
-        // verify that it has a public constructor
-        for (Element element : typeElement.getEnclosedElements()) {
-            if (element.getKind() != ElementKind.CONSTRUCTOR)
-                continue;
-
-            if (!element.getModifiers().contains(Modifier.PUBLIC))
-                continue;
-
-            ExecutableElement executableElement = (ExecutableElement) element;
-            if (executableElement.getParameters().size() == 0)
-                return true;
         }
 
         return true;

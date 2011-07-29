@@ -21,7 +21,6 @@ import javax.xml.namespace.QName;
 
 public final class SchemaConstants {
     public static final String BASE_NAMESPACE = "http://www.mulesoft.org/schema/mule/";
-    public static final String DEVKIT_NAMESPACE = "http://www.mulesoft.org/schema/mule/devkit";
     public static final String XML_NAMESPACE = "http://www.w3.org/XML/1998/namespace";
     public static final String XSD_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
     public static final String SPRING_FRAMEWORK_NAMESPACE = "http://www.springframework.org/schema/beans";
@@ -33,7 +32,9 @@ public final class SchemaConstants {
     public static final QName MULE_ABSTRACT_EXTENSION = new QName(MULE_NAMESPACE, "abstract-extension", "mule");
     public static final QName MULE_ABSTRACT_EXTENSION_TYPE = new QName(MULE_NAMESPACE, "abstractExtensionType", "mule");
     public static final QName MULE_ABSTRACT_MESSAGE_PROCESSOR = new QName(MULE_NAMESPACE, "abstract-message-processor", "mule");
-    public static final QName MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE = new QName(MULE_NAMESPACE, "abstractInterceptingMessageProcessorType", "mule");
+    public static final QName MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE = new QName(MULE_NAMESPACE, "abstractMessageProcessorType", "mule");
+    public static final QName MULE_ABSTRACT_INTERCEPTING_MESSAGE_PROCESSOR = new QName(MULE_NAMESPACE, "abstract-intercepting-message-processor", "mule");
+    public static final QName MULE_ABSTRACT_INTERCEPTING_MESSAGE_PROCESSOR_TYPE = new QName(MULE_NAMESPACE, "abstractInterceptingMessageProcessorType", "mule");
     public static final QName MULE_ABSTRACT_TRANSFORMER = new QName(MULE_NAMESPACE, "abstract-transformer", "mule");
     public static final QName MULE_ABSTRACT_TRANSFORMER_TYPE = new QName(MULE_NAMESPACE, "abstractTransformerType", "mule");
     public static final QName MULE_ABSTRACT_INBOUND_ENDPOINT = new QName(MULE_NAMESPACE, "abstract-inbound-endpoint", "mule");

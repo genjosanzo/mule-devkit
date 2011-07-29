@@ -48,7 +48,7 @@ public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
         lifecycleAdapterFactory.javadoc().add(" of {@link ObjectFactory} interface for ");
         lifecycleAdapterFactory.javadoc().add(ref(element.asType()));
 
-        DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePojoRoleKey((TypeElement) element));
+        DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey((TypeElement) element));
         context.setClassRole(context.getNameUtils().generatePoolObjectRoleKey((TypeElement) element), poolObjectClass);
 
         generateFields(element, lifecycleAdapterFactory);

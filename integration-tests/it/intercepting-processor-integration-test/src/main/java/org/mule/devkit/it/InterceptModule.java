@@ -17,23 +17,26 @@
 
 package org.mule.devkit.it;
 
-import org.mule.api.annotations.callback.ProcessorCallback;
-import org.mule.api.annotations.param.Optional;
+import org.mule.api.annotations.Module;
+import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.callback.SourceCallback;
 
-public interface Apple {
+@Module(name = "intercept")
+public class InterceptModule
+{
+    @Processor(intercepting=true)
+    public Object shouldContinue(boolean cont, SourceCallback afterChain) throws Exception
+    {
+		if( cont ) {
+			return afterChain.process(null);
+		}
 
-    boolean getIsBitten();
+        return null;
+    }
 
-    @Optional
-    void setIsBitten(boolean bitten);
+	@Processor
+	public String setPayload(String payload) {
+		return payload;
+	}
 
-    int getWeight();
-
-    @Optional
-    void setWeight(int weight);
-
-    ProcessorCallback getWhenBitten();
-
-    @Optional
-    public void setWhenBitten(ProcessorCallback whenBitten);
 }

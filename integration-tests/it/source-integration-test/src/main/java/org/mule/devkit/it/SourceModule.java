@@ -25,7 +25,7 @@ import org.mule.api.annotations.callback.SourceCallback;
 public class SourceModule
 {
     @Source
-    public void count(int startAt, int endAt, int step, SourceCallback callback) throws InterruptedException
+    public void count(int startAt, int endAt, int step, SourceCallback callback) throws Exception
     {
 		int count = startAt;
         while(true)

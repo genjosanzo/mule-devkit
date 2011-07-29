@@ -24,7 +24,9 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.ProcessorCallback;
+import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
@@ -38,11 +40,10 @@ import org.mule.devkit.model.code.Variable;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 
-public class ProcessorCallbackGenerator extends AbstractModuleGenerator {
-    public static final String ROLE = "ProcessorCallback";
+public class SourceCallbackGenerator extends AbstractModuleGenerator {
+    public static final String ROLE = "SourceCallback";
 
     public void generate(Element element) throws GenerationException {
         boolean shouldGenerate = false;
@@ -53,11 +54,9 @@ public class ProcessorCallbackGenerator extends AbstractModuleGenerator {
             if (processor == null)
                 continue;
 
-            for (VariableElement variable : method.getParameters()) {
-                if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
-                    shouldGenerate = true;
-                    break;
-                }
+            if( processor.intercepting() ) {
+                shouldGenerate = true;
+                break;
             }
         }
 
@@ -67,29 +66,29 @@ public class ProcessorCallbackGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass generateCallbackClass(TypeElement typeElement) {
-        DefinedClass callbackClass = getProcessorCallbackClass(typeElement);
-        callbackClass._implements(ref(ProcessorCallback.class));
+        DefinedClass callbackClass = getSourceCallbackClass(typeElement);
+        callbackClass._implements(ref(SourceCallback.class));
 
         FieldVariable muleContext = callbackClass.field(Modifier.PRIVATE, ref(MuleContext.class), "muleContext");
         muleContext.javadoc().add("Mule Context");
 
         generateSetter(callbackClass, muleContext);
 
-        FieldVariable chain = callbackClass.field(Modifier.PRIVATE, ref(MessageProcessorChain.class), "chain");
-        chain.javadoc().add("Chain that will be executed upon calling process");
+        FieldVariable listener = callbackClass.field(Modifier.PRIVATE, ref(MessageProcessor.class), "listener");
+        listener.javadoc().add("Listener that will be executed upon calling process");
 
-        generateSetter(callbackClass, chain);
+        generateSetter(callbackClass, listener);
 
         FieldVariable event = callbackClass.field(Modifier.PRIVATE, ref(MuleEvent.class), "event");
         event.javadoc().add("Event that will be cloned for dispatching");
 
         generateSetter(callbackClass, event);
 
-        generateCallbackConstructor(callbackClass, chain, event, muleContext);
+        generateCallbackConstructor(callbackClass, listener, event, muleContext);
 
-        generateCallbackProcess(callbackClass, chain, event, muleContext);
+        generateCallbackProcess(callbackClass, listener, event, muleContext);
 
-        generateCallbackProcessWithPayload(callbackClass, chain, event, muleContext);
+        generateCallbackProcessWithPayload(callbackClass, listener, event, muleContext);
 
         context.setClassRole(ROLE, callbackClass);
 
@@ -116,7 +115,7 @@ public class ProcessorCallbackGenerator extends AbstractModuleGenerator {
         process.body()._return(chain.invoke("process").arg(muleEvent).invoke("getMessage").invoke("getPayload"));
     }
 
-    private void generateCallbackProcess(DefinedClass callbackClass, FieldVariable chain, FieldVariable event, FieldVariable muleContext) {
+    private void generateCallbackProcess(DefinedClass callbackClass, FieldVariable listener, FieldVariable event, FieldVariable muleContext) {
         Method process = callbackClass.method(Modifier.PUBLIC, ref(Object.class), "process");
         process._throws(ref(Exception.class));
 
@@ -126,23 +125,23 @@ public class ProcessorCallbackGenerator extends AbstractModuleGenerator {
         newMuleEvent.arg(event);
         process.body().assign(muleEvent, newMuleEvent);
 
-        process.body()._return(chain.invoke("process").arg(muleEvent).invoke("getMessage").invoke("getPayload"));
+        process.body()._return(listener.invoke("process").arg(muleEvent).invoke("getMessage").invoke("getPayload"));
     }
 
-    private void generateCallbackConstructor(DefinedClass callbackClass, FieldVariable chain, FieldVariable event, FieldVariable muleContext) {
+    private void generateCallbackConstructor(DefinedClass callbackClass, FieldVariable listener, FieldVariable event, FieldVariable muleContext) {
         Method constructor = callbackClass.constructor(Modifier.PUBLIC);
         Variable event2 = constructor.param(ref(MuleEvent.class), "event");
         Variable muleContext2 = constructor.param(ref(MuleContext.class), "muleContext");
-        Variable chain2 = constructor.param(ref(MessageProcessorChain.class), "chain");
+        Variable listener2 = constructor.param(ref(MessageProcessor.class), "listener");
         constructor.body().assign(ExpressionFactory._this().ref(event), event2);
-        constructor.body().assign(ExpressionFactory._this().ref(chain), chain2);
+        constructor.body().assign(ExpressionFactory._this().ref(listener), listener2);
         constructor.body().assign(ExpressionFactory._this().ref(muleContext), muleContext2);
     }
 
-    private DefinedClass getProcessorCallbackClass(TypeElement type) {
-        String processorCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, ".config.spring", "ProcessorCallback");
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(processorCallbackClassName));
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(processorCallbackClassName), new Class[]{MuleContextAware.class});
+    private DefinedClass getSourceCallbackClass(TypeElement type) {
+        String sourceCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, ".config.spring", "SourceCallback");
+        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(sourceCallbackClassName));
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(sourceCallbackClassName), new Class[]{MuleContextAware.class});
 
         context.setClassRole(ROLE, clazz);
 

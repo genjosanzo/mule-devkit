@@ -45,13 +45,13 @@ public class PojoModule {
 
     @Processor
     public boolean isBitten(Apple apple) {
-        return apple.isBitten();
+        return apple.getIsBitten();
     }
 
     @Processor
     public boolean areAllBitten(List<Apple> apples) {
         for (Apple apple : apples) {
-            if (!apple.isBitten()) {
+            if (!apple.getIsBitten()) {
                 return false;
             }
         }
@@ -62,7 +62,7 @@ public class PojoModule {
     @Processor
     public boolean areAllBittenMap(Map<String, Apple> apples) {
         for (String key : apples.keySet()) {
-            if (!apples.get(key).isBitten()) {
+            if (!apples.get(key).getIsBitten()) {
                 return false;
             }
         }

@@ -27,5 +27,5 @@ public interface SourceCallback {
      * @param payload The payload of the message
      * @return The response of the flow
      */
-    Object process(Object payload);
+    Object process(Object payload) throws Exception;
 }

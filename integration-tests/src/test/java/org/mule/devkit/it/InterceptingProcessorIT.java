@@ -17,23 +17,28 @@
 
 package org.mule.devkit.it;
 
-import org.mule.api.annotations.callback.ProcessorCallback;
-import org.mule.api.annotations.param.Optional;
+import java.io.File;
 
-public interface Apple {
+public class InterceptingProcessorIT extends AbstractMavenIT
+{
 
-    boolean getIsBitten();
+    protected String getArtifactVersion()
+    {
+        return "1.0";
+    }
 
-    @Optional
-    void setIsBitten(boolean bitten);
+    protected String getArtifactId()
+    {
+        return "intercepting-processor-integration-test";
+    }
 
-    int getWeight();
+    protected String getGroupId()
+    {
+        return "org.mule.devkit.it";
+    }
 
-    @Optional
-    void setWeight(int weight);
-
-    ProcessorCallback getWhenBitten();
-
-    @Optional
-    public void setWhenBitten(ProcessorCallback whenBitten);
+    protected File getRoot()
+    {
+        return new File("target/integration-tests/" + getArtifactId());
+    }
 }

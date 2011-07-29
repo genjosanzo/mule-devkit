@@ -81,13 +81,19 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             if (processor == null)
                 continue;
 
-            generateMessageProcessor(typeElement, executableElement);
+            generateMessageProcessor(typeElement, executableElement, processor.intercepting());
         }
     }
 
-    private void generateMessageProcessor(Element typeElement, ExecutableElement executableElement) {
+    private void generateMessageProcessor(Element typeElement, ExecutableElement executableElement, boolean intercepting) {
         // get class
-        DefinedClass messageProcessorClass = getMessageProcessorClass(executableElement);
+        DefinedClass messageProcessorClass = null;
+
+        if( intercepting ) {
+            messageProcessorClass = getInterceptingMessageProcessorClass(executableElement);
+        } else {
+            messageProcessorClass = getMessageProcessorClass(executableElement);
+        }
 
         // add javadoc
         generateMessageProcessorClassDoc(executableElement, messageProcessorClass);
@@ -96,10 +102,15 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         Map<String, AbstractMessageGenerator.FieldVariableElement> fields = generateFieldForEachParameter(messageProcessorClass, executableElement);
 
         // add standard fields
-        FieldVariable object = generateFieldForPojo(messageProcessorClass, typeElement);
+        FieldVariable object = generateFieldForModuleObject(messageProcessorClass, typeElement);
         FieldVariable muleContext = generateFieldForMuleContext(messageProcessorClass);
         FieldVariable expressionManager = generateFieldForExpressionManager(messageProcessorClass);
         FieldVariable patternInfo = generateFieldForPatternInfo(messageProcessorClass);
+
+        FieldVariable messageProcessorListener = null;
+        if( intercepting ) {
+            messageProcessorListener = generateFieldForMessageProcessorListener(messageProcessorClass);
+        }
 
         // add initialise
         generateInitialiseMethod(messageProcessorClass, fields, typeElement, muleContext, expressionManager, patternInfo, object);
@@ -116,8 +127,13 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         // add setmulecontext
         generateSetMuleContextMethod(messageProcessorClass, muleContext);
 
+        if( intercepting ) {
+            // add setlistener
+            generateSetListenerMethod(messageProcessorClass, messageProcessorListener);
+        }
+
         // add setobject
-        generateSetPojoMethod(messageProcessorClass, object);
+        generateSetModuleObjectMethod(messageProcessorClass, object);
 
         // generate setters for all parameters
         for (String fieldName : fields.keySet()) {
@@ -139,10 +155,10 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey((TypeElement) typeElement));
 
             // add process method
-            generateProcessMethod(executableElement, messageProcessorClass, fields, muleContext, object, expressionManager, patternInfo, poolObjectClass);
+            generateProcessMethod(executableElement, messageProcessorClass, fields, messageProcessorListener, muleContext, object, expressionManager, patternInfo, poolObjectClass);
         } else {
             // add process method
-            generateProcessMethod(executableElement, messageProcessorClass, fields, muleContext, object, expressionManager, patternInfo);
+            generateProcessMethod(executableElement, messageProcessorClass, fields, messageProcessorListener, muleContext, object, expressionManager, patternInfo);
         }
     }
 
@@ -461,11 +477,11 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         return defaultMuleEvent;
     }
 
-    private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, FieldVariable muleContext, FieldVariable object, FieldVariable expressionManager, FieldVariable patternInfo) {
-        generateProcessMethod(executableElement, messageProcessorClass, fields, muleContext, object, expressionManager, patternInfo, null);
+    private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, FieldVariable messageProcessorListener, FieldVariable muleContext, FieldVariable object, FieldVariable expressionManager, FieldVariable patternInfo) {
+        generateProcessMethod(executableElement, messageProcessorClass, fields, messageProcessorListener, muleContext, object, expressionManager, patternInfo, null);
     }
 
-    private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, FieldVariable muleContext, FieldVariable object, FieldVariable expressionManager, FieldVariable patternInfo, DefinedClass poolObjectClass) {
+    private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, FieldVariable messageProcessorListener, FieldVariable muleContext, FieldVariable object, FieldVariable expressionManager, FieldVariable patternInfo, DefinedClass poolObjectClass) {
         String methodName = executableElement.getSimpleName().toString();
         Type muleEvent = ref(MuleEvent.class);
 
@@ -488,22 +504,25 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         List<Variable> parameters = new ArrayList<Variable>();
         for (VariableElement variable : executableElement.getParameters()) {
-            if (variable.asType().toString().contains(SourceCallback.class.getName()))
-                continue;
-
             String fieldName = variable.getSimpleName().toString();
 
             if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
 
-                DefinedClass callbackClass = context.getClassForRole(ProcessorCallbackGenerator.CALLBACK_ROLE);
+                DefinedClass callbackClass = context.getClassForRole(ProcessorCallbackGenerator.ROLE);
 
                 Variable transformed = callProcessor.body().decl(callbackClass, "transformed" + StringUtils.capitalize(fieldName),
                         ExpressionFactory._new(callbackClass).arg(event).arg(muleContext).arg(fields.get(fieldName).getField()));
 
-                //callProcessor.body().add(transformed.invoke("setEvent").arg(event));
-                //callProcessor.body().add(transformed.invoke("setMuleContext").arg(muleContext));
+                parameters.add(transformed);
+            } else if (variable.asType().toString().contains(SourceCallback.class.getName())) {
+
+                DefinedClass callbackClass = context.getClassForRole(SourceCallbackGenerator.ROLE);
+
+                Variable transformed = callProcessor.body().decl(callbackClass, "transformed" + StringUtils.capitalize(fieldName),
+                        ExpressionFactory._new(callbackClass).arg(event).arg(muleContext).arg(messageProcessorListener));
 
                 parameters.add(transformed);
+
             } else {
                 InboundHeaders inboundHeaders = variable.getAnnotation(InboundHeaders.class);
 
@@ -515,7 +534,6 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 Invocation evaluateAndTransform = ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(getGenericType);
 
                 if( inboundHeaders != null ) {
-                    //Invocation getInboundHeader = muleMessage.invoke("getInboundProperty").arg(inboundHeaders.value());
                     if( context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
                         evaluateAndTransform.arg("#[" + MessageHeadersListExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
                     } else if (context.getTypeMirrorUtils().isMap(fields.get(fieldName).getVariableElement().asType())) {

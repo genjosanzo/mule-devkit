@@ -3,10 +3,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.mule.devkit.it</groupId>
-    <artifactId>pool-integration-test</artifactId>
+    <artifactId>intercepting-processor-integration-test</artifactId>
     <version>1.0</version>
     <packaging>mule-module</packaging>
-    <name>Mule DevKit Pool Integration Tests</name>
+    <name>Mule DevKit Intercepting Message Processor Integration Tests</name>
 
     <build>
         <pluginManagement>

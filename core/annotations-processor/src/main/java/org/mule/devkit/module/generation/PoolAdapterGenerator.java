@@ -127,7 +127,7 @@ public class PoolAdapterGenerator extends AbstractModuleGenerator {
         clazz._implements(Stoppable.class);
         clazz._implements(MuleContextAware.class);
         clazz._implements(FlowConstructAware.class);
-        context.setClassRole(context.getNameUtils().generatePojoRoleKey((TypeElement) typeElement), clazz);
+        context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey((TypeElement) typeElement), clazz);
 
         return clazz;
     }

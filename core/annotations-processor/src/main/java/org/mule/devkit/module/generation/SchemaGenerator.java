@@ -89,6 +89,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private static final String ELEMENT_NAME_CONFIG = "config";
     private static final String ATTRIBUTE_NAME_NAME = "name";
     private static final String REF_SUFFIX = "-ref";
+    private static final String TRANSFER_OBJECT_TYPE_SUFFIX = "TransferObjectType";
     private Schema schema;
     private ObjectFactory objectFactory;
 
@@ -111,14 +112,13 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         importXmlNamespace();
         importSpringFrameworkNamespace();
         importMuleNamespace();
-        //importMuleSchemaDocNamespace();
 
         registerTypes();
         registerConfigElement(targetNamespace, element);
         registerProcessorsAndSources(targetNamespace, element);
         registerTransformers(element);
         registerEnums(element);
-        registerPojos(element);
+        registerTransferObjects(element);
 
         String fileName = "META-INF/mule-" + module.name() + XSD_EXTENSION;
 
@@ -182,18 +182,18 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
     }
 
-    private void registerPojos(javax.lang.model.element.Element type) {
-        Set<TypeMirror> registeredPojos = new HashSet<TypeMirror>();
+    private void registerTransferObjects(javax.lang.model.element.Element type) {
+        Set<TypeMirror> registeredTransferObjects = new HashSet<TypeMirror>();
 
         java.util.List<VariableElement> variables = ElementFilter.fieldsIn(type.getEnclosedElements());
         for (VariableElement variable : variables) {
             if (isTypeSupported(variable.asType()))
                 continue;
 
-            if (context.getTypeMirrorUtils().isPojo(variable.asType())) {
-                if (!registeredPojos.contains(variable.asType())) {
-                    registerPojo(variable.asType());
-                    registeredPojos.add(variable.asType());
+            if (context.getTypeMirrorUtils().isTransferObject(variable.asType())) {
+                if (!registeredTransferObjects.contains(variable.asType())) {
+                    registerTransferObject(variable.asType());
+                    registeredTransferObjects.add(variable.asType());
                 }
             }
         }
@@ -208,12 +208,12 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 if (isTypeSupported(variable.asType()))
                     continue;
 
-                if (!context.getTypeMirrorUtils().isPojo(variable.asType()))
+                if (!context.getTypeMirrorUtils().isTransferObject(variable.asType()))
                     continue;
 
-                if (!registeredPojos.contains(variable.asType())) {
-                    registerPojo(variable.asType());
-                    registeredPojos.add(variable.asType());
+                if (!registeredTransferObjects.contains(variable.asType())) {
+                    registerTransferObject(variable.asType());
+                    registeredTransferObjects.add(variable.asType());
                 }
             }
         }
@@ -227,22 +227,22 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 if (isTypeSupported(variable.asType()))
                     continue;
 
-                if (!context.getTypeMirrorUtils().isPojo(variable.asType()))
+                if (!context.getTypeMirrorUtils().isTransferObject(variable.asType()))
                     continue;
 
-                if (!registeredPojos.contains(variable.asType())) {
-                    registerPojo(variable.asType());
-                    registeredPojos.add(variable.asType());
+                if (!registeredTransferObjects.contains(variable.asType())) {
+                    registerTransferObject(variable.asType());
+                    registeredTransferObjects.add(variable.asType());
                 }
             }
         }
     }
 
-    private void registerPojo(TypeMirror pojoType) {
+    private void registerTransferObject(TypeMirror pojoType) {
         javax.lang.model.element.Element pojoElement = context.getTypeUtils().asElement(pojoType);
 
         TopLevelComplexType pojoComplexType = new TopLevelComplexType();
-        pojoComplexType.setName(pojoElement.getSimpleName() + "PojoType");
+        pojoComplexType.setName(pojoElement.getSimpleName() + TRANSFER_OBJECT_TYPE_SUFFIX);
 
         All all = new All();
         pojoComplexType.setAll(all);
@@ -318,9 +318,9 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 name = processor.name();
             String typeName = StringUtils.capitalize(name) + TYPE_SUFFIX;
 
-            registerProcessorElement(targetNamespace, name, typeName);
+            registerProcessorElement(processor.intercepting(), targetNamespace, name, typeName);
 
-            registerProcessorType(targetNamespace, typeName, method);
+            registerProcessorType(processor.intercepting(), targetNamespace, typeName, method);
         }
 
         for (ExecutableElement method : methods) {
@@ -340,10 +340,14 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     }
 
-    private void registerProcessorElement(String targetNamespace, String name, String typeName) {
+    private void registerProcessorElement(boolean intercepting, String targetNamespace, String name, String typeName) {
         Element element = new TopLevelElement();
         element.setName(context.getNameUtils().uncamel(name));
-        element.setSubstitutionGroup(SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR);
+        if( intercepting ) {
+            element.setSubstitutionGroup(SchemaConstants.MULE_ABSTRACT_INTERCEPTING_MESSAGE_PROCESSOR);
+        } else {
+            element.setSubstitutionGroup(SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR);
+        }
         element.setType(new QName(targetNamespace, typeName));
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
@@ -358,8 +362,12 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
     }
 
-    private void registerProcessorType(String targetNamespace, String name, ExecutableElement element) {
-        registerExtendedType(SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE, targetNamespace, name, element);
+    private void registerProcessorType(boolean intercepting, String targetNamespace, String name, ExecutableElement element) {
+        if( intercepting ) {
+            registerExtendedType(SchemaConstants.MULE_ABSTRACT_INTERCEPTING_MESSAGE_PROCESSOR_TYPE, targetNamespace, name, element);
+        } else {
+            registerExtendedType(SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE, targetNamespace, name, element);
+        }
     }
 
     private void registerSourceType(String targetNamespace, String name, ExecutableElement element) {
@@ -395,10 +403,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                     generateProcessorCallbackElement(all, variable);
                 } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                     all.getParticle().add(objectFactory.createElement(generateXmlElement(variable.getSimpleName().toString(), targetNamespace)));
-                } else if (context.getTypeMirrorUtils().isPojo(variable.asType())) {
+                } else if (context.getTypeMirrorUtils().isTransferObject(variable.asType())) {
                     TopLevelElement xmlElement = new TopLevelElement();
                     xmlElement.setName(variable.getSimpleName().toString());
-                    xmlElement.setType(new QName(targetNamespace, ref(variable.asType()).name() + "PojoType"));
+                    xmlElement.setType(new QName(targetNamespace, ref(variable.asType()).name() + TRANSFER_OBJECT_TYPE_SUFFIX));
                     all.getParticle().add(objectFactory.createElement(xmlElement));
                 } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
                     generateCollectionElement(targetNamespace, all, variable);
@@ -508,7 +516,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 } else if (context.getTypeMirrorUtils().isArrayOrList(genericType) ||
                         context.getTypeMirrorUtils().isMap(genericType)) {
                     return generateCollectionComplexType(targetNamespace, "inner-" + name, genericType);
-                } else if (context.getTypeMirrorUtils().isPojo(genericType)) {
+                } else if (context.getTypeMirrorUtils().isTransferObject(genericType)) {
                     return generatePojoComplexTypeWithRef(targetNamespace, genericType);
                 } else {
                     return generateRefComplexType(ATTRIBUTE_NAME_VALUE_REF);
@@ -545,11 +553,11 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
                 complexContentExtension.getAttributeOrAttributeGroup().add(refAttribute);
                 complexContentExtension.getAttributeOrAttributeGroup().add(keyAttribute);
-            } else if (variableTypeParameters.size() > 1 && context.getTypeMirrorUtils().isPojo(variableTypeParameters.get(1))) {
+            } else if (variableTypeParameters.size() > 1 && context.getTypeMirrorUtils().isTransferObject(variableTypeParameters.get(1))) {
                 ComplexContent simpleContent = new ComplexContent();
                 mapComplexType.setComplexContent(simpleContent);
                 ExtensionType complexContentExtension = new ExtensionType();
-                QName qname = new QName(targetNamespace, ref(variableTypeParameters.get(1)).name() + "PojoType");
+                QName qname = new QName(targetNamespace, ref(variableTypeParameters.get(1)).name() + TRANSFER_OBJECT_TYPE_SUFFIX);
                 complexContentExtension.setBase(qname);
                 simpleContent.setExtension(complexContentExtension);
 
@@ -582,7 +590,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         ComplexContent simpleContent = new ComplexContent();
         complexType.setComplexContent(simpleContent);
         ExtensionType simpleContentExtension = new ExtensionType();
-        QName qname = new QName(targetNamespace, ref(genericType).name() + "PojoType");
+        QName qname = new QName(targetNamespace, ref(genericType).name() + TRANSFER_OBJECT_TYPE_SUFFIX);
         simpleContentExtension.setBase(qname);
         simpleContent.setExtension(simpleContentExtension);
 

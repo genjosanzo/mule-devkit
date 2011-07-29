@@ -19,6 +19,9 @@ package org.mule.devkit.module.validation;
 
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
+import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.Source;
+import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.devkit.validation.ValidationException;
@@ -26,6 +29,7 @@ import org.mule.devkit.validation.Validator;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -36,7 +40,7 @@ public class ModuleValidator implements Validator {
 
     public void validate(Element element) throws ValidationException {
         // if it not annotated just skip
-        if( element.getAnnotation(Module.class) == null )
+        if (element.getAnnotation(Module.class) == null)
             return;
 
         // must not be an interface
@@ -45,7 +49,7 @@ public class ModuleValidator implements Validator {
         }
 
         // must not have type parameters
-        if (!((TypeElement)element).getTypeParameters().isEmpty()) {
+        if (!((TypeElement) element).getTypeParameters().isEmpty()) {
             throw new ValidationException(element, "@Module type cannot have type parameters");
         }
 
@@ -54,36 +58,97 @@ public class ModuleValidator implements Validator {
             throw new ValidationException(element, "@Module must be public");
         }
 
-        //
         List<VariableElement> variables = ElementFilter.fieldsIn(element.getEnclosedElements());
-        for( VariableElement variable : variables )
-        {
+        for (VariableElement variable : variables) {
             Configurable configurable = variable.getAnnotation(Configurable.class);
-            if( configurable == null )
+            if (configurable == null)
                 continue;
+
             Optional optional = variable.getAnnotation(Optional.class);
             Default def = variable.getAnnotation(Default.class);
 
-            if( variable.getModifiers().contains(Modifier.FINAL) )
-            {
+            if (variable.getModifiers().contains(Modifier.FINAL)) {
                 throw new ValidationException(variable, "@Configurable cannot be applied to field with final modifier");
             }
 
-            if( variable.getModifiers().contains(Modifier.STATIC) )
-            {
+            if (variable.getModifiers().contains(Modifier.STATIC)) {
                 throw new ValidationException(variable, "@Configurable cannot be applied to field with static modifier");
             }
 
-            if( variable.asType().getKind().isPrimitive() && optional != null && def.value().length() == 0 )
-            {
-                throw new ValidationException(variable, "Optional configurable fields can only be applied to non-primitive types without a default value");
+            if (variable.asType().getKind().isPrimitive() && optional != null && def.value().length() == 0) {
+                throw new ValidationException(variable, "@Optional @Configurable fields can only be applied to non-primitive types with a @Default value");
             }
         }
 
         // verify that every @Processor is public and non-static and non-generic
+        List<ExecutableElement> executableElements = ElementFilter.methodsIn(element.getEnclosedElements());
+        for (ExecutableElement executableElement : executableElements) {
+            Processor processor = executableElement.getAnnotation(Processor.class);
+
+            if (processor == null)
+                continue;
+
+            if (executableElement.getModifiers().contains(Modifier.STATIC)) {
+                throw new ValidationException(executableElement, "@Processor cannot be applied to a static method");
+            }
+
+            if (executableElement.getTypeParameters().size() > 0) {
+                throw new ValidationException(executableElement, "@Processor cannot be applied to a generic method");
+            }
+
+            if (!executableElement.getModifiers().contains(Modifier.PUBLIC)) {
+                throw new ValidationException(executableElement, "@Processor cannot be applied to a non-public method");
+            }
+
+            if (processor.intercepting()) {
+                // verify that every @Processor(intercepting=true) receives a SourceCallback
+                boolean containsSourceCallback = false;
+                List<? extends VariableElement> parameters = executableElement.getParameters();
+                for (VariableElement parameter : parameters) {
+                    if (parameter.asType().toString().contains(SourceCallback.class.getName())) {
+                        containsSourceCallback = true;
+                    }
+                }
+
+                if (!containsSourceCallback) {
+                    throw new ValidationException(executableElement, "An intercepting processor method must contain a SourceCallback as one of its parameters");
+                }
+            }
+
+        }
 
         // verify that every @Source is public and non-static and non-generic
-        // verify that every @Source receives a SourceCallback
+        for (ExecutableElement executableElement : executableElements) {
+            Source source = executableElement.getAnnotation(Source.class);
+
+            if (source == null)
+                continue;
+
+            if (executableElement.getModifiers().contains(Modifier.STATIC)) {
+                throw new ValidationException(executableElement, "@Source cannot be applied to a static method");
+            }
+
+            if (executableElement.getTypeParameters().size() > 0) {
+                throw new ValidationException(executableElement, "@Source cannot be applied to a generic method");
+            }
+
+            if (!executableElement.getModifiers().contains(Modifier.PUBLIC)) {
+                throw new ValidationException(executableElement, "@Source cannot be applied to a non-public method");
+            }
+
+            // verify that every @Source receives a SourceCallback
+            boolean containsSourceCallback = false;
+            List<? extends VariableElement> parameters = executableElement.getParameters();
+            for (VariableElement parameter : parameters) {
+                if (parameter.asType().toString().contains(SourceCallback.class.getName())) {
+                    containsSourceCallback = true;
+                }
+            }
+
+            if (!containsSourceCallback) {
+                throw new ValidationException(executableElement, "@Source method must contain a SourceCallback as one of its parameters");
+            }
+        }
 
         // verify that every @Transformer is public and non-static and non-generic
         // verify that every @Transformer signature is Object x(Object);
