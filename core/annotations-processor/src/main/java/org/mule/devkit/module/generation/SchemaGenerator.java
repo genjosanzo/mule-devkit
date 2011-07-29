@@ -22,6 +22,7 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
+import org.mule.api.annotations.callback.InterceptCallback;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.param.Default;
@@ -395,6 +396,9 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             for (VariableElement variable : ((ExecutableElement) element).getParameters()) {
                 if (variable.asType().toString().contains(SourceCallback.class.getName()))
                     continue;
+                if (variable.asType().toString().contains(InterceptCallback.class.getName()))
+                    continue;
+
 
                 InboundHeaders inboundHeaders = variable.getAnnotation(InboundHeaders.class);
 
@@ -777,13 +781,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     private boolean isTypeSupported(TypeMirror typeMirror) {
         return SchemaTypeConversion.isSupported(typeMirror.toString());
-    }
-
-    private void importMuleSchemaDocNamespace() {
-        Import muleSchemaDocImport = new Import();
-        muleSchemaDocImport.setNamespace(SchemaConstants.MULE_SCHEMADOC_NAMESPACE);
-        muleSchemaDocImport.setSchemaLocation(SchemaConstants.MULE_SCHEMADOC_SCHEMA_LOCATION);
-        schema.getIncludeOrImportOrRedefine().add(muleSchemaDocImport);
     }
 
     private void importMuleNamespace() {

@@ -21,6 +21,7 @@ import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
+import org.mule.api.annotations.callback.InterceptCallback;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
@@ -102,16 +103,16 @@ public class ModuleValidator implements Validator {
 
             if (processor.intercepting()) {
                 // verify that every @Processor(intercepting=true) receives a SourceCallback
-                boolean containsSourceCallback = false;
+                boolean containsInterceptCallback = false;
                 List<? extends VariableElement> parameters = executableElement.getParameters();
                 for (VariableElement parameter : parameters) {
-                    if (parameter.asType().toString().contains(SourceCallback.class.getName())) {
-                        containsSourceCallback = true;
+                    if (parameter.asType().toString().contains(InterceptCallback.class.getName())) {
+                        containsInterceptCallback = true;
                     }
                 }
 
-                if (!containsSourceCallback) {
-                    throw new ValidationException(executableElement, "An intercepting processor method must contain a SourceCallback as one of its parameters");
+                if (!containsInterceptCallback) {
+                    throw new ValidationException(executableElement, "An intercepting processor method must contain a InterceptCallback as one of its parameters");
                 }
             }
 

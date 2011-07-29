@@ -28,6 +28,14 @@ import java.util.Map;
  */
 public interface ProcessorCallback {
     /**
+     * Dispatch original message to the processor chain
+     *
+     * @param properties Additional invocation properties
+     * @return The return payload for the processor chain
+     */
+    Object process(Map<String, Object> properties) throws Exception;
+
+    /**
      * Dispatch message to the processor chain
      *
      * @param payload The payload of the message
@@ -45,8 +53,7 @@ public interface ProcessorCallback {
     Object process(Object payload) throws Exception;
 
     /**
-     * Dispatch message to the processor chain using
-     * the same payload used to execute
+     * Dispatch original message to the processor chain
      *
      * @return The return payload for the processor chain
      */

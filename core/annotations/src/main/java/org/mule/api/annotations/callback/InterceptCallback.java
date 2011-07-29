@@ -15,28 +15,19 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.it;
+package org.mule.api.annotations.callback;
 
-import org.mule.api.annotations.Module;
-import org.mule.api.annotations.Processor;
-import org.mule.api.annotations.callback.InterceptCallback;
-
-@Module(name = "intercept")
-public class InterceptModule
-{
-    @Processor(intercepting=true)
-    public Object shouldContinue(boolean cont, InterceptCallback afterChain) throws Exception
-    {
-		if( !cont ) {
-			afterChain.doNotContinue();
-		}
-
-        return null;
-    }
-
-	@Processor
-	public String setPayload(String payload) {
-		return payload;
-	}
-
+/**
+ * Callback interface used by {@link org.mule.api.annotations.Processor} annotated methods which also are
+ * declared as intercepting.
+ *
+ * This callback is there to facilitate the decision made by the processor to continue the chain or to stop
+ * it.
+ */
+public interface InterceptCallback {
+    /**
+     * Message processors that call this method indicate that they wish the
+     * processing to stop.
+     */
+    void doNotContinue();
 }
