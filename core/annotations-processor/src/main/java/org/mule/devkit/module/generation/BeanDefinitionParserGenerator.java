@@ -22,6 +22,7 @@ import org.apache.commons.lang.UnhandledException;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
+import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.lifecycle.Disposable;
@@ -203,7 +204,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
         Variable parserContext = parse.param(ref(ParserContext.class), "parserContent");
 
-        Variable definition = generateParseCommon(messageProcessorClass, executableElement, parse, element, parserContext);
+        Variable definition = generateParseCommon(beanDefinitionparser, messageProcessorClass, executableElement, parse, element, parserContext);
 
         generateAttachMessageProcessor(parse, definition, parserContext);
 
@@ -215,14 +216,14 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
         Variable parserContext = parse.param(ref(ParserContext.class), "parserContent");
 
-        Variable definition = generateParseCommon(messageProcessorClass, executableElement, parse, element, parserContext);
+        Variable definition = generateParseCommon(beanDefinitionparser, messageProcessorClass, executableElement, parse, element, parserContext);
 
         generateAttachMessageSource(parse, definition, parserContext);
 
         parse.body()._return(definition);
     }
 
-    private Variable generateParseCommon(DefinedClass messageProcessorClass, ExecutableElement executableElement, Method parse, Variable element, Variable parserContext) {
+    private Variable generateParseCommon(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, ExecutableElement executableElement, Method parse, Variable element, Variable parserContext) {
         Variable builder = parse.body().decl(ref(BeanDefinitionBuilder.class), "builder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition").arg(messageProcessorClass.dotclass().invoke("getName")));
 
@@ -291,6 +292,12 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 managedMap.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedMap.getManagedCollection()));
             } else if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
                 generateParseEnum(parse.body(), element, builder, fieldName);
+            }  else if(variable.asType().toString().contains(HttpCallback.class.getName())) {
+                Method getAttributeValue = generateGetAttributeValue(beanDefinitionparser);
+                Variable callbackFlowName = parse.body().decl(ref(String.class), "callbackFlowName", ExpressionFactory.invoke(getAttributeValue).arg(element).arg(context.getNameUtils().uncamel(fieldName) + "-flow-ref"));
+                Block block = parse.body()._if(Op.ne(callbackFlowName, ExpressionFactory._null()))._then();
+                Variable runtimeBeanReference = block.decl(ref(RuntimeBeanReference.class), "callbackFlowBeanRef", ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(callbackFlowName));
+                block.invoke(builder, "addPropertyValue").arg("callbackFlow").arg(runtimeBeanReference);
             }
         }
 
@@ -644,7 +651,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         isBlank._else()._return(id);
     }
 
-    private void generateGetAttributeValue(DefinedClass beanDefinitionparser) {
+    private Method generateGetAttributeValue(DefinedClass beanDefinitionparser) {
         Method getAttributeValue = beanDefinitionparser.method(Modifier.PROTECTED, ref(String.class), "getAttributeValue");
         Variable element = getAttributeValue.param(ref(org.w3c.dom.Element.class), "element");
         Variable attributeName = getAttributeValue.param(ref(String.class), "attributeName");
@@ -658,6 +665,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         ifIsEmpty._return(getAttribute);
 
         getAttributeValue.body()._return(ExpressionFactory._null());
+        return getAttributeValue;
     }
 
 

@@ -22,6 +22,7 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
+import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.param.Default;
@@ -762,6 +763,9 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             attribute.setName(name);
             javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(variable.asType());
             attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + EMUM_TYPE_SUFFIX));
+        } else if(variable.asType().toString().contains(HttpCallback.class.getName())) {
+            attribute.setName(context.getNameUtils().uncamel(name) + "-flow-ref");
+            attribute.setType(SchemaConstants.STRING);
         } else {
             // non-supported types will get "-ref" so beans can be injected
             attribute.setName(name + REF_SUFFIX);

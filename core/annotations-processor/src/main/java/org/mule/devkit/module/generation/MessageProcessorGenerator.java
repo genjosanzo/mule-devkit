@@ -26,6 +26,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.param.InboundHeaders;
@@ -37,6 +38,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.construct.SimpleFlowConstruct;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Cast;
@@ -54,6 +56,7 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Type;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
+import org.mule.devkit.utils.FieldBuilder;
 import org.mule.expression.MessageHeaderExpressionEvaluator;
 import org.mule.expression.MessageHeadersExpressionEvaluator;
 import org.mule.expression.MessageHeadersListExpressionEvaluator;
@@ -176,6 +179,11 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 ifStartable._then().add(
                         ExpressionFactory.cast(ref(Startable.class), forEach.var()).invoke("start")
                 );
+            } else if (variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
+                FieldVariable callbackFlow = new FieldBuilder(messageProcessorClass, this).type(SimpleFlowConstruct.class).name("callbackFlow").setter().javadoc("The flow to be invoked when the http callback is received").build();
+                startMethod.body().assign(variableElement.getField(), ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).arg(callbackFlow));
+                startMethod.body().invoke(ExpressionFactory.cast(ref(HttpCallback.class), variableElement.getField()), "setMuleContext").arg(messageProcessorClass.fields().get("muleContext"));
+                startMethod.body().invoke(ExpressionFactory.cast(ref(HttpCallback.class), variableElement.getField()), "start");
             }
         }
     }
@@ -193,6 +201,8 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 ifStartable._then().add(
                         ExpressionFactory.cast(ref(Stoppable.class), forEach.var()).invoke("stop")
                 );
+            } else if (variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
+                stopMethod.body().invoke(ExpressionFactory.cast(ref(Stoppable.class), variableElement.getField()), "stop");
             }
         }
     }
