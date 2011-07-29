@@ -23,6 +23,7 @@ import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.callback.HttpCallback;
+import org.mule.api.annotations.callback.InterceptCallback;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.lifecycle.Disposable;
@@ -244,6 +245,8 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         for (VariableElement variable : executableElement.getParameters()) {
             if (variable.asType().toString().contains(SourceCallback.class.getName()))
+                continue;
+            if (variable.asType().toString().contains(InterceptCallback.class.getName()))
                 continue;
 
             String fieldName = variable.getSimpleName().toString();

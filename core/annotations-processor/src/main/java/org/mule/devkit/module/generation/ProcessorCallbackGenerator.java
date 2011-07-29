@@ -93,6 +93,8 @@ public class ProcessorCallbackGenerator extends AbstractModuleGenerator {
 
         generateCallbackProcessWithPayload(callbackClass, chain, event, muleContext);
 
+        generateCallbackProcessWithProperties(callbackClass, chain, event, muleContext);
+
         generateCallbackProcessWithPayloadAndProperties(callbackClass, chain, event, muleContext);
 
         context.setClassRole(ROLE, callbackClass);
@@ -129,6 +131,31 @@ public class ProcessorCallbackGenerator extends AbstractModuleGenerator {
         Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage");
         Invocation newMuleMessage = ExpressionFactory._new(ref(DefaultMuleMessage.class));
         newMuleMessage.arg(payload);
+        newMuleMessage.arg(muleContext);
+        process.body().assign(muleMessage, newMuleMessage);
+
+        ForEach forEachProperty = process.body().forEach(ref(String.class), "property", properties.invoke("keySet"));
+        forEachProperty.body().add(muleMessage.invoke("setInvocationProperty")
+                .arg(forEachProperty.var())
+                .arg(properties.invoke("get").arg(forEachProperty.var())));
+
+        Variable muleEvent = process.body().decl(ref(MuleEvent.class), "muleEvent");
+        Invocation newMuleEvent = ExpressionFactory._new(ref(DefaultMuleEvent.class));
+        newMuleEvent.arg(muleMessage);
+        newMuleEvent.arg(event);
+        process.body().assign(muleEvent, newMuleEvent);
+
+        process.body()._return(chain.invoke("process").arg(muleEvent).invoke("getMessage").invoke("getPayload"));
+    }
+
+    private void generateCallbackProcessWithProperties(DefinedClass callbackClass, FieldVariable chain, FieldVariable event, FieldVariable muleContext) {
+        Method process = callbackClass.method(Modifier.PUBLIC, ref(Object.class), "process");
+        process._throws(ref(Exception.class));
+        Variable properties = process.param(ref(Map.class).narrow(ref(String.class)).narrow(ref(Object.class)), "properties");
+
+        Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage");
+        Invocation newMuleMessage = ExpressionFactory._new(ref(DefaultMuleMessage.class));
+        newMuleMessage.arg(event.invoke("getMessage").invoke("getPayload"));
         newMuleMessage.arg(muleContext);
         process.body().assign(muleMessage, newMuleMessage);
 

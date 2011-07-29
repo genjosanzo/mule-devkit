@@ -27,8 +27,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.HttpCallback;
+import org.mule.api.annotations.callback.InterceptCallback;
 import org.mule.api.annotations.callback.ProcessorCallback;
-import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.lifecycle.Disposable;
@@ -93,7 +93,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         // get class
         DefinedClass messageProcessorClass = null;
 
-        if( intercepting ) {
+        if (intercepting) {
             messageProcessorClass = getInterceptingMessageProcessorClass(executableElement);
         } else {
             messageProcessorClass = getMessageProcessorClass(executableElement);
@@ -112,7 +112,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         FieldVariable patternInfo = generateFieldForPatternInfo(messageProcessorClass);
 
         FieldVariable messageProcessorListener = null;
-        if( intercepting ) {
+        if (intercepting) {
             messageProcessorListener = generateFieldForMessageProcessorListener(messageProcessorClass);
         }
 
@@ -131,7 +131,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         // add setmulecontext
         generateSetMuleContextMethod(messageProcessorClass, muleContext);
 
-        if( intercepting ) {
+        if (intercepting) {
             // add setlistener
             generateSetListenerMethod(messageProcessorClass, messageProcessorListener);
         }
@@ -514,23 +514,24 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         TryStatement callProcessor = process.body()._try();
 
         List<Variable> parameters = new ArrayList<Variable>();
+        Variable interceptCallback = null;
         for (VariableElement variable : executableElement.getParameters()) {
             String fieldName = variable.getSimpleName().toString();
 
-            if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
+            if (variable.asType().toString().contains(InterceptCallback.class.getName())) {
+
+                DefinedClass callbackClass = context.getClassForRole(InterceptCallbackGenerator.ROLE);
+
+                interceptCallback = callProcessor.body().decl(callbackClass, "transformed" + StringUtils.capitalize(fieldName),
+                        ExpressionFactory._new(callbackClass));
+
+                parameters.add(interceptCallback);
+            } else if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
 
                 DefinedClass callbackClass = context.getClassForRole(ProcessorCallbackGenerator.ROLE);
 
                 Variable transformed = callProcessor.body().decl(callbackClass, "transformed" + StringUtils.capitalize(fieldName),
                         ExpressionFactory._new(callbackClass).arg(event).arg(muleContext).arg(fields.get(fieldName).getField()));
-
-                parameters.add(transformed);
-            } else if (variable.asType().toString().contains(SourceCallback.class.getName())) {
-
-                DefinedClass callbackClass = context.getClassForRole(SourceCallbackGenerator.ROLE);
-
-                Variable transformed = callProcessor.body().decl(callbackClass, "transformed" + StringUtils.capitalize(fieldName),
-                        ExpressionFactory._new(callbackClass).arg(event).arg(muleContext).arg(messageProcessorListener));
 
                 parameters.add(transformed);
 
@@ -545,22 +546,22 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 ).invoke("getGenericType");
                 Invocation evaluateAndTransform = ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(getGenericType);
 
-                if( inboundHeaders != null ) {
-                    if( context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
+                if (inboundHeaders != null) {
+                    if (context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
                         evaluateAndTransform.arg("#[" + MessageHeadersListExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
                     } else if (context.getTypeMirrorUtils().isMap(fields.get(fieldName).getVariableElement().asType())) {
                         evaluateAndTransform.arg("#[" + MessageHeadersExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
                     } else {
                         evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
                     }
-                } else if( invocationHeaders != null ) {
-                        if( context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
-                            evaluateAndTransform.arg("#[" + MessageHeadersListExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
-                        } else if (context.getTypeMirrorUtils().isMap(fields.get(fieldName).getVariableElement().asType())) {
-                            evaluateAndTransform.arg("#[" + MessageHeadersExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
-                        } else {
-                            evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
-                        }
+                } else if (invocationHeaders != null) {
+                    if (context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
+                        evaluateAndTransform.arg("#[" + MessageHeadersListExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
+                    } else if (context.getTypeMirrorUtils().isMap(fields.get(fieldName).getVariableElement().asType())) {
+                        evaluateAndTransform.arg("#[" + MessageHeadersExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
+                    } else {
+                        evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
+                    }
                 } else {
                     evaluateAndTransform.arg(fields.get(fieldName).getField());
                 }
@@ -574,17 +575,20 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         Type returnType = ref(executableElement.getReturnType());
 
-        generateMethodCall(callProcessor.body(), object, methodName, parameters, muleContext, event, returnType, poolObject
+        generateMethodCall(callProcessor.body(), object, methodName, parameters, muleContext, event, returnType, poolObject);
 
-        );
+        if (interceptCallback != null) {
+            Conditional shallContinue = callProcessor.body()._if(interceptCallback.invoke("getShallContinue"));
 
-        generateThrow("failedToInvoke", MessagingException.class, callProcessor._catch((TypeReference) ref
+            shallContinue._then().assign(event, messageProcessorListener.invoke("process").arg(event));
+        }
 
-                (Exception.class)), event, methodName);
+        callProcessor.body()._return(event);
 
-        if (poolObjectClass != null)
+        generateThrow("failedToInvoke", MessagingException.class,
+                callProcessor._catch((TypeReference) ref(Exception.class)), event, methodName);
 
-        {
+        if (poolObjectClass != null) {
             Block fin = callProcessor._finally();
             Block poolObjectNotNull = fin._if(Op.ne(poolObject, ExpressionFactory._null()))._then();
             poolObjectNotNull.add(object.invoke("getLifecyleEnabledObjectPool").invoke("returnObject").arg(poolObject));
@@ -612,12 +616,11 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         if (returnType != context.getCodeModel().VOID) {
             body.assign(resultPayload, methodCall);
-            body._if(resultPayload.eq(ExpressionFactory._null()))._then()._return(generateNullPayload(muleContext, event));
-            generatePayloadOverwrite(body, event, resultPayload);
-            body._return(event);
+            Conditional ifPayloadIsNull = body._if(resultPayload.eq(ExpressionFactory._null()));
+            ifPayloadIsNull._then().assign(event, generateNullPayload(muleContext, event));
+            generatePayloadOverwrite(ifPayloadIsNull._else(), event, resultPayload);
         } else {
             body.add(methodCall);
-            body._return(event);
         }
 
         return resultPayload;

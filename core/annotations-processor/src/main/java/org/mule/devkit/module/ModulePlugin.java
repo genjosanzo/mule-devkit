@@ -33,7 +33,7 @@ import org.mule.devkit.module.generation.PoolAdapterGenerator;
 import org.mule.devkit.module.generation.ProcessorCallbackGenerator;
 import org.mule.devkit.module.generation.RegistryBootstrapGenerator;
 import org.mule.devkit.module.generation.SchemaGenerator;
-import org.mule.devkit.module.generation.SourceCallbackGenerator;
+import org.mule.devkit.module.generation.InterceptCallbackGenerator;
 import org.mule.devkit.module.generation.SpringNamespaceHandlerGenerator;
 import org.mule.devkit.module.generation.SpringSchemaGenerator;
 import org.mule.devkit.module.generation.TransformerGenerator;
@@ -59,7 +59,7 @@ public class ModulePlugin implements Plugin {
         this.generators.add(new EnumTransformerGenerator());
         this.generators.add(new ProcessorCallbackGenerator());
         this.generators.add(new HttpCallbackGenerator());
-        this.generators.add(new SourceCallbackGenerator());
+        this.generators.add(new InterceptCallbackGenerator());
         this.generators.add(new BeanDefinitionParserGenerator());
         this.generators.add(new MessageSourceGenerator());
         this.generators.add(new MessageProcessorGenerator());
