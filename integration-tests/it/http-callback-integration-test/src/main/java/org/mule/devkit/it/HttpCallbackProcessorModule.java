@@ -32,7 +32,13 @@ public class HttpCallbackProcessorModule {
         try {
             simulateCallback(onEventX.getUrl());
             simulateCallback(onEventY.getUrl());
-            Thread.sleep(250); // without this tests can fail b/c the generated flow is async
+            // without this tests can fail b/c the generated flow is async
+            if(!ComponentX.wasExecuted() || !ComponentY.wasExecuted()) {
+                Thread.sleep(1000);
+            }
+            if(!ComponentX.wasExecuted() || !ComponentY.wasExecuted()) {
+                Thread.sleep(1000);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
