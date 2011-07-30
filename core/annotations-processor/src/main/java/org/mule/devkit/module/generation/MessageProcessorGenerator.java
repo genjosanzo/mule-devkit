@@ -38,12 +38,12 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.construct.SimpleFlowConstruct;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.ForEach;
@@ -56,7 +56,6 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Type;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
-import org.mule.devkit.utils.FieldBuilder;
 import org.mule.expression.MessageHeaderExpressionEvaluator;
 import org.mule.expression.MessageHeadersExpressionEvaluator;
 import org.mule.expression.MessageHeadersListExpressionEvaluator;
@@ -120,7 +119,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         generateInitialiseMethod(messageProcessorClass, fields, typeElement, muleContext, expressionManager, patternInfo, object);
 
         // add start
-        generateStartMethod(messageProcessorClass, fields);
+        generateStartMethod(messageProcessorClass, fields, muleContext);
 
         // add stop
         generateStopMethod(messageProcessorClass, fields);
@@ -166,7 +165,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private void generateStartMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields) {
+    private void generateStartMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, FieldVariable muleContext) {
         Method startMethod = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
         startMethod._throws(ref(MuleException.class));
 
@@ -180,10 +179,9 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                         ExpressionFactory.cast(ref(Startable.class), forEach.var()).invoke("start")
                 );
             } else if (variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
-                FieldVariable callbackFlow = new FieldBuilder(messageProcessorClass, this).type(SimpleFlowConstruct.class).name("callbackFlow").setter().javadoc("The flow to be invoked when the http callback is received").build();
-                startMethod.body().assign(variableElement.getField(), ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).arg(callbackFlow));
-                startMethod.body().invoke(ExpressionFactory.cast(ref(HttpCallback.class), variableElement.getField()), "setMuleContext").arg(messageProcessorClass.fields().get("muleContext"));
-                startMethod.body().invoke(ExpressionFactory.cast(ref(HttpCallback.class), variableElement.getField()), "start");
+                Expression callbackFlowField = messageProcessorClass.fields().get(fieldName + "CallbackFlow");
+                startMethod.body().assign(variableElement.getField(), ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).arg(callbackFlowField).arg(muleContext));
+                startMethod.body().invoke(variableElement.getField(), "start");
             }
         }
     }
@@ -202,7 +200,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                         ExpressionFactory.cast(ref(Stoppable.class), forEach.var()).invoke("stop")
                 );
             } else if (variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
-                stopMethod.body().invoke(ExpressionFactory.cast(ref(Stoppable.class), variableElement.getField()), "stop");
+                stopMethod.body().invoke(variableElement.getField(), "stop");
             }
         }
     }
@@ -517,6 +515,11 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         Variable interceptCallback = null;
         for (VariableElement variable : executableElement.getParameters()) {
             String fieldName = variable.getSimpleName().toString();
+
+            if(variable.asType().toString().contains(HttpCallback.class.getName())) {
+                parameters.add(messageProcessorClass.fields().get(fieldName));
+                continue;
+            }
 
             if (variable.asType().toString().contains(InterceptCallback.class.getName())) {
 

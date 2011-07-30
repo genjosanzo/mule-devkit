@@ -29,13 +29,17 @@
         http://www.mulesoft.org/schema/mule/callback http://www.mulesoft.org/schema/mule/callback/1.0/mule-callback.xsd
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.1/mule-test.xsd">
 
-    <callback:config/>
+    <callback:config />
 
-    <flow name="sendSms">
-        <callback:send-sms on-fail-flow-ref="flowToExecuteOnFail"/>
+    <flow name="doA">
+        <callback:do-a on-event-x-flow-ref="flowToExecuteOnEventX" on-event-y-flow-ref="flowToExecuteOnEventY"/>
     </flow>
 
-    <flow name="flowToExecuteOnFail">
-        <component class="org.mule.devkit.it.CustomComponent" />
+    <flow name="flowToExecuteOnEventX">
+        <component class="org.mule.devkit.it.ComponentX" />
+    </flow>
+
+    <flow name="flowToExecuteOnEventY">
+        <component class="org.mule.devkit.it.ComponentY" />
     </flow>
 </mule>

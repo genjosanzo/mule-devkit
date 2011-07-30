@@ -21,53 +21,26 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.HttpCallback;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URL;
 
 @Module(name = "callback")
 public class HttpCallbackProcessorModule {
 
     @Processor
-    public Object sendSms(HttpCallback onFail) {
+    public void doA(HttpCallback onEventX, HttpCallback onEventY) {
         try {
-            HttpURLConnection urlConnection = (HttpURLConnection) new URL(onFail.getUrl()).openConnection();
-            urlConnection.setDoOutput(true);
-            urlConnection.setRequestMethod("GET");
-            return readResponseFromServer(urlConnection);
+            simulateCallback(onEventX.getUrl());
+            simulateCallback(onEventY.getUrl());
+            Thread.sleep(250); // without this tests can fail b/c the generated flow is async
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private String readResponseFromServer(HttpURLConnection con) throws IOException {
-        BufferedReader bufferedReader = null;
-        try {
-            if (con.getInputStream() != null) {
-                bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            }
-        } catch (IOException e) {
-            if (con.getErrorStream() != null) {
-                bufferedReader = new BufferedReader(new InputStreamReader(con.getErrorStream()));
-            }
-        }
-
-        if (bufferedReader == null) {
-            throw new IOException("Unable to read response from server");
-        }
-
-        StringBuilder decodedString = new StringBuilder();
-
-        try {
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                decodedString.append(line).append("\n");
-            }
-        } finally {
-            bufferedReader.close();
-        }
-        return decodedString.toString();
+    private void simulateCallback(String callbackUrl) throws IOException {
+        new URL(callbackUrl).openConnection().getContent();
     }
 }

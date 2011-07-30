@@ -23,12 +23,16 @@ import org.mule.api.lifecycle.Callable;
 /**
  * This component is just for test usage.
  */
-public class CustomComponent implements Callable {
+public class ComponentX implements Callable {
 
-    public static int timesExecuted;
+    private static boolean wasExecuted;
 
     public Object onCall(MuleEventContext eventContext) throws Exception {
-        timesExecuted++;
+        wasExecuted = true;
         return "";
+    }
+
+    public static boolean wasExecuted() {
+        return wasExecuted;
     }
 }

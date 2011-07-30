@@ -35,22 +35,20 @@ public class HttpCallbackProcessorModuleTest extends FunctionalTestCase {
 
     @Override
     protected String getConfigResources() {
-        return "callback.xml";
+        return "http-callback.xml";
     }
 
     public void testCallback() throws Exception {
-        assertEquals(0, CustomComponent.timesExecuted);
-        runFlow("sendSms");
-        assertEquals(1, CustomComponent.timesExecuted);
+        assertFalse(ComponentX.wasExecuted());
+        assertFalse(ComponentY.wasExecuted());
+        runFlow("doA");
+        assertTrue(ComponentX.wasExecuted());
+        assertTrue(ComponentY.wasExecuted());
     }
 
     private MuleEvent runFlow(String flowName) throws Exception {
-        SimpleFlowConstruct flow = lookupFlowConstruct(flowName);
+        SimpleFlowConstruct flow = (SimpleFlowConstruct) AbstractMuleTestCase.muleContext.getRegistry().lookupFlowConstruct(flowName);
         MuleEvent event = AbstractMuleTestCase.getTestEvent("");
         return flow.process(event);
-    }
-
-    private SimpleFlowConstruct lookupFlowConstruct(String name) {
-        return (SimpleFlowConstruct) AbstractMuleTestCase.muleContext.getRegistry().lookupFlowConstruct(name);
     }
 }

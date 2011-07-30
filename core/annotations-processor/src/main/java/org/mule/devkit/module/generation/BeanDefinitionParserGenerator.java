@@ -243,11 +243,15 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(configRef))
         );
 
+        Method getAttributeValue = generateGetAttributeValue(beanDefinitionparser);
+
         for (VariableElement variable : executableElement.getParameters()) {
-            if (variable.asType().toString().contains(SourceCallback.class.getName()))
+            if (variable.asType().toString().contains(SourceCallback.class.getName())) {
                 continue;
-            if (variable.asType().toString().contains(InterceptCallback.class.getName()))
+            }
+            if (variable.asType().toString().contains(InterceptCallback.class.getName())) {
                 continue;
+            }
 
             String fieldName = variable.getSimpleName().toString();
 
@@ -296,11 +300,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             } else if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
                 generateParseEnum(parse.body(), element, builder, fieldName);
             }  else if(variable.asType().toString().contains(HttpCallback.class.getName())) {
-                Method getAttributeValue = generateGetAttributeValue(beanDefinitionparser);
-                Variable callbackFlowName = parse.body().decl(ref(String.class), "callbackFlowName", ExpressionFactory.invoke(getAttributeValue).arg(element).arg(context.getNameUtils().uncamel(fieldName) + "-flow-ref"));
+                Variable callbackFlowName = parse.body().decl(ref(String.class), fieldName + "CallbackFlowName", ExpressionFactory.invoke(getAttributeValue).arg(element).arg(context.getNameUtils().uncamel(fieldName) + "-flow-ref"));
                 Block block = parse.body()._if(Op.ne(callbackFlowName, ExpressionFactory._null()))._then();
-                Variable runtimeBeanReference = block.decl(ref(RuntimeBeanReference.class), "callbackFlowBeanRef", ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(callbackFlowName));
-                block.invoke(builder, "addPropertyValue").arg("callbackFlow").arg(runtimeBeanReference);
+                block.invoke(builder, "addPropertyValue").arg(fieldName + "CallbackFlow").arg(ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(callbackFlowName));
             }
         }
 

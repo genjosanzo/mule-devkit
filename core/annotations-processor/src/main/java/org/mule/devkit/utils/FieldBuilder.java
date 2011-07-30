@@ -20,7 +20,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.mule.devkit.generation.GeneratorContext;
-import org.mule.devkit.model.code.*;
+import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.Expression;
+import org.mule.devkit.model.code.ExpressionFactory;
+import org.mule.devkit.model.code.FieldVariable;
+import org.mule.devkit.model.code.Method;
+import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.module.generation.AbstractModuleGenerator;
 
 public class FieldBuilder {
@@ -32,8 +38,6 @@ public class FieldBuilder {
     private String javadoc;
     private boolean getter;
     private boolean setter;
-    private boolean privateVisibility;
-    private boolean instanceVariable;
     private int modifiers;
     private AbstractModuleGenerator generator;
     private Object initialValue;
@@ -62,6 +66,7 @@ public class FieldBuilder {
         Validate.notNull(generator, "the generator cannot be null");
         this.targetClass = targetClass;
         this.generator = generator;
+        privateVisibility();
     }
 
     public FieldBuilder name(String name) {
@@ -81,7 +86,6 @@ public class FieldBuilder {
 
     public FieldBuilder privateVisibility() {
         modifiers = modifiers | Modifier.PRIVATE;
-        privateVisibility = true;
         return this;
     }
 

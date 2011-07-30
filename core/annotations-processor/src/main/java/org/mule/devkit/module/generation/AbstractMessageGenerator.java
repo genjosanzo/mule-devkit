@@ -18,6 +18,7 @@
 package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.StringUtils;
+import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.construct.FlowConstructAware;
@@ -36,6 +37,7 @@ import org.mule.api.source.MessageSource;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.construct.SimpleFlowConstruct;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -52,6 +54,7 @@ import org.mule.devkit.model.code.Package;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
+import org.mule.devkit.utils.FieldBuilder;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.TemplateParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
@@ -162,8 +165,22 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         for (VariableElement variable : processorMethod.getParameters()) {
             if (variable.asType().toString().contains(SourceCallback.class.getName()))
                 continue;
-
             String fieldName = variable.getSimpleName().toString();
+            if(variable.asType().toString().contains(HttpCallback.class.getName())) {
+                // for each parameter of type HttpCallback we need two fields: one that will hold a reference to the flow
+                // that is going to be executed upon the callback and the other one to hold the HttpCallback object itself
+                FieldVariable httpCallbackField = new FieldBuilder(messageProcessorClass, this).
+                        type(HttpCallback.class).
+                        name(fieldName).
+                        javadoc("An HttpCallback instance responsible for linking the APIs http callback with the flow {@link " + messageProcessorClass.fullName() + "#" + fieldName + "CallbackFlow").build();
+                fields.put(fieldName, new AbstractMessageGenerator.FieldVariableElement(httpCallbackField, httpCallbackField, variable));
+                new FieldBuilder(messageProcessorClass, this).
+                        type(SimpleFlowConstruct.class).
+                        name(fieldName + "CallbackFlow").
+                        setter().
+                        javadoc("The flow to be invoked when the http callback is received").build();
+                continue;
+            }
             FieldVariable field = null;
             if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
                 field = messageProcessorClass.field(Modifier.PRIVATE, ref(MessageProcessorChain.class), fieldName);
