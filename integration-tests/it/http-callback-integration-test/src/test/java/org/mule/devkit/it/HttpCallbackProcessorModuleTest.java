@@ -42,6 +42,7 @@ public class HttpCallbackProcessorModuleTest extends FunctionalTestCase {
         assertFalse(ComponentX.wasExecuted());
         assertFalse(ComponentY.wasExecuted());
         runFlow("doA");
+        Thread.sleep(5000);
         assertTrue(ComponentX.wasExecuted());
         assertTrue(ComponentY.wasExecuted());
     }
