@@ -96,8 +96,6 @@ public class Proofread {
         writeIndented("{" + see.name() + " ... " + label + "}");
       } else if ("@code".equals(k)) {
         writeIndented(t.text());
-      } else if ("@samplecode".equals(k)) {
-        writeIndented(t.text());
       } else {
         writeIndented("{" + (t.name() != null ? t.name() : "") + "/" + t.text() + "}");
       }
