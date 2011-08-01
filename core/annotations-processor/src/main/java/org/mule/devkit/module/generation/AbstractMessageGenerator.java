@@ -54,7 +54,7 @@ import org.mule.devkit.model.code.Package;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
-import org.mule.devkit.utils.FieldBuilder;
+import org.mule.devkit.model.code.builders.FieldBuilder;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.TemplateParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
@@ -166,28 +166,43 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             if (variable.asType().toString().contains(SourceCallback.class.getName()))
                 continue;
             String fieldName = variable.getSimpleName().toString();
-            if(variable.asType().toString().contains(HttpCallback.class.getName())) {
+
+            FieldVariable field = null;
+            FieldVariable fieldType = null;
+            if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
+                field = new FieldBuilder(messageProcessorClass).
+                        privateVisibility().
+                        type(MessageProcessorChain.class).
+                        name(fieldName).
+                        build();
+                fieldType = new FieldBuilder(messageProcessorClass).
+                        privateVisibility().
+                        type(ref(variable.asType())).
+                        name(fieldName + "Type").
+                        build();
+            } else if(variable.asType().toString().contains(HttpCallback.class.getName())) {
                 // for each parameter of type HttpCallback we need two fields: one that will hold a reference to the flow
                 // that is going to be executed upon the callback and the other one to hold the HttpCallback object itself
-                FieldVariable httpCallbackField = new FieldBuilder(messageProcessorClass, this).
+                field = new FieldBuilder(messageProcessorClass).
+                        type(SimpleFlowConstruct.class).
+                        name(fieldName + "CallbackFlow").
+                        javadoc("The flow to be invoked when the http callback is received").build();
+                fieldType = new FieldBuilder(messageProcessorClass).
                         type(HttpCallback.class).
                         name(fieldName).
                         javadoc("An HttpCallback instance responsible for linking the APIs http callback with the flow {@link " + messageProcessorClass.fullName() + "#" + fieldName + "CallbackFlow").build();
-                fields.put(fieldName, new AbstractMessageGenerator.FieldVariableElement(httpCallbackField, httpCallbackField, variable));
-                new FieldBuilder(messageProcessorClass, this).
-                        type(SimpleFlowConstruct.class).
-                        name(fieldName + "CallbackFlow").
-                        setter().
-                        javadoc("The flow to be invoked when the http callback is received").build();
-                continue;
-            }
-            FieldVariable field = null;
-            if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
-                field = messageProcessorClass.field(Modifier.PRIVATE, ref(MessageProcessorChain.class), fieldName);
             } else {
-                field = messageProcessorClass.field(Modifier.PRIVATE, ref(Object.class), fieldName);
+                field = new FieldBuilder(messageProcessorClass).
+                        privateVisibility().
+                        type(Object.class).
+                        name(fieldName).
+                        build();
+                fieldType = new FieldBuilder(messageProcessorClass).
+                        privateVisibility().
+                        type(ref(variable.asType())).
+                        name(fieldName + "Type").
+                        build();
             }
-            FieldVariable fieldType = messageProcessorClass.field(Modifier.PRIVATE, ref(variable.asType()), fieldName + "Type");
             fields.put(variable.getSimpleName().toString(), new AbstractMessageGenerator.FieldVariableElement(field, fieldType, variable));
         }
         return fields;

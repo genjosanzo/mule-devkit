@@ -46,7 +46,7 @@ import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.Package;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
-import org.mule.devkit.utils.FieldBuilder;
+import org.mule.devkit.model.code.builders.FieldBuilder;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.util.NumberUtils;
 
@@ -115,47 +115,46 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
     }
 
     private void generateFields(DefinedClass callbackClass) {
-        FieldBuilder.setGeneratorContext(context);
-        loggerField = FieldBuilder.newLoggerField(callbackClass, this);
-        defaultPortField = FieldBuilder.newConstantFieldBuilder(callbackClass, this).
+        loggerField = FieldBuilder.newLoggerField(callbackClass);
+        defaultPortField = FieldBuilder.newConstantFieldBuilder(callbackClass).
                 type(Integer.class).
                 name("DEFAULT_PORT").
                 initialValue(ExpressionFactory.lit(8080)).
                 javadoc("The port to be used if 'http.port' environment variable is not defined").
                 build();
-        portVariable = new FieldBuilder(callbackClass, this).
+        portVariable = new FieldBuilder(callbackClass).
                 privateVisibility().
                 type(Integer.class).
                 name("port").
                 javadoc("The port number to be used in the dynamic http inbound endpoint that will receive the callback").
                 build();
-        urlPrefixVariable = FieldBuilder.newConstantFieldBuilder(callbackClass, this).
+        urlPrefixVariable = FieldBuilder.newConstantFieldBuilder(callbackClass).
                 type(String.class).
                 name("URL_PREFIX").
                 initialValue("http://localhost:").
                 javadoc("The URL prefix for the http inbound endpoint").
                 build();
-        urlVariable = new FieldBuilder(callbackClass, this).
+        urlVariable = new FieldBuilder(callbackClass).
                 privateVisibility().
                 type(String.class).
                 name("url").
                 javadoc("The dynamically generated url to pass on to the cloud connector. When this url is called the callback flow will be executed").
                 getter().
                 build();
-        muleContextField = new FieldBuilder(callbackClass, this).
+        muleContextField = new FieldBuilder(callbackClass).
                 privateVisibility().
                 type(MuleContext.class).
                 name("muleContext").
                 javadoc("Mule Context").
                 setter().
                 build();
-        callbackFlowField = new FieldBuilder(callbackClass, this).
+        callbackFlowField = new FieldBuilder(callbackClass).
                 privateVisibility().
                 type(SimpleFlowConstruct.class).
                 name("callbackFlow").
                 javadoc("The flow to be called upon the http callback").
                 build();
-        flowConstructVariable = new FieldBuilder(callbackClass, this).
+        flowConstructVariable = new FieldBuilder(callbackClass).
                 privateVisibility().
                 type(SimpleFlowConstruct.class).
                 name("flowConstruct").

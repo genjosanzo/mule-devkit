@@ -14,58 +14,53 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mule.devkit.utils;
+package org.mule.devkit.model.code.builders;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
-import org.mule.devkit.generation.GeneratorContext;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Type;
 import org.mule.devkit.model.code.Variable;
-import org.mule.devkit.module.generation.AbstractModuleGenerator;
 
 public class FieldBuilder {
-
-    private static GeneratorContext generatorContext;
     private DefinedClass targetClass;
     private Class<?> type;
+    private Type typeRef;
     private String name;
     private String javadoc;
     private boolean getter;
     private boolean setter;
     private int modifiers;
-    private AbstractModuleGenerator generator;
     private Object initialValue;
 
-    public static FieldBuilder newConstantFieldBuilder(DefinedClass targetClass, AbstractModuleGenerator generator) {
-        FieldBuilder fieldBuilder = new FieldBuilder(targetClass, generator);
+    public static FieldBuilder newConstantFieldBuilder(DefinedClass targetClass) {
+        FieldBuilder fieldBuilder = new FieldBuilder(targetClass);
         fieldBuilder.privateVisibility();
         fieldBuilder.staticField();
         fieldBuilder.finalField();
         return fieldBuilder;
     }
 
-    public static FieldVariable newLoggerField(DefinedClass targetClass, AbstractModuleGenerator generator) {
-        return new FieldBuilder(targetClass, generator).
+    public static FieldVariable newLoggerField(DefinedClass targetClass) {
+        return new FieldBuilder(targetClass).
                 privateVisibility().
                 staticField().
                 finalField().
                 name("LOGGER").
                 type(Logger.class).
-                initialValue(generator.ref(Logger.class).staticInvoke("getLogger").arg(ExpressionFactory.dotclass(targetClass))).
+                initialValue(targetClass.owner().ref(Logger.class).staticInvoke("getLogger").arg(ExpressionFactory.dotclass(targetClass))).
                 build();
     }
 
-    public FieldBuilder(DefinedClass targetClass, AbstractModuleGenerator generator) {
+    public FieldBuilder(DefinedClass targetClass) {
         Validate.notNull(targetClass, "the target class cannot be null");
-        Validate.notNull(generator, "the generator cannot be null");
         this.targetClass = targetClass;
-        this.generator = generator;
         privateVisibility();
     }
 
@@ -76,6 +71,11 @@ public class FieldBuilder {
 
     public FieldBuilder type(Class<?> type) {
         this.type = type;
+        return this;
+    }
+
+    public FieldBuilder type(Type typeRef) {
+        this.typeRef = typeRef;
         return this;
     }
 
@@ -131,7 +131,7 @@ public class FieldBuilder {
     }
 
     private Method generateSetter(FieldVariable field) {
-        Method setter = targetClass.method(Modifier.PUBLIC, generatorContext.getCodeModel().VOID, "set" + StringUtils.capitalize(field.name()));
+        Method setter = targetClass.method(Modifier.PUBLIC, targetClass.owner().VOID, "set" + StringUtils.capitalize(field.name()));
         setter.javadoc().add("Sets " + field.name());
         setter.javadoc().addParam("value Value to set");
         Variable value = setter.param(field.type(), "value");
@@ -149,10 +149,11 @@ public class FieldBuilder {
     }
 
     public FieldVariable build() {
-        Validate.notNull(generatorContext, "The GeneratorConext needs to be set");
         Validate.notNull(name, "The name must be set");
-        Validate.notNull(type, "The type must be set");
-        FieldVariable field = targetClass.field(modifiers, generator.ref(type), name);
+        if (typeRef == null) {
+            this.typeRef = targetClass.owner().ref(type);
+        }
+        FieldVariable field = targetClass.field(modifiers, typeRef, name);
         if (javadoc != null && !javadoc.isEmpty()) {
             field.javadoc().add(javadoc);
         }
@@ -172,9 +173,5 @@ public class FieldBuilder {
             }
         }
         return field;
-    }
-
-    public static void setGeneratorContext(GeneratorContext generatorContext) {
-        FieldBuilder.generatorContext = generatorContext;
     }
 }

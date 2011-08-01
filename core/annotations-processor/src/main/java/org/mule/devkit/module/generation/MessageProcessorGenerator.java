@@ -179,9 +179,8 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                         ExpressionFactory.cast(ref(Startable.class), forEach.var()).invoke("start")
                 );
             } else if (variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
-                Expression callbackFlowField = messageProcessorClass.fields().get(fieldName + "CallbackFlow");
-                startMethod.body().assign(variableElement.getField(), ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).arg(callbackFlowField).arg(muleContext));
-                startMethod.body().invoke(variableElement.getField(), "start");
+                startMethod.body().assign(variableElement.getFieldType(), ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).arg(fields.get(fieldName).getField()).arg(muleContext));
+                startMethod.body().invoke(variableElement.getFieldType(), "start");
             }
         }
     }
@@ -200,7 +199,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                         ExpressionFactory.cast(ref(Stoppable.class), forEach.var()).invoke("stop")
                 );
             } else if (variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
-                stopMethod.body().invoke(variableElement.getField(), "stop");
+                stopMethod.body().invoke(variableElement.getFieldType(), "stop");
             }
         }
     }
@@ -516,11 +515,6 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         for (VariableElement variable : executableElement.getParameters()) {
             String fieldName = variable.getSimpleName().toString();
 
-            if(variable.asType().toString().contains(HttpCallback.class.getName())) {
-                parameters.add(messageProcessorClass.fields().get(fieldName));
-                continue;
-            }
-
             if (variable.asType().toString().contains(InterceptCallback.class.getName())) {
 
                 DefinedClass callbackClass = context.getClassForRole(InterceptCallbackGenerator.ROLE);
@@ -529,6 +523,10 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                         ExpressionFactory._new(callbackClass));
 
                 parameters.add(interceptCallback);
+
+            } else if(variable.asType().toString().contains(HttpCallback.class.getName())) {
+                parameters.add(fields.get(fieldName).getFieldType());
+
             } else if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
 
                 DefinedClass callbackClass = context.getClassForRole(ProcessorCallbackGenerator.ROLE);

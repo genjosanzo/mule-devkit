@@ -24,13 +24,13 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
-public abstract class AbstractMavenIT
-{
+public abstract class AbstractMavenIT {
 
     @Before
-    public void setUp() throws VerificationException, IOException
-    {
+    public void setUp() throws VerificationException, IOException {
         Verifier verifier = new Verifier(getRoot().getAbsolutePath());
 
         // Deleting a former created artefact from the archetype to be tested
@@ -49,15 +49,25 @@ public abstract class AbstractMavenIT
     protected abstract File getRoot();
 
     @Test
-    public void buildExecutable() throws VerificationException
-    {
-        Verifier verifier = new Verifier(getRoot().getAbsolutePath(), null, true);
-        verifier.setAutoclean(false);
-        verifier.setMavenDebug(true);
-        verifier.setDebug(true);
+    public void buildExecutable() throws VerificationException {
+        try {
+            Verifier verifier = new Verifier(getRoot().getAbsolutePath(), null, true);
+            verifier.setAutoclean(false);
+            verifier.setMavenDebug(true);
+            verifier.setDebug(true);
 
-        verifier.executeGoal("package");
+            InputStream systemPropertiesStream = getClass().getClassLoader().getResourceAsStream("maven.properties");
+            Properties systemProperties = new Properties();
+            systemProperties.load(systemPropertiesStream);
+            systemPropertiesStream.close();
 
-        verifier.verifyErrorFreeLog();
+            verifier.setSystemProperties(systemProperties);
+
+            verifier.executeGoal("package");
+
+            verifier.verifyErrorFreeLog();
+        } catch (IOException ioe) {
+            throw new VerificationException(ioe);
+        }
     }
 }
