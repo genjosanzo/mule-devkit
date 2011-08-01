@@ -168,7 +168,7 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
         Variable muleContextArg = constructor.param(ref(MuleContext.class), "muleContext");
         constructor.body().assign(ExpressionFactory._this().ref(callbackFlowField), callbackFlowArg);
         constructor.body().assign(ExpressionFactory._this().ref(muleContextField), muleContextArg);
-        Variable portSystemVar = constructor.body().decl(ref(String.class), "portSystemVar", ref(System.class).staticInvoke("getenv").arg("http.port"));
+        Variable portSystemVar = constructor.body().decl(ref(String.class), "portSystemVar", ref(System.class).staticInvoke("getProperty").arg("http.port"));
         Conditional conditional = constructor.body()._if(ref(NumberUtils.class).staticInvoke("isDigits").arg(portSystemVar));
         conditional._then().block().assign(portVariable, ref(Integer.class).staticInvoke("parseInt").arg(portSystemVar));
         Block thenBlock = conditional._else().block();
