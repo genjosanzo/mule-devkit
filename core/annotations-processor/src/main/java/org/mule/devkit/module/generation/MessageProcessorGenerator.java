@@ -43,7 +43,6 @@ import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
-import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.ForEach;
@@ -173,10 +172,9 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             FieldVariableElement variableElement = fields.get(fieldName);
 
             if (variableElement.getVariableElement().asType().toString().contains(ProcessorCallback.class.getName())) {
-                ForEach forEach = startMethod.body().forEach(ref(MessageProcessor.class), "messageProcessor", variableElement.getField().invoke("getMessageProcessors"));
-                Conditional ifStartable = forEach.body()._if(Op._instanceof(forEach.var(), ref(Startable.class)));
+                Conditional ifStartable = startMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Startable.class)));
                 ifStartable._then().add(
-                        ExpressionFactory.cast(ref(Startable.class), forEach.var()).invoke("start")
+                        ExpressionFactory.cast(ref(Startable.class), variableElement.getField()).invoke("start")
                 );
             } else if (variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
                 startMethod.body().assign(variableElement.getFieldType(), ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).arg(fields.get(fieldName).getField()).arg(muleContext));
@@ -193,10 +191,9 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             FieldVariableElement variableElement = fields.get(fieldName);
 
             if (variableElement.getVariableElement().asType().toString().contains(ProcessorCallback.class.getName())) {
-                ForEach forEach = stopMethod.body().forEach(ref(MessageProcessor.class), "messageProcessor", variableElement.getField().invoke("getMessageProcessors"));
-                Conditional ifStartable = forEach.body()._if(Op._instanceof(forEach.var(), ref(Stoppable.class)));
-                ifStartable._then().add(
-                        ExpressionFactory.cast(ref(Stoppable.class), forEach.var()).invoke("stop")
+                Conditional ifStoppable = stopMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Stoppable.class)));
+                ifStoppable._then().add(
+                        ExpressionFactory.cast(ref(Stoppable.class), variableElement.getField()).invoke("stop")
                 );
             } else if (variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
                 stopMethod.body().invoke(variableElement.getFieldType(), "stop");
@@ -211,10 +208,9 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             FieldVariableElement variableElement = fields.get(fieldName);
 
             if (variableElement.getVariableElement().asType().toString().contains(ProcessorCallback.class.getName())) {
-                ForEach forEach = diposeMethod.body().forEach(ref(MessageProcessor.class), "messageProcessor", variableElement.getField().invoke("getMessageProcessors"));
-                Conditional ifStartable = forEach.body()._if(Op._instanceof(forEach.var(), ref(Disposable.class)));
-                ifStartable._then().add(
-                        ExpressionFactory.cast(ref(Disposable.class), forEach.var()).invoke("dispose")
+                Conditional ifDisposable = diposeMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Disposable.class)));
+                ifDisposable._then().add(
+                        ExpressionFactory.cast(ref(Disposable.class), variableElement.getField()).invoke("dispose")
                 );
             }
         }
@@ -524,7 +520,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
                 parameters.add(interceptCallback);
 
-            } else if(variable.asType().toString().contains(HttpCallback.class.getName())) {
+            } else if (variable.asType().toString().contains(HttpCallback.class.getName())) {
                 parameters.add(fields.get(fieldName).getFieldType());
 
             } else if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {

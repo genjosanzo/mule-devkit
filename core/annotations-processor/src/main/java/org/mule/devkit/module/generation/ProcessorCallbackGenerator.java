@@ -25,6 +25,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
@@ -77,7 +78,7 @@ public class ProcessorCallbackGenerator extends AbstractModuleGenerator {
 
         generateSetter(callbackClass, muleContext);
 
-        FieldVariable chain = callbackClass.field(Modifier.PRIVATE, ref(MessageProcessorChain.class), "chain");
+        FieldVariable chain = callbackClass.field(Modifier.PRIVATE, ref(MessageProcessor.class), "chain");
         chain.javadoc().add("Chain that will be executed upon calling process");
 
         generateSetter(callbackClass, chain);
@@ -149,7 +150,7 @@ public class ProcessorCallbackGenerator extends AbstractModuleGenerator {
     }
 
     private void generateCallbackProcessWithProperties(DefinedClass callbackClass, FieldVariable chain, FieldVariable event, FieldVariable muleContext) {
-        Method process = callbackClass.method(Modifier.PUBLIC, ref(Object.class), "process");
+        Method process = callbackClass.method(Modifier.PUBLIC, ref(Object.class), "processWithExtraProperties");
         process._throws(ref(Exception.class));
         Variable properties = process.param(ref(Map.class).narrow(ref(String.class)).narrow(ref(Object.class)), "properties");
 
@@ -190,7 +191,7 @@ public class ProcessorCallbackGenerator extends AbstractModuleGenerator {
         Method constructor = callbackClass.constructor(Modifier.PUBLIC);
         Variable event2 = constructor.param(ref(MuleEvent.class), "event");
         Variable muleContext2 = constructor.param(ref(MuleContext.class), "muleContext");
-        Variable chain2 = constructor.param(ref(MessageProcessorChain.class), "chain");
+        Variable chain2 = constructor.param(ref(MessageProcessor.class), "chain");
         constructor.body().assign(ExpressionFactory._this().ref(event), event2);
         constructor.body().assign(ExpressionFactory._this().ref(chain), chain2);
         constructor.body().assign(ExpressionFactory._this().ref(muleContext), muleContext2);

@@ -121,7 +121,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         registerProcessorsAndSources(targetNamespace, element);
         registerTransformers(element);
         registerEnums(element);
-        registerTransferObjects(element);
 
         String fileName = "META-INF/mule-" + module.name() + XSD_EXTENSION;
 
@@ -183,86 +182,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 }
             }
         }
-    }
-
-    private void registerTransferObjects(javax.lang.model.element.Element type) {
-        Set<TypeMirror> registeredTransferObjects = new HashSet<TypeMirror>();
-
-        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(type.getEnclosedElements());
-        for (VariableElement variable : variables) {
-            if (isTypeSupported(variable.asType()))
-                continue;
-
-            if (context.getTypeMirrorUtils().isTransferObject(variable.asType())) {
-                if (!registeredTransferObjects.contains(variable.asType())) {
-                    registerTransferObject(variable.asType());
-                    registeredTransferObjects.add(variable.asType());
-                }
-            }
-        }
-
-        java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(type.getEnclosedElements());
-        for (ExecutableElement method : methods) {
-            Processor processor = method.getAnnotation(Processor.class);
-            if (processor == null)
-                continue;
-
-            for (VariableElement variable : method.getParameters()) {
-                if (isTypeSupported(variable.asType()))
-                    continue;
-
-                if (!context.getTypeMirrorUtils().isTransferObject(variable.asType()))
-                    continue;
-
-                if (!registeredTransferObjects.contains(variable.asType())) {
-                    registerTransferObject(variable.asType());
-                    registeredTransferObjects.add(variable.asType());
-                }
-            }
-        }
-
-        for (ExecutableElement method : methods) {
-            Source source = method.getAnnotation(Source.class);
-            if (source == null)
-                continue;
-
-            for (VariableElement variable : method.getParameters()) {
-                if (isTypeSupported(variable.asType()))
-                    continue;
-
-                if (!context.getTypeMirrorUtils().isTransferObject(variable.asType()))
-                    continue;
-
-                if (!registeredTransferObjects.contains(variable.asType())) {
-                    registerTransferObject(variable.asType());
-                    registeredTransferObjects.add(variable.asType());
-                }
-            }
-        }
-    }
-
-    private void registerTransferObject(TypeMirror pojoType) {
-        javax.lang.model.element.Element pojoElement = context.getTypeUtils().asElement(pojoType);
-
-        TopLevelComplexType pojoComplexType = new TopLevelComplexType();
-        pojoComplexType.setName(pojoElement.getSimpleName() + TRANSFER_OBJECT_TYPE_SUFFIX);
-
-        All all = new All();
-        pojoComplexType.setAll(all);
-
-        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(pojoElement.getEnclosedElements());
-        for (VariableElement variable : variables) {
-
-            if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
-                generateProcessorCallbackElement(all, variable);
-            } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
-                generateCollectionElement(schema.getTargetNamespace(), all, variable);
-            } else {
-                pojoComplexType.getAttributeOrAttributeGroup().add(createAttribute(variable));
-            }
-        }
-
-        schema.getSimpleTypeOrComplexTypeOrGroup().add(pojoComplexType);
     }
 
     private void registerEnum(TypeMirror enumType) {
@@ -415,11 +334,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                     generateProcessorCallbackElement(all, variable);
                 } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                     all.getParticle().add(objectFactory.createElement(generateXmlElement(variable.getSimpleName().toString(), targetNamespace)));
-                } else if (context.getTypeMirrorUtils().isTransferObject(variable.asType())) {
-                    TopLevelElement xmlElement = new TopLevelElement();
-                    xmlElement.setName(variable.getSimpleName().toString());
-                    xmlElement.setType(new QName(targetNamespace, ref(variable.asType()).name() + TRANSFER_OBJECT_TYPE_SUFFIX));
-                    all.getParticle().add(objectFactory.createElement(xmlElement));
                 } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
                     generateCollectionElement(targetNamespace, all, variable);
                 } else {
@@ -528,8 +442,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 } else if (context.getTypeMirrorUtils().isArrayOrList(genericType) ||
                         context.getTypeMirrorUtils().isMap(genericType)) {
                     return generateCollectionComplexType(targetNamespace, "inner-" + name, genericType);
-                } else if (context.getTypeMirrorUtils().isTransferObject(genericType)) {
-                    return generatePojoComplexTypeWithRef(targetNamespace, genericType);
                 } else {
                     return generateRefComplexType(ATTRIBUTE_NAME_VALUE_REF);
                 }
@@ -595,24 +507,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
 
         return null;
-    }
-
-    private LocalComplexType generatePojoComplexTypeWithRef(String targetNamespace, TypeMirror genericType) {
-        LocalComplexType complexType = new LocalComplexType();
-        ComplexContent simpleContent = new ComplexContent();
-        complexType.setComplexContent(simpleContent);
-        ExtensionType simpleContentExtension = new ExtensionType();
-        QName qname = new QName(targetNamespace, ref(genericType).name() + TRANSFER_OBJECT_TYPE_SUFFIX);
-        simpleContentExtension.setBase(qname);
-        simpleContent.setExtension(simpleContentExtension);
-
-        Attribute refAttribute = new Attribute();
-        refAttribute.setUse(SchemaConstants.USE_OPTIONAL);
-        refAttribute.setName(ATTRIBUTE_NAME_VALUE_REF);
-        refAttribute.setType(SchemaConstants.STRING);
-
-        simpleContentExtension.getAttributeOrAttributeGroup().add(refAttribute);
-        return complexType;
     }
 
     private LocalComplexType generateComplexTypeWithRef(TypeMirror genericType) {
