@@ -21,7 +21,7 @@
 #set($D='$')
 #set($moduleNameLower = "${muleModuleName.toLowerCase()}")
 #set($moduleGroupIdPath = $groupId.replace(".", "/"))
-package ${muleModulePackage};
+package ${package};
 
 import org.mule.api.MuleEvent;
 import org.mule.construct.SimpleFlowConstruct;
