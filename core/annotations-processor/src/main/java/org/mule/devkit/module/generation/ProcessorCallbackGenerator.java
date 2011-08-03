@@ -155,10 +155,10 @@ public class ProcessorCallbackGenerator extends AbstractModuleGenerator {
         Variable properties = process.param(ref(Map.class).narrow(ref(String.class)).narrow(ref(Object.class)), "properties");
 
         Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage");
-        Invocation newMuleMessage = ExpressionFactory._new(ref(DefaultMuleMessage.class));
-        newMuleMessage.arg(event.invoke("getMessage").invoke("getPayload"));
-        newMuleMessage.arg(muleContext);
-        process.body().assign(muleMessage, newMuleMessage);
+        //Invocation newMuleMessage = ExpressionFactory._new(ref(DefaultMuleMessage.class));
+        //newMuleMessage.arg(event.invoke("getMessage").invoke("getPayload"));
+        //newMuleMessage.arg(muleContext);
+        process.body().assign(muleMessage, event.invoke("getMessage"));
 
         ForEach forEachProperty = process.body().forEach(ref(String.class), "property", properties.invoke("keySet"));
         forEachProperty.body().add(muleMessage.invoke("setInvocationProperty")

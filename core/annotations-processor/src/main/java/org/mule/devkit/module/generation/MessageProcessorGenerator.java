@@ -575,7 +575,8 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         generateMethodCall(callProcessor.body(), object, methodName, parameters, muleContext, event, returnType, poolObject);
 
         if (interceptCallback != null) {
-            Conditional shallContinue = callProcessor.body()._if(interceptCallback.invoke("getShallContinue"));
+            Conditional shallContinue = callProcessor.body()._if(Op.cand(interceptCallback.invoke("getShallContinue"),
+                    Op.ne(messageProcessorListener, ExpressionFactory._null())));
 
             shallContinue._then().assign(event, messageProcessorListener.invoke("process").arg(event));
         }
