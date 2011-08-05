@@ -85,8 +85,31 @@ def:tag_list(tags) ?><?cs
       elif:tag.kind == "@seeHref" ?><a href="<?cs var:tag.href ?>"><?cs var:tag.label ?></a><?cs
       elif:tag.kind == "@seeJustLabel" ?><?cs var:tag.label ?><?cs
       elif:tag.kind == "@code" ?><code><?cs var:tag.text ?></code><?cs
-      elif:tag.kind == "@samplecode" ?><pre><?cs var:tag.text ?></pre><?cs
-      elif:tag.name == "@sample" ?><pre><?cs var:tag.text ?></pre><?cs
+      elif:tag.name == "@sample.xml" ?><?cs
+      elif:tag.name == "@sample.java" ?><h5 class="jd-tagtitle">Java Sample</h5><pre><?cs var:tag.text ?></pre><?cs
+      elif:tag.name == "@include" ?><?cs var:tag.text ?><?cs
+      elif:tag.kind == "@docRoot" ?><?cs var:toroot ?><?cs
+      elif:tag.kind == "@inheritDoc" ?><?cs # This is the case when @inheritDoc is in something
+                                              that doesn't inherit from anything?><?cs
+      elif:tag.kind == "@attr" ?><?cs
+      else ?>{<?cs var:tag.name?> <?cs var:tag.text ?>}<?cs
+      /if ?><?cs
+  /each ?><?cs
+/def ?>
+
+<?cs # Print a list of tags (e.g. description text ?><?cs
+def:op_tag_list(tags) ?><?cs
+  each:tag = tags ?><?cs
+      if:tag.name == "Text" ?><?cs var:tag.text?><?cs
+      elif:tag.kind == "@more" ?><p><?cs
+      elif:tag.kind == "@see" ?><code><a href="<?cs
+        if:tag.isLocal?><?cs var:toroot ?>java/<?cs /if ?><?cs
+        var:tag.href ?>"><?cs var:tag.label ?></a></code><?cs
+      elif:tag.kind == "@seeHref" ?><a href="<?cs var:tag.href ?>"><?cs var:tag.label ?></a><?cs
+      elif:tag.kind == "@seeJustLabel" ?><?cs var:tag.label ?><?cs
+      elif:tag.kind == "@code" ?><code><?cs var:tag.text ?></code><?cs
+      elif:tag.name == "@sample.xml" ?><h5 class="jd-tagtitle">XML Sample</h5><pre><?cs var:tag.text ?></pre><?cs
+      elif:tag.name == "@sample.java" ?><?cs
       elif:tag.name == "@include" ?><?cs var:tag.text ?><?cs
       elif:tag.kind == "@docRoot" ?><?cs var:toroot ?><?cs
       elif:tag.kind == "@inheritDoc" ?><?cs # This is the case when @inheritDoc is in something
@@ -108,6 +131,15 @@ def:short_descr(obj) ?><?cs
       <em><?cs call:deprecated_text(obj.kind) ?>
       <?cs call:tag_list(obj.deprecated) ?></em><?cs
   else ?><?cs call:tag_list(obj.shortDescr) ?><?cs
+  /if ?><?cs
+/def ?>
+
+<?cs # Show the short-form description of something.  These come from shortDescr and deprecated ?><?cs
+def:op_short_descr(obj) ?><?cs
+  if:subcount(obj.deprecated) ?>
+      <em><?cs call:deprecated_text(obj.kind) ?>
+      <?cs call:op_tag_list(obj.deprecated) ?></em><?cs
+  else ?><?cs call:op_tag_list(obj.shortDescr) ?><?cs
   /if ?><?cs
 /def ?>
 
@@ -212,7 +244,7 @@ def:description(obj) ?><?cs
        Uses the following fields: deprecated descr seeAlso since ?><?cs
 def:op_description(obj) ?><?cs
   call:deprecated_warning(obj) ?>
-  <div class="jd-tagdata jd-tagdescr"><p><?cs call:tag_list(obj.descr) ?></p></div>
+  <div class="jd-tagdata jd-tagdescr"><p><?cs call:op_tag_list(obj.descr) ?></p>></div>
   <div class="jd-tagdata">
       <h5 class="jd-tagtitle">Attributes</h5>
       <table class="jd-tagtable">
@@ -223,7 +255,7 @@ def:op_description(obj) ?><?cs
       each:tag=obj.paramTags ?>
         <tr>
           <th><?cs var:tag.attributeName ?></td>
-          <td><?cs if:tag.optional=="true" ?><i>Optional.&nbsp;</i><?cs /if ?><?cs call:tag_list(tag.comment) ?></td>
+          <td><?cs if:tag.optional=="true" ?><i>Optional.&nbsp;</i><?cs /if ?><?cs call:op_tag_list(tag.comment) ?></td>
         </tr><?cs
       /each ?>
       </table>
@@ -231,7 +263,7 @@ def:op_description(obj) ?><?cs
   if:subcount(obj.returns) ?>
   <div class="jd-tagdata">
       <h5 class="jd-tagtitle">Return Payload</h5>
-      <ul class="nolist"><li><?cs call:tag_list(obj.returns) ?></li></ul>
+      <ul class="nolist"><li><?cs call:op_tag_list(obj.returns) ?></li></ul>
   </div><?cs
   /if ?><?cs
   if:subcount(obj.throws) ?>
@@ -241,7 +273,7 @@ def:op_description(obj) ?><?cs
       each:tag=obj.throws ?>
         <tr>
             <th><?cs call:type_link(tag.type) ?></td>
-            <td><?cs call:tag_list(tag.comment) ?></td>
+            <td><?cs call:op_tag_list(tag.comment) ?></td>
         </tr><?cs
       /each ?>
       </table>

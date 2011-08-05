@@ -31,7 +31,6 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transformer.DataType;
@@ -45,7 +44,6 @@ import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
-import org.mule.devkit.model.code.ForEach;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
@@ -172,7 +170,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
                 field = new FieldBuilder(messageProcessorClass).
                         privateVisibility().
-                        type(MessageProcessorChain.class).
+                        type(MessageProcessor.class).
                         name(fieldName).
                         build();
                 fieldType = new FieldBuilder(messageProcessorClass).
@@ -180,7 +178,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                         type(ref(variable.asType())).
                         name(fieldName + "Type").
                         build();
-            } else if(variable.asType().toString().contains(HttpCallback.class.getName())) {
+            } else if (variable.asType().toString().contains(HttpCallback.class.getName())) {
                 // for each parameter of type HttpCallback we need two fields: one that will hold a reference to the flow
                 // that is going to be executed upon the callback and the other one to hold the HttpCallback object itself
                 field = new FieldBuilder(messageProcessorClass).
@@ -223,7 +221,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             TypeMirror fieldTypeMirror = method.getParameters().get(0).asType();
             FieldVariable field = null;
             if (fieldTypeMirror.toString().contains(ProcessorCallback.class.getName())) {
-                field = transferObjectClass.field(Modifier.PRIVATE, ref(MessageProcessorChain.class), fieldName);
+                field = transferObjectClass.field(Modifier.PRIVATE, ref(MessageProcessor.class), fieldName);
             } else {
                 field = transferObjectClass.field(Modifier.PRIVATE, ref(Object.class), fieldName);
             }
@@ -269,10 +267,9 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
                 if (variableElement.getVariableElement().asType().toString().contains(ProcessorCallback.class.getName())) {
-                    ForEach forEach = initialise.body().forEach(ref(MessageProcessor.class), "messageProcessor", variableElement.getField().invoke("getMessageProcessors"));
-                    Conditional ifStartable = forEach.body()._if(Op._instanceof(forEach.var(), ref(Initialisable.class)));
-                    ifStartable._then().add(
-                            ExpressionFactory.cast(ref(Initialisable.class), forEach.var()).invoke("initialise")
+                    Conditional ifInitialisable = initialise.body()._if(Op._instanceof(variableElement.getField(), ref(Initialisable.class)));
+                    ifInitialisable._then().add(
+                            ExpressionFactory.cast(ref(Initialisable.class), variableElement.getField()).invoke("initialise")
                     );
                 }
             }

@@ -43,7 +43,6 @@ public class Comment {
           "@sdkCurrent",
           "@inheritDoc",
           "@more",
-          "@samplecode",
           "@sample",
           "@include",
           "@serial",
@@ -148,8 +147,10 @@ public class Comment {
       }
     } else if (name.equals("@undeprecate")) {
       mUndeprecateTagsList.add(new TextTagInfo("@undeprecate", "@undeprecate", text, pos));
-    } else if (name.equals("@include") || name.equals("@sample")) {
-      mInlineTagsList.add(new SampleTagInfo(name, "@include", text, mBase, pos));
+    } else if (name.equals("@sample.java")) {
+      mInlineTagsList.add(new SampleTagInfo(name, "@include", text, SampleTagInfo.SampleLanguage.JAVA, mBase, pos));
+    } else if (name.equals("@sample.xml")) {
+      mInlineTagsList.add(new SampleTagInfo(name, "@include", text, SampleTagInfo.SampleLanguage.XML, mBase, pos));
     } else {
       boolean known = false;
       for (String s : KNOWN_TAGS) {

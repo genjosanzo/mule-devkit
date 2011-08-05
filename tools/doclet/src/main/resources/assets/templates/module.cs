@@ -67,7 +67,7 @@ Summary:
 <?cs call:deprecated_warning(class) ?>
 <?cs if:subcount(class.descr) ?>
 <h2>Module Overview</h2>
-<p><?cs call:tag_list(class.descr) ?></p>
+<p><?cs call:op_tag_list(class.descr) ?></p>
 <?cs /if ?>
 
 </div><!-- jd-descr -->
@@ -83,7 +83,7 @@ Summary:
         <td class="jd-linkcol" width="100%"><nobr>
         <span class="sympad"><?cs call:cond_link("&lt;" + class.moduleName + ":" + method.elementName + "&gt;", toroot + "mule/", method.modhref, included) ?></nobr>
         <?cs if:subcount(method.shortDescr) || subcount(method.deprecated) ?>
-        <div class="jd-descrdiv"><?cs call:short_descr(method) ?></div>
+        <div class="jd-descrdiv"><?cs call:op_short_descr(method) ?></div>
         <?cs /if ?>
   </td></tr>
 <?cs set:count = count + #1 ?>

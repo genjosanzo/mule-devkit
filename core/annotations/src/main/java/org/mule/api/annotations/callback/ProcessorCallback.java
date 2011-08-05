@@ -33,7 +33,7 @@ public interface ProcessorCallback {
      * @param properties Additional invocation properties
      * @return The return payload for the processor chain
      */
-    Object process(Map<String, Object> properties) throws Exception;
+    Object processWithExtraProperties(Map<String, Object> properties) throws Exception;
 
     /**
      * Dispatch message to the processor chain

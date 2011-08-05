@@ -31,6 +31,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
+import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
@@ -106,6 +107,14 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         Method parse = beanDefinitionparser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
         Variable parserContext = parse.param(ref(ParserContext.class), "parserContent");
+
+        Variable name = parse.body().decl(ref(String.class), "name", element.invoke("getAttribute").arg("name"));
+        Conditional ifNotNamed = parse.body()._if(Op.cor(Op.eq(name, ExpressionFactory._null()),
+                ref(StringUtils.class).staticInvoke("isBlank").arg(name)));
+
+        ifNotNamed._then().add(element.invoke("setAttribute")
+                .arg("name")
+                .arg(ref(AutoIdUtils.class).staticInvoke("getUniqueName").arg(element).arg("mule-bean")));
 
         Variable builder = parse.body().decl(ref(BeanDefinitionBuilder.class), "builder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition").arg(pojo.dotclass().invoke("getName")));
@@ -314,6 +323,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     }
 
     private void generateParseProcessorCallback(Block block, Variable element, Variable parserContext, Variable builder, String fieldName) {
+
         Variable elements = block.decl(ref(org.w3c.dom.Element.class), fieldName + "Element",
                 ref(DomUtils.class).staticInvoke("getChildElementByTagName")
                         .arg(element).arg(context.getNameUtils().uncamel(fieldName)));
@@ -323,6 +333,19 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         Variable beanDefinitionBuilder = ifNotNull._then().decl(ref(BeanDefinitionBuilder.class), fieldName + "BeanDefinitionBuilder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition")
                         .arg(ref(MessageProcessorChainFactoryBean.class).dotclass()));
+
+        //ifNotNull._then().add(beanDefinitionBuilder.invoke("setInitMethodName").arg(ref(Initialisable.class).staticRef("PHASE_NAME")));
+        //ifNotNull._then().add(beanDefinitionBuilder.invoke("setDestroyMethodName").arg(ref(Disposable.class).staticRef("PHASE_NAME")));
+
+        Variable beanDefinition = ifNotNull._then().decl(ref(BeanDefinition.class), fieldName + "BeanDefinition",
+                beanDefinitionBuilder.invoke("getBeanDefinition"));
+
+        ifNotNull._then().add(parserContext.invoke("getRegistry").invoke("registerBeanDefinition")
+                .arg(ExpressionFactory.invoke("generateChildBeanName").arg(elements))
+                .arg(beanDefinition));
+
+        ifNotNull._then().add(elements.invoke("setAttribute")
+                .arg("name").arg(ExpressionFactory.invoke("generateChildBeanName").arg(elements)));
 
         ifNotNull._then().add(beanDefinitionBuilder.invoke("setSource").arg(parserContext.invoke("extractSource")
                 .arg(elements)));
@@ -334,8 +357,11 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 parserContext.invoke("getDelegate").invoke("parseListElement")
                         .arg(elements).arg(beanDefinitionBuilder.invoke("getBeanDefinition")));
 
+        ifNotNull._then().add(parserContext.invoke("getRegistry").invoke("removeBeanDefinition")
+                .arg(ExpressionFactory.invoke("generateChildBeanName").arg(elements)));
+
         ifNotNull._then().add(builder.invoke("addPropertyValue").arg(fieldName)
-                .arg(beanDefinitionBuilder.invoke("getBeanDefinition")));
+                .arg(beanDefinition));
     }
 
     private void generateParseXmlType(Block block, Variable element, Variable builder, String fieldName) {
