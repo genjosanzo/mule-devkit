@@ -19,9 +19,10 @@ package org.mule.devkit.utils;
 
 import org.apache.commons.lang.StringUtils;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import java.util.ArrayList;
@@ -202,12 +203,18 @@ public class NameUtils {
         return packageName + "." + className;
     }
 
-    public String generateClassNameInPackage(VariableElement variableElement, String className) {
-        TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(variableElement.getEnclosingElement().getEnclosingElement())).get(0);
-        String packageName = getPackageName(elements.getBinaryName(parentClass).toString());
-
+    public String generateClassNameInPackage(Element element, String className) {
+        Element enclosingElement = element.getEnclosingElement();
+        String packageName;
+        if (enclosingElement != null && enclosingElement.getEnclosingElement() != null) {
+            TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(enclosingElement.getEnclosingElement())).get(0);
+            packageName = getPackageName(elements.getBinaryName(parentClass).toString());
+        } else {
+            // inner enum or parametrized type
+            DeclaredType declaredType = (DeclaredType) element.asType();
+            packageName = getPackageName(declaredType.toString());
+        }
         return packageName + "." + className;
-
     }
 
     public String generateClassNameInPackage(TypeElement typeElement, String extraPackage, String className) {

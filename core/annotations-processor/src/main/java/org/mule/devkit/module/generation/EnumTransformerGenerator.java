@@ -39,6 +39,7 @@ import org.mule.transformer.types.DataTypeFactory;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import java.util.HashSet;
@@ -66,12 +67,18 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
                 continue;
 
             for (VariableElement variable : method.getParameters()) {
-                if (!context.getTypeMirrorUtils().isEnum(variable.asType()))
-                    continue;
-
-                if (!registeredEnums.contains(variable.asType())) {
+                if (context.getTypeMirrorUtils().isEnum(variable.asType()) && !registeredEnums.contains(variable.asType())) {
                     registerEnumTransformer(type, variable);
                     registeredEnums.add(variable.asType());
+                } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
+                    DeclaredType variableType = (DeclaredType) variable.asType();
+                    for (TypeMirror variableTypeParameter : variableType.getTypeArguments()) {
+                        if (context.getTypeMirrorUtils().isEnum(variableTypeParameter) && !registeredEnums.contains(variableTypeParameter)) {
+                            Element enumElement = context.getTypeUtils().asElement(variableTypeParameter);
+                            registerEnumTransformer(type, enumElement);
+                            registeredEnums.add(variableTypeParameter);
+                        }
+                    }
                 }
             }
         }
@@ -93,7 +100,7 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private void registerEnumTransformer(Element type, VariableElement variableElement) {
+    private void registerEnumTransformer(Element type, Element variableElement) {
         // get class
         DefinedClass transformerClass = getEnumTransformerClass(variableElement);
 
@@ -130,7 +137,7 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
         getPriorityWeighting.body()._return(weighting);
     }
 
-    private void generateDoTransform(DefinedClass jaxbTransformerClass, VariableElement variableElement) {
+    private void generateDoTransform(DefinedClass jaxbTransformerClass, Element variableElement) {
         Method doTransform = jaxbTransformerClass.method(Modifier.PROTECTED, ref(Object.class), "doTransform");
         doTransform._throws(TransformerException.class);
         Variable src = doTransform.param(ref(Object.class), "src");
@@ -159,7 +166,7 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
         catchBlock.body()._throw(transformerException);
     }
 
-    private void generateConstructor(DefinedClass transformerClass, VariableElement variableElement) {
+    private void generateConstructor(DefinedClass transformerClass, Element variableElement) {
         // generate constructor
         Method constructor = transformerClass.constructor(Modifier.PUBLIC);
 
@@ -182,7 +189,7 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
         registerSourceType.arg(ref(DataTypeFactory.class).staticInvoke("create").arg(ref(String.class).boxify().dotclass()));
     }
 
-    private DefinedClass getEnumTransformerClass(VariableElement variableElement) {
+    private DefinedClass getEnumTransformerClass(Element variableElement) {
         javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(variableElement.asType());
         String transformerClassName = context.getNameUtils().generateClassNameInPackage(variableElement, enumElement.getSimpleName().toString() + "EnumTransformer");
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(transformerClassName) + ".config");
