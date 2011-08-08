@@ -15,20 +15,30 @@
  * limitations under the License.
  */
 
-package org.mule.api.annotations.lifecycle;
+package org.mule.devkit.it;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.io.File;
 
-/**
- * This is a lifecycle annotation. The method annotated with @Start will be called during the
- * {@link org.mule.api.lifecycle.Startable} phase of its lifecycle.
- */
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface Start {
+public class EnumIT extends AbstractMavenIT
+{
+
+    protected String getArtifactVersion()
+    {
+        return "1.0";
+    }
+
+    protected String getArtifactId()
+    {
+        return "enum-integration-test";
+    }
+
+    protected String getGroupId()
+    {
+        return "org.mule.devkit.it";
+    }
+
+    protected File getRoot()
+    {
+        return new File("target/integration-tests/" + getArtifactId());
+    }
 }

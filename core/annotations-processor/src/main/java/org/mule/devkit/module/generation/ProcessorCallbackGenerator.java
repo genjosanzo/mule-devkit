@@ -26,7 +26,6 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChain;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;

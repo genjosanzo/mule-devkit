@@ -83,7 +83,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private static final String ATTRIBUTE_NAME_KEY_REF = "key-ref";
     private static final String XSD_EXTENSION = ".xsd";
     private static final String NAMESPACE_HANDLER_SUFFIX = "NamespaceHandler";
-    private static final String EMUM_TYPE_SUFFIX = "EmumType";
+    private static final String ENUM_TYPE_SUFFIX = "EnumType";
     private static final String TYPE_SUFFIX = "Type";
     private static final String XML_TYPE_SUFFIX = "XmlType";
     private static final String ATTRIBUTE_NAME_CONFIG_REF = "config-ref";
@@ -148,6 +148,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                     registeredEnums.add(variable.asType());
                 }
             }
+
         }
 
         java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(type.getEnclosedElements());
@@ -157,12 +158,17 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 continue;
 
             for (VariableElement variable : method.getParameters()) {
-                if (!context.getTypeMirrorUtils().isEnum(variable.asType()))
-                    continue;
-
-                if (!registeredEnums.contains(variable.asType())) {
+                if (context.getTypeMirrorUtils().isEnum(variable.asType()) && !registeredEnums.contains(variable.asType())) {
                     registerEnum(variable.asType());
                     registeredEnums.add(variable.asType());
+                } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
+                    DeclaredType variableType = (DeclaredType) variable.asType();
+                    for (TypeMirror variableTypeParameter : variableType.getTypeArguments()) {
+                        if (context.getTypeMirrorUtils().isEnum(variableTypeParameter) && !registeredEnums.contains(variableTypeParameter)) {
+                            registerEnum(variableTypeParameter);
+                            registeredEnums.add(variableTypeParameter);
+                        }
+                    }
                 }
             }
         }
@@ -188,7 +194,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(enumType);
 
         TopLevelSimpleType enumSimpleType = new TopLevelSimpleType();
-        enumSimpleType.setName(enumElement.getSimpleName() + EMUM_TYPE_SUFFIX);
+        enumSimpleType.setName(enumElement.getSimpleName() + ENUM_TYPE_SUFFIX);
 
         Union union = new Union();
         union.getSimpleType().add(createEnumSimpleType(enumElement));
@@ -442,6 +448,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 } else if (context.getTypeMirrorUtils().isArrayOrList(genericType) ||
                         context.getTypeMirrorUtils().isMap(genericType)) {
                     return generateCollectionComplexType(targetNamespace, "inner-" + name, genericType);
+                } else if (context.getTypeMirrorUtils().isTransferObject(genericType)) {
+                    return generatePojoComplexTypeWithRef(targetNamespace, genericType);
+                } else if (context.getTypeMirrorUtils().isEnum(genericType)) {
+                    return genereateEnumComplexType(genericType, targetNamespace);
                 } else {
                     return generateRefComplexType(ATTRIBUTE_NAME_VALUE_REF);
                 }
@@ -457,6 +467,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             if (variableTypeParameters.size() > 0 && isTypeSupported(variableTypeParameters.get(0))) {
                 keyAttribute.setName(ATTRIBUTE_NAME_KEY);
                 keyAttribute.setType(SchemaTypeConversion.convertType(variableTypeParameters.get(0).toString(), schema.getTargetNamespace()));
+            } else if(variableTypeParameters.size() > 0 && context.getTypeMirrorUtils().isEnum(variableTypeParameters.get(0))) {
+                keyAttribute.setName(ATTRIBUTE_NAME_KEY);
+                javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(variableTypeParameters.get(0));
+                keyAttribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + ENUM_TYPE_SUFFIX));
             } else {
                 keyAttribute.setUse(SchemaConstants.USE_REQUIRED);
                 keyAttribute.setName(ATTRIBUTE_NAME_KEY_REF);
@@ -507,6 +521,35 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
 
         return null;
+    }
+
+    private LocalComplexType genereateEnumComplexType(TypeMirror genericType, String targetNamespace) {
+        LocalComplexType complexType = new LocalComplexType();
+        SimpleContent simpleContent = new SimpleContent();
+        complexType.setSimpleContent(simpleContent);
+        SimpleExtensionType simpleContentExtension = new SimpleExtensionType();
+        javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(genericType);
+        simpleContentExtension.setBase(new QName(targetNamespace, enumElement.getSimpleName() + ENUM_TYPE_SUFFIX));
+        simpleContent.setExtension(simpleContentExtension);
+        return complexType;
+    }
+
+    private LocalComplexType generatePojoComplexTypeWithRef(String targetNamespace, TypeMirror genericType) {
+        LocalComplexType complexType = new LocalComplexType();
+        ComplexContent simpleContent = new ComplexContent();
+        complexType.setComplexContent(simpleContent);
+        ExtensionType simpleContentExtension = new ExtensionType();
+        QName qname = new QName(targetNamespace, ref(genericType).name() + TRANSFER_OBJECT_TYPE_SUFFIX);
+        simpleContentExtension.setBase(qname);
+        simpleContent.setExtension(simpleContentExtension);
+
+        Attribute refAttribute = new Attribute();
+        refAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+        refAttribute.setName(ATTRIBUTE_NAME_VALUE_REF);
+        refAttribute.setType(SchemaConstants.STRING);
+
+        simpleContentExtension.getAttributeOrAttributeGroup().add(refAttribute);
+        return complexType;
     }
 
     private LocalComplexType generateComplexTypeWithRef(TypeMirror genericType) {
@@ -626,7 +669,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         } else if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
             attribute.setName(name);
             javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(variable.asType());
-            attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + EMUM_TYPE_SUFFIX));
+            attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + ENUM_TYPE_SUFFIX));
         } else {
             // non-supported types will get "-ref" so beans can be injected
             attribute.setName(name + REF_SUFFIX);
@@ -660,7 +703,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         } else if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
             attribute.setName(name);
             javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(variable.asType());
-            attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + EMUM_TYPE_SUFFIX));
+            attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + ENUM_TYPE_SUFFIX));
         } else if(variable.asType().toString().contains(HttpCallback.class.getName())) {
             attribute.setName(context.getNameUtils().uncamel(name) + "-flow-ref");
             attribute.setType(SchemaConstants.STRING);

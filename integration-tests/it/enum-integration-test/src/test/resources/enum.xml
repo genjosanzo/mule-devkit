@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Mule Development Kit
+    Copyright 2010-2011 (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:enums="http://www.mulesoft.org/schema/mule/enums"
+      xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+        http://www.mulesoft.org/schema/mule/enums http://www.mulesoft.org/schema/mule/enums/1.0/mule-enums.xsd">
+
+    <enums:config />
+
+    <flow name="setProperties">
+        <enums:set-properties>
+            <enums:properties>
+                <enums:property key="FIRST_NAME">Federico</enums:property>
+                <enums:property key="LAST_NAME">Recio</enums:property>
+            </enums:properties>
+        </enums:set-properties>
+    </flow>
+
+    <flow name="checkPropertiesSet">
+        <enums:check-properties-set>
+            <enums:all-properties>
+                <enums:all-property key="FIRST_NAME">Federico</enums:all-property>
+                <enums:all-property key="LAST_NAME">Recio</enums:all-property>
+            </enums:all-properties>
+            <enums:properties-to-check>
+                <enums:properties-to-check>FIRST_NAME</enums:properties-to-check>
+            </enums:properties-to-check>
+        </enums:check-properties-set>
+    </flow>
+
+    <flow name="getPropertyValue">
+        <enums:get-property-value property="LAST_NAME" />
+    </flow>
+
+</mule>
