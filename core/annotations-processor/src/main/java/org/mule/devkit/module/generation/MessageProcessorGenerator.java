@@ -572,14 +572,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         Type returnType = ref(executableElement.getReturnType());
 
-        generateMethodCall(callProcessor.body(), object, methodName, parameters, muleContext, event, returnType, poolObject);
-
-        if (interceptCallback != null) {
-            Conditional shallContinue = callProcessor.body()._if(Op.cand(interceptCallback.invoke("getShallContinue"),
-                    Op.ne(messageProcessorListener, ExpressionFactory._null())));
-
-            shallContinue._then().assign(event, messageProcessorListener.invoke("process").arg(event));
-        }
+        generateMethodCall(callProcessor.body(), object, methodName, parameters, muleContext, event, returnType, poolObject, interceptCallback, messageProcessorListener);
 
         callProcessor.body()._return(event);
 
@@ -594,7 +587,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
     }
 
-    private Variable generateMethodCall(Block body, FieldVariable object, String methodName, List<Variable> parameters, FieldVariable muleContext, Variable event, Type returnType, Variable poolObject) {
+    private Variable generateMethodCall(Block body, FieldVariable object, String methodName, List<Variable> parameters, FieldVariable muleContext, Variable event, Type returnType, Variable poolObject, Variable interceptCallback, FieldVariable messageProcessorListener) {
         Variable resultPayload = null;
         if (returnType != context.getCodeModel().VOID) {
             resultPayload = body.decl(ref(Object.class), "resultPayload");
@@ -614,11 +607,24 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         if (returnType != context.getCodeModel().VOID) {
             body.assign(resultPayload, methodCall);
-            Conditional ifPayloadIsNull = body._if(resultPayload.eq(ExpressionFactory._null()));
-            ifPayloadIsNull._then().assign(event, generateNullPayload(muleContext, event));
-            generatePayloadOverwrite(ifPayloadIsNull._else(), event, resultPayload);
         } else {
             body.add(methodCall);
+        }
+
+        Block scope = body;
+        if (interceptCallback != null) {
+            Conditional shallContinue = body._if(Op.cand(interceptCallback.invoke("getShallContinue"),
+                    Op.ne(messageProcessorListener, ExpressionFactory._null())));
+
+            shallContinue._then().assign(event, messageProcessorListener.invoke("process").arg(event));
+
+            scope = shallContinue._else();
+        }
+
+        if (returnType != context.getCodeModel().VOID) {
+            Conditional ifPayloadIsNull = scope._if(resultPayload.eq(ExpressionFactory._null()));
+            ifPayloadIsNull._then().assign(event, generateNullPayload(muleContext, event));
+            generatePayloadOverwrite(ifPayloadIsNull._else(), event, resultPayload);
         }
 
         return resultPayload;
