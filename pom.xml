@@ -122,14 +122,6 @@
         </repository>
     </repositories>
 
-  <scm>
-    <connection>scm:git:git://github.com:mulesoft/mule-devkit.git</connection>
-    <developerConnection>
-            scm:git:git@github.com:mulesoft/mule-devkit.git
-        </developerConnection>
-    <url>http://github.com/mulesoft/mule-devkit</url>
-  </scm>
-
   <distributionManagement>
     <repository>
       <id>muleforge-releases</id>
