@@ -546,7 +546,11 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 DefinedClass callbackClass = context.getClassForRole(ProcessorCallbackGenerator.ROLE);
 
                 Variable transformed = callProcessor.body().decl(callbackClass, "transformed" + StringUtils.capitalize(fieldName),
-                        ExpressionFactory._new(callbackClass).arg(event).arg(muleContext).arg(fields.get(fieldName).getField()));
+                        ExpressionFactory._null());
+
+                callProcessor.body()._if(Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()))._then()
+                        .assign(transformed,
+                                ExpressionFactory._new(callbackClass).arg(event).arg(muleContext).arg(fields.get(fieldName).getField()));
 
                 parameters.add(transformed);
 
