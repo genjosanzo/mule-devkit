@@ -18,9 +18,11 @@
 package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.StringUtils;
+import org.mule.api.MuleContext;
 import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionManager;
@@ -122,7 +124,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                 Disposable.class,
                 Stoppable.class,
                 MessageProcessor.class,
-                MuleContextAware.class});
+                MuleContextAware.class,
+                FlowConstructAware.class});
 
         return clazz;
     }
@@ -136,7 +139,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                 Disposable.class,
                 Stoppable.class,
                 InterceptingMessageProcessor.class,
-                MuleContextAware.class});
+                MuleContextAware.class,
+                FlowConstructAware.class});
 
         return clazz;
     }
@@ -279,6 +283,65 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return initialise;
     }
 
+    protected Method generateSetMuleContextMethod(DefinedClass clazz, FieldVariable muleContext) {
+        return generateSetMuleContextMethod(clazz, muleContext, null);
+    }
+    protected Method generateSetMuleContextMethod(DefinedClass clazz, FieldVariable muleContext, Map<String, FieldVariableElement> fields) {
+        Method setMuleContext = clazz.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setMuleContext");
+        setMuleContext.javadoc().add("Set the Mule context");
+        setMuleContext.javadoc().addParam("context Mule context to set");
+        Variable muleContextParam = setMuleContext.param(ref(MuleContext.class), "context");
+        setMuleContext.body().assign(ExpressionFactory._this().ref(muleContext), muleContextParam);
+
+        if (fields != null) {
+            for (String fieldName : fields.keySet()) {
+                FieldVariableElement variableElement = fields.get(fieldName);
+
+                if (variableElement.getVariableElement().asType().toString().contains(ProcessorCallback.class.getName())) {
+                    Conditional ifMuleContextAware = setMuleContext.body()._if(Op._instanceof(variableElement.getField(), ref(MuleContextAware.class)));
+                    ifMuleContextAware._then().add(
+                            ExpressionFactory.cast(ref(MuleContextAware.class), variableElement.getField()).invoke("setMuleContext").arg(muleContextParam)
+                    );
+                }
+            }
+        }
+
+        return setMuleContext;
+    }
+
+    protected Method generateSetFlowConstructMethod(DefinedClass messageSourceClass, FieldVariable flowConstruct) {
+        return generateSetFlowConstructMethod(messageSourceClass, flowConstruct, null);
+    }
+
+    protected Method generateSetFlowConstructMethod(DefinedClass messageSourceClass, FieldVariable flowConstruct, Map<String, FieldVariableElement> fields) {
+        Method setFlowConstruct = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setFlowConstruct");
+        setFlowConstruct.javadoc().add("Sets flow construct");
+        setFlowConstruct.javadoc().addParam("flowConstruct Flow construct to set");
+        Variable newFlowConstruct = setFlowConstruct.param(ref(FlowConstruct.class), "flowConstruct");
+        setFlowConstruct.body().assign(ExpressionFactory._this().ref(flowConstruct), newFlowConstruct);
+
+        if (fields != null) {
+            for (String fieldName : fields.keySet()) {
+                FieldVariableElement variableElement = fields.get(fieldName);
+
+                if (variableElement.getVariableElement().asType().toString().contains(ProcessorCallback.class.getName())) {
+                    Conditional ifMuleContextAware = setFlowConstruct.body()._if(Op._instanceof(variableElement.getField(), ref(FlowConstructAware.class)));
+                    ifMuleContextAware._then().add(
+                            ExpressionFactory.cast(ref(FlowConstructAware.class), variableElement.getField()).invoke("setFlowConstruct").arg(newFlowConstruct)
+                    );
+                }
+            }
+        }
+
+        return setFlowConstruct;
+    }
+
+
+    protected FieldVariable generateFieldForFlowConstruct(DefinedClass messageSourceClass) {
+        FieldVariable flowConstruct = messageSourceClass.field(Modifier.PRIVATE, ref(FlowConstruct.class), "flowConstruct");
+        flowConstruct.javadoc().add("Flow construct");
+        return flowConstruct;
+    }
 
     protected Method generateSetModuleObjectMethod(DefinedClass messageProcessorClass, FieldVariable object) {
         Method setObject = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setModuleObject");

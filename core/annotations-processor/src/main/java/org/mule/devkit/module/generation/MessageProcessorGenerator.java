@@ -31,6 +31,7 @@ import org.mule.api.annotations.callback.InterceptCallback;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
@@ -108,6 +109,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         FieldVariable muleContext = generateFieldForMuleContext(messageProcessorClass);
         FieldVariable expressionManager = generateFieldForExpressionManager(messageProcessorClass);
         FieldVariable patternInfo = generateFieldForPatternInfo(messageProcessorClass);
+        FieldVariable flowConstruct = generateFieldForFlowConstruct(messageProcessorClass);
 
         FieldVariable messageProcessorListener = null;
         if (intercepting) {
@@ -127,7 +129,10 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         generateDiposeMethod(messageProcessorClass, fields);
 
         // add setmulecontext
-        generateSetMuleContextMethod(messageProcessorClass, muleContext);
+        generateSetMuleContextMethod(messageProcessorClass, muleContext, fields);
+
+        // add setflowconstruct
+        generateSetFlowConstructMethod(messageProcessorClass, flowConstruct, fields);
 
         if (intercepting) {
             // add setlistener

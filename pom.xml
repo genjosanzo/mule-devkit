@@ -124,12 +124,12 @@
 
   <distributionManagement>
     <repository>
-      <id>muleforge-releases</id>
+      <id>mulesoft-releases</id>
       <name>MuleForge Release Repository</name>
       <url>http://repository.mulesoft.org/releases/</url>
     </repository>
     <snapshotRepository>
-      <id>muleforge-snapshots</id>
+      <id>mulesoft-snapshots</id>
       <name>MuleForge Snapshot Repository</name>
       <url>http://repository.mulesoft.org/snapshots/</url>
       <uniqueVersion>false</uniqueVersion>

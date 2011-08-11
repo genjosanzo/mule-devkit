@@ -44,7 +44,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 
-public class PoolAdapterGenerator extends AbstractModuleGenerator {
+public class PoolAdapterGenerator extends AbstractMessageGenerator {
     public void generate(Element element) throws GenerationException {
         Module module = element.getAnnotation(Module.class);
         if (!module.poolable())

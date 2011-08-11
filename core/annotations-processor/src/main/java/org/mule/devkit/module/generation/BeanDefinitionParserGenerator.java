@@ -40,6 +40,7 @@ import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
+import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.ForEach;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
@@ -47,6 +48,7 @@ import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
+import org.mule.util.TemplateParser;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -56,6 +58,7 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
+import sun.misc.ConditionLock;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -104,6 +107,11 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         DefinedClass beanDefinitionparser = getConfigBeanDefinitionParserClass(type);
         DefinedClass pojo = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey((TypeElement) type));
 
+        FieldVariable patternInfo = generateFieldForPatternInfo(beanDefinitionparser);
+
+        Method constructor = beanDefinitionparser.constructor(Modifier.PUBLIC);
+        constructor.body().assign(patternInfo, ref(TemplateParser.class).staticInvoke("createMuleStyleParser").invoke("getStyle"));
+
         Method parse = beanDefinitionparser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
         Variable parserContext = parse.param(ref(ParserContext.class), "parserContent");
@@ -149,7 +157,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                         .arg(element)
                         .arg(context.getNameUtils().uncamel(fieldName)));
 
-                UpperBlockClosure managedList = generateParseArrayOrList(parse.body(), variable.asType(), listElement, builder, fieldName, parserContext);
+                UpperBlockClosure managedList = generateParseArrayOrList(parse.body(), variable.asType(), listElement, builder, fieldName, patternInfo, parserContext);
 
                 managedList.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedList.getManagedCollection()));
             } else if (context.getTypeMirrorUtils().isMap(variable.asType())) {
@@ -161,7 +169,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                         .arg(element)
                         .arg(context.getNameUtils().uncamel(fieldName)));
 
-                UpperBlockClosure managedMap = generateParseMap(parse.body(), variable.asType(), listElement, builder, fieldName, parserContext);
+                UpperBlockClosure managedMap = generateParseMap(parse.body(), variable.asType(), listElement, builder, fieldName, patternInfo, parserContext);
 
                 managedMap.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedMap.getManagedCollection()));
             } else if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
@@ -183,15 +191,14 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         DefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
         DefinedClass messageSourceClass = getMessageSourceClass(executableElement);
 
-        generateSourceParseMethod(beanDefinitionparser, messageSourceClass, executableElement);
+        FieldVariable patternInfo = generateFieldForPatternInfo(beanDefinitionparser);
+
+        Method constructor = beanDefinitionparser.constructor(Modifier.PUBLIC);
+        constructor.body().assign(patternInfo, ref(TemplateParser.class).staticInvoke("createMuleStyleParser").invoke("getStyle"));
+
+        generateSourceParseMethod(beanDefinitionparser, messageSourceClass, executableElement, patternInfo);
 
         generateGenerateChildBeanNameMethod(beanDefinitionparser);
-    }
-
-    private void generateGetBeanClass(DefinedClass beanDefinitionparser, Expression expr) {
-        Method getBeanClass = beanDefinitionparser.method(Modifier.PROTECTED, ref(Class.class), "getBeanClass");
-        Variable element = getBeanClass.param(ref(org.w3c.dom.Element.class), "element");
-        getBeanClass.body()._return(expr);
     }
 
     private void generateBeanDefinitionParserForProcessor(ExecutableElement executableElement, boolean intercepting) {
@@ -204,36 +211,41 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             messageProcessorClass = getMessageProcessorClass(executableElement);
         }
 
-        generateProcessorParseMethod(beanDefinitionparser, messageProcessorClass, executableElement);
+        FieldVariable patternInfo = generateFieldForPatternInfo(beanDefinitionparser);
+
+        Method constructor = beanDefinitionparser.constructor(Modifier.PUBLIC);
+        constructor.body().assign(patternInfo, ref(TemplateParser.class).staticInvoke("createMuleStyleParser").invoke("getStyle"));
+
+        generateProcessorParseMethod(beanDefinitionparser, messageProcessorClass, executableElement, patternInfo);
 
         generateGenerateChildBeanNameMethod(beanDefinitionparser);
     }
 
-    private void generateProcessorParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, ExecutableElement executableElement) {
+    private void generateProcessorParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, ExecutableElement executableElement, Variable patternInfo) {
         Method parse = beanDefinitionparser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
         Variable parserContext = parse.param(ref(ParserContext.class), "parserContent");
 
-        Variable definition = generateParseCommon(beanDefinitionparser, messageProcessorClass, executableElement, parse, element, parserContext);
+        Variable definition = generateParseCommon(beanDefinitionparser, messageProcessorClass, executableElement, parse, element, patternInfo, parserContext);
 
         generateAttachMessageProcessor(parse, definition, parserContext);
 
         parse.body()._return(definition);
     }
 
-    private void generateSourceParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, ExecutableElement executableElement) {
+    private void generateSourceParseMethod(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, ExecutableElement executableElement, Variable patternInfo) {
         Method parse = beanDefinitionparser.method(Modifier.PUBLIC, ref(BeanDefinition.class), "parse");
         Variable element = parse.param(ref(org.w3c.dom.Element.class), "element");
         Variable parserContext = parse.param(ref(ParserContext.class), "parserContent");
 
-        Variable definition = generateParseCommon(beanDefinitionparser, messageProcessorClass, executableElement, parse, element, parserContext);
+        Variable definition = generateParseCommon(beanDefinitionparser, messageProcessorClass, executableElement, parse, element, patternInfo, parserContext);
 
         generateAttachMessageSource(parse, definition, parserContext);
 
         parse.body()._return(definition);
     }
 
-    private Variable generateParseCommon(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, ExecutableElement executableElement, Method parse, Variable element, Variable parserContext) {
+    private Variable generateParseCommon(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, ExecutableElement executableElement, Method parse, Variable element, Variable patternInfo, Variable parserContext) {
         Variable builder = parse.body().decl(ref(BeanDefinitionBuilder.class), "builder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition").arg(messageProcessorClass.dotclass().invoke("getName")));
 
@@ -277,7 +289,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                         .arg(element)
                         .arg(context.getNameUtils().uncamel(fieldName)));
 
-                Variable beanDefinitionBuilder = generateParseTransferObject(variable.asType(), parse.body(), transferObjectElement, parserContext);
+                Variable beanDefinitionBuilder = generateParseTransferObject(variable.asType(), parse.body(), transferObjectElement, patternInfo, parserContext);
 
                 parse.body().add(builder.invoke("addPropertyValue").arg(fieldName).arg(beanDefinitionBuilder.invoke("getBeanDefinition")));
             } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
@@ -291,7 +303,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                         .arg(element)
                         .arg(context.getNameUtils().uncamel(fieldName)));
 
-                UpperBlockClosure managedList = generateParseArrayOrList(parse.body(), variable.asType(), listElement, builder, fieldName, parserContext);
+                UpperBlockClosure managedList = generateParseArrayOrList(parse.body(), variable.asType(), listElement, builder, fieldName, patternInfo, parserContext);
 
                 managedList.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedList.getManagedCollection()));
             } else if (context.getTypeMirrorUtils().isMap(variable.asType())) {
@@ -303,7 +315,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                         .arg(element)
                         .arg(context.getNameUtils().uncamel(fieldName)));
 
-                UpperBlockClosure managedMap = generateParseMap(parse.body(), variable.asType(), listElement, builder, fieldName, parserContext);
+                UpperBlockClosure managedMap = generateParseMap(parse.body(), variable.asType(), listElement, builder, fieldName, patternInfo, parserContext);
 
                 managedMap.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedMap.getManagedCollection()));
             } else if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
@@ -425,7 +437,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         ));
     }
 
-    private UpperBlockClosure generateParseMap(Block body, TypeMirror typeMirror, Variable listElement, Variable builder, String fieldName, Variable parserContext) {
+    private UpperBlockClosure generateParseMap(Block body, TypeMirror typeMirror, Variable listElement, Variable builder, String fieldName, Variable patternInfo, Variable parserContext) {
         DeclaredType variableType = (DeclaredType) typeMirror;
         java.util.List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
 
@@ -439,12 +451,24 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         Variable ref = listElementNotNull._then().decl(ref(String.class), fieldName.replace("-", "") + "Ref",
                 getElementRef);
 
-        Conditional ifRef = listElementNotNull._then()._if(Op.cand(Op.ne(ref, ExpressionFactory._null()),
-                Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(ref))));
+        Conditional ifRef = listElementNotNull._then()._if(
+                Op.cand(
+                        Op.ne(ref, ExpressionFactory._null()),
+                        Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(ref))
+                )
+        );
 
-        ifRef._then().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
+        Conditional ifRefNotExpresion = ifRef._then()._if(Op.cand(
+                Op.not(ref.invoke("startsWith").arg(patternInfo.invoke("getPrefix"))),
+                Op.not(ref.invoke("endsWith").arg(patternInfo.invoke("getSuffix")))
+        ));
+
+        ifRefNotExpresion._then().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
                 ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(ref)
         ));
+
+        ifRefNotExpresion._else().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
+                ref));
 
         Variable managedMap = ifRef._else().decl(ref(ManagedMap.class), fieldName.replace("-", ""),
                 ExpressionFactory._new(ref(ManagedMap.class)));
@@ -486,15 +510,15 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
 
         if (variableTypeParameters.size() > 1 && context.getTypeMirrorUtils().isTransferObject(variableTypeParameters.get(1))) {
-            Variable pojoBuilder = generateParseTransferObject(variableTypeParameters.get(1), ifValueRef._else(), forEach.var(), parserContext);
+            Variable pojoBuilder = generateParseTransferObject(variableTypeParameters.get(1), ifValueRef._else(), forEach.var(), patternInfo, parserContext);
 
             ifValueRef._else().assign(valueObject, pojoBuilder.invoke("getBeanDefinition"));
         } else if (variableTypeParameters.size() > 1 && context.getTypeMirrorUtils().isArrayOrList(variableTypeParameters.get(1))) {
-            UpperBlockClosure subList = generateParseArrayOrList(forEach.body(), variableTypeParameters.get(1), forEach.var(), builder, "inner-" + childName, parserContext);
+            UpperBlockClosure subList = generateParseArrayOrList(forEach.body(), variableTypeParameters.get(1), forEach.var(), builder, "inner-" + childName, patternInfo, parserContext);
 
             subList.getNotRefBlock().assign(valueObject, subList.getManagedCollection());
         } else if (variableTypeParameters.size() > 1 && context.getTypeMirrorUtils().isMap(variableTypeParameters.get(1))) {
-            UpperBlockClosure subMap = generateParseMap(forEach.body(), variableTypeParameters.get(1), forEach.var(), builder, "inner-" + childName, parserContext);
+            UpperBlockClosure subMap = generateParseMap(forEach.body(), variableTypeParameters.get(1), forEach.var(), builder, "inner-" + childName, patternInfo, parserContext);
 
             subMap.getNotRefBlock().assign(valueObject, subMap.getManagedCollection());
         } else {
@@ -526,7 +550,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         return new UpperBlockClosure(managedMap, ifRef._else());
     }
 
-    private UpperBlockClosure generateParseArrayOrList(Block body, TypeMirror typeMirror, Variable listElement, Variable builder, String fieldName, Variable parserContext) {
+    private UpperBlockClosure generateParseArrayOrList(Block body, TypeMirror typeMirror, Variable listElement, Variable builder, String fieldName, Variable patternInfo, Variable parserContext) {
         DeclaredType variableType = (DeclaredType) typeMirror;
         java.util.List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
 
@@ -543,9 +567,17 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         Conditional ifRef = listElementNotNull._then()._if(Op.cand(Op.ne(ref, ExpressionFactory._null()),
                 Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(ref))));
 
-        ifRef._then().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
+        Conditional ifRefNotExpresion = ifRef._then()._if(Op.cand(
+                Op.not(ref.invoke("startsWith").arg(patternInfo.invoke("getPrefix"))),
+                Op.not(ref.invoke("endsWith").arg(patternInfo.invoke("getSuffix")))
+        ));
+
+        ifRefNotExpresion._then().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
                 ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(ref)
         ));
+
+        ifRefNotExpresion._else().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
+                ref));
 
         Variable managedList = ifRef._else().decl(ref(ManagedList.class), fieldName.replace("-", ""),
                 ExpressionFactory._new(ref(ManagedList.class)));
@@ -573,17 +605,17 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                         ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(valueRef)));
 
         if (variableTypeParameters.size() > 0 && context.getTypeMirrorUtils().isTransferObject(variableTypeParameters.get(0))) {
-            Variable pojoBeanDefinitionBuilder = generateParseTransferObject(variableTypeParameters.get(0), ifValueRef._else(), forEach.var(), parserContext);
+            Variable pojoBeanDefinitionBuilder = generateParseTransferObject(variableTypeParameters.get(0), ifValueRef._else(), forEach.var(), patternInfo, parserContext);
 
             ifValueRef._else().add(
                     managedList.invoke("add").arg(pojoBeanDefinitionBuilder.invoke("getBeanDefinition")));
         } else if (variableTypeParameters.size() > 0 && context.getTypeMirrorUtils().isArrayOrList(variableTypeParameters.get(0))) {
-            UpperBlockClosure subList = generateParseArrayOrList(ifValueRef._else(), variableTypeParameters.get(0), forEach.var(), builder, "inner-" + childName, parserContext);
+            UpperBlockClosure subList = generateParseArrayOrList(ifValueRef._else(), variableTypeParameters.get(0), forEach.var(), builder, "inner-" + childName, patternInfo, parserContext);
 
             subList.getNotRefBlock().add(
                     managedList.invoke("add").arg(subList.getManagedCollection()));
         } else if (variableTypeParameters.size() > 0 && context.getTypeMirrorUtils().isMap(variableTypeParameters.get(0))) {
-            UpperBlockClosure subMap = generateParseMap(ifValueRef._else(), variableTypeParameters.get(0), forEach.var(), builder, "inner-" + childName, parserContext);
+            UpperBlockClosure subMap = generateParseMap(ifValueRef._else(), variableTypeParameters.get(0), forEach.var(), builder, "inner-" + childName, patternInfo, parserContext);
 
             subMap.getNotRefBlock().add(
                     managedList.invoke("add").arg(subMap.getManagedCollection()));
@@ -595,7 +627,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         return new UpperBlockClosure(managedList, ifRef._else());
     }
 
-    private Variable generateParseTransferObject(TypeMirror transferObjectType, Block block, Variable element, Variable parserContext) {
+    private Variable generateParseTransferObject(TypeMirror transferObjectType, Block block, Variable element, Variable patternInfo, Variable parserContext) {
         DeclaredType declaredType = (DeclaredType) transferObjectType;
         String baseName = declaredType.asElement().getSimpleName().toString().toLowerCase();
         Variable builder = block.decl(ref(BeanDefinitionBuilder.class), baseName + "BeanDefinitionBuilder",
@@ -621,7 +653,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                         .arg(element)
                         .arg(context.getNameUtils().uncamel(fieldName)));
 
-                UpperBlockClosure managedList = generateParseArrayOrList(block, variable.asType(), listElement, builder, fieldName, parserContext);
+                UpperBlockClosure managedList = generateParseArrayOrList(block, variable.asType(), listElement, builder, fieldName, patternInfo, parserContext);
 
                 managedList.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedList.getManagedCollection()));
             } else if (context.getTypeMirrorUtils().isMap(variable.asType())) {
@@ -633,7 +665,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                         .arg(element)
                         .arg(context.getNameUtils().uncamel(fieldName)));
 
-                UpperBlockClosure managedMap = generateParseMap(block, variable.asType(), listElement, builder, fieldName, parserContext);
+                UpperBlockClosure managedMap = generateParseMap(block, variable.asType(), listElement, builder, fieldName, patternInfo, parserContext);
 
                 managedMap.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedMap.getManagedCollection()));
             } else if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
