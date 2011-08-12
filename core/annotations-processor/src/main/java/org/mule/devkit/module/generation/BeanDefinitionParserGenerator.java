@@ -249,6 +249,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         Variable builder = parse.body().decl(ref(BeanDefinitionBuilder.class), "builder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition").arg(messageProcessorClass.dotclass().invoke("getName")));
 
+        /*
         Conditional isInitialisable = parse.body()._if(ref(Initialisable.class).dotclass()
                 .invoke("isAssignableFrom").arg(messageProcessorClass.dotclass()));
         isInitialisable._then().add(builder.invoke("setInitMethodName").arg(ref(Initialisable.class).staticRef("PHASE_NAME")));
@@ -256,6 +257,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         Conditional isDisposable = parse.body()._if(ref(Disposable.class).dotclass()
                 .invoke("isAssignableFrom").arg(messageProcessorClass.dotclass()));
         isDisposable._then().add(builder.invoke("setDestroyMethodName").arg(ref(Disposable.class).staticRef("PHASE_NAME")));
+        */
 
         Variable configRef = parse.body().decl(ref(String.class), "configRef", element.invoke("getAttribute").arg("config-ref"));
         Conditional ifConfigRef = parse.body()._if(Op.cand(Op.ne(configRef, ExpressionFactory._null()),
