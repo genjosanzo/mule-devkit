@@ -46,7 +46,7 @@ public class AttachSchemaMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         for (File file : targetDirectory.listFiles(new SchemaFilenameFilter())) {
-            projectHelper.attachArtifact(project, "schema", file);
+            projectHelper.attachArtifact(project, "xsd", file);
         }
     }
 
