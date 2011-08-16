@@ -27,7 +27,6 @@ import org.mule.api.MuleSession;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.callback.SourceCallback;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;

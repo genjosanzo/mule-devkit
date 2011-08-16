@@ -19,23 +19,17 @@ package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleContext;
-import org.mule.api.annotations.callback.ProcessorCallback;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.devkit.generation.AbstractGenerator;
-import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
-import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.Type;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 
 import javax.lang.model.type.TypeMirror;
-import java.util.Map;
 
 public abstract class AbstractModuleGenerator extends AbstractGenerator {
 

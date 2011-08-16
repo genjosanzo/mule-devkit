@@ -78,6 +78,7 @@
                         <exclude>**/assets/**</exclude>
                         <exclude>**/*.xsd</exclude>
                         <exclude>**/*.properties</exclude>
+                        <exclude>**/pmd.xml</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -111,6 +112,28 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <id>pmd</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rulesets>
+                                <ruleset>${project.basedir}/pmd.xml</ruleset>
+                            </rulesets>
+                            <targetJdk>1.6</targetJdk>
+                            <verbose>true</verbose>
+                            <aggregate>true</aggregate>
+                            <linkXRef>false</linkXRef>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -122,17 +145,17 @@
         </repository>
     </repositories>
 
-  <distributionManagement>
-    <repository>
-      <id>mulesoft-releases</id>
-      <name>MuleForge Release Repository</name>
-      <url>http://repository.mulesoft.org/releases/</url>
-    </repository>
-    <snapshotRepository>
-      <id>mulesoft-snapshots</id>
-      <name>MuleForge Snapshot Repository</name>
-      <url>http://repository.mulesoft.org/snapshots/</url>
-      <uniqueVersion>false</uniqueVersion>
-    </snapshotRepository>
-  </distributionManagement>
+    <distributionManagement>
+        <repository>
+            <id>mulesoft-releases</id>
+            <name>MuleForge Release Repository</name>
+            <url>http://repository.mulesoft.org/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>mulesoft-snapshots</id>
+            <name>MuleForge Snapshot Repository</name>
+            <url>http://repository.mulesoft.org/snapshots/</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
 </project>  

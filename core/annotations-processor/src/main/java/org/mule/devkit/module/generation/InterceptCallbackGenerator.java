@@ -19,16 +19,12 @@ package org.mule.devkit.module.generation;
 
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.InterceptCallback;
-import org.mule.api.annotations.callback.SourceCallback;
-import org.mule.api.context.MuleContextAware;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
-import org.mule.devkit.model.code.Modifiers;
-import org.mule.devkit.model.code.Variable;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;

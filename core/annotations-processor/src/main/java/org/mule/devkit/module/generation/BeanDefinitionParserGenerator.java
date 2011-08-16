@@ -38,7 +38,6 @@ import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
-import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.ForEach;
@@ -58,7 +57,6 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
-import sun.misc.ConditionLock;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;

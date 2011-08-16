@@ -31,7 +31,6 @@ import org.mule.api.annotations.callback.InterceptCallback;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
