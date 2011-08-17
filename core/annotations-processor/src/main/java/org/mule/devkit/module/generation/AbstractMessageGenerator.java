@@ -38,6 +38,7 @@ import org.mule.api.source.MessageSource;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.SimpleFlowConstruct;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
@@ -255,6 +256,10 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         Conditional ifNoObject = initialise.body()._if(Op.eq(object, ExpressionFactory._null()));
         TryStatement tryLookUp = ifNoObject._then()._try();
         tryLookUp.body().assign(object, muleContext.invoke("getRegistry").invoke("lookupObject").arg(ExpressionFactory.dotclass(pojoClass)));
+        tryLookUp.body()._if(Op.eq(object, ExpressionFactory._null()))._then().
+                        _throw(ExpressionFactory._new(ref(InitialisationException.class)).
+                                arg(ref(MessageFactory.class).staticInvoke("createStaticMessage").
+                                        arg("Cannot find object")).arg(object));
         CatchBlock catchBlock = tryLookUp._catch(ref(RegistrationException.class));
         Variable exception = catchBlock.param("e");
         TypeReference coreMessages = ref(CoreMessages.class);
