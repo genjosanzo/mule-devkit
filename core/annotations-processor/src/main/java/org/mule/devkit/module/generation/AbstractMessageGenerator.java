@@ -259,7 +259,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         tryLookUp.body()._if(Op.eq(object, ExpressionFactory._null()))._then().
                         _throw(ExpressionFactory._new(ref(InitialisationException.class)).
                                 arg(ref(MessageFactory.class).staticInvoke("createStaticMessage").
-                                        arg("Cannot find object")).arg(object));
+                                        arg("Cannot find object")).arg(ExpressionFactory._this()));
         CatchBlock catchBlock = tryLookUp._catch(ref(RegistrationException.class));
         Variable exception = catchBlock.param("e");
         TypeReference coreMessages = ref(CoreMessages.class);
