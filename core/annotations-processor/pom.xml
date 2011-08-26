@@ -78,6 +78,11 @@
             <artifactId>spring-core</artifactId>
             <version>3.0.3.RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>oauth.signpost</groupId>
+            <artifactId>signpost-core</artifactId>
+            <version>1.2</version>
+        </dependency>
     </dependencies>
 
     <build>

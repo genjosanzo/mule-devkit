@@ -26,6 +26,7 @@ import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.callback.InterceptCallback;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
+import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
@@ -77,6 +78,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class SchemaGenerator extends AbstractModuleGenerator {
+
+    public static final String DOMAIN_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.DOMAIN_FIELD_NAME;
+    public static final String PORT_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.PORT_FIELD_NAME;
     private static final String ATTRIBUTE_NAME_KEY = "key";
     private static final String ATTRIBUTE_NAME_REF = "ref";
     private static final String ATTRIBUTE_NAME_VALUE_REF = "value-ref";
@@ -93,6 +97,9 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private static final String ATTRIBUTE_NAME_NAME = "name";
     private static final String REF_SUFFIX = "-ref";
     private static final String TRANSFER_OBJECT_TYPE_SUFFIX = "TransferObjectType";
+    private static final String DOMAIN_DEFAULT_VALUE = "${fullDomain}";
+    private static final String PORT_DEFAULT_VALUE = "${http.port}";
+    public static final String HTTP_CALLBACK_CONFIG_ELEMENT_NAME = "httpCallbackConfig";
     private Schema schema;
     private ObjectFactory objectFactory;
 
@@ -612,6 +619,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     }
 
     private void registerConfigElement(String targetNamespace, javax.lang.model.element.Element element) {
+
         ExtensionType config = registerExtension(ELEMENT_NAME_CONFIG);
         Attribute nameAttribute = createAttribute(ATTRIBUTE_NAME_NAME, true, SchemaConstants.STRING, "Give a name to this configuration so it can be later referenced by config-ref.");
         config.getAttributeOrAttributeGroup().add(nameAttribute);
@@ -631,6 +639,46 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             } else {
                 config.getAttributeOrAttributeGroup().add(createAttribute(variable));
             }
+        }
+
+        if(element.getAnnotation(OAuth.class) != null || classHasMethodWithParameterOfType((TypeElement)element, HttpCallback.class)) {
+
+           Attribute domainAttribute = new Attribute();
+           domainAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+           domainAttribute.setName(DOMAIN_ATTRIBUTE_NAME);
+           domainAttribute.setType(SchemaConstants.STRING);
+           domainAttribute.setDefault(DOMAIN_DEFAULT_VALUE);
+
+           Attribute portAttribute = new Attribute();
+           portAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+           portAttribute.setName(PORT_ATTRIBUTE_NAME);
+           portAttribute.setType(SchemaConstants.STRING);
+           portAttribute.setDefault(PORT_DEFAULT_VALUE);
+
+           TopLevelElement httpCallbackConfig = new TopLevelElement();
+           httpCallbackConfig.setName(HTTP_CALLBACK_CONFIG_ELEMENT_NAME);
+           httpCallbackConfig.setMinOccurs(BigInteger.ZERO);
+           httpCallbackConfig.setMaxOccurs("1");
+
+           Annotation annotation = new Annotation();
+           Documentation doc = new Documentation();
+           doc.setSource("Config for http callbacks.");
+           annotation.getAppinfoOrDocumentation().add(doc);
+           httpCallbackConfig.setAnnotation(annotation);
+
+           ExtensionType extensionType = new ExtensionType();
+           extensionType.setBase(SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE);
+           extensionType.getAttributeOrAttributeGroup().add(portAttribute);
+           extensionType.getAttributeOrAttributeGroup().add(domainAttribute);
+
+           ComplexContent complextContent = new ComplexContent();
+           complextContent.setExtension(extensionType);
+
+           LocalComplexType localComplexType = new LocalComplexType();
+           localComplexType.setComplexContent(complextContent);
+
+           httpCallbackConfig.setComplexType(localComplexType);
+           all.getParticle().add(objectFactory.createElement(httpCallbackConfig));
         }
 
         if (element.getAnnotation(Module.class).poolable()) {

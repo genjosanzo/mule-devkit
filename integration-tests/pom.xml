@@ -58,6 +58,7 @@
                         <include>target/integration-tests/**/pom.xml</include>
                         <include>target/test-classes/**/cloud-connector-archetype.properties</include>
                         <include>target/test-classes/**/transformer-archetype.properties</include>
+                        <include>target/classes/**/*OAuth*</include>
                     </includes>
                     <replacements>
                         <replacement>
@@ -67,6 +68,10 @@
                         <replacement>
                             <token>@mule.version@</token>
                             <value>${mule.version}</value>
+                        </replacement>
+                        <replacement>
+                            <token>@http.port@</token>
+                            <value>${env.http.port}</value>
                         </replacement>
                     </replacements>
                 </configuration>

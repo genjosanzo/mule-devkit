@@ -29,6 +29,9 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.callback.InterceptCallback;
 import org.mule.api.annotations.callback.ProcessorCallback;
+import org.mule.api.annotations.oauth.OAuth;
+import org.mule.api.annotations.oauth.OAuthAccessToken;
+import org.mule.api.annotations.oauth.RequiresAccessToken;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.lifecycle.Disposable;
@@ -75,6 +78,11 @@ import java.util.ListIterator;
 import java.util.Map;
 
 public class MessageProcessorGenerator extends AbstractMessageGenerator {
+
+    private static final String HTTP_STATUS_PROPERTY = "http.status";
+    private static final String REDIRECT_HTTP_STATUS = "302";
+    private static final String LOCATION_PROPERTY = "Location";
+
     public void generate(Element typeElement) throws GenerationException {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
@@ -119,7 +127,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         generateInitialiseMethod(messageProcessorClass, fields, typeElement, muleContext, expressionManager, patternInfo, object);
 
         // add start
-        generateStartMethod(messageProcessorClass, fields, muleContext);
+        generateStartMethod(messageProcessorClass, fields, muleContext, object);
 
         // add stop
         generateStopMethod(messageProcessorClass, fields);
@@ -168,7 +176,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private void generateStartMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, FieldVariable muleContext) {
+    private void generateStartMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, FieldVariable muleContext, FieldVariable object) {
         Method startMethod = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
         startMethod._throws(ref(MuleException.class));
 
@@ -181,8 +189,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                         ExpressionFactory.cast(ref(Startable.class), variableElement.getField()).invoke("start")
                 );
             } else if (variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
-                startMethod.body().assign(variableElement.getFieldType(), ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).arg(fields.get(fieldName).getField()).arg(muleContext));
-                startMethod.body().invoke(variableElement.getFieldType(), "start");
+                startMethod.body()._if(Op.ne(variableElement.getFieldType(), ExpressionFactory._null()))._then().invoke(variableElement.getFieldType(), "start");
             }
         }
     }
@@ -200,7 +207,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                         ExpressionFactory.cast(ref(Stoppable.class), variableElement.getField()).invoke("stop")
                 );
             } else if (variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
-                stopMethod.body().invoke(variableElement.getFieldType(), "stop");
+                stopMethod.body()._if(Op.ne(variableElement.getFieldType(), ExpressionFactory._null()))._then().invoke(variableElement.getFieldType(), "stop");
             }
         }
     }
@@ -518,12 +525,15 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         process._throws(MuleException.class);
         Variable event = process.param(muleEvent, "event");
-        Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage");
-        process.body().assign(muleMessage, event.invoke("getMessage"));
+        Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage", event.invoke("getMessage"));
 
         Variable poolObject = null;
         if (poolObjectClass != null) {
             poolObject = process.body().decl(poolObjectClass, "poolObject", ExpressionFactory._null());
+        }
+
+        if(executableElement.getEnclosingElement().getAnnotation(OAuth.class) != null && executableElement.getAnnotation(RequiresAccessToken.class) != null) {
+            addOauth(process, event, object, executableElement);
         }
 
         TryStatement callProcessor = process.body()._try();
@@ -611,6 +621,20 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             poolObjectNotNull.add(object.invoke("getLifecyleEnabledObjectPool").invoke("returnObject").arg(poolObject));
         }
 
+    }
+
+    private void addOauth(Method process, Variable event, FieldVariable object, ExecutableElement executableElement) {
+        Invocation oauthVerifier = object.invoke("get" + StringUtils.capitalize(OAuthAdapterGenerator.OAUTH_VERIFIER_FIELD_NAME));
+        Block ifOauthVerifierIsNull = process.body()._if(isNull(oauthVerifier))._then();
+        Variable authorizationUrl = ifOauthVerifierIsNull.decl(ref(String.class), "authorizationUrl", ExpressionFactory.invoke(object, OAuthAdapterGenerator.GET_AUTHORIZATION_URL_METHOD_NAME));
+        ifOauthVerifierIsNull.invoke(event.invoke("getMessage"), "setOutboundProperty").arg(HTTP_STATUS_PROPERTY).arg(REDIRECT_HTTP_STATUS);
+        ifOauthVerifierIsNull.invoke(event.invoke("getMessage"), "setOutboundProperty").arg(LOCATION_PROPERTY).arg(authorizationUrl);
+        ifOauthVerifierIsNull._return(event);
+
+        TypeElement typeElement = (TypeElement) executableElement.getEnclosingElement();
+        Invocation accessToken = object.invoke(getterMethodForFieldAnnotatedWith(typeElement, OAuthAccessToken.class));
+        Block ifAccessTokenIsNull = process.body()._if(isNull(accessToken))._then();
+        ifAccessTokenIsNull.invoke(object, OAuthAdapterGenerator.FETCH_ACCESS_TOKEN_METHOD_NAME);
     }
 
     private Variable generateMethodCall(Block body, FieldVariable object, String methodName, List<Variable> parameters, FieldVariable muleContext, Variable event, Type returnType, Variable poolObject, Variable interceptCallback, FieldVariable messageProcessorListener) {

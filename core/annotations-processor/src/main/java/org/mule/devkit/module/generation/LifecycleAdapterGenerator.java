@@ -54,11 +54,13 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
 
         ExecutableElement startElement = getStartElement(element);
         lifecycleAdapter._implements(Startable.class);
-        generateLifecycleInvocation(lifecycleAdapter, startElement, "start", MuleException.class, false);
+        Method start = generateLifecycleInvocation(lifecycleAdapter, startElement, "start", MuleException.class, false);
+        start._throws(ref(MuleException.class));
 
         ExecutableElement stopElement = getStopElement(element);
         lifecycleAdapter._implements(Stoppable.class);
-        generateLifecycleInvocation(lifecycleAdapter, stopElement, "stop", MuleException.class, false);
+        Method stop = generateLifecycleInvocation(lifecycleAdapter, stopElement, "stop", MuleException.class, false);
+        stop._throws(ref(MuleException.class));
 
         ExecutableElement postConstructElement = getPostConstructElement(element);
         lifecycleAdapter._implements(Initialisable.class);
@@ -79,14 +81,14 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         return clazz;
     }
 
-    private void generateLifecycleInvocation(DefinedClass lifecycleWrapper, ExecutableElement superExecutableElement, String name, Class<?> catchException, boolean addThis) {
-        Method startMethod = lifecycleWrapper.method(Modifier.PUBLIC, context.getCodeModel().VOID, name);
+    private Method generateLifecycleInvocation(DefinedClass lifecycleWrapper, ExecutableElement superExecutableElement, String name, Class<?> catchException, boolean addThis) {
+        Method lifecycleMethod = lifecycleWrapper.method(Modifier.PUBLIC, context.getCodeModel().VOID, name);
 
         if (catchException != null &&
             superExecutableElement != null &&
             superExecutableElement.getThrownTypes() != null &&
             superExecutableElement.getThrownTypes().size() > 0) {
-            startMethod._throws(ref(catchException));
+            lifecycleMethod._throws(ref(catchException));
         }
 
         if (superExecutableElement != null) {
@@ -94,7 +96,7 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
             Invocation startInvocation = ExpressionFactory._super().invoke(superExecutableElement.getSimpleName().toString());
 
             if (superExecutableElement.getThrownTypes().size() > 0) {
-                TryStatement tryBlock = startMethod.body()._try();
+                TryStatement tryBlock = lifecycleMethod.body()._try();
                 tryBlock.body().add(startInvocation);
 
                 int i = 0;
@@ -113,9 +115,10 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
                     i++;
                 }
             } else {
-                startMethod.body().add(startInvocation);
+                lifecycleMethod.body().add(startInvocation);
             }
         }
+        return lifecycleMethod;
     }
 
     private ExecutableElement getStartElement(Element element) {

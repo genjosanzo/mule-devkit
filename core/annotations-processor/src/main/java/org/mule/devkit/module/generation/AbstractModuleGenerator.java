@@ -21,15 +21,24 @@ import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleContext;
 import org.mule.devkit.generation.AbstractGenerator;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
+import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.Type;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.ElementFilter;
+import java.lang.annotation.Annotation;
+import java.util.List;
 
 public abstract class AbstractModuleGenerator extends AbstractGenerator {
 
@@ -70,5 +79,37 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
         return muleContext;
     }
 
+    protected Expression isNull(Invocation invocation) {
+        return Op.eq(invocation, ExpressionFactory._null());
+    }
 
+    protected String getterMethodForFieldAnnotatedWith(TypeElement typeElement, Class<? extends Annotation> annotation) {
+        return methodForFieldAnnotatedWith(typeElement, annotation, "get");
+    }
+
+    protected String setterMethodForFieldAnnotatedWith(TypeElement typeElement, Class<? extends Annotation> annotation) {
+        return methodForFieldAnnotatedWith(typeElement, annotation, "set");
+    }
+
+    protected boolean classHasMethodWithParameterOfType(TypeElement typeElement, Class<?> parameterType) {
+        List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
+        for(ExecutableElement method : methods) {
+            for(VariableElement parameter : method.getParameters()) {
+                if(parameter.asType().toString().contains(parameterType.getName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private String methodForFieldAnnotatedWith(TypeElement typeElement, Class<? extends Annotation> annotation, String prefix) {
+        List<VariableElement> fields = ElementFilter.fieldsIn(typeElement.getEnclosedElements());
+        for (VariableElement field : fields) {
+            if (field.getAnnotation(annotation) != null) {
+                return prefix + StringUtils.capitalize(field.getSimpleName().toString());
+            }
+        }
+        return null;
+    }
 }

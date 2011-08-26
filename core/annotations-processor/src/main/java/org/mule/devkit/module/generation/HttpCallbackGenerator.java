@@ -24,6 +24,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.HttpCallback;
+import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -39,7 +40,6 @@ import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
-import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
@@ -48,7 +48,6 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.builders.FieldBuilder;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.util.NumberUtils;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -61,20 +60,23 @@ import java.util.UUID;
 public class HttpCallbackGenerator extends AbstractModuleGenerator {
 
     public static final String HTTP_CALLBACK_ROLE = "HttpCallback";
+    public static final String PORT_FIELD_NAME = "port";
+    public static final String DOMAIN_FIELD_NAME = "domain";
     private static final String CLASS_NAME = "DefaultPortHttpCallback";
     private static final String INBOUND_ENDPOINT_EXCHANGE_PATTERN = "REQUEST_RESPONSE";
     private Method buildUrlMethod;
     private FieldVariable muleContextField;
     private FieldVariable flowConstructVariable;
     private Method createHttpInboundEndpointMethod;
-    private FieldVariable urlVariable;
+    private FieldVariable urlField;
     private Method createConnectorMethod;
     private Method createFlowRefMessageProcessorMethod;
     private FieldVariable loggerField;
     private FieldVariable callbackFlowField;
-    private FieldVariable defaultPortField;
-    private FieldVariable portVariable;
-    private FieldVariable urlPrefixVariable;
+    private FieldVariable portField;
+    private FieldVariable callbackMessageProcessorField;
+    private FieldVariable domainField;
+    private FieldVariable localUrlField;
 
     public void generate(Element element) throws GenerationException {
         boolean shouldGenerate = false;
@@ -93,6 +95,10 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
             }
         }
 
+        if (element.getAnnotation(OAuth.class) != null) {
+            shouldGenerate = true;
+        }
+
         if (shouldGenerate) {
             generateCallbackClass((TypeElement) element);
         }
@@ -101,7 +107,8 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
     private DefinedClass generateCallbackClass(TypeElement typeElement) {
         DefinedClass callbackClass = getProcessorCallbackClass(typeElement);
         generateFields(callbackClass);
-        generateCallbackConstructor(callbackClass);
+        generateConstructorArgSimpleFlowConstruct(callbackClass);
+        generateConstructorArgMessageProcessor(callbackClass);
         generateBuildUrlMethod(callbackClass);
         generateCreateFlowRefMessageProcessorMethod(callbackClass);
         generateCreateConnectorMethod(callbackClass);
@@ -116,30 +123,28 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
 
     private void generateFields(DefinedClass callbackClass) {
         loggerField = FieldBuilder.newLoggerField(callbackClass);
-        defaultPortField = FieldBuilder.newConstantFieldBuilder(callbackClass).
-                type(Integer.class).
-                name("DEFAULT_PORT").
-                initialValue(ExpressionFactory.lit(8080)).
-                javadoc("The port to be used if 'http.port' environment variable is not defined").
-                build();
-        portVariable = new FieldBuilder(callbackClass).
+        portField = new FieldBuilder(callbackClass).
                 privateVisibility().
                 type(Integer.class).
-                name("port").
+                name(PORT_FIELD_NAME).
                 javadoc("The port number to be used in the dynamic http inbound endpoint that will receive the callback").
                 build();
-        urlPrefixVariable = FieldBuilder.newConstantFieldBuilder(callbackClass).
+        domainField = new FieldBuilder(callbackClass).
                 type(String.class).
-                name("URL_PREFIX").
-                initialValue("http://localhost:").
-                javadoc("The URL prefix for the http inbound endpoint").
+                name(DOMAIN_FIELD_NAME).
+                javadoc("The domain to be used in the dynamic http inbound endpoint that will receive the callback").
                 build();
-        urlVariable = new FieldBuilder(callbackClass).
+        urlField = new FieldBuilder(callbackClass).
                 privateVisibility().
                 type(String.class).
                 name("url").
                 javadoc("The dynamically generated url to pass on to the cloud connector. When this url is called the callback flow will be executed").
                 getter().
+                build();
+        localUrlField = new FieldBuilder(callbackClass).
+                privateVisibility().
+                type(String.class).
+                name("localUrl").
                 build();
         muleContextField = new FieldBuilder(callbackClass).
                 privateVisibility().
@@ -160,28 +165,46 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
                 name("flowConstruct").
                 javadoc("The dynamically created flow").
                 build();
+        callbackMessageProcessorField = new FieldBuilder(callbackClass).
+                type(MessageProcessor.class).
+                name("callbackMessageProcessor").
+                javadoc("The message processor to be called upon the http callback").
+                build();
     }
 
-    private void generateCallbackConstructor(DefinedClass callbackClass) {
+    private void generateConstructorArgSimpleFlowConstruct(DefinedClass callbackClass) {
         Method constructor = callbackClass.constructor(Modifier.PUBLIC);
         Variable callbackFlowArg = constructor.param(ref(SimpleFlowConstruct.class), "callbackFlow");
         Variable muleContextArg = constructor.param(ref(MuleContext.class), "muleContext");
+        Variable callbackDomainArg = constructor.param(ref(String.class), "callbackDomain");
+        Variable callbackPortArg = constructor.param(ref(Integer.class), "callbackPort");
         constructor.body().assign(ExpressionFactory._this().ref(callbackFlowField), callbackFlowArg);
         constructor.body().assign(ExpressionFactory._this().ref(muleContextField), muleContextArg);
-        Variable portSystemVar = constructor.body().decl(ref(String.class), "portSystemVar", ref(System.class).staticInvoke("getProperty").arg("http.port"));
-        Conditional conditional = constructor.body()._if(ref(NumberUtils.class).staticInvoke("isDigits").arg(portSystemVar));
-        conditional._then().block().assign(portVariable, ref(Integer.class).staticInvoke("parseInt").arg(portSystemVar));
-        Block thenBlock = conditional._else().block();
-        thenBlock.invoke(loggerField, "warn").arg(ref(String.class).staticInvoke("format").arg("Environment variable 'http.port' not found, using default port: %s").arg(defaultPortField));
-        thenBlock.assign(portVariable, defaultPortField);
+        constructor.body().assign(ExpressionFactory._this().ref(portField), callbackPortArg);
+        constructor.body().assign(ExpressionFactory._this().ref(domainField), callbackDomainArg);
+    }
+
+    private void generateConstructorArgMessageProcessor(DefinedClass callbackClass) {
+        Method constructor = callbackClass.constructor(Modifier.PUBLIC);
+        Variable messageProcessorArg = constructor.param(ref(MessageProcessor.class), "callbackMessageProcessor");
+        Variable muleContextArg = constructor.param(ref(MuleContext.class), "muleContext");
+        Variable callbackDomainArg = constructor.param(ref(String.class), "callbackDomain");
+        Variable callbackPortArg = constructor.param(ref(Integer.class), "callbackPort");
+        constructor.body().assign(ExpressionFactory._this().ref(callbackMessageProcessorField), messageProcessorArg);
+        constructor.body().assign(ExpressionFactory._this().ref(muleContextField), muleContextArg);
+        constructor.body().assign(ExpressionFactory._this().ref(portField), callbackPortArg);
+        constructor.body().assign(ExpressionFactory._this().ref(domainField), callbackDomainArg);
     }
 
     private void generateBuildUrlMethod(DefinedClass callbackClass) {
         buildUrlMethod = callbackClass.method(Modifier.PRIVATE, ref(String.class), "buildUrl");
         Block body = buildUrlMethod.body();
         Variable urlBuilder = body.decl(ref(StringBuilder.class), "urlBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
-        body.invoke(urlBuilder, "append").arg(urlPrefixVariable);
-        body.invoke(urlBuilder, "append").arg(portVariable);
+        Block ifDomainNotPrefixed = body._if(Op.not(domainField.invoke("startsWith").arg("http://")))._then();
+        ifDomainNotPrefixed.invoke(urlBuilder, "append").arg("http://");
+        body.invoke(urlBuilder, "append").arg(domainField);
+        body.invoke(urlBuilder, "append").arg(":");
+        body.invoke(urlBuilder, "append").arg(portField);
         body.invoke(urlBuilder, "append").arg("/");
         body.invoke(urlBuilder, "append").arg(ref(UUID.class).staticInvoke("randomUUID"));
         body._return(urlBuilder.invoke("toString"));
@@ -193,11 +216,17 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
         createFlowRefMessageProcessorMethod = callbackClass.method(Modifier.PRIVATE, ref(MessageProcessor.class), "createFlowRefMessageProcessor")._throws(ref(MuleException.class));
         Block body = createFlowRefMessageProcessorMethod.body();
 
-        Invocation mp = ExpressionFactory._new(callbackClass.listClasses()[0]);
 
         Variable asyncMessageProcessorsFactoryBean = body.decl(ref(AsyncMessageProcessorsFactoryBean.class), "asyncMessageProcessorsFactoryBean", ExpressionFactory._new(ref(AsyncMessageProcessorsFactoryBean.class)));
         body.invoke(asyncMessageProcessorsFactoryBean, "setMuleContext").arg(muleContextField);
-        body.invoke(asyncMessageProcessorsFactoryBean, "setMessageProcessors").arg(ref(Arrays.class).staticInvoke("asList").arg(mp));
+
+        Variable messageProcessor = body.decl(ref(MessageProcessor.class), "messageProcessor");
+
+        Conditional ifCallbackFlowNotNull = body._if(Op.ne(callbackFlowField, ExpressionFactory._null()));
+        ifCallbackFlowNotNull._then().assign(messageProcessor, ExpressionFactory._new(callbackClass.listClasses()[0]));
+        ifCallbackFlowNotNull._else().assign(messageProcessor, callbackMessageProcessorField);
+
+        body.invoke(asyncMessageProcessorsFactoryBean, "setMessageProcessors").arg(ref(Arrays.class).staticInvoke("asList").arg(messageProcessor));
 
         TryStatement tryStatement = body._try();
         tryStatement.body()._return(ExpressionFactory.cast(ref(MessageProcessor.class), asyncMessageProcessorsFactoryBean.invoke("getObject")));
@@ -219,7 +248,7 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
     private void generateCreateHttpInboundEndpointMethod(DefinedClass callbackClass) {
         createHttpInboundEndpointMethod = callbackClass.method(Modifier.PRIVATE, ref(InboundEndpoint.class), "createHttpInboundEndpoint")._throws(ref(MuleException.class));
         Block body = createHttpInboundEndpointMethod.body();
-        Variable inBuilderVariable = body.decl(ref(EndpointURIEndpointBuilder.class), "inBuilder", ExpressionFactory._new(ref(EndpointURIEndpointBuilder.class)).arg(urlVariable).arg(muleContextField));
+        Variable inBuilderVariable = body.decl(ref(EndpointURIEndpointBuilder.class), "inBuilder", ExpressionFactory._new(ref(EndpointURIEndpointBuilder.class)).arg(localUrlField).arg(muleContextField));
         body.invoke(inBuilderVariable, "setConnector").arg(ExpressionFactory.invoke(createConnectorMethod));
         body.invoke(inBuilderVariable, "setExchangePattern").arg(ref(MessageExchangePattern.class).staticRef(INBOUND_ENDPOINT_EXCHANGE_PATTERN));
         Variable endpointFactoryVariable = body.decl(ref(EndpointFactory.class), "endpointFactory", ExpressionFactory.invoke(muleContextField, "getEndpointFactory"));
@@ -229,14 +258,15 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
     private void generateStartMethod(DefinedClass callbackClass) {
         Method startMethod = callbackClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start")._throws(ref(MuleException.class));
         Block body = startMethod.body();
-        body.assign(ExpressionFactory._this().ref(urlVariable), ExpressionFactory.invoke(buildUrlMethod));
-        Variable dynamicFlowName = body.decl(ref(String.class), "dynamicFlowName", ref(String.class).staticInvoke("format").arg("DynamicFlowRefTo-%s").arg(ExpressionFactory.invoke(callbackFlowField, "getName")));
+        body.assign(ExpressionFactory._this().ref(urlField), ExpressionFactory.invoke(buildUrlMethod));
+        body.assign(ExpressionFactory._this().ref(localUrlField), urlField.invoke("replace").arg(domainField).arg("localhost"));
+        Variable dynamicFlowName = body.decl(ref(String.class), "dynamicFlowName", ref(String.class).staticInvoke("format").arg("DynamicFlow-%s").arg(localUrlField));
         body.assign(flowConstructVariable, ExpressionFactory._new(ref(SimpleFlowConstruct.class)).arg(dynamicFlowName).arg(muleContextField));
         body.invoke(flowConstructVariable, "setMessageSource").arg(ExpressionFactory.invoke(createHttpInboundEndpointMethod));
         body.invoke(flowConstructVariable, "setMessageProcessors").arg(ref(Arrays.class).staticInvoke("asList").arg(ExpressionFactory.invoke(createFlowRefMessageProcessorMethod)));
         body.invoke(flowConstructVariable, "initialise");
         body.invoke(flowConstructVariable, "start");
-        body.invoke(loggerField, "debug").arg(ref(String.class).staticInvoke("format").arg("Created flow with http inbound endpoint listening at: %s").arg(urlVariable));
+        body.invoke(loggerField, "debug").arg(ref(String.class).staticInvoke("format").arg("Created flow with http inbound endpoint listening at: %s").arg(urlField));
     }
 
     private void generateStopMethod(DefinedClass callbackClass) {
@@ -244,6 +274,7 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
         Block body = stopMethod.body();
         Block block = body._if(Op.ne(flowConstructVariable, ExpressionFactory._null()))._then();
         block.invoke(flowConstructVariable, "stop");
+        block.invoke(flowConstructVariable, "dispose");
         block.invoke(loggerField, "debug").arg("Http callback flow stopped");
     }
 

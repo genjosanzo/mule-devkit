@@ -26,6 +26,7 @@ import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.callback.InterceptCallback;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
+import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
@@ -173,6 +174,13 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             } else if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
                 generateParseEnum(parse.body(), element, builder, fieldName);
             }
+        }
+
+        if (element instanceof TypeElement && (type.getAnnotation(OAuth.class) != null || classHasMethodWithParameterOfType((TypeElement) element, HttpCallback.class))) {
+            Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class), "httpCallbackConfigElement", ref(DomUtils.class).staticInvoke("getChildElementByTagName").
+                    arg(element).arg(SchemaGenerator.HTTP_CALLBACK_CONFIG_ELEMENT_NAME));
+            generateParseSupportedType(parse.body(), listElement, builder, HttpCallbackAdapterGenerator.DOMAIN_FIELD_NAME);
+            generateParseSupportedType(parse.body(), listElement, builder, HttpCallbackAdapterGenerator.PORT_FIELD_NAME);
         }
 
         Variable definition = parse.body().decl(ref(BeanDefinition.class), "definition", builder.invoke("getBeanDefinition"));

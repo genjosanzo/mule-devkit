@@ -23,6 +23,12 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.callback.InterceptCallback;
 import org.mule.api.annotations.callback.SourceCallback;
+import org.mule.api.annotations.oauth.OAuth;
+import org.mule.api.annotations.oauth.OAuthAccessToken;
+import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
+import org.mule.api.annotations.oauth.OAuthConsumerKey;
+import org.mule.api.annotations.oauth.OAuthConsumerSecret;
+import org.mule.api.annotations.oauth.RequiresAccessToken;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.devkit.validation.ValidationException;
@@ -35,6 +41,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
+import java.lang.annotation.Annotation;
 import java.util.List;
 
 public class ModuleValidator implements Validator {
@@ -76,7 +83,7 @@ public class ModuleValidator implements Validator {
                 throw new ValidationException(variable, "@Configurable cannot be applied to field with static modifier");
             }
 
-            if (variable.asType().getKind().isPrimitive() && optional != null && def.value().length() == 0) {
+            if (variable.asType().getKind().isPrimitive() && optional != null && (def == null || def.value().length() == 0)) {
                 throw new ValidationException(variable, "@Optional @Configurable fields can only be applied to non-primitive types with a @Default value");
             }
         }
@@ -151,9 +158,38 @@ public class ModuleValidator implements Validator {
             }
         }
 
+        if (element.getAnnotation(OAuth.class) != null) {
+            checkClassHasFieldWithAnnotation(element, OAuthConsumerKey.class, "@OAuth class must contain a field annotated with @OAuthConsumerKey");
+            checkClassHasFieldWithAnnotation(element, OAuthConsumerSecret.class, "@OAuth class must contain a field annotated with @OAuthConsumerSecret");
+            checkClassHasFieldWithAnnotation(element, OAuthAccessToken.class, "@OAuth class must contain a field annotated with @OAuthAccessToken");
+            checkClassHasFieldWithAnnotation(element, OAuthAccessTokenSecret.class, "@OAuth class must contain a field annotated with @OAuthAccessTokenSecret");
+        } else if (classHasMethodWithAnnotation(element, RequiresAccessToken.class)){
+            throw new ValidationException(element, "@RequiresAccessToken methods requires that the class is annotated with @OAuth");
+        }
+
         // verify that every @Transformer is public and non-static and non-generic
         // verify that every @Transformer signature is Object x(Object);
 
         // verify that every @Filter is public and non-static and non-generic
+    }
+
+    private void checkClassHasFieldWithAnnotation(Element element, Class<? extends Annotation> annotation, String errorMessage) throws ValidationException {
+        List<VariableElement> fields = ElementFilter.fieldsIn(element.getEnclosedElements());
+        for (VariableElement field : fields) {
+            if (field.getAnnotation(annotation) != null) {
+                return;
+            }
+        }
+        throw new ValidationException(element, errorMessage);
+    }
+
+    private boolean classHasMethodWithAnnotation(Element element, Class<? extends Annotation> annotation) throws ValidationException {
+        List<ExecutableElement> methods = ElementFilter.methodsIn(element.getEnclosedElements());
+        for (ExecutableElement method : methods) {
+            if (method.getAnnotation(annotation) != null) {
+                return true;
+            }
+        }
+        return false;
     }
 }
