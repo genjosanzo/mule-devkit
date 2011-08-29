@@ -682,7 +682,7 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
     }
 
     public String modulePath() {
-        String s = name();
+        String s = moduleName();
         s += ".html";
         return s;
     }

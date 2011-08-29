@@ -41,7 +41,6 @@
 
 <?cs call:class_table("Interfaces", package.interfaces) ?>
 <?cs call:class_table("Classes", package.classes) ?>
-<?cs call:class_table("Modules", package.modules) ?>
 <?cs call:class_table("Enums", package.enums) ?>
 <?cs call:class_table("Exceptions", package.exceptions) ?>
 <?cs call:class_table("Errors", package.errors) ?>
