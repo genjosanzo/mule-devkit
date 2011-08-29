@@ -34,6 +34,7 @@ import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.RequiresAccessToken;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
+import org.mule.api.annotations.param.Payload;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
@@ -571,6 +572,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             } else {
                 InboundHeaders inboundHeaders = variable.getAnnotation(InboundHeaders.class);
                 InvocationHeaders invocationHeaders = variable.getAnnotation(InvocationHeaders.class);
+                Payload payload = variable.getAnnotation(Payload.class);
 
                 Type type = ref(fields.get(fieldName).getVariableElement().asType()).boxify();
                 String name = "transformed" + StringUtils.capitalize(fieldName);
@@ -595,6 +597,8 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                     } else {
                         evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
                     }
+                } else if (payload != null) {
+                    evaluateAndTransform.arg("#[payload]");
                 } else {
                     evaluateAndTransform.arg(fields.get(fieldName).getField());
                 }

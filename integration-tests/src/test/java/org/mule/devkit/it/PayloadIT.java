@@ -17,20 +17,28 @@
 
 package org.mule.devkit.it;
 
-import org.mule.api.annotations.Module;
-import org.mule.api.annotations.Processor;
-import org.mule.api.annotations.param.Payload;
+import java.io.File;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
+public class PayloadIT extends AbstractMavenIT
+{
 
-@Module(name = "payload")
-public class PayloadModule {
-	
-    @Processor
-    public Object returnPayload(@Payload Object payload) {
-        return payload;
+    protected String getArtifactVersion()
+    {
+        return "1.0";
+    }
+
+    protected String getArtifactId()
+    {
+        return "payload-integration-test";
+    }
+
+    protected String getGroupId()
+    {
+        return "org.mule.devkit.it";
+    }
+
+    protected File getRoot()
+    {
+        return new File("target/integration-tests/" + getArtifactId());
     }
 }

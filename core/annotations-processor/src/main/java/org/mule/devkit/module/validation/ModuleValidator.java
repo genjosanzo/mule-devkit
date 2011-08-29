@@ -30,7 +30,10 @@ import org.mule.api.annotations.oauth.OAuthConsumerKey;
 import org.mule.api.annotations.oauth.OAuthConsumerSecret;
 import org.mule.api.annotations.oauth.RequiresAccessToken;
 import org.mule.api.annotations.param.Default;
+import org.mule.api.annotations.param.InboundHeaders;
+import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.Optional;
+import org.mule.api.annotations.param.Payload;
 import org.mule.devkit.validation.ValidationException;
 import org.mule.devkit.validation.Validator;
 
@@ -123,6 +126,21 @@ public class ModuleValidator implements Validator {
                 }
             }
 
+            List<? extends VariableElement> parameters = executableElement.getParameters();
+            for (VariableElement parameter : parameters) {
+                int count = 0;
+                if (parameter.getAnnotation(InboundHeaders.class) != null)
+                    count++;
+                if (parameter.getAnnotation(InvocationHeaders.class) != null)
+                    count++;
+                if (parameter.getAnnotation(Payload.class) != null)
+                    count++;
+
+                if( count > 1 ) {
+                    throw new ValidationException(parameter, "You cannot have more than one of InboundHeader, InvocationHeaders or Payload annotation");
+                }
+            }
+
         }
 
         // verify that every @Source is public and non-static and non-generic
@@ -163,7 +181,7 @@ public class ModuleValidator implements Validator {
             checkClassHasFieldWithAnnotation(element, OAuthConsumerSecret.class, "@OAuth class must contain a field annotated with @OAuthConsumerSecret");
             checkClassHasFieldWithAnnotation(element, OAuthAccessToken.class, "@OAuth class must contain a field annotated with @OAuthAccessToken");
             checkClassHasFieldWithAnnotation(element, OAuthAccessTokenSecret.class, "@OAuth class must contain a field annotated with @OAuthAccessTokenSecret");
-        } else if (classHasMethodWithAnnotation(element, RequiresAccessToken.class)){
+        } else if (classHasMethodWithAnnotation(element, RequiresAccessToken.class)) {
             throw new ValidationException(element, "@RequiresAccessToken methods requires that the class is annotated with @OAuth");
         }
 

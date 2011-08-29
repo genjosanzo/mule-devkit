@@ -31,6 +31,7 @@ import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.Optional;
+import org.mule.api.annotations.param.Payload;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.schema.All;
 import org.mule.devkit.model.schema.Annotation;
@@ -342,6 +343,12 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
                 if (invocationHeaders != null)
                     continue;
+
+                Payload payload = variable.getAnnotation(Payload.class);
+
+                if (payload != null)
+                    continue;
+
 
                 if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
                     generateProcessorCallbackElement(all, variable);
