@@ -323,6 +323,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         complexType.setName(name);
 
         ComplexContent complexContent = new ComplexContent();
+        complexContent.setMixed(true);
         complexType.setComplexContent(complexContent);
         ExtensionType complexContentExtension = new ExtensionType();
         complexContentExtension.setBase(base);
