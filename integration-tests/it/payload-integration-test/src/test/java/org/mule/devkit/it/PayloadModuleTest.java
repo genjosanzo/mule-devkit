@@ -17,11 +17,6 @@
 
 package org.mule.devkit.it;
 
-import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class PayloadModuleTest extends AbstractModuleTest
 {
 

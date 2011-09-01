@@ -247,12 +247,14 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         Variable poolingProfileElement = parse.body().decl(ref(org.w3c.dom.Element.class), propertyName + "Element",
                 ref(DomUtils.class).staticInvoke("getChildElementByTagName").arg(element).arg(elementName));
 
-        generateParseSupportedType(parse.body(), poolingProfileElement, poolingProfileBuilder, "maxActive");
-        generateParseSupportedType(parse.body(), poolingProfileElement, poolingProfileBuilder, "maxIdle");
-        generateParseSupportedType(parse.body(), poolingProfileElement, poolingProfileBuilder, "maxWait");
+        Conditional ifElementNotNull = parse.body()._if(Op.ne(poolingProfileElement, ExpressionFactory._null()));
+
+        generateParseSupportedType(ifElementNotNull._then(), poolingProfileElement, poolingProfileBuilder, "maxActive");
+        generateParseSupportedType(ifElementNotNull._then(), poolingProfileElement, poolingProfileBuilder, "maxIdle");
+        generateParseSupportedType(ifElementNotNull._then(), poolingProfileElement, poolingProfileBuilder, "maxWait");
 
         Invocation getAttribute = poolingProfileElement.invoke("getAttribute").arg("exhaustedAction");
-        Conditional ifNotNull = parse.body()._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
+        Conditional ifNotNull = ifElementNotNull._then()._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
                 Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(
                         getAttribute
                 ))));
@@ -261,7 +263,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         ));
 
         getAttribute = poolingProfileElement.invoke("getAttribute").arg("exhaustedAction");
-        ifNotNull = parse.body()._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
+        ifNotNull = ifElementNotNull._then()._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
                 Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(
                         getAttribute
                 ))));
@@ -269,7 +271,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 ref(PoolingProfile.class).staticRef("POOL_INITIALISATION_POLICIES").invoke("get").arg(poolingProfileElement.invoke("getAttribute").arg("initialisationPolicy"))
         ));
 
-        parse.body().add(builder.invoke("addPropertyValue").arg(propertyName).arg(
+        ifElementNotNull._then().add(builder.invoke("addPropertyValue").arg(propertyName).arg(
                 poolingProfileBuilder.invoke("getBeanDefinition")
         ));
     }
