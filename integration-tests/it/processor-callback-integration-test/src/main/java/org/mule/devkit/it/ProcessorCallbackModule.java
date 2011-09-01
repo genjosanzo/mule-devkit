@@ -21,6 +21,8 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.ProcessorCallback;
 
+import java.util.List;
+
 @Module(name = "callback")
 public class ProcessorCallbackModule
 {
@@ -34,6 +36,12 @@ public class ProcessorCallbackModule
     public Object callback(ProcessorCallback innerProcessor) throws Exception
     {
 		return innerProcessor.process();
+    }
+
+    @Processor
+    public Object processItems(List<String> items, ProcessorCallback processors) throws Exception
+    {
+		return processors.process();
     }
 
 	@Processor

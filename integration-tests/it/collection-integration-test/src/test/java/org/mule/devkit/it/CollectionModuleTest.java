@@ -59,4 +59,9 @@ public class CollectionModuleTest extends AbstractModuleTest {
     public void testConfigItemsRefList() throws Exception {
         runFlow("flowConfigItemsRefList", 3);
     }
+
+    public void testCountTwoLists() throws Exception {
+        runFlow("flowCountTwoLists", 5);
+    }
+
 }

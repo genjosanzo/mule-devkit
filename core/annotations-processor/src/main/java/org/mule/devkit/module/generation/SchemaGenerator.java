@@ -335,12 +335,29 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         complexContentExtension.setAll(all);
 
         if (element.getKind() == ElementKind.METHOD) {
+            int requiredChildElements = 0;
+            for (VariableElement variable : element.getParameters()) {
+                if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
+                    requiredChildElements++;
+                } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
+                    requiredChildElements++;
+                } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
+                    requiredChildElements++;
+                }
+            }
             for (VariableElement variable : element.getParameters()) {
                 if (ignoreParameter(variable)) {
                     continue;
                 }
                 if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
-                    generateProcessorCallbackElement(all, variable);
+                    if( requiredChildElements == 1 ) {
+                        Optional optional = variable.getAnnotation(Optional.class);
+                        GroupRef groupRef = generateProcessorCallbackGroup(optional);
+                        complexContentExtension.setGroup(groupRef);
+                        complexContentExtension.setAll(null);
+                    } else {
+                        generateProcessorCallbackElement(all, variable);
+                    }
                 } else if (variable.getAnnotation(Session.class) != null) {
                     // get the executable element for create session
                     ExecutableElement sessionCreate = createSessionForMethod(element);
@@ -395,17 +412,22 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         collectionElement.setMaxOccurs("1");
 
         LocalComplexType collectionComplexType = new LocalComplexType();
+        GroupRef group = generateProcessorCallbackGroup(optional);
+
+        collectionComplexType.setGroup(group);
+        collectionElement.setComplexType(collectionComplexType);
+    }
+
+    private GroupRef generateProcessorCallbackGroup(Optional optional) {
         GroupRef group = new GroupRef();
-        group.setRef(SchemaConstants.MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE);
+        group.generateProcessorCallbackGroup(SchemaConstants.MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE);
         if (optional != null) {
             group.setMinOccurs(BigInteger.valueOf(0L));
         } else {
             group.setMinOccurs(BigInteger.valueOf(1L));
         }
         group.setMaxOccurs("unbounded");
-
-        collectionComplexType.setGroup(group);
-        collectionElement.setComplexType(collectionComplexType);
+        return group;
     }
 
     private void generateCollectionElement(String targetNamespace, All all, VariableElement variable) {

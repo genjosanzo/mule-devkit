@@ -140,4 +140,18 @@
         <collection:count-config-items config-ref="configE"/>
     </flow>
 
+    <flow name="flowCountTwoLists">
+        <collection:count-two-lists  config-ref="configE">
+            <collection:first-lists>
+                <collection:first-list>itemA</collection:first-list>
+                <collection:first-list>itemB</collection:first-list>
+                <collection:first-list>itemC</collection:first-list>
+            </collection:first-lists>
+            <collection:second-lists>
+                <collection:second-list>itemA</collection:second-list>
+                <collection:second-list>itemB</collection:second-list>
+            </collection:second-lists>
+        </collection:count-two-lists>
+    </flow>
+
 </mule>

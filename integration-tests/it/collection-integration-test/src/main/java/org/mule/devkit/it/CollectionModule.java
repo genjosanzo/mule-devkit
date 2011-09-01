@@ -22,6 +22,7 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.param.Optional;
 
+import java.lang.String;
 import java.util.List;
 import java.util.Map;
 
@@ -101,6 +102,11 @@ public class CollectionModule
             if( object.keySet().size() != 3 )
                 throw new RuntimeException("Invalid object");
         }
+    }
+
+    @Processor
+    public int countTwoLists(List<String> firstLists, List<String> secondLists) {
+        return firstLists.size() + secondLists.size();
     }
 
 	public void setStrings(List strings)

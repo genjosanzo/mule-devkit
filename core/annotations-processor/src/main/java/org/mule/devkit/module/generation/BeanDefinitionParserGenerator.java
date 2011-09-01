@@ -348,6 +348,17 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         Method getAttributeValue = generateGetAttributeValue(beanDefinitionparser);
 
+        int requiredChildElements = 0;
+        for (VariableElement variable : executableElement.getParameters()) {
+            if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
+                requiredChildElements++;
+            } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
+                requiredChildElements++;
+            } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
+                requiredChildElements++;
+            }
+        }
+
         for (VariableElement variable : executableElement.getParameters()) {
             if (variable.asType().toString().contains(SourceCallback.class.getName())) {
                 continue;
@@ -359,7 +370,11 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             String fieldName = variable.getSimpleName().toString();
 
             if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
-                generateParseProcessorCallback(parse.body(), element, parserContext, builder, fieldName);
+                if (requiredChildElements == 1) {
+                    generateParseProcessorCallback(parse.body(), element, parserContext, builder, fieldName, true);
+                } else {
+                    generateParseProcessorCallback(parse.body(), element, parserContext, builder, fieldName, false);
+                }
             } else if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
                 generateParseSupportedType(parse.body(), element, builder, fieldName);
             } else if (context.getTypeMirrorUtils().isTransferObject(variable.asType())) {
@@ -453,11 +468,14 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         return definition;
     }
 
-    private void generateParseProcessorCallback(Block block, Variable element, Variable parserContext, Variable builder, String fieldName) {
+    private void generateParseProcessorCallback(Block block, Variable element, Variable parserContext, Variable builder, String fieldName, boolean skipElement) {
 
-        Variable elements = block.decl(ref(org.w3c.dom.Element.class), fieldName + "Element",
-                ref(DomUtils.class).staticInvoke("getChildElementByTagName")
-                        .arg(element).arg(context.getNameUtils().uncamel(fieldName)));
+        Variable elements = element;
+        if (!skipElement) {
+            elements = block.decl(ref(org.w3c.dom.Element.class), fieldName + "Element",
+                    ref(DomUtils.class).staticInvoke("getChildElementByTagName")
+                            .arg(element).arg(context.getNameUtils().uncamel(fieldName)));
+        }
 
         Conditional ifNotNull = block._if(Op.ne(elements, ExpressionFactory._null()));
 
@@ -759,8 +777,6 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
             if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
                 generateParseSupportedType(block, element, builder, fieldName);
-            } else if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
-                generateParseProcessorCallback(block, element, parserContext, builder, fieldName);
             } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                 generateParseXmlType(block, element, builder, fieldName);
             } else if (context.getTypeMirrorUtils().isArrayOrList(variable.asType())) {

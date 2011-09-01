@@ -234,7 +234,7 @@ public abstract class Group
      *     {@link QName }
      *     
      */
-    public void setRef(QName value) {
+    public void generateProcessorCallbackGroup(QName value) {
         this.ref = value;
     }
 

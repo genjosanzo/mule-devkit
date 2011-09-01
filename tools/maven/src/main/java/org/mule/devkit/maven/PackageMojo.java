@@ -102,7 +102,7 @@ public class PackageMojo extends AbstractMuleMojo {
 
     protected void createMulePlugin(final File plugin) throws MojoExecutionException, ArchiverException {
         ModuleArchiver archiver = new ModuleArchiver();
-        //addAppDirectory(archiver);
+        addAppDirectory(archiver);
         addCompiledClasses(archiver);
         addDependencies(archiver);
 
@@ -118,9 +118,13 @@ public class PackageMojo extends AbstractMuleMojo {
 
     private void addAppDirectory(ModuleArchiver archiver) throws ArchiverException {
         if (filterAppDirectory) {
-            archiver.addResources(getFilteredAppDirectory());
+            if( getFilteredAppDirectory().exists() ) {
+                archiver.addResources(getFilteredAppDirectory());
+            }
         } else {
-            archiver.addResources(appDirectory);
+            if( appDirectory.exists() ) {
+                archiver.addResources(appDirectory);
+            }
         }
     }
 

@@ -31,17 +31,25 @@
 
     <flow name="callback">
 		<callback:callback>
-			<callback:inner-processor>
-				<callback:set-payload payload="mulesoft"/>
-			</callback:inner-processor>
+            <callback:set-payload payload="mulesoft"/>
 		</callback:callback>
     </flow>
 
     <flow name="callbackWithPayload">
 		<callback:callback-with-payload>
-			<callback:inner-processor>
-				<callback:set-payload payload="#[payload]"/>
-			</callback:inner-processor>
+            <callback:set-payload payload="#[payload]"/>
 		</callback:callback-with-payload>
+    </flow>
+
+    <flow name="processItems">
+        <callback:process-items>
+            <callback:items>
+                <callback:item>orange</callback:item>
+                <callback:item>apple</callback:item>
+            </callback:items>
+            <callback:processors>
+                <callback:set-payload payload="#[payload]"/>
+            </callback:processors>
+        </callback:process-items>
     </flow>
 </mule>
