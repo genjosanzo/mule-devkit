@@ -27,14 +27,43 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
         http://www.mulesoft.org/schema/mule/session http://www.mulesoft.org/schema/mule/session/1.0/mule-session.xsd">
 
-    <session:config username="mulesoft" password="muleion"/>
+    <session:config name="configA" username="mulesoft" password="muleion">
+        <session:session-pooling-profile maxActive="10" maxIdle="10"
+                                         exhaustedAction="WHEN_EXHAUSTED_GROW" maxWait="120"/>
+    </session:config>
+
+    <session:config name="configB" username="mulesoft" password="muleion">
+        <session:session-pooling-profile maxActive="10" maxIdle="10"
+                                         exhaustedAction="WHEN_EXHAUSTED_GROW" maxWait="120"/>
+    </session:config>
 
     <flow name="testSession">
-        <session:verify-session/>
+        <session:verify-session config-ref="configB"/>
+    </flow>
+
+    <flow name="testGetSessionId">
+        <session:get-session-id config-ref="configB"/>
+    </flow>
+
+    <flow name="testInvalidateSessionOnException">
+        <session:invalidate-session-on-exception config-ref="configB"/>
     </flow>
 
     <flow name="testSessionWithCredentials">
-        <session:verify-session username="#[map-payload:username]" password="#[map-payload:password]"/>
+        <session:verify-session username="#[map-payload:username]" password="#[map-payload:password]" config-ref="configB"/>
+    </flow>
+
+    <flow name="testSessionWithUsername">
+        <session:get-username username="#[map-payload:username]" config-ref="configB"/>
+    </flow>
+
+    <flow name="testSessionWithPassword">
+        <session:get-password password="#[map-payload:password]" config-ref="configB"/>
+    </flow>
+
+    <flow name="testStream">
+        <session:stream config-ref="configA"/>
+        <session:verify-session config-ref="configA"/>
     </flow>
 
 </mule>

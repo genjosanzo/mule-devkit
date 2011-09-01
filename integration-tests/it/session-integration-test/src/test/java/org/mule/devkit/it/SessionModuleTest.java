@@ -17,42 +17,69 @@
 
 package org.mule.devkit.it;
 
-public class SessionModuleTest extends AbstractModuleTest
-{
+import java.util.HashMap;
+import java.util.Map;
+
+public class SessionModuleTest extends AbstractModuleTest {
 
     @Override
-    protected String getConfigResources()
-    {
-        return "basic.xml";
+    protected String getConfigResources() {
+        return "session.xml";
     }
 
-    public void testString() throws Exception
-    {
-        runFlow("passthruStringFlow", "mulesoft");
+    public void testVerifySessionWithPassword() throws Exception {
+        try {
+            runFlow("testInvalidateSessionOnException");
+        } catch (Exception e) {
+        }
+
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("password", "ion2");
+        runFlowWithPayload("testSessionWithPassword", "ion2", map);
     }
 
-    public void testInteger() throws Exception
-    {
-        runFlow("passthruIntegerFlow", 3);
+    public void testVerifySession() throws Exception {
+        runFlow("testSession", true);
     }
 
-    public void testFloat() throws Exception
-    {
-        runFlow("passthruFloatFlow", 3.14f);
+    public void testStream() throws Exception {
+        runFlow("testStream", true);
     }
 
-    public void testBoolean() throws Exception
-    {
-        runFlow("passthruBooleanFlow", true);
+    public void testVerifySessionWithCredentials() throws Exception {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("username", "ion2");
+        map.put("password", "ion3");
+        runFlowWithPayload("testSessionWithCredentials", true, map);
     }
 
-    public void testLong() throws Exception
-    {
-        runFlow("passthruLongFlow", 3456443463342345734L);
+    public void testVerifySessionWithUsername() throws Exception {
+        try {
+            runFlow("testInvalidateSessionOnException");
+        } catch (Exception e) {
+        }
+
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("username", "ion2");
+        runFlowWithPayload("testSessionWithUsername", "ion2", map);
     }
 
-    public void testEnum() throws Exception
-    {
-        runFlow("passthruEnumFlow", "In");
+    public void testVerifySameSession() throws Exception {
+        Integer sessionIdA = runFlow("testGetSessionId");
+        Integer sessionIdB = runFlow("testGetSessionId");
+
+        assertEquals(sessionIdA, sessionIdB);
     }
+
+    public void testVerifyDifferentSession() throws Exception {
+        Integer sessionIdA = runFlow("testGetSessionId");
+        try {
+            runFlow("testInvalidateSessionOnException");
+        } catch (Exception e) {
+        }
+        Integer sessionIdB = runFlow("testGetSessionId");
+
+        assertNotSame(sessionIdA, sessionIdB);
+    }
+
 }

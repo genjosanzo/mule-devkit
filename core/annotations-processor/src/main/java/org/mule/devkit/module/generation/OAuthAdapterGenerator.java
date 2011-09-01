@@ -112,12 +112,12 @@ public class OAuthAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getOAuthAdapterClass(TypeElement typeElement) {
-        String lifecycleAdapterName = context.getNameUtils().generateClassName(typeElement, ".config", "OAuthAdapter");
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(lifecycleAdapterName));
+        String oauthAdapterName = context.getNameUtils().generateClassName(typeElement, ".config", "OAuthAdapter");
+        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(oauthAdapterName));
 
         DefinedClass classToExtend = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
 
-        DefinedClass oauthAdapter = pkg._class(context.getNameUtils().getClassName(lifecycleAdapterName), classToExtend);
+        DefinedClass oauthAdapter = pkg._class(context.getNameUtils().getClassName(oauthAdapterName), classToExtend);
         oauthAdapter._implements(MuleContextAware.class);
         oauthAdapter._implements(Startable.class);
         oauthAdapter._implements(Initialisable.class);

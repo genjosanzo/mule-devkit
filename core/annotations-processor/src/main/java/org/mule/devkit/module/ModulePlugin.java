@@ -36,6 +36,7 @@ import org.mule.devkit.module.generation.ProcessorCallbackGenerator;
 import org.mule.devkit.module.generation.RegistryBootstrapGenerator;
 import org.mule.devkit.module.generation.SchemaGenerator;
 import org.mule.devkit.module.generation.InterceptCallbackGenerator;
+import org.mule.devkit.module.generation.SessionAdapterGenerator;
 import org.mule.devkit.module.generation.SpringNamespaceHandlerGenerator;
 import org.mule.devkit.module.generation.SpringSchemaGenerator;
 import org.mule.devkit.module.generation.TransformerGenerator;
@@ -58,6 +59,7 @@ public class ModulePlugin implements Plugin {
         this.generators.add(new HttpCallbackAdapterGenerator());
         this.generators.add(new OAuthAdapterGenerator());
         this.generators.add(new LifecycleAdapterFactoryGenerator());
+        this.generators.add(new SessionAdapterGenerator());
         this.generators.add(new PoolAdapterGenerator());
         this.generators.add(new JaxbTransformerGenerator());
         this.generators.add(new TransformerGenerator());

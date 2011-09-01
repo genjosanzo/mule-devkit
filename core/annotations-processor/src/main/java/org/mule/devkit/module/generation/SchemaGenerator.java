@@ -32,6 +32,7 @@ import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.Optional;
 import org.mule.api.annotations.param.Payload;
+import org.mule.api.annotations.param.Session;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.schema.All;
 import org.mule.devkit.model.schema.Annotation;
@@ -279,7 +280,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private void registerProcessorElement(boolean intercepting, String targetNamespace, String name, String typeName) {
         Element element = new TopLevelElement();
         element.setName(context.getNameUtils().uncamel(name));
-        if( intercepting ) {
+        if (intercepting) {
             element.setSubstitutionGroup(SchemaConstants.MULE_ABSTRACT_INTERCEPTING_MESSAGE_PROCESSOR);
         } else {
             element.setSubstitutionGroup(SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR);
@@ -299,7 +300,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     }
 
     private void registerProcessorType(boolean intercepting, String targetNamespace, String name, ExecutableElement element) {
-        if( intercepting ) {
+        if (intercepting) {
             registerExtendedType(SchemaConstants.MULE_ABSTRACT_INTERCEPTING_MESSAGE_PROCESSOR_TYPE, targetNamespace, name, element);
         } else {
             registerExtendedType(SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE, targetNamespace, name, element);
@@ -352,6 +353,17 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
                 if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
                     generateProcessorCallbackElement(all, variable);
+                } else if (variable.getAnnotation(Session.class) != null) {
+                    // get the executable element for create session
+                    ExecutableElement sessionCreate = createSessionForMethod(element);
+                    // add a configurable argument for each session variable
+                    for (VariableElement sessionVariable : sessionCreate.getParameters()) {
+                        if (context.getTypeMirrorUtils().isCollection(sessionVariable.asType())) {
+                            generateCollectionElement(targetNamespace, all, sessionVariable, true);
+                        } else {
+                            complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(sessionVariable, true));
+                        }
+                    }
                 } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                     all.getParticle().add(objectFactory.createElement(generateXmlElement(variable.getSimpleName().toString(), targetNamespace)));
                 } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
@@ -394,15 +406,25 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         collectionElement.setComplexType(collectionComplexType);
     }
 
-    private void generateCollectionElement(String targetNamespace, All all, VariableElement variable, boolean optional) {
+    private void generateCollectionElement(String targetNamespace, All all, VariableElement variable) {
+        generateCollectionElement(targetNamespace, all, variable, false);
+    }
+
+    private void generateCollectionElement(String targetNamespace, All all, VariableElement variable, boolean forceOptional) {
+        Optional optional = variable.getAnnotation(Optional.class);
+
         TopLevelElement collectionElement = new TopLevelElement();
         all.getParticle().add(objectFactory.createElement(collectionElement));
         collectionElement.setName(context.getNameUtils().uncamel(variable.getSimpleName().toString()));
 
-        if (optional) {
-            collectionElement.setMinOccurs(BigInteger.valueOf(0L));
+        if (!forceOptional) {
+            if (optional != null) {
+                collectionElement.setMinOccurs(BigInteger.valueOf(0L));
+            } else {
+                collectionElement.setMinOccurs(BigInteger.valueOf(1L));
+            }
         } else {
-            collectionElement.setMinOccurs(BigInteger.valueOf(1L));
+            collectionElement.setMinOccurs(BigInteger.valueOf(0L));
         }
         collectionElement.setMaxOccurs("1");
 
@@ -481,7 +503,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             if (variableTypeParameters.size() > 0 && isTypeSupported(variableTypeParameters.get(0))) {
                 keyAttribute.setName(ATTRIBUTE_NAME_KEY);
                 keyAttribute.setType(SchemaTypeConversion.convertType(variableTypeParameters.get(0).toString(), schema.getTargetNamespace()));
-            } else if(variableTypeParameters.size() > 0 && context.getTypeMirrorUtils().isEnum(variableTypeParameters.get(0))) {
+            } else if (variableTypeParameters.size() > 0 && context.getTypeMirrorUtils().isEnum(variableTypeParameters.get(0))) {
                 keyAttribute.setName(ATTRIBUTE_NAME_KEY);
                 javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(variableTypeParameters.get(0));
                 keyAttribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + ENUM_TYPE_SUFFIX));
@@ -583,12 +605,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return complexType;
     }
 
-    private void generateCollectionElement(String targetNamespace, All all, VariableElement variable) {
-        Optional optional = variable.getAnnotation(Optional.class);
-
-        generateCollectionElement(targetNamespace, all, variable, optional != null);
-    }
-
     private LocalComplexType generateRefComplexType(String name) {
         LocalComplexType itemComplexType = new LocalComplexType();
 
@@ -648,59 +664,91 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             }
         }
 
-        if(element.getAnnotation(OAuth.class) != null || classHasMethodWithParameterOfType((TypeElement)element, HttpCallback.class)) {
+        // get the executable element for create session
+        ExecutableElement sessionCreate = createSessionForClass(element);
 
-           Attribute domainAttribute = new Attribute();
-           domainAttribute.setUse(SchemaConstants.USE_OPTIONAL);
-           domainAttribute.setName(DOMAIN_ATTRIBUTE_NAME);
-           domainAttribute.setType(SchemaConstants.STRING);
-           domainAttribute.setDefault(DOMAIN_DEFAULT_VALUE);
+        if (sessionCreate != null) {
+            // add a configurable argument for each session variable
+            for (VariableElement sessionVariable : sessionCreate.getParameters()) {
+                if (context.getTypeMirrorUtils().isCollection(sessionVariable.asType())) {
+                    generateCollectionElement(targetNamespace, all, sessionVariable, true);
+                } else {
+                    config.getAttributeOrAttributeGroup().add(createParameterAttribute(sessionVariable, true));
+                }
+            }
 
-           Attribute portAttribute = new Attribute();
-           portAttribute.setUse(SchemaConstants.USE_OPTIONAL);
-           portAttribute.setName(PORT_ATTRIBUTE_NAME);
-           portAttribute.setType(SchemaConstants.STRING);
-           portAttribute.setDefault(PORT_DEFAULT_VALUE);
+            TopLevelElement poolingProfile = new TopLevelElement();
+            poolingProfile.setName("session-pooling-profile");
+            poolingProfile.setType(SchemaConstants.MULE_POOLING_PROFILE_TYPE);
+            poolingProfile.setMinOccurs(BigInteger.valueOf(0L));
 
-           TopLevelElement httpCallbackConfig = new TopLevelElement();
-           httpCallbackConfig.setName(HTTP_CALLBACK_CONFIG_ELEMENT_NAME);
-           httpCallbackConfig.setMinOccurs(BigInteger.ZERO);
-           httpCallbackConfig.setMaxOccurs("1");
+            Annotation annotation = new Annotation();
+            Documentation doc = new Documentation();
+            doc.setSource("Characteristics of the session pool.");
+            annotation.getAppinfoOrDocumentation().add(doc);
 
-           Annotation annotation = new Annotation();
-           Documentation doc = new Documentation();
-           doc.setSource("Config for http callbacks.");
-           annotation.getAppinfoOrDocumentation().add(doc);
-           httpCallbackConfig.setAnnotation(annotation);
+            poolingProfile.setAnnotation(annotation);
 
-           ExtensionType extensionType = new ExtensionType();
-           extensionType.setBase(SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE);
-           extensionType.getAttributeOrAttributeGroup().add(portAttribute);
-           extensionType.getAttributeOrAttributeGroup().add(domainAttribute);
+            all.getParticle().add(objectFactory.createElement(poolingProfile));
+        }
 
-           ComplexContent complextContent = new ComplexContent();
-           complextContent.setExtension(extensionType);
+        // add oauth callback configuration
+        if (element.getAnnotation(OAuth.class) != null || classHasMethodWithParameterOfType((TypeElement) element, HttpCallback.class)) {
 
-           LocalComplexType localComplexType = new LocalComplexType();
-           localComplexType.setComplexContent(complextContent);
+            Attribute domainAttribute = new Attribute();
+            domainAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+            domainAttribute.setName(DOMAIN_ATTRIBUTE_NAME);
+            domainAttribute.setType(SchemaConstants.STRING);
+            domainAttribute.setDefault(DOMAIN_DEFAULT_VALUE);
 
-           httpCallbackConfig.setComplexType(localComplexType);
-           all.getParticle().add(objectFactory.createElement(httpCallbackConfig));
+            Attribute portAttribute = new Attribute();
+            portAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+            portAttribute.setName(PORT_ATTRIBUTE_NAME);
+            portAttribute.setType(SchemaConstants.STRING);
+            portAttribute.setDefault(PORT_DEFAULT_VALUE);
+
+            TopLevelElement httpCallbackConfig = new TopLevelElement();
+            httpCallbackConfig.setName(HTTP_CALLBACK_CONFIG_ELEMENT_NAME);
+            httpCallbackConfig.setMinOccurs(BigInteger.ZERO);
+            httpCallbackConfig.setMaxOccurs("1");
+
+            Annotation annotation = new Annotation();
+            Documentation doc = new Documentation();
+            doc.setSource("Config for http callbacks.");
+            annotation.getAppinfoOrDocumentation().add(doc);
+            httpCallbackConfig.setAnnotation(annotation);
+
+            ExtensionType extensionType = new ExtensionType();
+            extensionType.setBase(SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE);
+            extensionType.getAttributeOrAttributeGroup().add(portAttribute);
+            extensionType.getAttributeOrAttributeGroup().add(domainAttribute);
+
+            ComplexContent complextContent = new ComplexContent();
+            complextContent.setExtension(extensionType);
+
+            LocalComplexType localComplexType = new LocalComplexType();
+            localComplexType.setComplexContent(complextContent);
+
+            httpCallbackConfig.setComplexType(localComplexType);
+            all.getParticle().add(objectFactory.createElement(httpCallbackConfig));
         }
 
         if (element.getAnnotation(Module.class).poolable()) {
-            TopLevelElement abstractPoolingProfile = new TopLevelElement();
-            abstractPoolingProfile.setRef(SchemaConstants.MULE_ABSTRACT_POOLING_PROFILE);
-            abstractPoolingProfile.setMinOccurs(BigInteger.valueOf(0L));
+            //<xsd:element name="abstract-pooling-profile" abstract="true" type="abstractPoolingProfileType"/>
+
+            TopLevelElement poolingProfile = new TopLevelElement();
+            poolingProfile.setName("pooling-profile");
+            poolingProfile.setType(SchemaConstants.MULE_POOLING_PROFILE_TYPE);
+            poolingProfile.setMinOccurs(BigInteger.valueOf(0L));
 
             Annotation annotation = new Annotation();
             Documentation doc = new Documentation();
             doc.setSource("Characteristics of the object pool.");
             annotation.getAppinfoOrDocumentation().add(doc);
 
-            abstractPoolingProfile.setAnnotation(annotation);
+            poolingProfile.setAnnotation(annotation);
 
-            all.getParticle().add(objectFactory.createElement(abstractPoolingProfile));
+            all.getParticle().add(objectFactory.createElement(poolingProfile));
         }
     }
 
@@ -739,6 +787,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     }
 
     private Attribute createParameterAttribute(VariableElement variable) {
+        return createParameterAttribute(variable, false);
+    }
+
+    private Attribute createParameterAttribute(VariableElement variable, boolean forceOptional) {
         Named named = variable.getAnnotation(Named.class);
         Optional optional = variable.getAnnotation(Optional.class);
         Default def = variable.getAnnotation(Default.class);
@@ -750,7 +802,12 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         Attribute attribute = new Attribute();
 
         // set whenever or not is optional
-        attribute.setUse(optional != null ? SchemaConstants.USE_OPTIONAL : SchemaConstants.USE_REQUIRED);
+        if (!forceOptional) {
+            attribute.setUse(optional != null ? SchemaConstants.USE_OPTIONAL : SchemaConstants.USE_REQUIRED);
+        } else {
+            attribute.setUse(SchemaConstants.USE_OPTIONAL);
+        }
+
 
         if (isTypeSupported(variable.asType())) {
             attribute.setName(name);
@@ -759,7 +816,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             attribute.setName(name);
             javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(variable.asType());
             attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + ENUM_TYPE_SUFFIX));
-        } else if(variable.asType().toString().contains(HttpCallback.class.getName())) {
+        } else if (variable.asType().toString().contains(HttpCallback.class.getName())) {
             attribute.setName(context.getNameUtils().uncamel(name) + "-flow-ref");
             attribute.setType(SchemaConstants.STRING);
         } else {

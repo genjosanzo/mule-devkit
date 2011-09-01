@@ -14,8 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.mule.api.annotations;
+package org.mule.api.annotations.session;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -24,24 +23,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation marks a method inside a {@link Module} as a callable from within a Mule flow. Each
- * parameter on this method will be featured as an attribute on the Mule XML invocation.
+ * This annotation can be attached to any method also annotated with {@link org.mule.api.annotations.Processor} or
+ * {@link org.mule.api.annotations.Source}. It receives a single argument which is the class of the exception to
+ * be catch.
+ *
+ * If the exception is thrown by the Processor/Source it will automatically invalidate the session.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Processor {
+public @interface InvalidateSessionOn {
     /**
-     * The xml name of the element that will invoke this processor. This is optional and if it is not specified a name
-     * will be derived from the name of the method.
+     * The class of the exception that signals the invalidation of the session
      */
-    String name() default "";
-
-    /**
-     * Setting this value to true will trigger the generation of an {@link org.mule.api.processor.InterceptingMessageProcessor} rather than
-     * a {@link org.mule.api.processor.MessageProcessor}. An intercepting processor must receive a {@link org.mule.api.annotations.callback.SourceCallback} to trigger the
-     * next portion of the chain.
-     * @return
-     */
-    boolean intercepting() default false;
+    Class exception();
 }

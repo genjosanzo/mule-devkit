@@ -28,8 +28,8 @@
         http://www.mulesoft.org/schema/mule/pool http://www.mulesoft.org/schema/mule/pool/1.0/mule-pool.xsd">
 
     <pool:config name="poolConfig">
-        <pooling-profile maxActive="10" maxIdle="5" initialisationPolicy="INITIALISE_ALL"
-                         exhaustedAction="WHEN_EXHAUSTED_FAIL" maxWait="60"/>
+        <pool:pooling-profile maxActive="10" maxIdle="5" initialisationPolicy="INITIALISE_ALL"
+                              exhaustedAction="WHEN_EXHAUSTED_FAIL" maxWait="60"/>
     </pool:config>
 
     <flow name="sumMultiplyAndDivide">

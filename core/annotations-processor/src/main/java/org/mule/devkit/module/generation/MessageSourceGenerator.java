@@ -27,8 +27,10 @@ import org.mule.api.MuleSession;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.callback.SourceCallback;
+import org.mule.api.annotations.param.Session;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
+import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
@@ -40,6 +42,7 @@ import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
+import org.mule.devkit.model.code.Type;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.session.DefaultMuleSession;
@@ -50,6 +53,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -89,7 +93,14 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         messageSourceClass.javadoc().add(" The POJO's method is invoked in its own thread.");
 
         // add a field for each argument of the method
-        Map<String, FieldVariableElement> fields = generateFieldForEachParameter(messageSourceClass, executableElement);
+        Map<String, FieldVariableElement> fields = generateProcessorFieldForEachParameter(messageSourceClass, executableElement);
+
+        // add fields for session if required
+        ExecutableElement sessionCreate = createSessionForClass(typeElement);
+        Map<String, AbstractMessageGenerator.FieldVariableElement> sessionFields = null;
+        if (sessionCreate != null) {
+            sessionFields = generateProcessorFieldForEachParameter(messageSourceClass, sessionCreate);
+        }
 
         // add standard fields
         FieldVariable object = generateFieldForModuleObject(messageSourceClass, typeElement);
@@ -119,6 +130,13 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
             generateSetter(messageSourceClass, fields.get(fieldName).getField());
         }
 
+        // generate setters for session fields
+        if (sessionFields != null) {
+            for (String fieldName : sessionFields.keySet()) {
+                generateSetter(messageSourceClass, sessionFields.get(fieldName).getField());
+            }
+        }
+
         // add process method
         generateSourceCallbackMethod(messageSourceClass, executableElement, messageProcessor, muleContext, flowConstruct);
 
@@ -133,18 +151,18 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
             DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey((TypeElement) typeElement));
 
             // add run method
-            generateRunMethod(messageSourceClass, executableElement, fields, object, muleContext, poolObjectClass);
+            generateRunMethod(messageSourceClass, executableElement, fields, sessionFields, object, muleContext, poolObjectClass);
         } else {
             // add run method
-            generateRunMethod(messageSourceClass, executableElement, fields, object, muleContext);
+            generateRunMethod(messageSourceClass, executableElement, fields, sessionFields, object, muleContext);
         }
     }
 
-    private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, FieldVariable object, FieldVariable muleContext) {
-        generateRunMethod(messageSourceClass, executableElement, fields, object, muleContext, null);
+    private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> sessionFields, FieldVariable object, FieldVariable muleContext) {
+        generateRunMethod(messageSourceClass, executableElement, fields, sessionFields, object, muleContext, null);
     }
 
-    private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass) {
+    private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> sessionFields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass) {
         Method run = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "run");
         run.javadoc().add("Implementation {@link Runnable#run()} that will invoke the method on the pojo that this message source wraps.");
 
@@ -153,7 +171,48 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
             poolObject = run.body().decl(poolObjectClass, "poolObject", ExpressionFactory._null());
         }
 
+        // add session field declarations
+        Map<String, Expression> sessionParameters = new HashMap<String, Expression>();
+        ExecutableElement createSession = createSessionForMethod(executableElement);
+        Variable session = null;
+        if (createSession != null) {
+            session = run.body().decl(ref(createSession.getReturnType()), "session", ExpressionFactory._null());
+
+            for (VariableElement variable : createSession.getParameters()) {
+                String fieldName = variable.getSimpleName().toString();
+
+                Type type = ref(sessionFields.get(fieldName).getVariableElement().asType()).boxify();
+                String name = "transformed" + StringUtils.capitalize(fieldName);
+
+                Variable transformed = run.body().decl(type, name, ExpressionFactory._null());
+                sessionParameters.put(fieldName, transformed);
+            }
+        }
+
         TryStatement callSource = run.body()._try();
+
+        if (createSession != null) {
+            for (VariableElement variable : createSession.getParameters()) {
+                String fieldName = variable.getSimpleName().toString();
+
+                Conditional ifNotNull = callSource.body()._if(Op.ne(sessionFields.get(fieldName).getField(),
+                        ExpressionFactory._null()));
+
+                Type type = ref(sessionFields.get(fieldName).getVariableElement().asType()).boxify();
+                String name = "transformed" + StringUtils.capitalize(fieldName);
+
+                Variable transformed = (Variable) sessionParameters.get(fieldName);
+
+                Cast cast = ExpressionFactory.cast(type, sessionFields.get(fieldName).getField());
+
+                ifNotNull._then().assign(transformed, cast);
+
+                Cast castLocal = ExpressionFactory.cast(type, object.invoke("get" + StringUtils.capitalize(fieldName)));
+
+                ifNotNull._else().assign(transformed, castLocal);
+
+            }
+        }
 
         String methodName = executableElement.getSimpleName().toString();
 
@@ -161,6 +220,19 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         for (VariableElement variable : executableElement.getParameters()) {
             if (variable.asType().toString().contains(SourceCallback.class.getName())) {
                 parameters.add(ExpressionFactory._this());
+            } else if (variable.getAnnotation(Session.class) != null) {
+                if (createSession != null) {
+                    Invocation createSessionInvoke = object.invoke("borrowSession");
+                    for (String field : sessionParameters.keySet()) {
+                        createSessionInvoke.arg(sessionParameters.get(field));
+                    }
+
+                    callSource.body().assign(session, createSessionInvoke);
+
+                    parameters.add(session);
+                } else {
+                    parameters.add(ExpressionFactory._null());
+                }
             } else {
                 String fieldName = variable.getSimpleName().toString();
                 if (SchemaTypeConversion.isSupported(fields.get(fieldName).getVariableElement().asType().toString()) ||
@@ -197,6 +269,26 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
             Block fin = callSource._finally();
             Block poolObjectNotNull = fin._if(Op.ne(poolObject, ExpressionFactory._null()))._then();
             poolObjectNotNull.add(object.invoke("getLifecyleEnabledObjectPool").invoke("returnObject").arg(poolObject));
+        }
+
+        if (createSession != null) {
+            Block fin = callSource._finally();
+            Block sessionNotNull = fin._if(Op.ne(session, ExpressionFactory._null()))._then();
+
+            TryStatement tryToReleaseSession = sessionNotNull._try();
+
+            Invocation releaseSession = object.invoke("returnSession");
+            for (String field : sessionParameters.keySet()) {
+                releaseSession.arg(sessionParameters.get(field));
+            }
+            releaseSession.arg(session);
+
+            tryToReleaseSession.body().add(releaseSession);
+
+            tryToReleaseSession._catch((TypeReference) ref(Exception.class));
+
+            //generateThrow("failedToInvoke", MessagingException.class,
+            //        tryToReleaseSession._catch((TypeReference) ref(Exception.class)), event, methodName);
         }
     }
 

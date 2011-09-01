@@ -14,8 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.mule.api.annotations;
+package org.mule.api.annotations.session;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -24,24 +23,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation marks a method inside a {@link Module} as a callable from within a Mule flow. Each
- * parameter on this method will be featured as an attribute on the Mule XML invocation.
+ * This annotation marks a method inside a {@link org.mule.api.annotations.Module} as the responsible for creating
+ * a session. It will be called by the module's session manager.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Processor {
-    /**
-     * The xml name of the element that will invoke this processor. This is optional and if it is not specified a name
-     * will be derived from the name of the method.
-     */
-    String name() default "";
+public @interface SessionCreate {
 
-    /**
-     * Setting this value to true will trigger the generation of an {@link org.mule.api.processor.InterceptingMessageProcessor} rather than
-     * a {@link org.mule.api.processor.MessageProcessor}. An intercepting processor must receive a {@link org.mule.api.annotations.callback.SourceCallback} to trigger the
-     * next portion of the chain.
-     * @return
-     */
-    boolean intercepting() default false;
 }

@@ -22,6 +22,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
+import org.mule.api.annotations.param.Session;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
@@ -39,6 +40,7 @@ import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.config.spring.parsers.specific.ConfigurationChildDefinitionParser;
 import org.mule.construct.SimpleFlowConstruct;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
@@ -116,6 +118,16 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return clazz;
     }
 
+    protected DefinedClass getPoolingProfileBeanDefinitionParserClass(Element typeElement) {
+        String poolAdapterName = context.getNameUtils().generateClassName((TypeElement) typeElement, ".config.spring", "PoolingProfileDefinitionParser");
+        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(poolAdapterName));
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(poolAdapterName), ConfigurationChildDefinitionParser.class);
+
+        context.setClassRole(context.getNameUtils().generatePoolingProfileDefParserRoleKey((TypeElement) typeElement), clazz);
+
+        return clazz;
+    }
+
     protected DefinedClass getMessageProcessorClass(ExecutableElement executableElement) {
         String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, "MessageProcessor");
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + ".config");
@@ -163,11 +175,22 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return clazz;
     }
 
-    protected Map<String, FieldVariableElement> generateFieldForEachParameter(DefinedClass messageProcessorClass, ExecutableElement processorMethod) {
+    protected Map<String, FieldVariableElement> generateProcessorFieldForEachParameter(DefinedClass messageProcessorClass, ExecutableElement processorMethod) {
+        return generateProcessorFieldForEachParameter(messageProcessorClass, processorMethod, null);
+    }
+
+    protected Map<String, FieldVariableElement> generateProcessorFieldForEachParameter(DefinedClass messageProcessorClass, ExecutableElement processorMethod, Class annotatedWith) {
         Map<String, AbstractMessageGenerator.FieldVariableElement> fields = new HashMap<String, FieldVariableElement>();
         for (VariableElement variable : processorMethod.getParameters()) {
             if (variable.asType().toString().contains(SourceCallback.class.getName()))
                 continue;
+
+            if (variable.getAnnotation(Session.class) != null)
+                continue;
+
+            if (annotatedWith != null && variable.getAnnotation(annotatedWith) == null)
+                continue;
+
             String fieldName = variable.getSimpleName().toString();
 
             FieldVariable field = null;
@@ -206,6 +229,30 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                         name(fieldName + "Type").
                         build();
             }
+            fields.put(variable.getSimpleName().toString(), new AbstractMessageGenerator.FieldVariableElement(field, fieldType, variable));
+        }
+        return fields;
+    }
+
+    protected Map<String, FieldVariableElement> generateStandardFieldForEachParameter(DefinedClass messageProcessorClass, ExecutableElement processorMethod) {
+        return generateStandardFieldForEachParameter(messageProcessorClass, processorMethod, null);
+    }
+
+    protected Map<String, FieldVariableElement> generateStandardFieldForEachParameter(DefinedClass messageProcessorClass, ExecutableElement processorMethod, Class annotatedWith) {
+        Map<String, AbstractMessageGenerator.FieldVariableElement> fields = new HashMap<String, FieldVariableElement>();
+        for (VariableElement variable : processorMethod.getParameters()) {
+            if (annotatedWith != null && variable.getAnnotation(annotatedWith) == null)
+                continue;
+
+            String fieldName = variable.getSimpleName().toString();
+
+            FieldVariable field = null;
+            FieldVariable fieldType = null;
+            field = new FieldBuilder(messageProcessorClass).
+                    privateVisibility().
+                    type(ref(variable.asType())).
+                    name(fieldName).
+                    build();
             fields.put(variable.getSimpleName().toString(), new AbstractMessageGenerator.FieldVariableElement(field, fieldType, variable));
         }
         return fields;
@@ -257,9 +304,9 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         TryStatement tryLookUp = ifNoObject._then()._try();
         tryLookUp.body().assign(object, muleContext.invoke("getRegistry").invoke("lookupObject").arg(ExpressionFactory.dotclass(pojoClass)));
         tryLookUp.body()._if(Op.eq(object, ExpressionFactory._null()))._then().
-                        _throw(ExpressionFactory._new(ref(InitialisationException.class)).
-                                arg(ref(MessageFactory.class).staticInvoke("createStaticMessage").
-                                        arg("Cannot find object")).arg(ExpressionFactory._this()));
+                _throw(ExpressionFactory._new(ref(InitialisationException.class)).
+                        arg(ref(MessageFactory.class).staticInvoke("createStaticMessage").
+                                arg("Cannot find object")).arg(ExpressionFactory._this()));
         CatchBlock catchBlock = tryLookUp._catch(ref(RegistrationException.class));
         Variable exception = catchBlock.param("e");
         TypeReference coreMessages = ref(CoreMessages.class);
@@ -280,7 +327,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                     ifInitialisable._then().add(
                             ExpressionFactory.cast(ref(Initialisable.class), variableElement.getField()).invoke("initialise")
                     );
-                } else if(variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
+                } else if (variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
                     Invocation domain = object.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.DOMAIN_FIELD_NAME));
                     Invocation port = object.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.PORT_FIELD_NAME));
                     initialise.body().assign(variableElement.getFieldType(), ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
@@ -295,6 +342,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     protected Method generateSetMuleContextMethod(DefinedClass clazz, FieldVariable muleContext) {
         return generateSetMuleContextMethod(clazz, muleContext, null);
     }
+
     protected Method generateSetMuleContextMethod(DefinedClass clazz, FieldVariable muleContext, Map<String, FieldVariableElement> fields) {
         Method setMuleContext = clazz.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setMuleContext");
         setMuleContext.javadoc().add("Set the Mule context");

@@ -19,6 +19,8 @@ package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleContext;
+import org.mule.api.annotations.session.SessionCreate;
+import org.mule.api.annotations.session.SessionDestroy;
 import org.mule.devkit.generation.AbstractGenerator;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.Expression;
@@ -73,7 +75,7 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
     }
 
     protected FieldVariable generateFieldForMuleContext(DefinedClass messageProcessorClass) {
-        FieldVariable muleContext =  messageProcessorClass.field(Modifier.PRIVATE, ref(MuleContext.class), "muleContext");
+        FieldVariable muleContext = messageProcessorClass.field(Modifier.PRIVATE, ref(MuleContext.class), "muleContext");
         muleContext.javadoc().add("Mule Context");
 
         return muleContext;
@@ -93,9 +95,9 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
 
     protected boolean classHasMethodWithParameterOfType(TypeElement typeElement, Class<?> parameterType) {
         List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for(ExecutableElement method : methods) {
-            for(VariableElement parameter : method.getParameters()) {
-                if(parameter.asType().toString().contains(parameterType.getName())) {
+        for (ExecutableElement method : methods) {
+            for (VariableElement parameter : method.getParameters()) {
+                if (parameter.asType().toString().contains(parameterType.getName())) {
                     return true;
                 }
             }
@@ -111,5 +113,41 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
             }
         }
         return null;
+    }
+
+    protected ExecutableElement createSessionForClass(javax.lang.model.element.Element element) {
+        List<? extends javax.lang.model.element.Element> enclosedElements = element.getEnclosedElements();
+        List<javax.lang.model.element.ExecutableElement> executableElements = ElementFilter.methodsIn(enclosedElements);
+        ExecutableElement createSession = null;
+        for (ExecutableElement executableElement : executableElements) {
+            if (executableElement.getAnnotation(SessionCreate.class) != null) {
+                createSession = executableElement;
+                break;
+            }
+        }
+
+        return createSession;
+    }
+
+    protected ExecutableElement destroySessionForMethod(javax.lang.model.element.Element element) {
+        return createSessionForClass(element.getEnclosingElement());
+    }
+
+    protected ExecutableElement destroySessionForClass(javax.lang.model.element.Element element) {
+        List<? extends javax.lang.model.element.Element> enclosedElements = element.getEnclosedElements();
+        List<javax.lang.model.element.ExecutableElement> executableElements = ElementFilter.methodsIn(enclosedElements);
+        ExecutableElement destroySession = null;
+        for (ExecutableElement executableElement : executableElements) {
+            if (executableElement.getAnnotation(SessionDestroy.class) != null) {
+                destroySession = executableElement;
+                break;
+            }
+        }
+
+        return destroySession;
+    }
+
+    protected ExecutableElement createSessionForMethod(javax.lang.model.element.Element element) {
+        return createSessionForClass(element.getEnclosingElement());
     }
 }

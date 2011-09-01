@@ -34,6 +34,9 @@ import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.Optional;
 import org.mule.api.annotations.param.Payload;
+import org.mule.api.annotations.param.Session;
+import org.mule.api.annotations.session.SessionCreate;
+import org.mule.api.annotations.session.SessionDestroy;
 import org.mule.devkit.validation.ValidationException;
 import org.mule.devkit.validation.Validator;
 
@@ -43,6 +46,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import java.lang.annotation.Annotation;
 import java.util.List;
@@ -91,8 +95,80 @@ public class ModuleValidator implements Validator {
             }
         }
 
-        // verify that every @Processor is public and non-static and non-generic
+        // does it have a @SessionCreate?
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(element.getEnclosedElements());
+        boolean hasSessionCreation = false;
+        TypeMirror sessionClass = null;
+        for (ExecutableElement executableElement : executableElements) {
+            SessionCreate sessionCreate = executableElement.getAnnotation(SessionCreate.class);
+
+            if (sessionCreate == null)
+                continue;
+
+            hasSessionCreation = true;
+            sessionClass = executableElement.getReturnType();
+            break;
+        }
+
+        // make sure that an @SessionDestroy does not exists without a @SessionCreate
+        if (!hasSessionCreation) {
+            for (ExecutableElement executableElement : executableElements) {
+                SessionDestroy sessionDestroy = executableElement.getAnnotation(SessionDestroy.class);
+
+                if (sessionDestroy == null)
+                    continue;
+
+                throw new ValidationException(element, "You cannot annotate a method with @SessionDestroy without having another method annotated with @SessionCreate");
+            }
+        } else {
+            // make sure that it the signature for the @SessionDestroy is correct
+            for (ExecutableElement executableElement : executableElements) {
+                SessionDestroy sessionDestroy = executableElement.getAnnotation(SessionDestroy.class);
+
+                if (sessionDestroy == null)
+                    continue;
+
+                if (executableElement.getParameters().size() != 1 ) {
+                    throw new ValidationException(executableElement, "The @SessionDestroy method must receive a single argument");
+                }
+
+                if (executableElement.getParameters().get(0).asType() != sessionClass ) {
+                    throw new ValidationException(executableElement, "The argument for @SessionDestroy must be of the same type as the return value of @SessionCreate");
+                }
+
+                break;
+            }
+        }
+
+        // make sure that methods with @Session do not exists without @SessionCreate
+        if (!hasSessionCreation) {
+            for (ExecutableElement executableElement : executableElements) {
+                for (VariableElement parameter : executableElement.getParameters()) {
+                    Session session = parameter.getAnnotation(Session.class);
+
+                    if( session == null )
+                        continue;
+
+                    throw new ValidationException(parameter, "You cannot annotate a parameter with @Session without specifying a way to create session with @SessionCreate");
+                }
+            }
+        } else {
+            // make sure that each parameter is of correct type
+            for (ExecutableElement executableElement : executableElements) {
+                for (VariableElement parameter : executableElement.getParameters()) {
+                    Session session = parameter.getAnnotation(Session.class);
+
+                    if( session == null )
+                        continue;
+
+                    if (parameter.asType() != sessionClass ) {
+                        throw new ValidationException(parameter, "The type for any parameter annotated with @Session must be of the same type as the return type of method annotation with @SessionCreate");
+                    }
+                }
+            }
+        }
+
+        // verify that every @Processor is public and non-static and non-generic
         for (ExecutableElement executableElement : executableElements) {
             Processor processor = executableElement.getAnnotation(Processor.class);
 
@@ -136,11 +212,10 @@ public class ModuleValidator implements Validator {
                 if (parameter.getAnnotation(Payload.class) != null)
                     count++;
 
-                if( count > 1 ) {
+                if (count > 1) {
                     throw new ValidationException(parameter, "You cannot have more than one of InboundHeader, InvocationHeaders or Payload annotation");
                 }
             }
-
         }
 
         // verify that every @Source is public and non-static and non-generic
@@ -177,12 +252,12 @@ public class ModuleValidator implements Validator {
         }
 
         if (element.getAnnotation(OAuth.class) != null) {
-            checkClassHasFieldWithAnnotation(element, OAuthConsumerKey.class, "@OAuth class must contain a field annotated with @OAuthConsumerKey");
-            checkClassHasFieldWithAnnotation(element, OAuthConsumerSecret.class, "@OAuth class must contain a field annotated with @OAuthConsumerSecret");
-            checkClassHasFieldWithAnnotation(element, OAuthAccessToken.class, "@OAuth class must contain a field annotated with @OAuthAccessToken");
-            checkClassHasFieldWithAnnotation(element, OAuthAccessTokenSecret.class, "@OAuth class must contain a field annotated with @OAuthAccessTokenSecret");
+            checkClassHasFieldWithAnnotation(element, OAuthConsumerKey.class, "@OAuth-enabled module must contain a field annotated with @OAuthConsumerKey");
+            checkClassHasFieldWithAnnotation(element, OAuthConsumerSecret.class, "@OAuth-enabled module must contain a field annotated with @OAuthConsumerSecret");
+            checkClassHasFieldWithAnnotation(element, OAuthAccessToken.class, "@OAuth-enabled module must contain a field annotated with @OAuthAccessToken");
+            checkClassHasFieldWithAnnotation(element, OAuthAccessTokenSecret.class, "@OAuth-enabled module must contain a field annotated with @OAuthAccessTokenSecret");
         } else if (classHasMethodWithAnnotation(element, RequiresAccessToken.class)) {
-            throw new ValidationException(element, "@RequiresAccessToken methods requires that the class is annotated with @OAuth");
+            throw new ValidationException(element, "@RequiresAccessToken methods requires that the module to be annotated with @OAuth");
         }
 
         // verify that every @Transformer is public and non-static and non-generic

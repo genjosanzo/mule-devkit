@@ -20,6 +20,7 @@ package org.mule.devkit.module.generation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.mule.api.annotations.Configurable;
+import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.callback.HttpCallback;
@@ -29,6 +30,7 @@ import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.config.PoolingProfile;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
@@ -176,11 +178,57 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
+        ExecutableElement sessionCreate = createSessionForClass(type);
+        if (sessionCreate != null) {
+            for (VariableElement variable : sessionCreate.getParameters()) {
+                String fieldName = variable.getSimpleName().toString();
+
+                if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
+                    generateParseSupportedType(parse.body(), element, builder, fieldName);
+                } else if (context.getTypeMirrorUtils().isArrayOrList(variable.asType())) {
+                    Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class),
+                            fieldName + "ListElement",
+                            ExpressionFactory._null());
+
+                    parse.body().assign(listElement, ref(DomUtils.class).staticInvoke("getChildElementByTagName")
+                            .arg(element)
+                            .arg(context.getNameUtils().uncamel(fieldName)));
+
+                    UpperBlockClosure managedList = generateParseArrayOrList(parse.body(), variable.asType(), listElement, builder, fieldName, patternInfo, parserContext);
+
+                    managedList.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedList.getManagedCollection()));
+                } else if (context.getTypeMirrorUtils().isMap(variable.asType())) {
+                    Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class),
+                            fieldName + "ListElement",
+                            ExpressionFactory._null());
+
+                    parse.body().assign(listElement, ref(DomUtils.class).staticInvoke("getChildElementByTagName")
+                            .arg(element)
+                            .arg(context.getNameUtils().uncamel(fieldName)));
+
+                    UpperBlockClosure managedMap = generateParseMap(parse.body(), variable.asType(), listElement, builder, fieldName, patternInfo, parserContext);
+
+                    managedMap.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedMap.getManagedCollection()));
+                } else if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
+                    generateParseEnum(parse.body(), element, builder, fieldName);
+                }
+            }
+        }
+
         if (element instanceof TypeElement && (type.getAnnotation(OAuth.class) != null || classHasMethodWithParameterOfType((TypeElement) element, HttpCallback.class))) {
             Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class), "httpCallbackConfigElement", ref(DomUtils.class).staticInvoke("getChildElementByTagName").
                     arg(element).arg(SchemaGenerator.HTTP_CALLBACK_CONFIG_ELEMENT_NAME));
             generateParseSupportedType(parse.body(), listElement, builder, HttpCallbackAdapterGenerator.DOMAIN_FIELD_NAME);
             generateParseSupportedType(parse.body(), listElement, builder, HttpCallbackAdapterGenerator.PORT_FIELD_NAME);
+        }
+
+        if (sessionCreate != null) {
+            generateParsePoolingProfile("session-pooling-profile", "sessionPoolingProfile", parse, element, builder);
+        }
+
+        Module module = type.getAnnotation(Module.class);
+        if (module.poolable()) {
+            generateParsePoolingProfile("pooling-profile", "poolingProfile", parse, element, builder);
         }
 
         Variable definition = parse.body().decl(ref(BeanDefinition.class), "definition", builder.invoke("getBeanDefinition"));
@@ -190,6 +238,40 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         parse.body()._return(definition);
 
+    }
+
+    private void generateParsePoolingProfile(String elementName, String propertyName, Method parse, Variable element, Variable builder) {
+        Variable poolingProfileBuilder = parse.body().decl(ref(BeanDefinitionBuilder.class), propertyName + "Builder",
+                ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition").arg(ref(PoolingProfile.class).dotclass().invoke("getName")));
+
+        Variable poolingProfileElement = parse.body().decl(ref(org.w3c.dom.Element.class), propertyName + "Element",
+                ref(DomUtils.class).staticInvoke("getChildElementByTagName").arg(element).arg(elementName));
+
+        generateParseSupportedType(parse.body(), poolingProfileElement, poolingProfileBuilder, "maxActive");
+        generateParseSupportedType(parse.body(), poolingProfileElement, poolingProfileBuilder, "maxIdle");
+        generateParseSupportedType(parse.body(), poolingProfileElement, poolingProfileBuilder, "maxWait");
+
+        Invocation getAttribute = poolingProfileElement.invoke("getAttribute").arg("exhaustedAction");
+        Conditional ifNotNull = parse.body()._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
+                Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(
+                        getAttribute
+                ))));
+        ifNotNull._then().add(poolingProfileBuilder.invoke("addPropertyValue").arg("exhaustedAction").arg(
+                ref(PoolingProfile.class).staticRef("POOL_EXHAUSTED_ACTIONS").invoke("get").arg(poolingProfileElement.invoke("getAttribute").arg("exhaustedAction"))
+        ));
+
+        getAttribute = poolingProfileElement.invoke("getAttribute").arg("exhaustedAction");
+        ifNotNull = parse.body()._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
+                Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(
+                        getAttribute
+                ))));
+        ifNotNull._then().add(poolingProfileBuilder.invoke("addPropertyValue").arg("initialisationPolicy").arg(
+                ref(PoolingProfile.class).staticRef("POOL_INITIALISATION_POLICIES").invoke("get").arg(poolingProfileElement.invoke("getAttribute").arg("initialisationPolicy"))
+        ));
+
+        parse.body().add(builder.invoke("addPropertyValue").arg(propertyName).arg(
+                poolingProfileBuilder.invoke("getBeanDefinition")
+        ));
     }
 
     private void generateBeanDefinitionParserForSource(ExecutableElement executableElement) {
@@ -211,7 +293,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         DefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
         DefinedClass messageProcessorClass = null;
 
-        if( intercepting ) {
+        if (intercepting) {
             messageProcessorClass = getInterceptingMessageProcessorClass(executableElement);
         } else {
             messageProcessorClass = getMessageProcessorClass(executableElement);
@@ -254,16 +336,6 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     private Variable generateParseCommon(DefinedClass beanDefinitionparser, DefinedClass messageProcessorClass, ExecutableElement executableElement, Method parse, Variable element, Variable patternInfo, Variable parserContext) {
         Variable builder = parse.body().decl(ref(BeanDefinitionBuilder.class), "builder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition").arg(messageProcessorClass.dotclass().invoke("getName")));
-
-        /*
-        Conditional isInitialisable = parse.body()._if(ref(Initialisable.class).dotclass()
-                .invoke("isAssignableFrom").arg(messageProcessorClass.dotclass()));
-        isInitialisable._then().add(builder.invoke("setInitMethodName").arg(ref(Initialisable.class).staticRef("PHASE_NAME")));
-
-        Conditional isDisposable = parse.body()._if(ref(Disposable.class).dotclass()
-                .invoke("isAssignableFrom").arg(messageProcessorClass.dotclass()));
-        isDisposable._then().add(builder.invoke("setDestroyMethodName").arg(ref(Disposable.class).staticRef("PHASE_NAME")));
-        */
 
         Variable configRef = parse.body().decl(ref(String.class), "configRef", element.invoke("getAttribute").arg("config-ref"));
         Conditional ifConfigRef = parse.body()._if(Op.cand(Op.ne(configRef, ExpressionFactory._null()),
@@ -328,10 +400,47 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 managedMap.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedMap.getManagedCollection()));
             } else if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
                 generateParseEnum(parse.body(), element, builder, fieldName);
-            }  else if(variable.asType().toString().contains(HttpCallback.class.getName())) {
+            } else if (variable.asType().toString().contains(HttpCallback.class.getName())) {
                 Variable callbackFlowName = parse.body().decl(ref(String.class), fieldName + "CallbackFlowName", ExpressionFactory.invoke(getAttributeValue).arg(element).arg(context.getNameUtils().uncamel(fieldName) + "-flow-ref"));
                 Block block = parse.body()._if(Op.ne(callbackFlowName, ExpressionFactory._null()))._then();
                 block.invoke(builder, "addPropertyValue").arg(fieldName + "CallbackFlow").arg(ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(callbackFlowName));
+            }
+        }
+
+        ExecutableElement sessionCreate = createSessionForMethod(executableElement);
+        if (sessionCreate != null) {
+            for (VariableElement variable : sessionCreate.getParameters()) {
+                String fieldName = variable.getSimpleName().toString();
+
+                if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
+                    generateParseSupportedType(parse.body(), element, builder, fieldName);
+                } else if (context.getTypeMirrorUtils().isArrayOrList(variable.asType())) {
+                    Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class),
+                            fieldName + "ListElement",
+                            ExpressionFactory._null());
+
+                    parse.body().assign(listElement, ref(DomUtils.class).staticInvoke("getChildElementByTagName")
+                            .arg(element)
+                            .arg(context.getNameUtils().uncamel(fieldName)));
+
+                    UpperBlockClosure managedList = generateParseArrayOrList(parse.body(), variable.asType(), listElement, builder, fieldName, patternInfo, parserContext);
+
+                    managedList.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedList.getManagedCollection()));
+                } else if (context.getTypeMirrorUtils().isMap(variable.asType())) {
+                    Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class),
+                            fieldName + "ListElement",
+                            ExpressionFactory._null());
+
+                    parse.body().assign(listElement, ref(DomUtils.class).staticInvoke("getChildElementByTagName")
+                            .arg(element)
+                            .arg(context.getNameUtils().uncamel(fieldName)));
+
+                    UpperBlockClosure managedMap = generateParseMap(parse.body(), variable.asType(), listElement, builder, fieldName, patternInfo, parserContext);
+
+                    managedMap.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedMap.getManagedCollection()));
+                } else if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
+                    generateParseEnum(parse.body(), element, builder, fieldName);
+                }
             }
         }
 
