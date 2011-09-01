@@ -37,7 +37,7 @@
             </implementation>
             <configuration>
                 <phases>
-                    <validate></validate>
+                    <validate>org.mule.tools.devkit:mule-devkit-maven-plugin:attach-test-resources</validate>
                     <initialize></initialize>
                     <generate-sources>org.mule.tools.devkit:mule-devkit-maven-plugin:generate-sources
                     </generate-sources>
@@ -45,7 +45,8 @@
                     </process-sources>
                     <!-- <generate-resources>org.mule.tools:mule-cloud-connector-maven-plugin:typeSchema-generate
                     </generate-resources> -->
-                    <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources
+                    <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources,
+                        org.mule.tools.devkit:mule-devkit-maven-plugin:filter-resources
                     </process-resources>
                     <compile>org.apache.maven.plugins:maven-compiler-plugin:compile
                     </compile>
@@ -62,18 +63,26 @@
                     </process-test-classes>
                     <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
                     <package>org.mule.tools.devkit:mule-devkit-maven-plugin:attach-schema,
-                        org.apache.maven.plugins:maven-jar-plugin:jar</package>
+                        org.apache.maven.plugins:maven-jar-plugin:jar,
+                        org.mule.tools.devkit:mule-devkit-maven-plugin:package</package>
                     <pre-integration-test></pre-integration-test>
                     <integration-test>
                     </integration-test>
                     <post-integration-test></post-integration-test>
                     <verify></verify>
-                    <install>org.apache.maven.plugins:maven-install-plugin:install
+                    <install>org.apache.maven.plugins:maven-install-plugin:install,
+                        org.mule.tools.devkit:mule-devkit-maven-plugin:install
                     </install>
                     <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy
                     </deploy>
                 </phases>
             </configuration>
+        </component>
+        <component>
+            <role>org.codehaus.plexus.archiver.Archiver</role>
+            <role-hint>mule-module</role-hint>
+            <implementation>org.mule.devkit.maven.ModuleArchiver</implementation>
+            <instantiation-strategy>per-lookup</instantiation-strategy>
         </component>
     </components>
 </component-set>

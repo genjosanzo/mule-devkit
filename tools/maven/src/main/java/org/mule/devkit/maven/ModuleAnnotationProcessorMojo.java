@@ -30,11 +30,12 @@ import java.util.List;
 @MojoGoal("generate-sources")
 @MojoRequiresDependencyResolution(value = "compile")
 @MojoPhase("generate-sources")
-public class ModuleAnnotationProcessorMojo extends AbstractAnnotationProcessorMojo
-{
-    private static String[] processors = new String[]{ "org.mule.devkit.apt.ModuleAnnotationProcessor" };
+public class ModuleAnnotationProcessorMojo extends AbstractAnnotationProcessorMojo {
+    private static String[] processors = new String[]{"org.mule.devkit.apt.ModuleAnnotationProcessor"};
 
-    /** project classpath */
+    /**
+     * project classpath
+     */
     @MojoParameter(expression = "${project.compileClasspathElements}", required = true, readonly = true)
     private List classpathElements;
 
@@ -44,18 +45,16 @@ public class ModuleAnnotationProcessorMojo extends AbstractAnnotationProcessorMo
     @MojoParameter(expression = "${project.build.directory}/generated-sources/mule", required = true)
     private File defaultOutputDirectory;
 
-    @MojoParameter(required = false, expression="${project.build.outputDirectory}", description = "Set the destination directory for class files (same behaviour of -d option)")
+    @MojoParameter(required = false, expression = "${project.build.outputDirectory}", description = "Set the destination directory for class files (same behaviour of -d option)")
     private File outputClassDirectory;
 
     @Override
-    public File getSourceDirectory()
-    {
+    public File getSourceDirectory() {
         return sourceDirectory;
     }
 
     @Override
-    protected File getOutputClassDirectory()
-    {
+    protected File getOutputClassDirectory() {
         return outputClassDirectory;
     }
 
@@ -64,33 +63,30 @@ public class ModuleAnnotationProcessorMojo extends AbstractAnnotationProcessorMo
         return processors;
     }
 
-    protected void addCompileSourceRoot(MavenProject project, String dir)
-    {
+    protected void addCompileSourceRoot(MavenProject project, String dir) {
         project.addCompileSourceRoot(dir);
     }
 
     @Override
-    public File getDefaultOutputDirectory()
-    {
+    public File getDefaultOutputDirectory() {
         return defaultOutputDirectory;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    protected java.util.Set<String> getClasspathElements( java.util.Set<String> result)
-    {
+    protected java.util.Set<String> getClasspathElements(java.util.Set<String> result) {
         List<Resource> resources = project.getResources();
 
-        if( resources!=null ) {
-            for( Resource r : resources ) {
+        if (resources != null) {
+            for (Resource r : resources) {
                 result.add(r.getDirectory());
             }
         }
 
-        result.addAll( classpathElements );
-        
+        result.addAll(classpathElements);
+
         return result;
-     }
+    }
 
 
 }
