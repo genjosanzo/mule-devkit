@@ -61,6 +61,7 @@ import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Type;
+import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.expression.MessageHeaderExpressionEvaluator;
 import org.mule.expression.MessageHeadersExpressionEvaluator;
@@ -554,10 +555,6 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             poolObject = process.body().decl(poolObjectClass, "poolObject", ExpressionFactory._null());
         }
 
-<<<<<<< HEAD
-        if (executableElement.getEnclosingElement().getAnnotation(OAuth.class) != null && executableElement.getAnnotation(RequiresAccessToken.class) != null) {
-            addOauth(process, event, object, executableElement);
-=======
         if(executableElement.getEnclosingElement().getAnnotation(OAuth.class) != null) {
             for (VariableElement variable : executableElement.getParameters()) {
                 if (variable.getAnnotation(OAuthAccessToken.class) != null || variable.getAnnotation(OAuthAccessTokenSecret.class) != null) {
@@ -565,7 +562,6 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                     break;
                 }
             }
->>>>>>> 35a0ed4d4db0a1638a286bb28bbfa433d71803a1
         }
 
         // add session field declarations
