@@ -43,8 +43,8 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 import java.util.Map;
 
-public class ProcessorCallbackGenerator extends AbstractModuleGenerator {
-    public static final String ROLE = "ProcessorCallback";
+public class ChainProcessorCallbackGenerator extends AbstractModuleGenerator {
+    public static final String ROLE = "ChainProcessorCallback";
 
     public void generate(Element element) throws GenerationException {
         boolean shouldGenerate = false;
@@ -197,7 +197,7 @@ public class ProcessorCallbackGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getProcessorCallbackClass(TypeElement type) {
-        String processorCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, ".config.spring", "ProcessorCallback");
+        String processorCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, ".config.spring", "ChainProcessorCallback");
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(processorCallbackClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(processorCallbackClassName), new Class[]{MuleContextAware.class});
 

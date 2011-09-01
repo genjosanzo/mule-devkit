@@ -44,6 +44,7 @@ import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.ForEach;
+import org.mule.devkit.model.code.ForLoop;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
@@ -60,6 +61,7 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
+import org.w3c.dom.Node;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -479,37 +481,50 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         Conditional ifNotNull = block._if(Op.ne(elements, ExpressionFactory._null()));
 
-        Variable beanDefinitionBuilder = ifNotNull._then().decl(ref(BeanDefinitionBuilder.class), fieldName + "BeanDefinitionBuilder",
+        Variable containsOnlyText = ifNotNull._then().decl(context.getCodeModel().BOOLEAN, "containsOnlyText", ExpressionFactory.TRUE);
+        ForLoop iterateOverNodes = ifNotNull._then()._for();
+        Variable i = iterateOverNodes.init(context.getCodeModel().INT, "i", ExpressionFactory.lit(0));
+        iterateOverNodes.test(Op.lt(i, element.invoke("getChildNodes").invoke("getLength")));
+        iterateOverNodes.update(Op.incr(i));
+
+        Conditional isTextNode = iterateOverNodes.body()._if(Op.ne(element.invoke("getChildNodes").invoke("item").arg(i).invoke("getNodeType"),
+                ref(Node.class).staticRef("TEXT_NODE")));
+
+        isTextNode._then().assign(containsOnlyText, ExpressionFactory.FALSE);
+
+        Conditional ifTextElement = ifNotNull._then()._if(containsOnlyText);
+
+        ifTextElement._then().add(builder.invoke("addPropertyValue")
+                .arg(fieldName).arg(element.invoke("getTextContent")));
+
+        Variable beanDefinitionBuilder = ifTextElement._else().decl(ref(BeanDefinitionBuilder.class), fieldName + "BeanDefinitionBuilder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition")
                         .arg(ref(MessageProcessorChainFactoryBean.class).dotclass()));
 
-        //ifNotNull._then().add(beanDefinitionBuilder.invoke("setInitMethodName").arg(ref(Initialisable.class).staticRef("PHASE_NAME")));
-        //ifNotNull._then().add(beanDefinitionBuilder.invoke("setDestroyMethodName").arg(ref(Disposable.class).staticRef("PHASE_NAME")));
-
-        Variable beanDefinition = ifNotNull._then().decl(ref(BeanDefinition.class), fieldName + "BeanDefinition",
+        Variable beanDefinition = ifTextElement._else().decl(ref(BeanDefinition.class), fieldName + "BeanDefinition",
                 beanDefinitionBuilder.invoke("getBeanDefinition"));
 
-        ifNotNull._then().add(parserContext.invoke("getRegistry").invoke("registerBeanDefinition")
+        ifTextElement._else().add(parserContext.invoke("getRegistry").invoke("registerBeanDefinition")
                 .arg(ExpressionFactory.invoke("generateChildBeanName").arg(elements))
                 .arg(beanDefinition));
 
-        ifNotNull._then().add(elements.invoke("setAttribute")
+        ifTextElement._else().add(elements.invoke("setAttribute")
                 .arg("name").arg(ExpressionFactory.invoke("generateChildBeanName").arg(elements)));
 
-        ifNotNull._then().add(beanDefinitionBuilder.invoke("setSource").arg(parserContext.invoke("extractSource")
+        ifTextElement._else().add(beanDefinitionBuilder.invoke("setSource").arg(parserContext.invoke("extractSource")
                 .arg(elements)));
 
-        ifNotNull._then().add(beanDefinitionBuilder.invoke("setScope")
+        ifTextElement._else().add(beanDefinitionBuilder.invoke("setScope")
                 .arg(ref(BeanDefinition.class).staticRef("SCOPE_SINGLETON")));
 
-        Variable list = ifNotNull._then().decl(ref(List.class), fieldName + "List",
+        Variable list = ifTextElement._else().decl(ref(List.class), fieldName + "List",
                 parserContext.invoke("getDelegate").invoke("parseListElement")
                         .arg(elements).arg(beanDefinitionBuilder.invoke("getBeanDefinition")));
 
-        ifNotNull._then().add(parserContext.invoke("getRegistry").invoke("removeBeanDefinition")
+        ifTextElement._else().add(parserContext.invoke("getRegistry").invoke("removeBeanDefinition")
                 .arg(ExpressionFactory.invoke("generateChildBeanName").arg(elements)));
 
-        ifNotNull._then().add(builder.invoke("addPropertyValue").arg(fieldName)
+        ifTextElement._else().add(builder.invoke("addPropertyValue").arg(fieldName)
                 .arg(beanDefinition));
     }
 
@@ -569,7 +584,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     }
 
     private void generateParseEnum(Block block, Variable element, Variable builder, String fieldName) {
-        block.add(builder.invoke("addPropertyValue").arg(fieldName).arg(
+        Invocation hasAttribute = element.invoke("hasAttribute").arg(fieldName);
+        Conditional ifNotNull = block._if(hasAttribute);
+        ifNotNull._then().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
                 element.invoke("getAttribute").arg(fieldName)
         ));
     }

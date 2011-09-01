@@ -40,6 +40,7 @@ import org.mule.api.annotations.session.InvalidateSessionOn;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -555,7 +556,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             poolObject = process.body().decl(poolObjectClass, "poolObject", ExpressionFactory._null());
         }
 
-        if(executableElement.getEnclosingElement().getAnnotation(OAuth.class) != null) {
+        if (executableElement.getEnclosingElement().getAnnotation(OAuth.class) != null) {
             for (VariableElement variable : executableElement.getParameters()) {
                 if (variable.getAnnotation(OAuthAccessToken.class) != null || variable.getAnnotation(OAuthAccessTokenSecret.class) != null) {
                     addOauth(process, event, object);
@@ -656,14 +657,30 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 parameters.add(accessTokenSecret);
             } else if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
 
-                DefinedClass callbackClass = context.getClassForRole(ProcessorCallbackGenerator.ROLE);
+                DefinedClass callbackClass = context.getClassForRole(ChainProcessorCallbackGenerator.ROLE);
+                DefinedClass stringCallbackClass = context.getClassForRole(StringProcessorCallbackGenerator.ROLE);
 
-                Variable transformed = callProcessor.body().decl(callbackClass, "transformed" + StringUtils.capitalize(fieldName),
+                Variable transformed = callProcessor.body().decl(ref(ProcessorCallback.class), "transformed" + StringUtils.capitalize(fieldName),
                         ExpressionFactory._null());
 
-                callProcessor.body()._if(Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()))._then()
+                Conditional ifMessageProcessor = callProcessor.body()._if(Op.cand(
+                        Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()),
+                        Op._instanceof(fields.get(fieldName).getField(), ref(MessageProcessor.class))));
+
+                ifMessageProcessor._then()
                         .assign(transformed,
-                                ExpressionFactory._new(callbackClass).arg(event).arg(muleContext).arg(fields.get(fieldName).getField()));
+                                ExpressionFactory._new(callbackClass).arg(event).arg(muleContext).arg(
+                                        ExpressionFactory.cast(ref(MessageProcessor.class), fields.get(fieldName).getField())));
+
+                Conditional ifString = ifMessageProcessor._elseif(Op.cand(
+                        Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()),
+                        Op._instanceof(fields.get(fieldName).getField(), ref(String.class))));
+
+                ifString._then()
+                        .assign(transformed,
+                                ExpressionFactory._new(stringCallbackClass).arg(
+                                        ExpressionFactory.cast(ref(String.class), fields.get(fieldName).getField())
+                                ));
 
                 parameters.add(transformed);
 

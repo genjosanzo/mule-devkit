@@ -35,6 +35,10 @@
 		</callback:callback>
     </flow>
 
+    <flow name="callbackWithString">
+		<callback:callback>mulesoft</callback:callback>
+    </flow>
+
     <flow name="callbackWithPayload">
 		<callback:callback-with-payload>
             <callback:set-payload payload="#[payload]"/>

@@ -20,6 +20,7 @@ package org.mule.devkit.it;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.ProcessorCallback;
+import org.mule.api.annotations.param.Optional;
 
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class ProcessorCallbackModule
     }
 
     @Processor
-    public Object callback(ProcessorCallback innerProcessor) throws Exception
+    public Object callback(@Optional ProcessorCallback innerProcessor) throws Exception
     {
 		return innerProcessor.process();
     }

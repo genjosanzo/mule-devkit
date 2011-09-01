@@ -198,7 +198,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
                 field = new FieldBuilder(messageProcessorClass).
                         privateVisibility().
-                        type(MessageProcessor.class).
+                        type(Object.class).
                         name(fieldName).
                         build();
                 fieldType = new FieldBuilder(messageProcessorClass).

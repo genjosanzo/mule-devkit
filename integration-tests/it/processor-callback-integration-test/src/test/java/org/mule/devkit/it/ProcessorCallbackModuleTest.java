@@ -31,6 +31,11 @@ public class ProcessorCallbackModuleTest extends AbstractModuleTest
         runFlow("callback", "mulesoft");
     }
 
+    public void testCallbackWithString() throws Exception
+    {
+        runFlow("callbackWithString", "mulesoft");
+    }
+
     public void testProcessItems() throws Exception
     {
         runFlowWithPayload("processItems", "payload", "payload");
