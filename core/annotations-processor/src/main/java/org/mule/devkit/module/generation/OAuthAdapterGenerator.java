@@ -32,8 +32,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.oauth.OAuth;
-import org.mule.api.annotations.oauth.OAuthAccessToken;
-import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.oauth.OAuthConsumerKey;
 import org.mule.api.annotations.oauth.OAuthConsumerSecret;
 import org.mule.api.annotations.oauth.OAuthMessageSigner;
@@ -76,6 +74,8 @@ import java.util.regex.Pattern;
 public class OAuthAdapterGenerator extends AbstractModuleGenerator {
 
     public static final String OAUTH_VERIFIER_FIELD_NAME = "oauthVerifier";
+    public static final String OAUTH_ACCESS_TOKEN_FIELD_NAME = "accessToken";
+    public static final String OAUTH_ACCESS_TOKEN_SECRET_FIELD_NAME = "accessTokenSecret";
     public static final String GET_AUTHORIZATION_URL_METHOD_NAME = "getAuthorizationUrl";
     public static final String FETCH_ACCESS_TOKEN_METHOD_NAME = "fetchAccessToken";
     private static final String REQUEST_TOKEN_FIELD_NAME = "requestToken";
@@ -95,6 +95,8 @@ public class OAuthAdapterGenerator extends AbstractModuleGenerator {
         FieldVariable requestTokenSecret = requestTokenSecretField(oauthAdapter);
         FieldVariable oauthVerifier = oauthVerifierField(oauthAdapter);
         FieldVariable redirectUrl = redirectUrlField(oauthAdapter);
+        FieldVariable accessToken = oauthAccessTokenField(oauthAdapter);
+        FieldVariable accessTokenSecret = oauthAccessTokenSecretField(oauthAdapter);
         FieldVariable consumer = consumerField(oauthAdapter);
         FieldVariable oauthCallback = oauthCallbackField(oauthAdapter);
 
@@ -145,11 +147,19 @@ public class OAuthAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private FieldVariable oauthVerifierField(DefinedClass oauthAdapter) {
-        return new FieldBuilder(oauthAdapter).type(String.class).name(OAUTH_VERIFIER_FIELD_NAME).getter().build();
+        return new FieldBuilder(oauthAdapter).type(String.class).name(OAUTH_VERIFIER_FIELD_NAME).getterAndSetter().build();
     }
 
     private FieldVariable redirectUrlField(DefinedClass oauthAdapter) {
         return new FieldBuilder(oauthAdapter).type(String.class).name(REDIRECT_URL_FIELD_NAME).getter().build();
+    }
+
+    private FieldVariable oauthAccessTokenField(DefinedClass oauthAdapter) {
+        return new FieldBuilder(oauthAdapter).type(String.class).name(OAUTH_ACCESS_TOKEN_FIELD_NAME).getterAndSetter().build();
+    }
+
+    private FieldVariable oauthAccessTokenSecretField(DefinedClass oauthAdapter) {
+        return new FieldBuilder(oauthAdapter).type(String.class).name(OAUTH_ACCESS_TOKEN_SECRET_FIELD_NAME).getterAndSetter().build();
     }
 
     private FieldVariable consumerField(DefinedClass oauthAdapter) {
@@ -261,8 +271,8 @@ public class OAuthAdapterGenerator extends AbstractModuleGenerator {
         TryStatement tryRetrieveAccessToken = fetchAccessToken.body()._try();
         tryRetrieveAccessToken.body().invoke(provider, "retrieveAccessToken").arg(consumer).arg(oauthVerifier);
         generateReThrow(tryRetrieveAccessToken, Exception.class, RuntimeException.class);
-        fetchAccessToken.body().invoke(setterMethodForFieldAnnotatedWith(typeElement, OAuthAccessToken.class)).arg(consumer.invoke("getToken"));
-        fetchAccessToken.body().invoke(setterMethodForFieldAnnotatedWith(typeElement, OAuthAccessTokenSecret.class)).arg(consumer.invoke("getTokenSecret"));
+        fetchAccessToken.body().assign(oauthAdapter.fields().get(OAUTH_ACCESS_TOKEN_FIELD_NAME), consumer.invoke("getToken"));
+        fetchAccessToken.body().assign(oauthAdapter.fields().get(OAUTH_ACCESS_TOKEN_SECRET_FIELD_NAME), consumer.invoke("getTokenSecret"));
     }
 
     private Variable generateProvider(OAuth oauth, Block block, TypeElement typeElement) {

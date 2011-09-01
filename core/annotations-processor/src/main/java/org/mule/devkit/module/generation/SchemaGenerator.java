@@ -27,6 +27,8 @@ import org.mule.api.annotations.callback.InterceptCallback;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.oauth.OAuth;
+import org.mule.api.annotations.oauth.OAuthAccessToken;
+import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
@@ -76,13 +78,16 @@ import javax.lang.model.util.ElementFilter;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class SchemaGenerator extends AbstractModuleGenerator {
 
     public static final String DOMAIN_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.DOMAIN_FIELD_NAME;
     public static final String PORT_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.PORT_FIELD_NAME;
+    public static final String HTTP_CALLBACK_CONFIG_ELEMENT_NAME = "httpCallbackConfig";
     private static final String ATTRIBUTE_NAME_KEY = "key";
     private static final String ATTRIBUTE_NAME_REF = "ref";
     private static final String ATTRIBUTE_NAME_VALUE_REF = "value-ref";
@@ -101,7 +106,9 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private static final String TRANSFER_OBJECT_TYPE_SUFFIX = "TransferObjectType";
     private static final String DOMAIN_DEFAULT_VALUE = "${fullDomain}";
     private static final String PORT_DEFAULT_VALUE = "${http.port}";
-    public static final String HTTP_CALLBACK_CONFIG_ELEMENT_NAME = "httpCallbackConfig";
+    private static final List<Class<? extends java.lang.annotation.Annotation>> PARAMETERS_ANNOTATIONS_TO_IGNORE =
+            Arrays.asList(InboundHeaders.class, InvocationHeaders.class, Payload.class, OAuthAccessToken.class, OAuthAccessTokenSecret.class);
+    private static final List<Class<?>> PARAMETER_TYPES_TO_IGNORE = Arrays.<Class<?>>asList(SourceCallback.class, InterceptCallback.class);
     private Schema schema;
     private ObjectFactory objectFactory;
 
@@ -328,29 +335,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         complexContentExtension.setAll(all);
 
         if (element.getKind() == ElementKind.METHOD) {
-            for (VariableElement variable : ((ExecutableElement) element).getParameters()) {
-                if (variable.asType().toString().contains(SourceCallback.class.getName()))
+            for (VariableElement variable : element.getParameters()) {
+                if (ignoreParameter(variable)) {
                     continue;
-                if (variable.asType().toString().contains(InterceptCallback.class.getName()))
-                    continue;
-
-
-                InboundHeaders inboundHeaders = variable.getAnnotation(InboundHeaders.class);
-
-                if (inboundHeaders != null)
-                    continue;
-
-                InvocationHeaders invocationHeaders = variable.getAnnotation(InvocationHeaders.class);
-
-                if (invocationHeaders != null)
-                    continue;
-
-                Payload payload = variable.getAnnotation(Payload.class);
-
-                if (payload != null)
-                    continue;
-
-
+                }
                 if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
                     generateProcessorCallbackElement(all, variable);
                 } else if (variable.getAnnotation(Session.class) != null) {
@@ -376,6 +364,20 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
 
+    }
+
+    private boolean ignoreParameter(VariableElement variable) {
+        String variableType = variable.asType().toString();
+        for (Class<?> typeToIgnore : PARAMETER_TYPES_TO_IGNORE) {
+            if (variableType.contains(typeToIgnore.getName()))
+                return true;
+        }
+        for (Class<? extends java.lang.annotation.Annotation> annotationToIgnore : PARAMETERS_ANNOTATIONS_TO_IGNORE) {
+            if (variable.getAnnotation(annotationToIgnore) != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void generateProcessorCallbackElement(All all, VariableElement variable) {

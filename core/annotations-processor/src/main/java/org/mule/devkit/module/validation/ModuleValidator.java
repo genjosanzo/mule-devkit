@@ -28,7 +28,6 @@ import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.oauth.OAuthConsumerKey;
 import org.mule.api.annotations.oauth.OAuthConsumerSecret;
-import org.mule.api.annotations.oauth.RequiresAccessToken;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
@@ -252,12 +251,12 @@ public class ModuleValidator implements Validator {
         }
 
         if (element.getAnnotation(OAuth.class) != null) {
-            checkClassHasFieldWithAnnotation(element, OAuthConsumerKey.class, "@OAuth-enabled module must contain a field annotated with @OAuthConsumerKey");
-            checkClassHasFieldWithAnnotation(element, OAuthConsumerSecret.class, "@OAuth-enabled module must contain a field annotated with @OAuthConsumerSecret");
-            checkClassHasFieldWithAnnotation(element, OAuthAccessToken.class, "@OAuth-enabled module must contain a field annotated with @OAuthAccessToken");
-            checkClassHasFieldWithAnnotation(element, OAuthAccessTokenSecret.class, "@OAuth-enabled module must contain a field annotated with @OAuthAccessTokenSecret");
-        } else if (classHasMethodWithAnnotation(element, RequiresAccessToken.class)) {
-            throw new ValidationException(element, "@RequiresAccessToken methods requires that the module to be annotated with @OAuth");
+            checkClassHasFieldWithAnnotation(element, OAuthConsumerKey.class, "@OAuth class must contain a field annotated with @OAuthConsumerKey");
+            checkClassHasFieldWithAnnotation(element, OAuthConsumerSecret.class, "@OAuth class must contain a field annotated with @OAuthConsumerSecret");
+        } else if (classHasMethodWithParameterAnnotated(element, OAuthAccessToken.class)) {
+            throw new ValidationException(element, "Cannot annotate parameter with @OAuthAccessToken without annotating the class with @OAuth");
+        } else if (classHasMethodWithParameterAnnotated(element, OAuthAccessTokenSecret.class)) {
+            throw new ValidationException(element, "Cannot annotate parameter with @OAuthAccessTokenSecret without annotating the class with @OAuth");
         }
 
         // verify that every @Transformer is public and non-static and non-generic
@@ -276,11 +275,13 @@ public class ModuleValidator implements Validator {
         throw new ValidationException(element, errorMessage);
     }
 
-    private boolean classHasMethodWithAnnotation(Element element, Class<? extends Annotation> annotation) throws ValidationException {
+    private boolean classHasMethodWithParameterAnnotated(Element element, Class<? extends Annotation> annotation) throws ValidationException {
         List<ExecutableElement> methods = ElementFilter.methodsIn(element.getEnclosedElements());
         for (ExecutableElement method : methods) {
-            if (method.getAnnotation(annotation) != null) {
-                return true;
+            for(VariableElement parameter : method.getParameters()) {
+                if(parameter.getAnnotation(annotation) != null) {
+                    return true;
+                }
             }
         }
         return false;

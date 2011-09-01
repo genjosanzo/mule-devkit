@@ -31,7 +31,7 @@ import org.mule.api.annotations.callback.InterceptCallback;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuthAccessToken;
-import org.mule.api.annotations.oauth.RequiresAccessToken;
+import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.Payload;
@@ -61,7 +61,6 @@ import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Type;
-import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.expression.MessageHeaderExpressionEvaluator;
 import org.mule.expression.MessageHeadersExpressionEvaluator;
@@ -555,8 +554,18 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             poolObject = process.body().decl(poolObjectClass, "poolObject", ExpressionFactory._null());
         }
 
+<<<<<<< HEAD
         if (executableElement.getEnclosingElement().getAnnotation(OAuth.class) != null && executableElement.getAnnotation(RequiresAccessToken.class) != null) {
             addOauth(process, event, object, executableElement);
+=======
+        if(executableElement.getEnclosingElement().getAnnotation(OAuth.class) != null) {
+            for (VariableElement variable : executableElement.getParameters()) {
+                if (variable.getAnnotation(OAuthAccessToken.class) != null || variable.getAnnotation(OAuthAccessTokenSecret.class) != null) {
+                    addOauth(process, event, object);
+                    break;
+                }
+            }
+>>>>>>> 35a0ed4d4db0a1638a286bb28bbfa433d71803a1
         }
 
         // add session field declarations
@@ -641,7 +650,14 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 }
             } else if (variable.asType().toString().contains(HttpCallback.class.getName())) {
                 parameters.add(fields.get(fieldName).getFieldType());
-
+            } else if (variable.getAnnotation(OAuthAccessToken.class) != null) {
+                Invocation getAccessToken = object.invoke("get" + StringUtils.capitalize(OAuthAdapterGenerator.OAUTH_ACCESS_TOKEN_FIELD_NAME));
+                Variable accessToken = callProcessor.body().decl(ref(String.class), "accessToken", getAccessToken);
+                parameters.add(accessToken);
+            } else if (variable.getAnnotation(OAuthAccessTokenSecret.class) != null) {
+                Invocation getAccessToken = object.invoke("get" + StringUtils.capitalize(OAuthAdapterGenerator.OAUTH_ACCESS_TOKEN_SECRET_FIELD_NAME));
+                Variable accessTokenSecret = callProcessor.body().decl(ref(String.class), "accessTokenSecret", getAccessToken);
+                parameters.add(accessTokenSecret);
             } else if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
 
                 DefinedClass callbackClass = context.getClassForRole(ProcessorCallbackGenerator.ROLE);
@@ -753,7 +769,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
 
         generateThrow("failedToInvoke", MessagingException.class,
-                callProcessor._catch((TypeReference) ref(Exception.class)), event, methodName);
+                callProcessor._catch(ref(Exception.class)), event, methodName);
 
         if (poolObjectClass != null) {
             Block fin = callProcessor._finally();
@@ -781,7 +797,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
     }
 
-    private void addOauth(Method process, Variable event, FieldVariable object, ExecutableElement executableElement) {
+    private void addOauth(Method process, Variable event, FieldVariable object) {
         Invocation oauthVerifier = object.invoke("get" + StringUtils.capitalize(OAuthAdapterGenerator.OAUTH_VERIFIER_FIELD_NAME));
         Block ifOauthVerifierIsNull = process.body()._if(isNull(oauthVerifier))._then();
         Variable authorizationUrl = ifOauthVerifierIsNull.decl(ref(String.class), "authorizationUrl", ExpressionFactory.invoke(object, OAuthAdapterGenerator.GET_AUTHORIZATION_URL_METHOD_NAME));
@@ -789,8 +805,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         ifOauthVerifierIsNull.invoke(event.invoke("getMessage"), "setOutboundProperty").arg(LOCATION_PROPERTY).arg(authorizationUrl);
         ifOauthVerifierIsNull._return(event);
 
-        TypeElement typeElement = (TypeElement) executableElement.getEnclosingElement();
-        Invocation accessToken = object.invoke(getterMethodForFieldAnnotatedWith(typeElement, OAuthAccessToken.class));
+        Invocation accessToken = object.invoke("get" + StringUtils.capitalize(OAuthAdapterGenerator.OAUTH_ACCESS_TOKEN_FIELD_NAME));
         Block ifAccessTokenIsNull = process.body()._if(isNull(accessToken))._then();
         ifAccessTokenIsNull.invoke(object, OAuthAdapterGenerator.FETCH_ACCESS_TOKEN_METHOD_NAME);
     }

@@ -24,7 +24,6 @@ import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.oauth.OAuthConsumerKey;
 import org.mule.api.annotations.oauth.OAuthConsumerSecret;
-import org.mule.api.annotations.oauth.RequiresAccessToken;
 
 @Module(name = "oauth")
 @OAuth(requestTokenUrl = OAuthModule.REQUEST_TOKEN_URL,
@@ -45,14 +44,12 @@ public class OAuthModule {
     @Configurable
     @OAuthConsumerSecret
     private String consumerSecret;
-    @OAuthAccessToken
-    private String accessToken;
-    @OAuthAccessTokenSecret
-    private String accessTokenSecret;
 
     @Processor
-    @RequiresAccessToken
-    public String protectedResource() {
+    public String protectedResource(@OAuthAccessToken String accessToken, @OAuthAccessTokenSecret String accessTokenSecret) {
+        if(!accessToken.equals(Constants.ACCESS_TOKEN) || !accessTokenSecret.equals(Constants.ACCESS_TOKEN_SECRET)) {
+             throw new RuntimeException("Access token or access token secret do not match expected");
+        }
         return PROTECTED_RESOURCE;
     }
 
@@ -75,21 +72,5 @@ public class OAuthModule {
 
     public void setConsumerSecret(String consumerSecret) {
         this.consumerSecret = consumerSecret;
-    }
-
-    public String getAccessTokenSecret() {
-        return accessTokenSecret;
-    }
-
-    public void setAccessTokenSecret(String accessTokenSecret) {
-        this.accessTokenSecret = accessTokenSecret;
-    }
-
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
     }
 }
