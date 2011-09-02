@@ -24,17 +24,21 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
         http://www.mulesoft.org/schema/mule/callback http://www.mulesoft.org/schema/mule/callback/1.0/mule-callback.xsd">
 
-    <callback:config />
+    <callback:config/>
 
     <flow name="doA">
         <callback:do-a on-event-x-flow-ref="flowToExecuteOnEventX" on-event-y-flow-ref="flowToExecuteOnEventY"/>
     </flow>
 
+    <flow name="doB">
+        <callback:do-b/>
+    </flow>
+
     <flow name="flowToExecuteOnEventX">
-        <component class="org.mule.devkit.it.ComponentX" />
+        <component class="org.mule.devkit.it.ComponentX"/>
     </flow>
 
     <flow name="flowToExecuteOnEventY">
-        <component class="org.mule.devkit.it.ComponentY" />
+        <component class="org.mule.devkit.it.ComponentY"/>
     </flow>
 </mule>

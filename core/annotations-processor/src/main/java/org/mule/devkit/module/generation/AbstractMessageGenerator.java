@@ -328,10 +328,12 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                             ExpressionFactory.cast(ref(Initialisable.class), variableElement.getField()).invoke("initialise")
                     );
                 } else if (variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
+                    FieldVariable callbackFlowName = fields.get(fieldName).getField();
+                    Block ifCallbackFlowNameIsNull = initialise.body()._if(Op.ne(callbackFlowName, ExpressionFactory._null()))._then();
                     Invocation domain = object.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.DOMAIN_FIELD_NAME));
                     Invocation port = object.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.PORT_FIELD_NAME));
-                    initialise.body().assign(variableElement.getFieldType(), ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
-                            arg(fields.get(fieldName).getField()).arg(muleContext).arg(domain).arg(port));
+                    ifCallbackFlowNameIsNull.assign(variableElement.getFieldType(), ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
+                            arg(callbackFlowName).arg(muleContext).arg(domain).arg(port));
                 }
             }
         }

@@ -38,13 +38,26 @@ public class HttpCallbackProcessorModuleTest extends FunctionalTestCase {
         return "http-callback.xml";
     }
 
+    @Override
+    protected void doSetUp() throws Exception {
+        ComponentX.reset();
+        ComponentY.reset();
+    }
+
     public void testCallback() throws Exception {
         assertFalse(ComponentX.wasExecuted());
         assertFalse(ComponentY.wasExecuted());
         runFlow("doA");
-        Thread.sleep(5000);
+        Thread.sleep(2000);
         assertTrue(ComponentX.wasExecuted());
         assertTrue(ComponentY.wasExecuted());
+    }
+
+    public void testCallbackOptional() throws Exception {
+        assertFalse(ComponentX.wasExecuted());
+        runFlow("doB");
+        Thread.sleep(2000);
+        assertFalse(ComponentX.wasExecuted());
     }
 
     private MuleEvent runFlow(String flowName) throws Exception {

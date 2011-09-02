@@ -35,4 +35,8 @@ public class ComponentY implements Callable {
     public static boolean wasExecuted() {
         return wasExecuted;
     }
+
+    public static void reset() {
+        wasExecuted = false;
+    }
 }

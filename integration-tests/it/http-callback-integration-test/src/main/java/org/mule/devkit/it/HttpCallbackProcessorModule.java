@@ -20,6 +20,7 @@ package org.mule.devkit.it;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.HttpCallback;
+import org.mule.api.annotations.param.Optional;
 
 import java.io.IOException;
 import java.net.URL;
@@ -32,6 +33,17 @@ public class HttpCallbackProcessorModule {
         try {
             simulateCallback(onEventX.getUrl());
             simulateCallback(onEventY.getUrl());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Processor
+    public void doB(@Optional HttpCallback onEventX) {
+        try {
+            if (onEventX != null) {
+                simulateCallback(onEventX.getUrl());
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
