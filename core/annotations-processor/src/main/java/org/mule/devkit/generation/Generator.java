@@ -21,7 +21,5 @@ import javax.lang.model.element.TypeElement;
 
 public interface Generator {
 
-    void setContext(GeneratorContext context);
-
-    void generate(TypeElement typeElement) throws GenerationException;
+    void generate(TypeElement typeElement, GeneratorContext context) throws GenerationException;
 }

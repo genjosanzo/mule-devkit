@@ -33,7 +33,6 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.transport.Connector;
 import org.mule.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.construct.SimpleFlowConstruct;
-import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -54,6 +53,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class HttpCallbackGenerator extends AbstractModuleGenerator {
@@ -77,33 +77,23 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
     private FieldVariable domainField;
     private FieldVariable localUrlField;
 
-    public void generate(TypeElement typeElement) throws GenerationException {
-        boolean shouldGenerate = false;
-
-        java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
+        List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement method : methods) {
-            Processor processor = method.getAnnotation(Processor.class);
-            if (processor == null)
-                continue;
-
-            for (VariableElement variable : method.getParameters()) {
-                if (variable.asType().toString().contains(HttpCallback.class.getName())) {
-                    shouldGenerate = true;
-                    break;
+            if (method.getAnnotation(Processor.class) != null) {
+                for (VariableElement variable : method.getParameters()) {
+                    if (variable.asType().toString().contains(HttpCallback.class.getName())) {
+                        return true;
+                    }
                 }
             }
         }
-
-        if (typeElement.getAnnotation(OAuth.class) != null) {
-            shouldGenerate = true;
-        }
-
-        if (shouldGenerate) {
-            generateCallbackClass(typeElement);
-        }
+        return typeElement.getAnnotation(OAuth.class) != null;
     }
 
-    private DefinedClass generateCallbackClass(TypeElement typeElement) {
+    @Override
+    protected void doGenerate(TypeElement typeElement) {
         DefinedClass callbackClass = getProcessorCallbackClass(typeElement);
         generateFields(callbackClass);
         generateConstructorArgSimpleFlowConstruct(callbackClass);
@@ -116,8 +106,6 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
         generateStopMethod(callbackClass);
 
         context.setClassRole(HTTP_CALLBACK_ROLE, callbackClass);
-
-        return callbackClass;
     }
 
     private void generateFields(DefinedClass callbackClass) {

@@ -36,7 +36,6 @@ import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.util.SpringXMLUtils;
-import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -81,7 +80,13 @@ import java.util.List;
 
 public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
-    public void generate(TypeElement typeElement) throws GenerationException {
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
+        return true;
+    }
+
+    @Override
+    protected void doGenerate(TypeElement typeElement) {
         generateConfigBeanDefinitionParserFor(typeElement);
 
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
@@ -102,7 +107,6 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
             generateBeanDefinitionParserForSource(executableElement);
         }
-
     }
 
     private void generateConfigBeanDefinitionParserFor(TypeElement typeElement) {
@@ -865,6 +869,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         isBlank._else()._return(id);
     }
 
+
     private Method generateGetAttributeValue(DefinedClass beanDefinitionparser) {
         Method getAttributeValue = beanDefinitionparser.method(Modifier.PROTECTED, ref(String.class), "getAttributeValue");
         Variable element = getAttributeValue.param(ref(org.w3c.dom.Element.class), "element");
@@ -881,7 +886,6 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         getAttributeValue.body()._return(ExpressionFactory._null());
         return getAttributeValue;
     }
-
 
     private void generateParseChild(DefinedClass beanDefinitionparser, ExecutableElement executableElement) {
         Method parseChild = beanDefinitionparser.method(Modifier.PROTECTED, context.getCodeModel().VOID, "parseChild");
@@ -943,6 +947,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         return addPropertyValue;
     }
 
+
     private Invocation generateAddPropertyRefValue(Variable element, Variable beanDefinitionBuilder, VariableElement variable) {
         Invocation getAttributeValue = ExpressionFactory.invoke("getAttributeValue");
         getAttributeValue.arg(element);
@@ -953,7 +958,6 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         return addPropertyValue;
     }
-
 
     private Variable generateBeanAssembler(Method parseChild, Variable element, Variable beanDefinitionBuilder) {
         Variable assembler = parseChild.body().decl(ref(BeanAssembler.class), "assembler");

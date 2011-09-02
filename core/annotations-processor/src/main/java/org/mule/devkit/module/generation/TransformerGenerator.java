@@ -52,7 +52,13 @@ import java.util.Map;
 
 public class TransformerGenerator extends AbstractMessageGenerator {
 
-    public void generate(TypeElement typeElement) throws GenerationException {
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
+        return true;
+    }
+
+    @Override
+    protected void doGenerate(TypeElement typeElement) throws GenerationException {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Transformer transformer = executableElement.getAnnotation(Transformer.class);

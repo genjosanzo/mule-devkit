@@ -45,11 +45,14 @@ import javax.lang.model.util.ElementFilter;
 
 public class PoolAdapterGenerator extends AbstractMessageGenerator {
 
-    public void generate(TypeElement typeElement) throws GenerationException {
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
         Module module = typeElement.getAnnotation(Module.class);
-        if (!module.poolable())
-            return;
+        return module.poolable();
+    }
 
+    @Override
+    protected void doGenerate(TypeElement typeElement) throws GenerationException {
         DefinedClass poolAdapter = getPoolAdapterClass(typeElement);
         poolAdapter.javadoc().add("A <code>" + poolAdapter.name() + "</code> is a wrapper around ");
         poolAdapter.javadoc().add(ref(typeElement.asType()));

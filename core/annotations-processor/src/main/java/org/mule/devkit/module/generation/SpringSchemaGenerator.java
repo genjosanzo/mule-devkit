@@ -27,7 +27,13 @@ import java.io.OutputStreamWriter;
 
 public class SpringSchemaGenerator extends AbstractModuleGenerator {
 
-    public void generate(TypeElement typeElement) throws GenerationException {
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
+        return true;
+    }
+
+    @Override
+    protected void doGenerate(TypeElement typeElement) throws GenerationException {
         try {
             OutputStream springSchemasStream = context.getCodeModel().getCodeWriter().openBinary(null, "META-INF/spring.schemas");
             OutputStreamWriter springSchemasOut = new OutputStreamWriter(springSchemasStream, "UTF-8");

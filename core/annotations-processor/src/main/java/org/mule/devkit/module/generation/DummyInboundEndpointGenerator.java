@@ -31,7 +31,6 @@ import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
-import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.GeneratorContext;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -52,26 +51,20 @@ public class DummyInboundEndpointGenerator extends AbstractModuleGenerator {
 
     public static final String DUMMY_INBOUND_ENDPOINT_ROLE = "DummyInboundEndpoint";
 
-    public void generate(TypeElement typeElement) throws GenerationException {
-        boolean shouldGenerate = false;
-
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Source source = executableElement.getAnnotation(Source.class);
-
-            if (source == null)
-                continue;
-
-            shouldGenerate = true;
-            break;
+            if (source != null) {
+                return true;
+            }
         }
-
-        if (shouldGenerate) {
-            generateDummyInboundEndpoint(typeElement);
-        }
+        return false;
     }
 
-    private void generateDummyInboundEndpoint(TypeElement typeElement) {
+    @Override
+    public void doGenerate(TypeElement typeElement) {
         DefinedClass dummyInboundEndpoint = getDummyInboundEndpointClass(typeElement, context);
         dummyInboundEndpoint.javadoc().add("Dummy ");
         dummyInboundEndpoint.javadoc().add(ref(InboundEndpoint.class));
@@ -183,5 +176,4 @@ public class DummyInboundEndpointGenerator extends AbstractModuleGenerator {
 
         return dummyInboundEndpoint;
     }
-
 }

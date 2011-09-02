@@ -28,7 +28,6 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.param.Session;
-import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.CatchBlock;
@@ -57,7 +56,13 @@ import java.util.Map;
 
 public class MessageSourceGenerator extends AbstractMessageGenerator {
 
-    public void generate(TypeElement typeElement) throws GenerationException {
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
+        return true;
+    }
+
+    @Override
+    protected void doGenerate(TypeElement typeElement) {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Source source = executableElement.getAnnotation(Source.class);
@@ -158,6 +163,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
     private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> sessionFields, FieldVariable object, FieldVariable muleContext) {
         generateRunMethod(messageSourceClass, executableElement, fields, sessionFields, object, muleContext, null);
     }
+
 
     private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> sessionFields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass) {
         Method run = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "run");
@@ -289,7 +295,6 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         }
     }
 
-
     private void generateStartMethod(DefinedClass messageSourceClass, FieldVariable thread) {
         Method start = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
         start.javadoc().add("Method to be called when Mule instance gets started.");
@@ -303,6 +308,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         start.body().add(thread.invoke("start"));
     }
 
+
     private void generateStopMethod(DefinedClass messageSourceClass, FieldVariable thread) {
         Method stop = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "stop");
         stop.javadoc().add("Method to be called when Mule instance gets stopped.");
@@ -310,7 +316,6 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
         stop.body().add(thread.invoke("interrupt"));
     }
-
 
     private void generateSourceCallbackMethod(DefinedClass messageSourceClass, FieldVariable messageProcessor, FieldVariable muleContext, FieldVariable flowConstruct) {
         Method process = messageSourceClass.method(Modifier.PUBLIC, ref(Object.class), "process");

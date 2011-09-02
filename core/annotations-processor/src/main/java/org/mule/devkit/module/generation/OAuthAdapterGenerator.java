@@ -79,15 +79,18 @@ public class OAuthAdapterGenerator extends AbstractModuleGenerator {
     public static final String FETCH_ACCESS_TOKEN_METHOD_NAME = "fetchAccessToken";
     private static final String REQUEST_TOKEN_FIELD_NAME = "requestToken";
     private static final String REQUEST_TOKEN_SECRET_FIELD_NAME = "requestTokenSecret";
-    private static final String REDIRECT_URL_FIELD_NAME = "redirectUrl";
     private static final String CONSUMER_FIELD_NAME = "consumer";
+    private static final String REDIRECT_URL_FIELD_NAME = "redirectUrl";
 
-    public void generate(TypeElement typeElement) throws GenerationException {
-        OAuth oauth = typeElement.getAnnotation(OAuth.class);
-        if (oauth == null) {
-            return;
-        }
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
+        return typeElement.getAnnotation(OAuth.class) != null;
+    }
+
+    @Override
+    protected void doGenerate(TypeElement typeElement) throws GenerationException {
         DefinedClass oauthAdapter = getOAuthAdapterClass(typeElement);
+        OAuth oauth = typeElement.getAnnotation(OAuth.class);
         FieldVariable pattern = oauthVerifierPatterConstant(oauthAdapter, oauth);
         FieldVariable muleContext = muleContextField(oauthAdapter);
         FieldVariable requestToken = requestTokenField(oauthAdapter);

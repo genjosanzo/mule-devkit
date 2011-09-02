@@ -27,8 +27,13 @@ import java.io.OutputStreamWriter;
 
 public class SpringNamespaceHandlerGenerator extends AbstractModuleGenerator {
 
-    public void generate(TypeElement typeElement) throws GenerationException {
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
+        return true;
+    }
 
+    @Override
+    protected void doGenerate(TypeElement typeElement) throws GenerationException {
         try {
             OutputStream springNamespaceHandlersStream = context.getCodeModel().getCodeWriter().openBinary(null, "META-INF/spring.handlers");
             OutputStreamWriter springNamespaceHandlersOut = new OutputStreamWriter(springNamespaceHandlersStream, "UTF-8");

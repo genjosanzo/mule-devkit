@@ -26,8 +26,13 @@ import java.io.OutputStream;
 
 public class MuleSchemaGenerator extends AbstractModuleGenerator {
 
-    public void generate(TypeElement typeElement) throws GenerationException {
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
+        return true;
+    }
 
+    @Override
+    protected void doGenerate(TypeElement typeElement) throws GenerationException {
         InputStream inputStream = null;
         OutputStream outputStream = null;
 

@@ -22,7 +22,6 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
-import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.Invocation;
@@ -39,7 +38,13 @@ import java.util.List;
 
 public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
 
-    public void generate(TypeElement typeElement) throws GenerationException {
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
+        return true;
+    }
+
+    @Override
+    protected void doGenerate(TypeElement typeElement) {
         DefinedClass namespaceHandlerClass = getNamespaceHandlerClass(typeElement);
 
         Method init = namespaceHandlerClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "init");
