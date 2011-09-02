@@ -193,7 +193,7 @@ def:since_tags(obj) ?>
        Uses the following fields: deprecated descr seeAlso since ?><?cs
 def:description(obj) ?><?cs 
   call:deprecated_warning(obj) ?>
-  <div class="jd-tagdata jd-tagdescr"><p><?cs call:tag_list(obj.descr) ?></p></div><?cs 
+  <div class="jd-tagdata jd-tagdescr"><p><?cs call:tag_list(obj.descr) ?></p></div><?cs
   if:subcount(obj.attrRefs) ?>
   <div class="jd-tagdata">
       <h5 class="jd-tagtitle">Related XML Attributes</h5>
@@ -244,7 +244,7 @@ def:description(obj) ?><?cs
        Uses the following fields: deprecated descr seeAlso since ?><?cs
 def:op_description(obj) ?><?cs
   call:deprecated_warning(obj) ?>
-  <div class="jd-tagdata jd-tagdescr"><p><?cs call:op_tag_list(obj.descr) ?></p>></div>
+  <div class="jd-tagdata jd-tagdescr"><p><?cs call:op_tag_list(obj.descr) ?></p></div>
   <div class="jd-tagdata">
       <h5 class="jd-tagtitle">Attributes</h5>
       <table class="jd-tagtable">

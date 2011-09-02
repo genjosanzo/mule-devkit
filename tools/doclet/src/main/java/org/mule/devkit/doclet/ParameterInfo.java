@@ -65,6 +65,11 @@ public class ParameterInfo {
 
     public void makeHDF(Data data, String base, boolean isLastVararg, HashSet<String> typeVariables) {
         data.setValue(base + ".name", this.name());
+        if( mTypeName.contains("HttpCallback") ) {
+            data.setValue(base + ".attributeName", this.name() + "-flow-ref");
+        } else {
+            data.setValue(base + ".attributeName", this.name());
+        }
         type().makeHDF(data, base + ".type", isLastVararg, typeVariables);
     }
 

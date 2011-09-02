@@ -511,6 +511,11 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
             // our parent's names.
             for (int i = 0; i < N; i++) {
                 attributeName[i] = mParameters[i].name();
+                if (mParameters[i].typeName().contains("HttpCallback")) {
+                    attributeName[i] += "-flow-ref";
+                }
+                optional[i] = false;
+                defaultValue[i] = "";
                 for (AnnotationInstanceInfo annotation : mParameters[i].annotations()) {
                     if (annotation.type().qualifiedName().equals("org.mule.api.annotations.Parameter")) {
                         for (AnnotationValueInfo value : annotation.elementValues()) {
@@ -518,23 +523,15 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
                                 attributeName[i] = value.valueString().replace("\"", "");
                             }
                         }
-                        optional[i] = false;
-                        for (AnnotationInstanceInfo secondAnnotation : annotations()) {
-                            if (secondAnnotation.type().qualifiedName().equals("org.mule.api.annotations.param.Optional")) {
-                                optional[i] = true;
-                            }
-                        }
-                        defaultValue[i] = "";
-                        for (AnnotationInstanceInfo secondAnnotation : annotations()) {
-                            if (secondAnnotation.type().qualifiedName().equals("org.mule.api.annotations.param.Optional")) {
-                                defaultValue[i] = secondAnnotation.elementValues()[0].valueString().replace("\"", "");
-                            }
-                        }
+                        break;
+                    } else if (annotation.type().qualifiedName().equals("org.mule.api.annotations.param.Optional")) {
+                        optional[i] = true;
+                        break;
+                    } else if (annotation.type().qualifiedName().equals("org.mule.api.annotations.param.DefaultValue")) {
+                        defaultValue[i] = annotation.elementValues()[0].valueString().replace("\"", "");
                         break;
                     }
                 }
-
-
                 names[i] = mParameters[i].name();
                 comments[i] = "";
                 positions[i] = mParameters[i].position();
