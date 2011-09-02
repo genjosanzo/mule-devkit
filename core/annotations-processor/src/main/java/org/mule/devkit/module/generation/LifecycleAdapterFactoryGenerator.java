@@ -24,7 +24,6 @@ import org.mule.api.annotations.Module;
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.object.ObjectFactory;
-import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
@@ -38,11 +37,14 @@ import javax.lang.model.util.ElementFilter;
 
 public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
 
-    public void generate(TypeElement typeElement) throws GenerationException {
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
         Module module = typeElement.getAnnotation(Module.class);
-        if (!module.poolable())
-            return;
+        return module.poolable();
+    }
 
+    @Override
+    protected void doGenerate(TypeElement typeElement) {
         DefinedClass lifecycleAdapterFactory = getLifecycleAdapterFactoryClass(typeElement);
         lifecycleAdapterFactory.javadoc().add("A <code>" + lifecycleAdapterFactory.name() + "</code> is an implementation  ");
         lifecycleAdapterFactory.javadoc().add(" of {@link ObjectFactory} interface for ");

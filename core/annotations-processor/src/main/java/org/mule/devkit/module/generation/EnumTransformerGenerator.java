@@ -23,7 +23,6 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -48,7 +47,13 @@ import java.util.Set;
 
 public class EnumTransformerGenerator extends AbstractMessageGenerator {
 
-    public void generate(TypeElement typeElement) throws GenerationException {
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
+        return true;
+    }
+
+    @Override
+    protected void doGenerate(TypeElement typeElement) {
         Set<TypeMirror> registeredEnums = new HashSet<TypeMirror>();
 
         java.util.List<VariableElement> variables = ElementFilter.fieldsIn(typeElement.getEnclosedElements());

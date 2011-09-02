@@ -120,8 +120,7 @@ public class ModuleAnnotationProcessor extends AbstractProcessor {
                             validator.validate(e);
                         }
                         for (Generator generator : plugin.getGenerators()) {
-                            generator.setContext(context);
-                            generator.generate(e);
+                            generator.generate(e, context);
                         }
                     }
                 } catch (ValidationException tve) {

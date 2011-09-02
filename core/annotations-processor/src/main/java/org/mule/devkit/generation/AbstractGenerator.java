@@ -19,15 +19,26 @@ package org.mule.devkit.generation;
 
 import org.mule.devkit.model.code.CodeModel;
 
+import javax.lang.model.element.TypeElement;
+
 public abstract class AbstractGenerator implements Generator {
+
     protected GeneratorContext context;
 
-    public void setContext(GeneratorContext context) {
+    protected abstract boolean shouldGenerate(TypeElement typeElement);
+
+    protected abstract void doGenerate(TypeElement typeElement) throws GenerationException;
+
+    @Override
+    public final void generate(TypeElement typeElement, GeneratorContext context) throws GenerationException {
         this.context = context;
+        if(shouldGenerate(typeElement)) {
+           doGenerate(typeElement);
+        }
     }
 
     protected CodeModel getCodeModel()
     {
-        return this.context.getCodeModel();
+        return context.getCodeModel();
     }
 }

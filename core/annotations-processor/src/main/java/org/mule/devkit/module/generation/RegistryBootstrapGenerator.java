@@ -27,8 +27,13 @@ import java.io.OutputStreamWriter;
 
 public class RegistryBootstrapGenerator extends AbstractModuleGenerator {
 
-    public void generate(TypeElement typeElement) throws GenerationException {
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
+        return true;
+    }
 
+    @Override
+    protected void doGenerate(TypeElement typeElement) throws GenerationException {
         try {
             OutputStream registryBootstrapStream = context.getCodeModel().getCodeWriter().openBinary(null, "META-INF/services/org/mule/config/registry-bootstrap.properties");
             OutputStreamWriter registryBootstrapStreamOut = new OutputStreamWriter(registryBootstrapStream, "UTF-8");

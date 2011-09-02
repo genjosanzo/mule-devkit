@@ -19,7 +19,6 @@ package org.mule.devkit.module.generation;
 
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.InterceptCallback;
-import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
@@ -29,31 +28,26 @@ import org.mule.devkit.model.code.Modifier;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
+import java.util.List;
 
 public class InterceptCallbackGenerator extends AbstractModuleGenerator {
+
     public static final String ROLE = "InterceptCallback";
 
-    public void generate(TypeElement typeElement) throws GenerationException {
-        boolean shouldGenerate = false;
-
-        java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
+        List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement method : methods) {
             Processor processor = method.getAnnotation(Processor.class);
-            if (processor == null)
-                continue;
-
-            if( processor.intercepting() ) {
-                shouldGenerate = true;
-                break;
+            if (processor != null && processor.intercepting()) {
+                return true;
             }
         }
-
-        if (shouldGenerate) {
-            generateCallbackClass(typeElement);
-        }
+        return false;
     }
 
-    private DefinedClass generateCallbackClass(TypeElement typeElement) {
+    @Override
+    protected void doGenerate(TypeElement typeElement) {
         DefinedClass callbackClass = getInterceptCallbackClass(typeElement);
         callbackClass._implements(ref(InterceptCallback.class));
 
@@ -65,8 +59,6 @@ public class InterceptCallbackGenerator extends AbstractModuleGenerator {
         doNotContinue.body().assign(shallContinue, ExpressionFactory.FALSE);
 
         context.setClassRole(ROLE, callbackClass);
-
-        return callbackClass;
     }
 
     private DefinedClass getInterceptCallbackClass(TypeElement type) {

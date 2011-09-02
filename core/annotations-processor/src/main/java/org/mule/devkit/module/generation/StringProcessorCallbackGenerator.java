@@ -31,35 +31,30 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
+import java.util.List;
 import java.util.Map;
 
 public class StringProcessorCallbackGenerator extends AbstractModuleGenerator {
 
     public static final String ROLE = "StringProcessorCallback";
 
-    public void generate(TypeElement typeElement) throws GenerationException {
-        boolean shouldGenerate = false;
-
-        java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
+        List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement method : methods) {
-            Processor processor = method.getAnnotation(Processor.class);
-            if (processor == null)
-                continue;
-
-            for (VariableElement variable : method.getParameters()) {
-                if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
-                    shouldGenerate = true;
-                    break;
+            if (method.getAnnotation(Processor.class) != null) {
+                for (VariableElement variable : method.getParameters()) {
+                    if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
+                        return true;
+                    }
                 }
             }
         }
-
-        if (shouldGenerate) {
-            generateCallbackClass(typeElement);
-        }
+        return false;
     }
 
-    private DefinedClass generateCallbackClass(TypeElement typeElement) {
+    @Override
+    protected void doGenerate(TypeElement typeElement) throws GenerationException {
         DefinedClass callbackClass = getProcessorCallbackClass(typeElement);
         callbackClass._implements(ref(ProcessorCallback.class));
 
@@ -79,8 +74,6 @@ public class StringProcessorCallbackGenerator extends AbstractModuleGenerator {
         generateCallbackProcessWithPayloadAndProperties(callbackClass, output);
 
         context.setClassRole(ROLE, callbackClass);
-
-        return callbackClass;
     }
 
     private void generateCallbackProcessWithPayload(DefinedClass callbackClass, FieldVariable output) {

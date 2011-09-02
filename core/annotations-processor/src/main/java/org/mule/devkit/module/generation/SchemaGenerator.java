@@ -117,7 +117,13 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         objectFactory = new ObjectFactory();
     }
 
-    public void generate(TypeElement typeElement) throws GenerationException {
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
+        return true;
+    }
+
+    @Override
+    protected void doGenerate(TypeElement typeElement) throws GenerationException {
         Module module = typeElement.getAnnotation(Module.class);
         String targetNamespace = module.namespace();
         if (targetNamespace == null || targetNamespace.length() == 0) {

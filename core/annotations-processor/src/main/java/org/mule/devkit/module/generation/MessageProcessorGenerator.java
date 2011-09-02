@@ -45,7 +45,6 @@ import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.CatchBlock;
@@ -92,7 +91,13 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
     private static final String REDIRECT_HTTP_STATUS = "302";
     private static final String LOCATION_PROPERTY = "Location";
 
-    public void generate(TypeElement typeElement) throws GenerationException {
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
+        return true;
+    }
+
+    @Override
+    protected void doGenerate(TypeElement typeElement) {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Processor processor = executableElement.getAnnotation(Processor.class);
@@ -106,7 +111,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
     private void generateMessageProcessor(TypeElement typeElement, ExecutableElement executableElement, boolean intercepting) {
         // get class
-        DefinedClass messageProcessorClass = null;
+        DefinedClass messageProcessorClass;
 
         if (intercepting) {
             messageProcessorClass = getInterceptingMessageProcessorClass(executableElement);

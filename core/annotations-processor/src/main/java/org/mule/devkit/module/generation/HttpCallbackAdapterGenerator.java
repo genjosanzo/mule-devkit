@@ -21,7 +21,6 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.lifecycle.Initialisable;
-import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
@@ -46,32 +45,28 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
     public static final String PORT_FIELD_NAME = "port";
     public static final String DOMAIN_FIELD_NAME = "domain";
 
-    public void generate(TypeElement typeElement) throws GenerationException {
+    @Override
+    protected boolean shouldGenerate(TypeElement typeElement) {
         List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        boolean shouldGenerate = false;
         for (ExecutableElement method : methods) {
-            if (method.getAnnotation(Processor.class) == null)
-                continue;
-
-            for (VariableElement variable : method.getParameters()) {
-                if (variable.asType().toString().contains(HttpCallback.class.getName())) {
-                    shouldGenerate = true;
-                    break;
+            if (method.getAnnotation(Processor.class) != null) {
+                for (VariableElement variable : method.getParameters()) {
+                    if (variable.asType().toString().contains(HttpCallback.class.getName())) {
+                        return true;
+                    }
                 }
             }
         }
+        return typeElement.getAnnotation(OAuth.class) != null;
+    }
 
-        if (typeElement.getAnnotation(OAuth.class) != null) {
-            shouldGenerate = true;
-        }
-
-        if (shouldGenerate) {
-            DefinedClass httpCallbackAdapter = getHttpCallbackAdapterClass(typeElement);
-            FieldVariable port = portFieldWithGetterAndSetter(httpCallbackAdapter);
-            FieldVariable domain = domainFieldWithGetterAndSetter(httpCallbackAdapter);
-            FieldVariable logger = FieldBuilder.newLoggerField(httpCallbackAdapter);
-            generateInitialiseMethod(httpCallbackAdapter, port, domain, logger);
-        }
+    @Override
+    protected void doGenerate(TypeElement typeElement) {
+        DefinedClass httpCallbackAdapter = getHttpCallbackAdapterClass(typeElement);
+        FieldVariable port = portFieldWithGetterAndSetter(httpCallbackAdapter);
+        FieldVariable domain = domainFieldWithGetterAndSetter(httpCallbackAdapter);
+        FieldVariable logger = FieldBuilder.newLoggerField(httpCallbackAdapter);
+        generateInitialiseMethod(httpCallbackAdapter, port, domain, logger);
     }
 
     private void generateInitialiseMethod(DefinedClass httpCallbackAdapter, FieldVariable port, FieldVariable domain, FieldVariable logger) {
