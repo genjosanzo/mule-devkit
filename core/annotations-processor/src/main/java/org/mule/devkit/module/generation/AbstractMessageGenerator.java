@@ -86,8 +86,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return expressionManager;
     }
 
-    protected FieldVariable generateFieldForModuleObject(DefinedClass messageProcessorClass, Element typeElement) {
-        DefinedClass moduleObject = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey((TypeElement) typeElement));
+    protected FieldVariable generateFieldForModuleObject(DefinedClass messageProcessorClass, TypeElement typeElement) {
+        DefinedClass moduleObject = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
         FieldVariable field = messageProcessorClass.field(Modifier.PRIVATE, moduleObject, "moduleObject");
         field.javadoc().add("Module object");
 
@@ -108,12 +108,12 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return clazz;
     }
 
-    protected DefinedClass getConfigBeanDefinitionParserClass(Element typeElement) {
-        String poolAdapterName = context.getNameUtils().generateClassName((TypeElement) typeElement, ".config.spring", "ConfigDefinitionParser");
+    protected DefinedClass getConfigBeanDefinitionParserClass(TypeElement typeElement) {
+        String poolAdapterName = context.getNameUtils().generateClassName(typeElement, ".config.spring", "ConfigDefinitionParser");
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(poolAdapterName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(poolAdapterName), new Class[]{BeanDefinitionParser.class});
 
-        context.setClassRole(context.getNameUtils().generateConfigDefParserRoleKey((TypeElement) typeElement), clazz);
+        context.setClassRole(context.getNameUtils().generateConfigDefParserRoleKey(typeElement), clazz);
 
         return clazz;
     }
@@ -193,8 +193,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
             String fieldName = variable.getSimpleName().toString();
 
-            FieldVariable field = null;
-            FieldVariable fieldType = null;
+            FieldVariable field;
+            FieldVariable fieldType;
             if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
                 field = new FieldBuilder(messageProcessorClass).
                         privateVisibility().
@@ -284,8 +284,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
 
-    protected Method generateInitialiseMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, Element typeElement, FieldVariable muleContext, FieldVariable expressionManager, FieldVariable patternInfo, FieldVariable object) {
-        DefinedClass pojoClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey((TypeElement) typeElement));
+    protected Method generateInitialiseMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, TypeElement typeElement, FieldVariable muleContext, FieldVariable expressionManager, FieldVariable patternInfo, FieldVariable object) {
+        DefinedClass pojoClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
 
         Method initialise = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "initialise");
         initialise.javadoc().add("Obtains the expression manager from the Mule context and initialises the connector. If a target object ");

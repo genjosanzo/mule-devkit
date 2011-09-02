@@ -43,7 +43,6 @@ import org.mule.transformer.types.DataTypeFactory;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
@@ -53,8 +52,8 @@ import java.util.Map;
 
 public class TransformerGenerator extends AbstractMessageGenerator {
 
-    public void generate(Element type) throws GenerationException {
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(type.getEnclosedElements());
+    public void generate(TypeElement typeElement) throws GenerationException {
+        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Transformer transformer = executableElement.getAnnotation(Transformer.class);
 
@@ -65,7 +64,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             DefinedClass transformerClass = getTransformerClass(executableElement);
 
             // declare object
-            FieldVariable object = generateFieldForModuleObject(transformerClass, type);
+            FieldVariable object = generateFieldForModuleObject(transformerClass, typeElement);
             FieldVariable muleContext = generateFieldForMuleContext(transformerClass);
 
             // declare weight
@@ -75,7 +74,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             generateConstructor(transformerClass, executableElement);
 
             // generate initialise
-            generateInitialiseMethod(transformerClass, null, executableElement.getEnclosingElement(), muleContext, null, null, object);
+            generateInitialiseMethod(transformerClass, null, (TypeElement) executableElement.getEnclosingElement(), muleContext, null, null, object);
 
             // add setmulecontext
             generateSetMuleContextMethod(transformerClass, muleContext);
@@ -84,8 +83,8 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             generateSetModuleObjectMethod(transformerClass, object);
 
             // get pool object if poolable
-            if (type.getAnnotation(Module.class).poolable()) {
-                DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey((TypeElement) type));
+            if (typeElement.getAnnotation(Module.class).poolable()) {
+                DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey(typeElement));
 
                 // doTransform
                 generateDoTransform(transformerClass, executableElement, object, poolObjectClass);
@@ -135,7 +134,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         TryStatement tryBlock = doTransform.body()._try();
 
         // do something
-        Invocation invoke = null;
+        Invocation invoke;
         if (poolObject != null) {
             tryBlock.body().assign(poolObject, ExpressionFactory.cast(poolObject.type(), object.invoke("getLifecyleEnabledObjectPool").invoke("borrowObject")));
             invoke = poolObject.invoke(executableElement.getSimpleName().toString());
@@ -209,7 +208,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         }
 
         Invocation registerSourceType = constructor.body().invoke("registerSourceType");
-        registerSourceType.arg(ref(DataTypeFactory.class).staticInvoke("create").arg(ref((TypeMirror) executableElement.getParameters().get(0).asType()).boxify().dotclass()));
+        registerSourceType.arg(ref(DataTypeFactory.class).staticInvoke("create").arg(ref(executableElement.getParameters().get(0).asType()).boxify().dotclass()));
 
         if (sourceTypes != null) {
             for (AnnotationValue sourceType : sourceTypes) {

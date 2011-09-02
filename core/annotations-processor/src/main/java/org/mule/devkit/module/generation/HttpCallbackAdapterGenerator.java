@@ -35,7 +35,6 @@ import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.builders.FieldBuilder;
 import org.mule.util.NumberUtils;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -47,8 +46,8 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
     public static final String PORT_FIELD_NAME = "port";
     public static final String DOMAIN_FIELD_NAME = "domain";
 
-    public void generate(Element element) throws GenerationException {
-        List<ExecutableElement> methods = ElementFilter.methodsIn(element.getEnclosedElements());
+    public void generate(TypeElement typeElement) throws GenerationException {
+        List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         boolean shouldGenerate = false;
         for (ExecutableElement method : methods) {
             if (method.getAnnotation(Processor.class) == null)
@@ -62,12 +61,12 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
             }
         }
 
-        if (element.getAnnotation(OAuth.class) != null) {
+        if (typeElement.getAnnotation(OAuth.class) != null) {
             shouldGenerate = true;
         }
 
         if (shouldGenerate) {
-            DefinedClass httpCallbackAdapter = getHttpCallbackAdapterClass((TypeElement) element);
+            DefinedClass httpCallbackAdapter = getHttpCallbackAdapterClass(typeElement);
             FieldVariable port = portFieldWithGetterAndSetter(httpCallbackAdapter);
             FieldVariable domain = domainFieldWithGetterAndSetter(httpCallbackAdapter);
             FieldVariable logger = FieldBuilder.newLoggerField(httpCallbackAdapter);

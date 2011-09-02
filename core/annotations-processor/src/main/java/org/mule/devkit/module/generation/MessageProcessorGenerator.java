@@ -73,7 +73,6 @@ import org.mule.transport.NullPayload;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -93,7 +92,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
     private static final String REDIRECT_HTTP_STATUS = "302";
     private static final String LOCATION_PROPERTY = "Location";
 
-    public void generate(Element typeElement) throws GenerationException {
+    public void generate(TypeElement typeElement) throws GenerationException {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Processor processor = executableElement.getAnnotation(Processor.class);
@@ -105,7 +104,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private void generateMessageProcessor(Element typeElement, ExecutableElement executableElement, boolean intercepting) {
+    private void generateMessageProcessor(TypeElement typeElement, ExecutableElement executableElement, boolean intercepting) {
         // get class
         DefinedClass messageProcessorClass = null;
 
@@ -144,7 +143,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         generateInitialiseMethod(messageProcessorClass, fields, typeElement, muleContext, expressionManager, patternInfo, object);
 
         // add start
-        generateStartMethod(messageProcessorClass, fields, muleContext, object);
+        generateStartMethod(messageProcessorClass, fields);
 
         // add stop
         generateStopMethod(messageProcessorClass, fields);
@@ -190,7 +189,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         // get pool object if poolable
         if (typeElement.getAnnotation(Module.class).poolable()) {
-            DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey((TypeElement) typeElement));
+            DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey(typeElement));
 
             // add process method
             generateProcessMethod(executableElement, messageProcessorClass, fields, sessionFields, messageProcessorListener, muleContext, object, expressionManager, patternInfo, poolObjectClass);
@@ -200,7 +199,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private void generateStartMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, FieldVariable muleContext, FieldVariable object) {
+    private void generateStartMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields) {
         Method startMethod = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
         startMethod._throws(ref(MuleException.class));
 
@@ -764,7 +763,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             innerTry.body().assign(session, ExpressionFactory._null());
 
             generateThrow("failedToInvoke", MessagingException.class,
-                    innerTry._catch((TypeReference) ref(Exception.class)), event, methodName);
+                    innerTry._catch(ref(Exception.class)), event, methodName);
 
             Variable invalidSession = catchBlock.param("invalidSession");
             TypeReference coreMessages = ref(CoreMessages.class);
@@ -805,7 +804,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             tryToReleaseSession.body().add(releaseSession);
 
             generateThrow("failedToInvoke", MessagingException.class,
-                    tryToReleaseSession._catch((TypeReference) ref(Exception.class)), event, methodName);
+                    tryToReleaseSession._catch(ref(Exception.class)), event, methodName);
         }
 
     }
@@ -829,7 +828,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             resultPayload = body.decl(ref(Object.class), "resultPayload");
         }
 
-        Invocation methodCall = null;
+        Invocation methodCall;
         if (poolObject != null) {
             body.assign(poolObject, ExpressionFactory.cast(poolObject.type(), object.invoke("getLifecyleEnabledObjectPool").invoke("borrowObject")));
             methodCall = poolObject.invoke(methodName);
@@ -837,8 +836,8 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             methodCall = object.invoke(methodName);
         }
 
-        for (int i = 0; i < parameters.size(); i++) {
-            methodCall.arg(parameters.get(i));
+        for (Expression parameter : parameters) {
+            methodCall.arg(parameter);
         }
 
         if (returnType != context.getCodeModel().VOID) {

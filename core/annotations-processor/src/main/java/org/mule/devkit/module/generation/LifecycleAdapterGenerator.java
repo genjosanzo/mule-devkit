@@ -38,7 +38,6 @@ import org.mule.devkit.model.code.Variable;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
@@ -46,37 +45,38 @@ import javax.lang.model.util.ElementFilter;
 import java.util.List;
 
 public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
-    public void generate(Element element) throws GenerationException {
-        DefinedClass lifecycleAdapter = getLifecycleAdapterClass(element);
+
+    public void generate(TypeElement typeElement) throws GenerationException {
+        DefinedClass lifecycleAdapter = getLifecycleAdapterClass(typeElement);
         lifecycleAdapter.javadoc().add("A <code>" + lifecycleAdapter.name() + "</code> is a wrapper around ");
-        lifecycleAdapter.javadoc().add(ref(element.asType()));
+        lifecycleAdapter.javadoc().add(ref(typeElement.asType()));
         lifecycleAdapter.javadoc().add(" that adds lifecycle methods to the pojo.");
 
-        ExecutableElement startElement = getStartElement(element);
+        ExecutableElement startElement = getStartElement(typeElement);
         lifecycleAdapter._implements(Startable.class);
         Method start = generateLifecycleInvocation(lifecycleAdapter, startElement, "start", MuleException.class, false);
         start._throws(ref(MuleException.class));
 
-        ExecutableElement stopElement = getStopElement(element);
+        ExecutableElement stopElement = getStopElement(typeElement);
         lifecycleAdapter._implements(Stoppable.class);
         Method stop = generateLifecycleInvocation(lifecycleAdapter, stopElement, "stop", MuleException.class, false);
         stop._throws(ref(MuleException.class));
 
-        ExecutableElement postConstructElement = getPostConstructElement(element);
+        ExecutableElement postConstructElement = getPostConstructElement(typeElement);
         lifecycleAdapter._implements(Initialisable.class);
         generateLifecycleInvocation(lifecycleAdapter, postConstructElement, "initialise", InitialisationException.class, true);
 
-        ExecutableElement preDestroyElement = getPreDestroyElement(element);
+        ExecutableElement preDestroyElement = getPreDestroyElement(typeElement);
         lifecycleAdapter._implements(Disposable.class);
         generateLifecycleInvocation(lifecycleAdapter, preDestroyElement, "dispose", null, false);
     }
 
-    private DefinedClass getLifecycleAdapterClass(Element typeElement) {
-        String lifecycleAdapterName = context.getNameUtils().generateClassName((TypeElement) typeElement, ".config", "LifecycleAdapter");
+    private DefinedClass getLifecycleAdapterClass(TypeElement typeElement) {
+        String lifecycleAdapterName = context.getNameUtils().generateClassName(typeElement, ".config", "LifecycleAdapter");
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(lifecycleAdapterName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(lifecycleAdapterName), (TypeReference) ref(typeElement.asType()));
 
-        context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey((TypeElement) typeElement), clazz);
+        context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
 
         return clazz;
     }
@@ -121,8 +121,8 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         return lifecycleMethod;
     }
 
-    private ExecutableElement getStartElement(Element element) {
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(element.getEnclosedElements());
+    private ExecutableElement getStartElement(TypeElement typeElement) {
+        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Start start = executableElement.getAnnotation(Start.class);
 
@@ -134,8 +134,8 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         return null;
     }
 
-    private ExecutableElement getStopElement(Element element) {
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(element.getEnclosedElements());
+    private ExecutableElement getStopElement(TypeElement typeElement) {
+        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Stop stop = executableElement.getAnnotation(Stop.class);
 
@@ -147,8 +147,8 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         return null;
     }
 
-    private ExecutableElement getPostConstructElement(Element element) {
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(element.getEnclosedElements());
+    private ExecutableElement getPostConstructElement(TypeElement typeElement) {
+        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             PostConstruct postConstruct = executableElement.getAnnotation(PostConstruct.class);
 
@@ -160,8 +160,8 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         return null;
     }
 
-    private ExecutableElement getPreDestroyElement(Element element) {
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(element.getEnclosedElements());
+    private ExecutableElement getPreDestroyElement(TypeElement typeElement) {
+        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             PreDestroy preDestroy = executableElement.getAnnotation(PreDestroy.class);
 

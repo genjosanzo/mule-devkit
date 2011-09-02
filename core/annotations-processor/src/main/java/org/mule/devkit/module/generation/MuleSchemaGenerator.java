@@ -19,13 +19,14 @@ package org.mule.devkit.module.generation;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.schema.SchemaLocation;
 
-import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 public class MuleSchemaGenerator extends AbstractModuleGenerator {
-    public void generate(Element element) throws GenerationException {
+
+    public void generate(TypeElement typeElement) throws GenerationException {
 
         InputStream inputStream = null;
         OutputStream outputStream = null;

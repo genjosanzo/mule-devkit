@@ -20,13 +20,14 @@ package org.mule.devkit.module.generation;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.schema.SchemaLocation;
 
-import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 public class SpringSchemaGenerator extends AbstractModuleGenerator {
-    public void generate(Element element) throws GenerationException {
+
+    public void generate(TypeElement typeElement) throws GenerationException {
         try {
             OutputStream springSchemasStream = context.getCodeModel().getCodeWriter().openBinary(null, "META-INF/spring.schemas");
             OutputStreamWriter springSchemasOut = new OutputStreamWriter(springSchemasStream, "UTF-8");

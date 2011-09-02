@@ -42,7 +42,6 @@ import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Variable;
 import org.mule.transaction.MuleTransactionConfig;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
@@ -53,10 +52,10 @@ public class DummyInboundEndpointGenerator extends AbstractModuleGenerator {
 
     public static final String DUMMY_INBOUND_ENDPOINT_ROLE = "DummyInboundEndpoint";
 
-    public void generate(Element type) throws GenerationException {
+    public void generate(TypeElement typeElement) throws GenerationException {
         boolean shouldGenerate = false;
 
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(type.getEnclosedElements());
+        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Source source = executableElement.getAnnotation(Source.class);
 
@@ -68,7 +67,7 @@ public class DummyInboundEndpointGenerator extends AbstractModuleGenerator {
         }
 
         if (shouldGenerate) {
-            generateDummyInboundEndpoint((TypeElement) type);
+            generateDummyInboundEndpoint(typeElement);
         }
     }
 

@@ -36,7 +36,6 @@ import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.Variable;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -44,14 +43,15 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class SessionAdapterGenerator extends AbstractMessageGenerator {
-    public void generate(Element element) throws GenerationException {
-        ExecutableElement sessionCreate = createSessionForClass(element);
-        ExecutableElement sessionDestroy = destroySessionForClass(element);
+
+    public void generate(TypeElement typeElement) throws GenerationException {
+        ExecutableElement sessionCreate = createSessionForClass(typeElement);
+        ExecutableElement sessionDestroy = destroySessionForClass(typeElement);
 
         if (sessionCreate == null || sessionDestroy == null)
             return;
 
-        DefinedClass sessionAdapter = getSessionAdapterClass((TypeElement) element);
+        DefinedClass sessionAdapter = getSessionAdapterClass(typeElement);
 
         // generate fields for each session
         Map<String, AbstractMessageGenerator.FieldVariableElement> fields = generateStandardFieldForEachParameter(sessionAdapter, sessionCreate);

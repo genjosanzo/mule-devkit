@@ -59,7 +59,6 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.builders.FieldBuilder;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
@@ -83,12 +82,12 @@ public class OAuthAdapterGenerator extends AbstractModuleGenerator {
     private static final String REDIRECT_URL_FIELD_NAME = "redirectUrl";
     private static final String CONSUMER_FIELD_NAME = "consumer";
 
-    public void generate(Element element) throws GenerationException {
-        OAuth oauth = element.getAnnotation(OAuth.class);
+    public void generate(TypeElement typeElement) throws GenerationException {
+        OAuth oauth = typeElement.getAnnotation(OAuth.class);
         if (oauth == null) {
             return;
         }
-        DefinedClass oauthAdapter = getOAuthAdapterClass((TypeElement) element);
+        DefinedClass oauthAdapter = getOAuthAdapterClass(typeElement);
         FieldVariable pattern = oauthVerifierPatterConstant(oauthAdapter, oauth);
         FieldVariable muleContext = muleContextField(oauthAdapter);
         FieldVariable requestToken = requestTokenField(oauthAdapter);
@@ -101,7 +100,6 @@ public class OAuthAdapterGenerator extends AbstractModuleGenerator {
         FieldVariable oauthCallback = oauthCallbackField(oauthAdapter);
 
         DefinedClass messageProcessor = generateMessageProcessorInnerClass(oauthAdapter, oauthVerifier, pattern);
-        TypeElement typeElement = (TypeElement) element;
 
         Method createConsumer = generateCreateConsumerMethod(oauthAdapter, consumer, oauth, typeElement);
 

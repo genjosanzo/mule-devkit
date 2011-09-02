@@ -63,7 +63,6 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Node;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -82,10 +81,10 @@ import java.util.List;
 
 public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
-    public void generate(Element type) throws GenerationException {
-        generateConfigBeanDefinitionParserFor(type);
+    public void generate(TypeElement typeElement) throws GenerationException {
+        generateConfigBeanDefinitionParserFor(typeElement);
 
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(type.getEnclosedElements());
+        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Processor processor = executableElement.getAnnotation(Processor.class);
 
@@ -106,9 +105,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
     }
 
-    private void generateConfigBeanDefinitionParserFor(Element type) {
-        DefinedClass beanDefinitionparser = getConfigBeanDefinitionParserClass(type);
-        DefinedClass pojo = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey((TypeElement) type));
+    private void generateConfigBeanDefinitionParserFor(TypeElement typeElement) {
+        DefinedClass beanDefinitionparser = getConfigBeanDefinitionParserClass(typeElement);
+        DefinedClass pojo = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
 
         FieldVariable patternInfo = generateFieldForPatternInfo(beanDefinitionparser);
 
@@ -138,7 +137,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 .invoke("isAssignableFrom").arg(pojo.dotclass()));
         isDisposable._then().add(builder.invoke("setDestroyMethodName").arg(ref(Disposable.class).staticRef("PHASE_NAME")));
 
-        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(type.getEnclosedElements());
+        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(typeElement.getEnclosedElements());
         for (VariableElement variable : variables) {
             Configurable configurable = variable.getAnnotation(Configurable.class);
 
@@ -180,7 +179,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
-        ExecutableElement sessionCreate = createSessionForClass(type);
+        ExecutableElement sessionCreate = createSessionForClass(typeElement);
         if (sessionCreate != null) {
             for (VariableElement variable : sessionCreate.getParameters()) {
                 String fieldName = variable.getSimpleName().toString();
@@ -217,7 +216,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
-        if (element instanceof TypeElement && (type.getAnnotation(OAuth.class) != null || classHasMethodWithParameterOfType((TypeElement) element, HttpCallback.class))) {
+        if (element instanceof TypeElement && (typeElement.getAnnotation(OAuth.class) != null || classHasMethodWithParameterOfType((TypeElement) element, HttpCallback.class))) {
             Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class), "httpCallbackConfigElement", ref(DomUtils.class).staticInvoke("getChildElementByTagName").
                     arg(element).arg(SchemaGenerator.HTTP_CALLBACK_CONFIG_ELEMENT_NAME));
             generateParseSupportedType(parse.body(), listElement, builder, HttpCallbackAdapterGenerator.DOMAIN_FIELD_NAME);
@@ -228,7 +227,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             generateParsePoolingProfile("session-pooling-profile", "sessionPoolingProfile", parse, element, builder);
         }
 
-        Module module = type.getAnnotation(Module.class);
+        Module module = typeElement.getAnnotation(Module.class);
         if (module.poolable()) {
             generateParsePoolingProfile("pooling-profile", "poolingProfile", parse, element, builder);
         }
@@ -295,7 +294,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
     private void generateBeanDefinitionParserForProcessor(ExecutableElement executableElement, boolean intercepting) {
         DefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
-        DefinedClass messageProcessorClass = null;
+        DefinedClass messageProcessorClass;
 
         if (intercepting) {
             messageProcessorClass = getInterceptingMessageProcessorClass(executableElement);
@@ -517,7 +516,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         ifTextElement._else().add(beanDefinitionBuilder.invoke("setScope")
                 .arg(ref(BeanDefinition.class).staticRef("SCOPE_SINGLETON")));
 
-        Variable list = ifTextElement._else().decl(ref(List.class), fieldName + "List",
+        ifTextElement._else().decl(ref(List.class), fieldName + "List",
                 parserContext.invoke("getDelegate").invoke("parseListElement")
                         .arg(elements).arg(beanDefinitionBuilder.invoke("getBeanDefinition")));
 

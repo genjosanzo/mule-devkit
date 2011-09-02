@@ -38,16 +38,17 @@ import javax.lang.model.util.ElementFilter;
 import java.util.List;
 
 public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
-    public void generate(Element type) throws GenerationException {
-        DefinedClass namespaceHandlerClass = getNamespaceHandlerClass(type);
+
+    public void generate(TypeElement typeElement) throws GenerationException {
+        DefinedClass namespaceHandlerClass = getNamespaceHandlerClass(typeElement);
 
         Method init = namespaceHandlerClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "init");
         init.javadoc().add("Invoked by the {@link DefaultBeanDefinitionDocumentReader} after construction but before any custom elements are parsed. \n@see NamespaceHandlerSupport#registerBeanDefinitionParser(String, BeanDefinitionParser)");
 
-        registerConfig(init, type);
-        registerBeanDefinitionParserForEachProcessor(type, init);
-        registerBeanDefinitionParserForEachSource(type, init);
-        registerBeanDefinitionParserForEachTransformer(type, init);
+        registerConfig(init, typeElement);
+        registerBeanDefinitionParserForEachProcessor(typeElement, init);
+        registerBeanDefinitionParserForEachSource(typeElement, init);
+        registerBeanDefinitionParserForEachTransformer(typeElement, init);
     }
 
     private DefinedClass getNamespaceHandlerClass(Element typeElement) {
@@ -65,12 +66,12 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
         return clazz;
     }
 
-    private void registerConfig(Method init, Element pojo) {
-        DefinedClass configBeanDefinitionParser = context.getClassForRole(context.getNameUtils().generateConfigDefParserRoleKey((TypeElement) pojo));
+    private void registerConfig(Method init, TypeElement pojo) {
+        DefinedClass configBeanDefinitionParser = context.getClassForRole(context.getNameUtils().generateConfigDefParserRoleKey(pojo));
         init.body().invoke("registerBeanDefinitionParser").arg("config").arg(ExpressionFactory._new(configBeanDefinitionParser));
     }
 
-    private void registerBeanDefinitionParserForEachProcessor(Element type, Method init) {
+    private void registerBeanDefinitionParserForEachProcessor(TypeElement type, Method init) {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(type.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Processor processor = executableElement.getAnnotation(Processor.class);
@@ -82,7 +83,7 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private void registerBeanDefinitionParserForEachSource(Element type, Method init) {
+    private void registerBeanDefinitionParserForEachSource(TypeElement type, Method init) {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(type.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Source source = executableElement.getAnnotation(Source.class);
@@ -94,7 +95,7 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private void registerBeanDefinitionParserForEachTransformer(Element type, Method init) {
+    private void registerBeanDefinitionParserForEachTransformer(TypeElement type, Method init) {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(type.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Transformer transformer = executableElement.getAnnotation(Transformer.class);

@@ -117,8 +117,8 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         objectFactory = new ObjectFactory();
     }
 
-    public void generate(javax.lang.model.element.Element element) throws GenerationException {
-        Module module = element.getAnnotation(Module.class);
+    public void generate(TypeElement typeElement) throws GenerationException {
+        Module module = typeElement.getAnnotation(Module.class);
         String targetNamespace = module.namespace();
         if (targetNamespace == null || targetNamespace.length() == 0) {
             targetNamespace = SchemaConstants.BASE_NAMESPACE + module.name();
@@ -133,10 +133,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         importMuleNamespace();
 
         registerTypes();
-        registerConfigElement(targetNamespace, element);
-        registerProcessorsAndSources(targetNamespace, element);
-        registerTransformers(element);
-        registerEnums(element);
+        registerConfigElement(targetNamespace, typeElement);
+        registerProcessorsAndSources(targetNamespace, typeElement);
+        registerTransformers(typeElement);
+        registerEnums(typeElement);
 
         String fileName = "META-INF/mule-" + module.name() + XSD_EXTENSION;
 
@@ -146,14 +146,14 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
 
         // TODO: replace with a class role
-        String namespaceHandlerName = context.getNameUtils().generateClassName((TypeElement) element, ".config.spring", NAMESPACE_HANDLER_SUFFIX);
+        String namespaceHandlerName = context.getNameUtils().generateClassName(typeElement, ".config.spring", NAMESPACE_HANDLER_SUFFIX);
 
         SchemaLocation schemaLocation = new SchemaLocation(schema, fileName, location, namespaceHandlerName);
 
         context.getSchemaModel().addSchemaLocation(schemaLocation);
     }
 
-    private void registerEnums(javax.lang.model.element.Element type) {
+    private void registerEnums(TypeElement type) {
         Set<TypeMirror> registeredEnums = new HashSet<TypeMirror>();
 
         java.util.List<VariableElement> variables = ElementFilter.fieldsIn(type.getEnclosedElements());
@@ -238,7 +238,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return enumValues;
     }
 
-    private void registerTransformers(javax.lang.model.element.Element type) {
+    private void registerTransformers(TypeElement type) {
         java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(type.getEnclosedElements());
         for (ExecutableElement method : methods) {
             Transformer transformer = method.getAnnotation(Transformer.class);
@@ -250,7 +250,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
     }
 
-    private void registerProcessorsAndSources(String targetNamespace, javax.lang.model.element.Element type) {
+    private void registerProcessorsAndSources(String targetNamespace, TypeElement type) {
         java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(type.getEnclosedElements());
         for (ExecutableElement method : methods) {
             Processor processor = method.getAnnotation(Processor.class);
@@ -666,7 +666,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return xmlComplexType;
     }
 
-    private void registerConfigElement(String targetNamespace, javax.lang.model.element.Element element) {
+    private void registerConfigElement(String targetNamespace, TypeElement typeElement) {
 
         ExtensionType config = registerExtension(ELEMENT_NAME_CONFIG);
         Attribute nameAttribute = createAttribute(ATTRIBUTE_NAME_NAME, true, SchemaConstants.STRING, "Give a name to this configuration so it can be later referenced by config-ref.");
@@ -675,7 +675,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         All all = new All();
         config.setAll(all);
 
-        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(element.getEnclosedElements());
+        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(typeElement.getEnclosedElements());
         for (VariableElement variable : variables) {
             Configurable configurable = variable.getAnnotation(Configurable.class);
 
@@ -689,8 +689,8 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             }
         }
 
-        // get the executable element for create session
-        ExecutableElement sessionCreate = createSessionForClass(element);
+        // get the executable typeElement for create session
+        ExecutableElement sessionCreate = createSessionForClass(typeElement);
 
         if (sessionCreate != null) {
             // add a configurable argument for each session variable
@@ -718,7 +718,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
 
         // add oauth callback configuration
-        if (element.getAnnotation(OAuth.class) != null || classHasMethodWithParameterOfType((TypeElement) element, HttpCallback.class)) {
+        if (typeElement.getAnnotation(OAuth.class) != null || classHasMethodWithParameterOfType(typeElement, HttpCallback.class)) {
 
             Attribute domainAttribute = new Attribute();
             domainAttribute.setUse(SchemaConstants.USE_OPTIONAL);
@@ -758,7 +758,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             all.getParticle().add(objectFactory.createElement(httpCallbackConfig));
         }
 
-        if (element.getAnnotation(Module.class).poolable()) {
+        if (typeElement.getAnnotation(Module.class).poolable()) {
             //<xsd:element name="abstract-pooling-profile" abstract="true" type="abstractPoolingProfileType"/>
 
             TopLevelElement poolingProfile = new TopLevelElement();

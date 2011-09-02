@@ -115,8 +115,8 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
         return null;
     }
 
-    protected ExecutableElement createSessionForClass(javax.lang.model.element.Element element) {
-        List<? extends javax.lang.model.element.Element> enclosedElements = element.getEnclosedElements();
+    protected ExecutableElement createSessionForClass(TypeElement typeElement) {
+        List<? extends javax.lang.model.element.Element> enclosedElements = typeElement.getEnclosedElements();
         List<javax.lang.model.element.ExecutableElement> executableElements = ElementFilter.methodsIn(enclosedElements);
         ExecutableElement createSession = null;
         for (ExecutableElement executableElement : executableElements) {
@@ -129,12 +129,12 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
         return createSession;
     }
 
-    protected ExecutableElement destroySessionForMethod(javax.lang.model.element.Element element) {
-        return createSessionForClass(element.getEnclosingElement());
+    protected ExecutableElement destroySessionForMethod(TypeElement typeElement) {
+        return createSessionForClass((TypeElement) typeElement.getEnclosingElement());
     }
 
-    protected ExecutableElement destroySessionForClass(javax.lang.model.element.Element element) {
-        List<? extends javax.lang.model.element.Element> enclosedElements = element.getEnclosedElements();
+    protected ExecutableElement destroySessionForClass(TypeElement typeElement) {
+        List<? extends javax.lang.model.element.Element> enclosedElements = typeElement.getEnclosedElements();
         List<javax.lang.model.element.ExecutableElement> executableElements = ElementFilter.methodsIn(enclosedElements);
         ExecutableElement destroySession = null;
         for (ExecutableElement executableElement : executableElements) {
@@ -147,7 +147,7 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
         return destroySession;
     }
 
-    protected ExecutableElement createSessionForMethod(javax.lang.model.element.Element element) {
-        return createSessionForClass(element.getEnclosingElement());
+    protected ExecutableElement createSessionForMethod(ExecutableElement executableElement) {
+        return createSessionForClass((TypeElement) executableElement.getEnclosingElement());
     }
 }

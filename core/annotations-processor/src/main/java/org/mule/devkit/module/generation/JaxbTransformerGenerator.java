@@ -37,7 +37,6 @@ import org.mule.devkit.model.code.Variable;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -55,8 +54,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class JaxbTransformerGenerator extends AbstractModuleGenerator {
-    public void generate(Element type) throws GenerationException {
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(type.getEnclosedElements());
+
+    public void generate(TypeElement typeElement) throws GenerationException {
+        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Processor processor = executableElement.getAnnotation(Processor.class);
 
@@ -78,7 +78,7 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
                     FieldVariable jaxbContext = jaxbTransformerClass.field(Modifier.PRIVATE | Modifier.STATIC, JAXBContext.class, "JAXB_CONTEXT", ExpressionFactory.invoke(loadJaxbContext).arg(ref(variable.asType()).boxify().dotclass()));
 
                     //generate constructor
-                    generateConstructor(jaxbTransformerClass, executableElement, variable);
+                    generateConstructor(jaxbTransformerClass, variable);
 
                     // doTransform
                     generateDoTransform(jaxbTransformerClass, jaxbContext, variable);
@@ -168,7 +168,7 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
         return loadJaxbContext;
     }
 
-    private void generateConstructor(DefinedClass jaxbTransformerClass, ExecutableElement executableElement, VariableElement variable) {
+    private void generateConstructor(DefinedClass jaxbTransformerClass, VariableElement variable) {
         // generate constructor
         Method constructor = jaxbTransformerClass.constructor(Modifier.PUBLIC);
 

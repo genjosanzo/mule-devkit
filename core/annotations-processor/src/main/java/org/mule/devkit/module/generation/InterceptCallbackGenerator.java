@@ -26,7 +26,6 @@ import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
@@ -34,10 +33,10 @@ import javax.lang.model.util.ElementFilter;
 public class InterceptCallbackGenerator extends AbstractModuleGenerator {
     public static final String ROLE = "InterceptCallback";
 
-    public void generate(Element element) throws GenerationException {
+    public void generate(TypeElement typeElement) throws GenerationException {
         boolean shouldGenerate = false;
 
-        java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(element.getEnclosedElements());
+        java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement method : methods) {
             Processor processor = method.getAnnotation(Processor.class);
             if (processor == null)
@@ -50,7 +49,7 @@ public class InterceptCallbackGenerator extends AbstractModuleGenerator {
         }
 
         if (shouldGenerate) {
-            generateCallbackClass((TypeElement) element);
+            generateCallbackClass(typeElement);
         }
     }
 

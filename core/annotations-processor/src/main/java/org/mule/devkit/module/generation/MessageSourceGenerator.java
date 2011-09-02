@@ -43,11 +43,9 @@ import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Type;
-import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.session.DefaultMuleSession;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -59,8 +57,7 @@ import java.util.Map;
 
 public class MessageSourceGenerator extends AbstractMessageGenerator {
 
-
-    public void generate(Element typeElement) throws GenerationException {
+    public void generate(TypeElement typeElement) throws GenerationException {
         List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement executableElement : executableElements) {
             Source source = executableElement.getAnnotation(Source.class);
@@ -72,7 +69,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private void generateMessageSource(Element typeElement, ExecutableElement executableElement) {
+    private void generateMessageSource(TypeElement typeElement, ExecutableElement executableElement) {
         // get class
         DefinedClass messageSourceClass = getMessageSourceClass(executableElement);
 
@@ -138,7 +135,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         }
 
         // add process method
-        generateSourceCallbackMethod(messageSourceClass, executableElement, messageProcessor, muleContext, flowConstruct);
+        generateSourceCallbackMethod(messageSourceClass, messageProcessor, muleContext, flowConstruct);
 
         // add start method
         generateStartMethod(messageSourceClass, thread);
@@ -148,7 +145,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
         // get pool object if poolable
         if (typeElement.getAnnotation(Module.class).poolable()) {
-            DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey((TypeElement) typeElement));
+            DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey(typeElement));
 
             // add run method
             generateRunMethod(messageSourceClass, executableElement, fields, sessionFields, object, muleContext, poolObjectClass);
@@ -249,7 +246,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
             }
         }
 
-        Invocation methodCall = null;
+        Invocation methodCall;
         if (poolObject != null) {
             callSource.body().assign(poolObject, ExpressionFactory.cast(poolObject.type(), object.invoke("getLifecyleEnabledObjectPool").invoke("borrowObject")));
             methodCall = poolObject.invoke(methodName);
@@ -263,7 +260,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
         callSource.body().add(methodCall);
 
-        CatchBlock swallowCatch = callSource._catch((TypeReference) ref(Exception.class));
+        CatchBlock swallowCatch = callSource._catch(ref(Exception.class));
 
         if (poolObjectClass != null) {
             Block fin = callSource._finally();
@@ -285,7 +282,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
             tryToReleaseSession.body().add(releaseSession);
 
-            tryToReleaseSession._catch((TypeReference) ref(Exception.class));
+            tryToReleaseSession._catch(ref(Exception.class));
 
             //generateThrow("failedToInvoke", MessagingException.class,
             //        tryToReleaseSession._catch((TypeReference) ref(Exception.class)), event, methodName);
@@ -315,7 +312,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
     }
 
 
-    private void generateSourceCallbackMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, FieldVariable messageProcessor, FieldVariable muleContext, FieldVariable flowConstruct) {
+    private void generateSourceCallbackMethod(DefinedClass messageSourceClass, FieldVariable messageProcessor, FieldVariable muleContext, FieldVariable flowConstruct) {
         Method process = messageSourceClass.method(Modifier.PUBLIC, ref(Object.class), "process");
         process.javadoc().add("Implements {@link SourceCallback#process(org.mule.api.MuleEvent)}. This message source will be passed on to ");
         process.javadoc().add("the actual pojo's method as a callback mechanism.");

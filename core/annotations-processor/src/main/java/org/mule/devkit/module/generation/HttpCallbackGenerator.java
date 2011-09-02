@@ -49,7 +49,6 @@ import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.builders.FieldBuilder;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -78,10 +77,10 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
     private FieldVariable domainField;
     private FieldVariable localUrlField;
 
-    public void generate(Element element) throws GenerationException {
+    public void generate(TypeElement typeElement) throws GenerationException {
         boolean shouldGenerate = false;
 
-        java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(element.getEnclosedElements());
+        java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
         for (ExecutableElement method : methods) {
             Processor processor = method.getAnnotation(Processor.class);
             if (processor == null)
@@ -95,12 +94,12 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
             }
         }
 
-        if (element.getAnnotation(OAuth.class) != null) {
+        if (typeElement.getAnnotation(OAuth.class) != null) {
             shouldGenerate = true;
         }
 
         if (shouldGenerate) {
-            generateCallbackClass((TypeElement) element);
+            generateCallbackClass(typeElement);
         }
     }
 

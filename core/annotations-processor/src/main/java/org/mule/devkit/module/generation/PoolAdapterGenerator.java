@@ -39,23 +39,23 @@ import org.mule.devkit.model.code.Variable;
 import org.mule.util.pool.DefaultLifecycleEnabledObjectPool;
 import org.mule.util.pool.LifecyleEnabledObjectPool;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 
 public class PoolAdapterGenerator extends AbstractMessageGenerator {
-    public void generate(Element element) throws GenerationException {
-        Module module = element.getAnnotation(Module.class);
+
+    public void generate(TypeElement typeElement) throws GenerationException {
+        Module module = typeElement.getAnnotation(Module.class);
         if (!module.poolable())
             return;
 
-        DefinedClass poolAdapter = getPoolAdapterClass(element);
+        DefinedClass poolAdapter = getPoolAdapterClass(typeElement);
         poolAdapter.javadoc().add("A <code>" + poolAdapter.name() + "</code> is a wrapper around ");
-        poolAdapter.javadoc().add(ref(element.asType()));
+        poolAdapter.javadoc().add(ref(typeElement.asType()));
         poolAdapter.javadoc().add(" that enables pooling on the POJO.");
 
-        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(element.getEnclosedElements());
+        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(typeElement.getEnclosedElements());
         for (VariableElement variable : variables) {
             Configurable configurable = variable.getAnnotation(Configurable.class);
 
@@ -78,7 +78,7 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
         generateSetFlowConstructMethod(poolAdapter, flowConstruct);
         generateSetMuleContextMethod(poolAdapter, muleContext);
 
-        generateStartMethod((TypeElement) element, poolAdapter, lifecyleEnabledObjectPool, muleContext, poolingProfile);
+        generateStartMethod(typeElement, poolAdapter, lifecyleEnabledObjectPool, muleContext, poolingProfile);
         generateStopMethod(poolAdapter, lifecyleEnabledObjectPool);
     }
 
@@ -92,14 +92,14 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
         newBody.assign(lifecyleEnabledObjectPool, ExpressionFactory._null());
     }
 
-    private void generateStartMethod(TypeElement element, DefinedClass poolAdapter, FieldVariable lifecyleEnabledObjectPool, FieldVariable muleContext, FieldVariable poolingProfile) {
-        DefinedClass objectFactory = context.getClassForRole(context.getNameUtils().generatePojoFactoryKey(element));
+    private void generateStartMethod(TypeElement typeElement, DefinedClass poolAdapter, FieldVariable lifecyleEnabledObjectPool, FieldVariable muleContext, FieldVariable poolingProfile) {
+        DefinedClass objectFactory = context.getClassForRole(context.getNameUtils().generatePojoFactoryKey(typeElement));
 
         Method startMethod = poolAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
         startMethod._throws(MuleException.class);
 
         Variable objectFactoryField = startMethod.body().decl(objectFactory, "objectFactory", ExpressionFactory._new(objectFactory));
-        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(element.getEnclosedElements());
+        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(typeElement.getEnclosedElements());
         for (VariableElement variable : variables) {
             Configurable configurable = variable.getAnnotation(Configurable.class);
 
@@ -119,15 +119,15 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
         startMethod.body().add(lifecyleEnabledObjectPool.invoke("start"));
     }
 
-    private DefinedClass getPoolAdapterClass(Element typeElement) {
-        String poolAdapterName = context.getNameUtils().generateClassName((TypeElement) typeElement, ".config", "PoolAdapter");
+    private DefinedClass getPoolAdapterClass(TypeElement typeElement) {
+        String poolAdapterName = context.getNameUtils().generateClassName(typeElement, ".config", "PoolAdapter");
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(poolAdapterName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(poolAdapterName));
         clazz._implements(Startable.class);
         clazz._implements(Stoppable.class);
         clazz._implements(MuleContextAware.class);
         clazz._implements(FlowConstructAware.class);
-        context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey((TypeElement) typeElement), clazz);
+        context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
 
         return clazz;
     }
