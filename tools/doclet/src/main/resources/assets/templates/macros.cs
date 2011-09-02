@@ -247,17 +247,21 @@ def:op_description(obj) ?><?cs
   <div class="jd-tagdata jd-tagdescr"><p><?cs call:op_tag_list(obj.descr) ?></p></div>
   <div class="jd-tagdata">
       <h5 class="jd-tagtitle">Attributes</h5>
+
       <table class="jd-tagtable">
-        <tr>
-          <th>config-ref</td>
-          <td><i>Optional.&nbsp;</i>Specify which configuration to use for this invocation.</td>
-        </tr><?cs
-      each:tag=obj.paramTags ?>
-        <tr>
-          <th><?cs var:tag.attributeName ?></td>
-          <td><?cs if:tag.optional=="true" ?><i>Optional.&nbsp;</i><?cs /if ?><?cs call:op_tag_list(tag.comment) ?></td>
-        </tr><?cs
-      /each ?>
+      <tr><th>Name</th><th>Default Value</th><th>Description</th></tr><tr>
+      <td class="jd-linkcol"><nobr>config-ref</nobr></td>
+      <td class="jd-descrcol"></td>
+      <td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i>Specify which configuration to use.</td></tr>
+          <?cs set:count = #2 ?>
+          <?cs each:attribute=obj.paramTags ?>
+            <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
+                <td class="jd-linkcol"><nobr><?cs var:attribute.attributeName ?></nobr></td>
+                <td class="jd-descrcol"><?cs var:attribute.defaultValue ?></td>
+                <td class="jd-descrcol" width="100%"><?cs if:attribute.optional=="true" ?><i>Optional.&nbsp;</i><?cs /if ?><?cs call:op_tag_list(attribute.comment) ?></td>
+            </tr>
+            <?cs set:count = count + #1 ?>
+          <?cs /each ?>
       </table>
   </div><?cs
   if:subcount(obj.returns) ?>

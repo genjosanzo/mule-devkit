@@ -27,7 +27,7 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
         http://www.mulesoft.org/schema/mule/lifecycle http://www.mulesoft.org/schema/mule/lifecycle/1.0/mule-lifecycle.xsd">
 
-    <lifecycle:config/>
+    <lifecycle:config cycleName="Game Of Life"/>
 
     <flow name="isStarted">
         <lifecycle:is-started/>

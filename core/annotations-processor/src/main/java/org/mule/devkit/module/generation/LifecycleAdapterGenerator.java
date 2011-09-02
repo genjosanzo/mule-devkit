@@ -17,6 +17,7 @@
 
 package org.mule.devkit.module.generation;
 
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
 import org.mule.api.annotations.lifecycle.Start;
 import org.mule.api.annotations.lifecycle.Stop;
@@ -54,12 +55,12 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
 
         ExecutableElement startElement = getStartElement(typeElement);
         lifecycleAdapter._implements(Startable.class);
-        Method start = generateLifecycleInvocation(lifecycleAdapter, startElement, "start", MuleException.class, false);
+        Method start = generateLifecycleInvocation(lifecycleAdapter, startElement, "start", DefaultMuleException.class, false);
         start._throws(ref(MuleException.class));
 
         ExecutableElement stopElement = getStopElement(typeElement);
         lifecycleAdapter._implements(Stoppable.class);
-        Method stop = generateLifecycleInvocation(lifecycleAdapter, stopElement, "stop", MuleException.class, false);
+        Method stop = generateLifecycleInvocation(lifecycleAdapter, stopElement, "stop", DefaultMuleException.class, false);
         stop._throws(ref(MuleException.class));
 
         ExecutableElement postConstructElement = getPostConstructElement(typeElement);
@@ -85,9 +86,9 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         Method lifecycleMethod = lifecycleWrapper.method(Modifier.PUBLIC, context.getCodeModel().VOID, name);
 
         if (catchException != null &&
-            superExecutableElement != null &&
-            superExecutableElement.getThrownTypes() != null &&
-            superExecutableElement.getThrownTypes().size() > 0) {
+                superExecutableElement != null &&
+                superExecutableElement.getThrownTypes() != null &&
+                superExecutableElement.getThrownTypes().size() > 0) {
             lifecycleMethod._throws(ref(catchException));
         }
 

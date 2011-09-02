@@ -17,25 +17,36 @@
 
 package org.mule.devkit.it;
 
+import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.lifecycle.Start;
 
 import javax.annotation.PostConstruct;
+import java.lang.Exception;
+import java.lang.RuntimeException;
+import java.lang.String;
 
 @Module(name = "lifecycle")
 public class LifecycleModule
 {
+    @Configurable
+    private String cycleName;
+
+
     private boolean isStarted = false;
     private boolean hasBeenInitialized = false;
 
     @PostConstruct
     public void init() {
+        if( cycleName == null )
+            throw new RuntimeException("@PostConstruct before setting variables");
+
         hasBeenInitialized = true;
     }
 
     @Start
-    public void startMeUp() {
+    public void startMeUp() throws Exception {
         isStarted = true;
     }
 
@@ -47,5 +58,13 @@ public class LifecycleModule
     @Processor
     public boolean hasBeenInitialized() {
         return hasBeenInitialized;
+    }
+
+    public String getCycleName() {
+        return cycleName;
+    }
+
+    public void setCycleName(String cycleName) {
+        this.cycleName = cycleName;
     }
 }
