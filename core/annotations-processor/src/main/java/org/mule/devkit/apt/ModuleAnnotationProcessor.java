@@ -35,7 +35,6 @@ import javax.lang.model.util.ElementFilter;
 import javax.tools.Diagnostic;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -47,6 +46,7 @@ import java.util.Set;
 @SupportedAnnotationTypes(value = {"org.mule.api.annotations.Module"})
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class ModuleAnnotationProcessor extends AbstractProcessor {
+
     private GeneratorContext context;
     private List<Plugin> plugins;
 
@@ -57,8 +57,7 @@ public class ModuleAnnotationProcessor extends AbstractProcessor {
         if (plugins == null) {
             plugins = new ArrayList<Plugin>();
             ClassLoader ucl = getUserClassLoader(getClass().getClassLoader());
-            for (Plugin aug : findServices(Plugin.class, ucl))
-                plugins.add(aug);
+            plugins.addAll(findServices(Plugin.class, ucl));
         }
 
         return plugins;
@@ -71,8 +70,9 @@ public class ModuleAnnotationProcessor extends AbstractProcessor {
     public URLClassLoader getUserClassLoader(ClassLoader parent) {
         String classpath = processingEnv.getOptions().get("-cp");
 
-        if (classpath == null)
+        if (classpath == null) {
             classpath = processingEnv.getOptions().get("-classpath");
+        }
 
         List<URL> classpaths = new ArrayList<URL>();
 
@@ -80,29 +80,28 @@ public class ModuleAnnotationProcessor extends AbstractProcessor {
             for (String p : classpath.split(File.pathSeparator)) {
                 File file = new File(p);
                 try {
-                    classpaths.add(file.toURL());
+                    classpaths.add(file.toURI().toURL());
                 } catch (MalformedURLException e) {
                     warn(e.getMessage());
                 }
             }
         }
 
-        return new URLClassLoader(
-                classpaths.toArray(new URL[classpaths.size()]), parent);
+        return new URLClassLoader(classpaths.toArray(new URL[classpaths.size()]), parent);
     }
 
     /**
      * Looks for all "META-INF/services/[className]" files and
      * create one instance for each class name found inside this file.
      */
-    private static <T> T[] findServices(Class<T> clazz, ClassLoader classLoader) {
+    private static <T> List<T> findServices(Class<T> clazz, ClassLoader classLoader) {
 
         Iterable<T> itr = ServiceLoader.load(clazz, classLoader);
         List<T> r = new ArrayList<T>();
-        for (T t : itr)
+        for (T t : itr) {
             r.add(t);
-
-        return r.toArray((T[]) Array.newInstance(clazz, r.size()));
+        }
+        return r;
     }
 
     @Override
