@@ -40,11 +40,13 @@ import org.mule.devkit.module.generation.SessionAdapterGenerator;
 import org.mule.devkit.module.generation.SpringNamespaceHandlerGenerator;
 import org.mule.devkit.module.generation.SpringSchemaGenerator;
 import org.mule.devkit.module.generation.StringProcessorCallbackGenerator;
+import org.mule.devkit.module.generation.StringToDateTransformerGenerator;
 import org.mule.devkit.module.generation.TransformerGenerator;
 import org.mule.devkit.module.validation.ModuleValidator;
 import org.mule.devkit.validation.Validator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ModulePlugin implements Plugin {
@@ -52,39 +54,40 @@ public class ModulePlugin implements Plugin {
     private List<Generator> generators;
 
     public ModulePlugin() {
-        this.generators = new ArrayList<Generator>();
-        this.generators.add(new SchemaGenerator());
-        this.generators.add(new DummyInboundEndpointGenerator());
-        this.generators.add(new HttpCallbackGenerator());
-        this.generators.add(new LifecycleAdapterGenerator());
-        this.generators.add(new HttpCallbackAdapterGenerator());
-        this.generators.add(new OAuthAdapterGenerator());
-        this.generators.add(new LifecycleAdapterFactoryGenerator());
-        this.generators.add(new SessionAdapterGenerator());
-        this.generators.add(new PoolAdapterGenerator());
-        this.generators.add(new JaxbTransformerGenerator());
-        this.generators.add(new TransformerGenerator());
-        this.generators.add(new EnumTransformerGenerator());
-        this.generators.add(new ChainProcessorCallbackGenerator());
-        this.generators.add(new StringProcessorCallbackGenerator());
-        this.generators.add(new InterceptCallbackGenerator());
-        this.generators.add(new BeanDefinitionParserGenerator());
-        this.generators.add(new MessageSourceGenerator());
-        this.generators.add(new MessageProcessorGenerator());
-        this.generators.add(new NamespaceHandlerGenerator());
-        this.generators.add(new SpringNamespaceHandlerGenerator());
-        this.generators.add(new SpringSchemaGenerator());
-        this.generators.add(new RegistryBootstrapGenerator());
+        generators = new ArrayList<Generator>();
+        generators.add(new SchemaGenerator());
+        generators.add(new StringToDateTransformerGenerator());
+        generators.add(new DummyInboundEndpointGenerator());
+        generators.add(new HttpCallbackGenerator());
+        generators.add(new LifecycleAdapterGenerator());
+        generators.add(new HttpCallbackAdapterGenerator());
+        generators.add(new OAuthAdapterGenerator());
+        generators.add(new LifecycleAdapterFactoryGenerator());
+        generators.add(new SessionAdapterGenerator());
+        generators.add(new PoolAdapterGenerator());
+        generators.add(new JaxbTransformerGenerator());
+        generators.add(new TransformerGenerator());
+        generators.add(new EnumTransformerGenerator());
+        generators.add(new ChainProcessorCallbackGenerator());
+        generators.add(new StringProcessorCallbackGenerator());
+        generators.add(new InterceptCallbackGenerator());
+        generators.add(new BeanDefinitionParserGenerator());
+        generators.add(new MessageSourceGenerator());
+        generators.add(new MessageProcessorGenerator());
+        generators.add(new NamespaceHandlerGenerator());
+        generators.add(new SpringNamespaceHandlerGenerator());
+        generators.add(new SpringSchemaGenerator());
+        generators.add(new RegistryBootstrapGenerator());
 
-        this.validators = new ArrayList<Validator>();
-        this.validators.add(new ModuleValidator());
+        validators = new ArrayList<Validator>();
+        validators.add(new ModuleValidator());
     }
 
     public List<Validator> getValidators() {
-        return this.validators;
+        return Collections.unmodifiableList(validators);
     }
 
     public List<Generator> getGenerators() {
-        return this.generators;
+        return Collections.unmodifiableList(generators);
     }
 }
