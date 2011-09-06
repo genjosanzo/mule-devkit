@@ -86,7 +86,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     public static final String DOMAIN_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.DOMAIN_FIELD_NAME;
     public static final String PORT_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.PORT_FIELD_NAME;
-    public static final String HTTP_CALLBACK_CONFIG_ELEMENT_NAME = "httpCallbackConfig";
+    public static final String HTTP_CALLBACK_CONFIG_ELEMENT_NAME = "http-callback-config";
     private static final String ATTRIBUTE_NAME_KEY = "key";
     private static final String ATTRIBUTE_NAME_REF = "ref";
     private static final String ATTRIBUTE_NAME_VALUE_REF = "value-ref";
