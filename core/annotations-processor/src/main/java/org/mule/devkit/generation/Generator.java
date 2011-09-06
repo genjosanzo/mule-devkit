@@ -17,9 +17,7 @@
 
 package org.mule.devkit.generation;
 
-import javax.lang.model.element.TypeElement;
-
 public interface Generator {
 
-    void generate(TypeElement typeElement, GeneratorContext context) throws GenerationException;
+    void generate(DevkitTypeElement typeElement, GeneratorContext context) throws GenerationException;
 }

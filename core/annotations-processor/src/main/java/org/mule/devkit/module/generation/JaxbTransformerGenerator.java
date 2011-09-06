@@ -22,6 +22,7 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -50,24 +51,17 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
-import java.util.List;
 
 public class JaxbTransformerGenerator extends AbstractModuleGenerator {
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(TypeElement typeElement) {
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for (ExecutableElement executableElement : executableElements) {
-            Processor processor = executableElement.getAnnotation(Processor.class);
-
-            if (processor == null)
-                continue;
-
+    protected void doGenerate(DevkitTypeElement typeElement) {
+        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             for (VariableElement variable : executableElement.getParameters()) {
                 if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                     // get class
@@ -203,7 +197,7 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
         DeclaredType declaredType = (DeclaredType) variable.asType();
         XmlType xmlType = declaredType.asElement().getAnnotation(XmlType.class);
         TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
-        String packageName = context.getNameUtils().getPackageName(context.getElementsUtils().getBinaryName(parentClass).toString()) + ".config";
+        String packageName = context.getNameUtils().getPackageName(context.getNameUtils().getBinaryName(parentClass)) + ".config";
         Package pkg = context.getCodeModel()._package(packageName);
         DefinedClass jaxbTransformer = pkg._class(StringUtils.capitalize(xmlType.name()) + "JaxbTransformer", AbstractTransformer.class, new Class<?>[] { DiscoverableTransformer.class });
 

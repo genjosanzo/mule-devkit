@@ -22,6 +22,7 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.mule.api.annotations.param.SessionKey;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.config.PoolingProfile;
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.ClassAlreadyExistsException;
@@ -45,12 +46,12 @@ import java.util.NoSuchElementException;
 public class SessionAdapterGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(TypeElement typeElement) throws GenerationException {
+    protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
         ExecutableElement sessionCreate = createSessionForClass(typeElement);
         ExecutableElement sessionDestroy = destroySessionForClass(typeElement);
 

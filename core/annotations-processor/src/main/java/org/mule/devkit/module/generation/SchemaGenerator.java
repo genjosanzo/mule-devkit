@@ -35,6 +35,7 @@ import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.Optional;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.Session;
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.schema.All;
 import org.mule.devkit.model.schema.Annotation;
@@ -70,11 +71,9 @@ import org.mule.util.StringUtils;
 import javax.inject.Named;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.ElementFilter;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.math.BigInteger;
@@ -118,12 +117,12 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     }
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(TypeElement typeElement) throws GenerationException {
+    protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
         Module module = typeElement.getAnnotation(Module.class);
         String targetNamespace = module.namespace();
         if (targetNamespace == null || targetNamespace.length() == 0) {
@@ -159,26 +158,20 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         context.getSchemaModel().addSchemaLocation(schemaLocation);
     }
 
-    private void registerEnums(TypeElement type) {
+    private void registerEnums(DevkitTypeElement typeElement) {
         Set<TypeMirror> registeredEnums = new HashSet<TypeMirror>();
 
-        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(type.getEnclosedElements());
-        for (VariableElement variable : variables) {
-            if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
-                if (!registeredEnums.contains(variable.asType())) {
-                    registerEnum(variable.asType());
-                    registeredEnums.add(variable.asType());
+        for (VariableElement field : typeElement.getFields()) {
+            if (context.getTypeMirrorUtils().isEnum(field.asType())) {
+                if (!registeredEnums.contains(field.asType())) {
+                    registerEnum(field.asType());
+                    registeredEnums.add(field.asType());
                 }
             }
 
         }
 
-        java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(type.getEnclosedElements());
-        for (ExecutableElement method : methods) {
-            Processor processor = method.getAnnotation(Processor.class);
-            if (processor == null)
-                continue;
-
+        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             for (VariableElement variable : method.getParameters()) {
                 if (context.getTypeMirrorUtils().isEnum(variable.asType()) && !registeredEnums.contains(variable.asType())) {
                     registerEnum(variable.asType());
@@ -195,11 +188,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             }
         }
 
-        for (ExecutableElement method : methods) {
-            Source source = method.getAnnotation(Source.class);
-            if (source == null)
-                continue;
-
+        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
             for (VariableElement variable : method.getParameters()) {
                 if (!context.getTypeMirrorUtils().isEnum(variable.asType()))
                     continue;
@@ -244,26 +233,17 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return enumValues;
     }
 
-    private void registerTransformers(TypeElement type) {
-        java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(type.getEnclosedElements());
-        for (ExecutableElement method : methods) {
-            Transformer transformer = method.getAnnotation(Transformer.class);
-            if (transformer == null)
-                continue;
-
+    private void registerTransformers(DevkitTypeElement typeElement) {
+        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
             Element transformerElement = registerTransformer(context.getNameUtils().uncamel(method.getSimpleName().toString()));
             schema.getSimpleTypeOrComplexTypeOrGroup().add(transformerElement);
         }
     }
 
-    private void registerProcessorsAndSources(String targetNamespace, TypeElement type) {
-        java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(type.getEnclosedElements());
-        for (ExecutableElement method : methods) {
-            Processor processor = method.getAnnotation(Processor.class);
-            if (processor == null)
-                continue;
-
+    private void registerProcessorsAndSources(String targetNamespace, DevkitTypeElement typeElement) {
+        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             String name = method.getSimpleName().toString();
+            Processor processor = method.getAnnotation(Processor.class);
             if (processor.name().length() > 0)
                 name = processor.name();
             String typeName = StringUtils.capitalize(name) + TYPE_SUFFIX;
@@ -273,12 +253,9 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             registerProcessorType(processor.intercepting(), targetNamespace, typeName, method);
         }
 
-        for (ExecutableElement method : methods) {
-            Source source = method.getAnnotation(Source.class);
-            if (source == null)
-                continue;
-
+        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
             String name = method.getSimpleName().toString();
+            Source source = method.getAnnotation(Source.class);
             if (source.name().length() > 0)
                 name = source.name();
             String typeName = StringUtils.capitalize(name) + TYPE_SUFFIX;
@@ -672,7 +649,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return xmlComplexType;
     }
 
-    private void registerConfigElement(String targetNamespace, TypeElement typeElement) {
+    private void registerConfigElement(String targetNamespace, DevkitTypeElement typeElement) {
 
         ExtensionType config = registerExtension(ELEMENT_NAME_CONFIG);
         Attribute nameAttribute = createAttribute(ATTRIBUTE_NAME_NAME, true, SchemaConstants.STRING, "Give a name to this configuration so it can be later referenced by config-ref.");
@@ -681,13 +658,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         All all = new All();
         config.setAll(all);
 
-        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(typeElement.getEnclosedElements());
-        for (VariableElement variable : variables) {
-            Configurable configurable = variable.getAnnotation(Configurable.class);
-
-            if (configurable == null)
-                continue;
-
+        for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
             if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
                 generateCollectionElement(targetNamespace, all, variable);
             } else {
@@ -724,7 +695,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
 
         // add oauth callback configuration
-        if (typeElement.getAnnotation(OAuth.class) != null || classHasMethodWithParameterOfType(typeElement, HttpCallback.class)) {
+        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasProcessorMethodWithParameter(HttpCallback.class)) {
 
             Attribute domainAttribute = new Attribute();
             domainAttribute.setUse(SchemaConstants.USE_OPTIONAL);

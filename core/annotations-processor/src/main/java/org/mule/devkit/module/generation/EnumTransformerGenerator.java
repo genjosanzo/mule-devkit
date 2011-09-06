@@ -23,6 +23,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -37,41 +38,33 @@ import org.mule.transformer.types.DataTypeFactory;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.ElementFilter;
 import java.util.HashSet;
 import java.util.Set;
 
 public class EnumTransformerGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(TypeElement typeElement) {
+    protected void doGenerate(DevkitTypeElement typeElement) {
         Set<TypeMirror> registeredEnums = new HashSet<TypeMirror>();
 
-        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(typeElement.getEnclosedElements());
-        for (VariableElement variable : variables) {
-            if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
-                if (!registeredEnums.contains(variable.asType())) {
-                    registerEnumTransformer(variable);
-                    registeredEnums.add(variable.asType());
+        for (VariableElement field : typeElement.getFields()) {
+            if (context.getTypeMirrorUtils().isEnum(field.asType())) {
+                if (!registeredEnums.contains(field.asType())) {
+                    registerEnumTransformer(field);
+                    registeredEnums.add(field.asType());
                 }
             }
         }
 
-        java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for (ExecutableElement method : methods) {
-            Processor processor = method.getAnnotation(Processor.class);
-            if (processor == null)
-                continue;
-
+        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             for (VariableElement variable : method.getParameters()) {
                 if (context.getTypeMirrorUtils().isEnum(variable.asType()) && !registeredEnums.contains(variable.asType())) {
                     registerEnumTransformer(variable);
@@ -89,11 +82,7 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
             }
         }
 
-        for (ExecutableElement method : methods) {
-            Source source = method.getAnnotation(Source.class);
-            if (source == null)
-                continue;
-
+        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
             for (VariableElement variable : method.getParameters()) {
                 if (!context.getTypeMirrorUtils().isEnum(variable.asType()))
                     continue;

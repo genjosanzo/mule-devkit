@@ -22,6 +22,8 @@ import org.mule.api.MuleContext;
 import org.mule.api.annotations.session.SessionCreate;
 import org.mule.api.annotations.session.SessionDestroy;
 import org.mule.devkit.generation.AbstractGenerator;
+import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevkitTypeElementImpl;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -89,22 +91,6 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
         return methodForFieldAnnotatedWith(typeElement, annotation, "get");
     }
 
-    protected String setterMethodForFieldAnnotatedWith(TypeElement typeElement, Class<? extends Annotation> annotation) {
-        return methodForFieldAnnotatedWith(typeElement, annotation, "set");
-    }
-
-    protected boolean classHasMethodWithParameterOfType(TypeElement typeElement, Class<?> parameterType) {
-        List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for (ExecutableElement method : methods) {
-            for (VariableElement parameter : method.getParameters()) {
-                if (parameter.asType().toString().contains(parameterType.getName())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     private String methodForFieldAnnotatedWith(TypeElement typeElement, Class<? extends Annotation> annotation, String prefix) {
         List<VariableElement> fields = ElementFilter.fieldsIn(typeElement.getEnclosedElements());
         for (VariableElement field : fields) {
@@ -115,39 +101,17 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
         return null;
     }
 
-    protected ExecutableElement createSessionForClass(TypeElement typeElement) {
-        List<? extends javax.lang.model.element.Element> enclosedElements = typeElement.getEnclosedElements();
-        List<javax.lang.model.element.ExecutableElement> executableElements = ElementFilter.methodsIn(enclosedElements);
-        ExecutableElement createSession = null;
-        for (ExecutableElement executableElement : executableElements) {
-            if (executableElement.getAnnotation(SessionCreate.class) != null) {
-                createSession = executableElement;
-                break;
-            }
-        }
-
-        return createSession;
+    protected ExecutableElement createSessionForClass(DevkitTypeElement typeElement) {
+        List<ExecutableElement> sessionCreateMethods = typeElement.getMethodsAnnotatedWith(SessionCreate.class);
+        return !sessionCreateMethods.isEmpty() ? sessionCreateMethods.get(0) : null;
     }
 
-    protected ExecutableElement destroySessionForMethod(TypeElement typeElement) {
-        return createSessionForClass((TypeElement) typeElement.getEnclosingElement());
-    }
-
-    protected ExecutableElement destroySessionForClass(TypeElement typeElement) {
-        List<? extends javax.lang.model.element.Element> enclosedElements = typeElement.getEnclosedElements();
-        List<javax.lang.model.element.ExecutableElement> executableElements = ElementFilter.methodsIn(enclosedElements);
-        ExecutableElement destroySession = null;
-        for (ExecutableElement executableElement : executableElements) {
-            if (executableElement.getAnnotation(SessionDestroy.class) != null) {
-                destroySession = executableElement;
-                break;
-            }
-        }
-
-        return destroySession;
+    protected ExecutableElement destroySessionForClass(DevkitTypeElement typeElement) {
+        List<ExecutableElement> sessionDestroyMethods = typeElement.getMethodsAnnotatedWith(SessionDestroy.class);
+        return !sessionDestroyMethods.isEmpty() ? sessionDestroyMethods.get(0) : null;
     }
 
     protected ExecutableElement createSessionForMethod(ExecutableElement executableElement) {
-        return createSessionForClass((TypeElement) executableElement.getEnclosingElement());
+        return createSessionForClass(new DevkitTypeElementImpl((TypeElement) executableElement.getEnclosingElement()));
     }
 }

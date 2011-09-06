@@ -24,6 +24,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
@@ -46,25 +47,19 @@ import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.ElementFilter;
 import java.util.List;
 import java.util.Map;
 
 public class TransformerGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(TypeElement typeElement) throws GenerationException {
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for (ExecutableElement executableElement : executableElements) {
-            Transformer transformer = executableElement.getAnnotation(Transformer.class);
-
-            if (transformer == null)
-                continue;
+    protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
+        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
 
             // get class
             DefinedClass transformerClass = getTransformerClass(executableElement);
@@ -74,6 +69,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             FieldVariable muleContext = generateFieldForMuleContext(transformerClass);
 
             // declare weight
+            Transformer transformer = executableElement.getAnnotation(Transformer.class);
             FieldVariable weighting = transformerClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "weighting", Op.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), ExpressionFactory.lit(transformer.priorityWeighting())));
 
             //generate constructor

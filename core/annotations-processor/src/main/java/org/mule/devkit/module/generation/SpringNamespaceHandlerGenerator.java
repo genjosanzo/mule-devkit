@@ -17,10 +17,10 @@
 
 package org.mule.devkit.module.generation;
 
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.schema.SchemaLocation;
 
-import javax.lang.model.element.TypeElement;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -28,12 +28,12 @@ import java.io.OutputStreamWriter;
 public class SpringNamespaceHandlerGenerator extends AbstractModuleGenerator {
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(TypeElement typeElement) throws GenerationException {
+    protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
         try {
             OutputStream springNamespaceHandlersStream = context.getCodeModel().getCodeWriter().openBinary(null, "META-INF/spring.handlers");
             OutputStreamWriter springNamespaceHandlersOut = new OutputStreamWriter(springNamespaceHandlersStream, "UTF-8");

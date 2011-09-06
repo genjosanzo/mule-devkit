@@ -24,6 +24,7 @@ import org.mule.api.annotations.Module;
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.object.ObjectFactory;
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
@@ -33,18 +34,17 @@ import org.mule.devkit.model.code.Variable;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.util.ElementFilter;
 
 public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
         Module module = typeElement.getAnnotation(Module.class);
         return module.poolable();
     }
 
     @Override
-    protected void doGenerate(TypeElement typeElement) {
+    protected void doGenerate(DevkitTypeElement typeElement) {
         DefinedClass lifecycleAdapterFactory = getLifecycleAdapterFactoryClass(typeElement);
         lifecycleAdapterFactory.javadoc().add("A <code>" + lifecycleAdapterFactory.name() + "</code> is an implementation  ");
         lifecycleAdapterFactory.javadoc().add(" of {@link ObjectFactory} interface for ");
@@ -91,18 +91,12 @@ public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
         getObjectClass.body()._return(poolObjectClass.dotclass());
     }
 
-    private void generateGetInstanceMethod(TypeElement typeElement, DefinedClass lifecycleAdapterFactory, DefinedClass poolObjectClass) {
+    private void generateGetInstanceMethod(DevkitTypeElement typeElement, DefinedClass lifecycleAdapterFactory, DefinedClass poolObjectClass) {
         Method getInstance = lifecycleAdapterFactory.method(Modifier.PUBLIC, ref(Object.class), "getInstance");
         getInstance.param(ref(MuleContext.class), "muleContext");
 
         Variable object = getInstance.body().decl(poolObjectClass, "object", ExpressionFactory._new(poolObjectClass));
-        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(typeElement.getEnclosedElements());
-        for (VariableElement variable : variables) {
-            Configurable configurable = variable.getAnnotation(Configurable.class);
-
-            if (configurable == null)
-                continue;
-
+        for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
             getInstance.body().add(object.invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(ExpressionFactory._this().ref(variable.getSimpleName().toString())));
         }
 
@@ -118,14 +112,8 @@ public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
         initialise._throws(ref(InitialisationException.class));
     }
 
-    private void generateFields(TypeElement typeElement, DefinedClass lifecycleAdapterFactory) {
-        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(typeElement.getEnclosedElements());
-        for (VariableElement variable : variables) {
-            Configurable configurable = variable.getAnnotation(Configurable.class);
-
-            if (configurable == null)
-                continue;
-
+    private void generateFields(DevkitTypeElement typeElement, DefinedClass lifecycleAdapterFactory) {
+        for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
             FieldVariable configField = lifecycleAdapterFactory.field(Modifier.PRIVATE, ref(variable.asType()), variable.getSimpleName().toString());
             generateSetter(lifecycleAdapterFactory, configField);
         }

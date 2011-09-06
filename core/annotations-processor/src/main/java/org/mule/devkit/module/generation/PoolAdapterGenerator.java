@@ -26,6 +26,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.config.PoolingProfile;
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.DefinedClass;
@@ -41,31 +42,24 @@ import org.mule.util.pool.LifecyleEnabledObjectPool;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.util.ElementFilter;
 
 public class PoolAdapterGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
         Module module = typeElement.getAnnotation(Module.class);
         return module.poolable();
     }
 
     @Override
-    protected void doGenerate(TypeElement typeElement) throws GenerationException {
+    protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
         DefinedClass poolAdapter = getPoolAdapterClass(typeElement);
         poolAdapter.javadoc().add("A <code>" + poolAdapter.name() + "</code> is a wrapper around ");
         poolAdapter.javadoc().add(ref(typeElement.asType()));
         poolAdapter.javadoc().add(" that enables pooling on the POJO.");
 
-        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(typeElement.getEnclosedElements());
-        for (VariableElement variable : variables) {
-            Configurable configurable = variable.getAnnotation(Configurable.class);
-
-            if (configurable == null)
-                continue;
-
-            FieldVariable configField = poolAdapter.field(Modifier.PRIVATE, ref(variable.asType()), variable.getSimpleName().toString());
+        for (VariableElement field : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
+            FieldVariable configField = poolAdapter.field(Modifier.PRIVATE, ref(field.asType()), field.getSimpleName().toString());
             generateSetter(poolAdapter, configField);
         }
 
@@ -95,21 +89,15 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
         newBody.assign(lifecyleEnabledObjectPool, ExpressionFactory._null());
     }
 
-    private void generateStartMethod(TypeElement typeElement, DefinedClass poolAdapter, FieldVariable lifecyleEnabledObjectPool, FieldVariable muleContext, FieldVariable poolingProfile) {
+    private void generateStartMethod(DevkitTypeElement typeElement, DefinedClass poolAdapter, FieldVariable lifecyleEnabledObjectPool, FieldVariable muleContext, FieldVariable poolingProfile) {
         DefinedClass objectFactory = context.getClassForRole(context.getNameUtils().generatePojoFactoryKey(typeElement));
 
         Method startMethod = poolAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
         startMethod._throws(MuleException.class);
 
         Variable objectFactoryField = startMethod.body().decl(objectFactory, "objectFactory", ExpressionFactory._new(objectFactory));
-        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(typeElement.getEnclosedElements());
-        for (VariableElement variable : variables) {
-            Configurable configurable = variable.getAnnotation(Configurable.class);
-
-            if (configurable == null)
-                continue;
-
-            startMethod.body().add(objectFactoryField.invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(ExpressionFactory._this().ref(variable.getSimpleName().toString())));
+        for (VariableElement field : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
+            startMethod.body().add(objectFactoryField.invoke("set" + StringUtils.capitalize(field.getSimpleName().toString())).arg(ExpressionFactory._this().ref(field.getSimpleName().toString())));
         }
 
         Invocation defaultLifecycleEnabledObjectPool = ExpressionFactory._new(ref(DefaultLifecycleEnabledObjectPool.class));

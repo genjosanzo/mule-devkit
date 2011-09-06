@@ -18,6 +18,8 @@
 package org.mule.devkit.utils;
 
 import org.apache.commons.lang.StringUtils;
+import org.mule.devkit.generation.DevkitTypeElementImpl;
+import org.mule.devkit.generation.TypeElementImpl;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -197,7 +199,7 @@ public class NameUtils {
 
     public String generateClassName(ExecutableElement executableElement, String append) {
         TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
-        String packageName = getPackageName(elements.getBinaryName(parentClass).toString());
+        String packageName = getPackageName(getBinaryName(parentClass));
         String className = StringUtils.capitalize(executableElement.getSimpleName().toString()) + append;
 
         return packageName + "." + className;
@@ -208,7 +210,7 @@ public class NameUtils {
         String packageName;
         if (enclosingElement != null && enclosingElement.getEnclosingElement() != null) {
             TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(enclosingElement.getEnclosingElement())).get(0);
-            packageName = getPackageName(elements.getBinaryName(parentClass).toString());
+            packageName = getPackageName(getBinaryName(parentClass));
         } else {
             // inner enum or parametrized type
             DeclaredType declaredType = (DeclaredType) element.asType();
@@ -218,22 +220,29 @@ public class NameUtils {
     }
 
     public String generateClassNameInPackage(TypeElement typeElement, String extraPackage, String className) {
-        String packageName = getPackageName(elements.getBinaryName(typeElement).toString());
+        String packageName = getPackageName(getBinaryName(typeElement));
 
         return packageName + extraPackage + "." + className;
 
     }
 
     public String generateModuleObjectRoleKey(TypeElement typeElement) {
-        String typeFullName = elements.getBinaryName(typeElement).toString();
+        String typeFullName = getBinaryName(typeElement);
         String pkg = getPackageName(typeFullName);
         String className = getClassName(typeFullName);
 
         return pkg + "." + className + "ModuleObject";
     }
 
+    public String getBinaryName(TypeElement typeElement) {
+        if(typeElement instanceof TypeElementImpl) {
+            typeElement = ((DevkitTypeElementImpl) typeElement).unWrap();
+        }
+        return elements.getBinaryName(typeElement).toString();
+    }
+
     public String generateConfigDefParserRoleKey(TypeElement typeElement) {
-        String typeFullName = elements.getBinaryName(typeElement).toString();
+        String typeFullName = getBinaryName(typeElement);
         String pkg = getPackageName(typeFullName);
         String className = getClassName(typeFullName);
 
@@ -241,7 +250,7 @@ public class NameUtils {
     }
 
     public String generatePoolingProfileDefParserRoleKey(TypeElement typeElement) {
-        String typeFullName = elements.getBinaryName(typeElement).toString();
+        String typeFullName = getBinaryName(typeElement);
         String pkg = getPackageName(typeFullName);
         String className = getClassName(typeFullName);
 
@@ -249,7 +258,7 @@ public class NameUtils {
     }
 
     public String generatePojoFactoryKey(TypeElement typeElement) {
-        String typeFullName = elements.getBinaryName(typeElement).toString();
+        String typeFullName = getBinaryName(typeElement);
         String pkg = getPackageName(typeFullName);
         String className = getClassName(typeFullName);
 
@@ -257,7 +266,7 @@ public class NameUtils {
     }
 
     public String generatePoolObjectRoleKey(TypeElement typeElement) {
-        String typeFullName = elements.getBinaryName(typeElement).toString();
+        String typeFullName = getBinaryName(typeElement);
         String pkg = getPackageName(typeFullName);
         String className = getClassName(typeFullName);
 
@@ -266,7 +275,7 @@ public class NameUtils {
 
 
     public String generateClassName(TypeElement typeElement, String extraPackage, String classNameAppend) {
-        String typeFullName = elements.getBinaryName(typeElement).toString();
+        String typeFullName = getBinaryName(typeElement);
         String pkg = getPackageName(typeFullName);
         String className = getClassName(typeFullName);
 

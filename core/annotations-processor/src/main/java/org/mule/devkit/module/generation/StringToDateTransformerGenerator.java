@@ -17,11 +17,11 @@
 
 package org.mule.devkit.module.generation;
 
-import org.mule.api.annotations.Processor;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -37,14 +37,10 @@ import org.mule.devkit.model.code.builders.FieldBuilder;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.util.ElementFilter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 public class StringToDateTransformerGenerator extends AbstractMessageGenerator {
 
@@ -53,22 +49,12 @@ public class StringToDateTransformerGenerator extends AbstractMessageGenerator {
     private static final String TRANSFORMER_CLASS_NAME = "StringToDateTransformer";
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
-        List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for (ExecutableElement method : methods) {
-            if (method.getAnnotation(Processor.class) != null) {
-                for (VariableElement parameter : method.getParameters()) {
-                    if (parameter.asType().toString().contains(Date.class.getName())) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+        return typeElement.hasProcessorMethodWithParameter(Date.class);
     }
 
     @Override
-    protected void doGenerate(TypeElement typeElement) {
+    protected void doGenerate(DevkitTypeElement typeElement) {
         DefinedClass transformerClass = getTransformerClass(typeElement);
         FieldVariable muleContext = generateFieldForMuleContext(transformerClass);
         FieldVariable simpleDateFormat = generateSimpleDateFormatField(transformerClass);

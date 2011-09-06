@@ -36,6 +36,7 @@ import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.util.SpringXMLUtils;
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -81,35 +82,24 @@ import java.util.List;
 public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(TypeElement typeElement) {
+    protected void doGenerate(DevkitTypeElement typeElement) {
         generateConfigBeanDefinitionParserFor(typeElement);
 
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for (ExecutableElement executableElement : executableElements) {
-            Processor processor = executableElement.getAnnotation(Processor.class);
-
-            if (processor == null)
-                continue;
-
-            generateBeanDefinitionParserForProcessor(executableElement, processor.intercepting());
+        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
+            generateBeanDefinitionParserForProcessor(executableElement);
         }
 
-        for (ExecutableElement executableElement : executableElements) {
-            Source source = executableElement.getAnnotation(Source.class);
-
-            if (source == null)
-                continue;
-
+        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Source.class)) {
             generateBeanDefinitionParserForSource(executableElement);
         }
     }
 
-    private void generateConfigBeanDefinitionParserFor(TypeElement typeElement) {
+    private void generateConfigBeanDefinitionParserFor(DevkitTypeElement typeElement) {
         DefinedClass beanDefinitionparser = getConfigBeanDefinitionParserClass(typeElement);
         DefinedClass pojo = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
 
@@ -141,12 +131,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 .invoke("isAssignableFrom").arg(pojo.dotclass()));
         isDisposable._then().add(builder.invoke("setDestroyMethodName").arg(ref(Disposable.class).staticRef("PHASE_NAME")));
 
-        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(typeElement.getEnclosedElements());
-        for (VariableElement variable : variables) {
-            Configurable configurable = variable.getAnnotation(Configurable.class);
-
-            if (configurable == null)
-                continue;
+        for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
 
             String fieldName = variable.getSimpleName().toString();
 
@@ -220,7 +205,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
-        if (element instanceof TypeElement && (typeElement.getAnnotation(OAuth.class) != null || classHasMethodWithParameterOfType((TypeElement) element, HttpCallback.class))) {
+        if (element instanceof TypeElement && (typeElement.hasAnnotation(OAuth.class) || typeElement.hasProcessorMethodWithParameter(HttpCallback.class))) {
             Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class), "httpCallbackConfigElement", ref(DomUtils.class).staticInvoke("getChildElementByTagName").
                     arg(element).arg(SchemaGenerator.HTTP_CALLBACK_CONFIG_ELEMENT_NAME));
             generateParseSupportedType(parse.body(), listElement, builder, HttpCallbackAdapterGenerator.DOMAIN_FIELD_NAME);
@@ -296,11 +281,11 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         generateGenerateChildBeanNameMethod(beanDefinitionparser);
     }
 
-    private void generateBeanDefinitionParserForProcessor(ExecutableElement executableElement, boolean intercepting) {
+    private void generateBeanDefinitionParserForProcessor(ExecutableElement executableElement) {
         DefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
         DefinedClass messageProcessorClass;
 
-        if (intercepting) {
+        if (executableElement.getAnnotation(Processor.class).intercepting()) {
             messageProcessorClass = getInterceptingMessageProcessorClass(executableElement);
         } else {
             messageProcessorClass = getMessageProcessorClass(executableElement);

@@ -17,10 +17,10 @@
 
 package org.mule.devkit.module.generation;
 
-import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
@@ -34,11 +34,7 @@ import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.builders.FieldBuilder;
 import org.mule.util.NumberUtils;
 
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.util.ElementFilter;
-import java.util.List;
 
 public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
 
@@ -46,22 +42,12 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
     public static final String DOMAIN_FIELD_NAME = "domain";
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
-        List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for (ExecutableElement method : methods) {
-            if (method.getAnnotation(Processor.class) != null) {
-                for (VariableElement variable : method.getParameters()) {
-                    if (variable.asType().toString().contains(HttpCallback.class.getName())) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return typeElement.getAnnotation(OAuth.class) != null;
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+        return typeElement.hasAnnotation(OAuth.class) || typeElement.hasProcessorMethodWithParameter(HttpCallback.class);
     }
 
     @Override
-    protected void doGenerate(TypeElement typeElement) {
+    protected void doGenerate(DevkitTypeElement typeElement) {
         DefinedClass httpCallbackAdapter = getHttpCallbackAdapterClass(typeElement);
         FieldVariable port = portFieldWithGetterAndSetter(httpCallbackAdapter);
         FieldVariable domain = domainFieldWithGetterAndSetter(httpCallbackAdapter);

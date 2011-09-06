@@ -19,6 +19,7 @@ package org.mule.devkit.module.generation;
 
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.InterceptCallback;
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
@@ -27,19 +28,15 @@ import org.mule.devkit.model.code.Modifier;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.ElementFilter;
-import java.util.List;
 
 public class InterceptCallbackGenerator extends AbstractModuleGenerator {
 
     public static final String ROLE = "InterceptCallback";
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
-        List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for (ExecutableElement method : methods) {
-            Processor processor = method.getAnnotation(Processor.class);
-            if (processor != null && processor.intercepting()) {
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
+            if (method.getAnnotation(Processor.class).intercepting()) {
                 return true;
             }
         }
@@ -47,7 +44,7 @@ public class InterceptCallbackGenerator extends AbstractModuleGenerator {
     }
 
     @Override
-    protected void doGenerate(TypeElement typeElement) {
+    protected void doGenerate(DevkitTypeElement typeElement) {
         DefinedClass callbackClass = getInterceptCallbackClass(typeElement);
         callbackClass._implements(ref(InterceptCallback.class));
 

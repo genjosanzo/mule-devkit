@@ -43,6 +43,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
@@ -60,13 +61,9 @@ import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.builders.FieldBuilder;
 
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.util.ElementFilter;
 import java.io.UnsupportedEncodingException;
-import java.lang.annotation.Annotation;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -83,12 +80,12 @@ public class OAuthAdapterGenerator extends AbstractModuleGenerator {
     private static final String REDIRECT_URL_FIELD_NAME = "redirectUrl";
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
         return typeElement.getAnnotation(OAuth.class) != null;
     }
 
     @Override
-    protected void doGenerate(TypeElement typeElement) throws GenerationException {
+    protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
         DefinedClass oauthAdapter = getOAuthAdapterClass(typeElement);
         OAuth oauth = typeElement.getAnnotation(OAuth.class);
         FieldVariable pattern = oauthVerifierPatterConstant(oauthAdapter, oauth);
@@ -252,7 +249,7 @@ public class OAuthAdapterGenerator extends AbstractModuleGenerator {
         return messageProcessor;
     }
 
-    private void generateGetAuthorizationUrlMethod(DefinedClass oauthAdapter, FieldVariable requestToken, FieldVariable requestTokenSecret, FieldVariable redirectUrl, FieldVariable consumer, TypeElement typeElement, OAuth oauth) {
+    private void generateGetAuthorizationUrlMethod(DefinedClass oauthAdapter, FieldVariable requestToken, FieldVariable requestTokenSecret, FieldVariable redirectUrl, FieldVariable consumer, DevkitTypeElement typeElement, OAuth oauth) {
         Method getAuthorizationUrl = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, GET_AUTHORIZATION_URL_METHOD_NAME);
         getAuthorizationUrl.type(ref(String.class));
         Variable provider = generateProvider(oauth, getAuthorizationUrl.body(), typeElement);
@@ -265,7 +262,7 @@ public class OAuthAdapterGenerator extends AbstractModuleGenerator {
         getAuthorizationUrl.body()._return(authorizationUrl);
     }
 
-    private void generateFetchAccessTokenMethod(DefinedClass oauthAdapter, FieldVariable requestToken, FieldVariable requestTokenSecret, FieldVariable oauthVerifier, FieldVariable consumer, TypeElement typeElement, OAuth oauth) {
+    private void generateFetchAccessTokenMethod(DefinedClass oauthAdapter, FieldVariable requestToken, FieldVariable requestTokenSecret, FieldVariable oauthVerifier, FieldVariable consumer, DevkitTypeElement typeElement, OAuth oauth) {
         Method fetchAccessToken = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, FETCH_ACCESS_TOKEN_METHOD_NAME);
         Variable provider = generateProvider(oauth, fetchAccessToken.body(), typeElement);
         fetchAccessToken.body().invoke(consumer, "setTokenWithSecret").arg(requestToken).arg(requestTokenSecret);
@@ -276,10 +273,10 @@ public class OAuthAdapterGenerator extends AbstractModuleGenerator {
         fetchAccessToken.body().assign(oauthAdapter.fields().get(OAUTH_ACCESS_TOKEN_SECRET_FIELD_NAME), consumer.invoke("getTokenSecret"));
     }
 
-    private Variable generateProvider(OAuth oauth, Block block, TypeElement typeElement) {
+    private Variable generateProvider(OAuth oauth, Block block, DevkitTypeElement typeElement) {
         Variable requestTokenUrl = block.decl(ref(String.class), "requestTokenUrl", ExpressionFactory.lit(oauth.requestTokenUrl()));
 
-        if (classHasFieldAnnotatedWith(typeElement, OAuthScope.class)) {
+        if (typeElement.hasFieldAnnotatedWith(OAuthScope.class)) {
             Variable scope = block.decl(ref(String.class), "scope", ExpressionFactory.invoke(getterMethodForFieldAnnotatedWith(typeElement, OAuthScope.class)));
             Block ifScopeNotNull = block._if(Op.ne(scope, ExpressionFactory._null()))._then();
             TryStatement tryToEncodeScopeParam = ifScopeNotNull._try();
@@ -300,15 +297,5 @@ public class OAuthAdapterGenerator extends AbstractModuleGenerator {
         CatchBlock catchBlock = tryStatement._catch(ref(exceptionToCatch));
         Variable caughtException = catchBlock.param("e");
         catchBlock.body()._throw(ExpressionFactory._new(ref(exceptionToThrow)).arg(caughtException));
-    }
-
-    private boolean classHasFieldAnnotatedWith(TypeElement typeElement, Class<? extends Annotation> annotation) {
-        List<VariableElement> fields = ElementFilter.fieldsIn(typeElement.getEnclosedElements());
-        for (VariableElement field : fields) {
-            if (field.getAnnotation(annotation) != null) {
-                return true;
-            }
-        }
-        return false;
     }
 }

@@ -31,6 +31,7 @@ import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.generation.GeneratorContext;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -41,9 +42,7 @@ import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Variable;
 import org.mule.transaction.MuleTransactionConfig;
 
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.ElementFilter;
 import java.util.List;
 import java.util.Map;
 
@@ -52,19 +51,12 @@ public class DummyInboundEndpointGenerator extends AbstractModuleGenerator {
     public static final String DUMMY_INBOUND_ENDPOINT_ROLE = "DummyInboundEndpoint";
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for (ExecutableElement executableElement : executableElements) {
-            Source source = executableElement.getAnnotation(Source.class);
-            if (source != null) {
-                return true;
-            }
-        }
-        return false;
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+        return typeElement.hasMethodsAnnotatedWith(Source.class);
     }
 
     @Override
-    public void doGenerate(TypeElement typeElement) {
+    public void doGenerate(DevkitTypeElement typeElement) {
         DefinedClass dummyInboundEndpoint = getDummyInboundEndpointClass(typeElement, context);
         dummyInboundEndpoint.javadoc().add("Dummy ");
         dummyInboundEndpoint.javadoc().add(ref(InboundEndpoint.class));
@@ -167,7 +159,7 @@ public class DummyInboundEndpointGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getDummyInboundEndpointClass(TypeElement parentClass, GeneratorContext context) {
-        String packageName = context.getNameUtils().getPackageName(context.getElementsUtils().getBinaryName(parentClass).toString()) + ".config";
+        String packageName = context.getNameUtils().getPackageName(context.getNameUtils().getBinaryName(parentClass)) + ".config";
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(packageName);
         DefinedClass dummyInboundEndpoint = pkg._class("DummyInboundEndpoint");
         dummyInboundEndpoint._implements(ImmutableEndpoint.class);

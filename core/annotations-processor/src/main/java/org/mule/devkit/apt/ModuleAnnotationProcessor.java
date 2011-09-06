@@ -18,6 +18,7 @@
 package org.mule.devkit.apt;
 
 import org.mule.devkit.Plugin;
+import org.mule.devkit.generation.DevkitTypeElementImpl;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.Generator;
 import org.mule.devkit.generation.GeneratorContext;
@@ -119,7 +120,7 @@ public class ModuleAnnotationProcessor extends AbstractProcessor {
                             validator.validate(e);
                         }
                         for (Generator generator : plugin.getGenerators()) {
-                            generator.generate(e, context);
+                            generator.generate(new DevkitTypeElementImpl(e), context);
                         }
                     }
                 } catch (ValidationException tve) {

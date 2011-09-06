@@ -22,7 +22,6 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.construct.FlowConstructInvalidException;
@@ -33,6 +32,7 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.transport.Connector;
 import org.mule.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.construct.SimpleFlowConstruct;
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -48,12 +48,8 @@ import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.builders.FieldBuilder;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.util.ElementFilter;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 public class HttpCallbackGenerator extends AbstractModuleGenerator {
@@ -78,22 +74,12 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
     private FieldVariable localUrlField;
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
-        List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for (ExecutableElement method : methods) {
-            if (method.getAnnotation(Processor.class) != null) {
-                for (VariableElement variable : method.getParameters()) {
-                    if (variable.asType().toString().contains(HttpCallback.class.getName())) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return typeElement.getAnnotation(OAuth.class) != null;
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+        return typeElement.hasAnnotation(OAuth.class) || typeElement.hasProcessorMethodWithParameter(HttpCallback.class);
     }
 
     @Override
-    protected void doGenerate(TypeElement typeElement) {
+    protected void doGenerate(DevkitTypeElement typeElement) {
         DefinedClass callbackClass = getProcessorCallbackClass(typeElement);
         generateFields(callbackClass);
         generateConstructorArgSimpleFlowConstruct(callbackClass);

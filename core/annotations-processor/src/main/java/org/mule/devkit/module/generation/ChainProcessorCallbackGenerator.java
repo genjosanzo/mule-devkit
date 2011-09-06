@@ -22,10 +22,10 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
@@ -35,11 +35,7 @@ import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Variable;
 
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.util.ElementFilter;
-import java.util.List;
 import java.util.Map;
 
 public class ChainProcessorCallbackGenerator extends AbstractModuleGenerator {
@@ -47,23 +43,12 @@ public class ChainProcessorCallbackGenerator extends AbstractModuleGenerator {
     public static final String ROLE = "ChainProcessorCallback";
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
-        List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for (ExecutableElement method : methods) {
-            Processor processor = method.getAnnotation(Processor.class);
-            if (processor != null) {
-                for (VariableElement variable : method.getParameters()) {
-                    if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+        return typeElement.hasProcessorMethodWithParameter(ProcessorCallback.class);
     }
 
     @Override
-    protected void doGenerate(TypeElement typeElement) {
+    protected void doGenerate(DevkitTypeElement typeElement) {
         DefinedClass callbackClass = getProcessorCallbackClass(typeElement);
         callbackClass._implements(ref(ProcessorCallback.class));
 

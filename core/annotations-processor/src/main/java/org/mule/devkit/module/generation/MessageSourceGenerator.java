@@ -28,6 +28,7 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.param.Session;
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.CatchBlock;
@@ -48,7 +49,6 @@ import org.mule.session.DefaultMuleSession;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.util.ElementFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,24 +57,18 @@ import java.util.Map;
 public class MessageSourceGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(TypeElement typeElement) {
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for (ExecutableElement executableElement : executableElements) {
-            Source source = executableElement.getAnnotation(Source.class);
-
-            if (source == null)
-                continue;
-
+    protected void doGenerate(DevkitTypeElement typeElement) {
+        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Source.class)) {
             generateMessageSource(typeElement, executableElement);
         }
     }
 
-    private void generateMessageSource(TypeElement typeElement, ExecutableElement executableElement) {
+    private void generateMessageSource(DevkitTypeElement typeElement, ExecutableElement executableElement) {
         // get class
         DefinedClass messageSourceClass = getMessageSourceClass(executableElement);
 

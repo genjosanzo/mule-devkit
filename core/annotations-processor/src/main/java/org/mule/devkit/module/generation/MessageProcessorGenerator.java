@@ -45,6 +45,7 @@ import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.CatchBlock;
@@ -76,7 +77,6 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.util.ElementFilter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
@@ -92,27 +92,22 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
     private static final String LOCATION_PROPERTY = "Location";
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(TypeElement typeElement) {
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for (ExecutableElement executableElement : executableElements) {
-            Processor processor = executableElement.getAnnotation(Processor.class);
-
-            if (processor == null)
-                continue;
-
-            generateMessageProcessor(typeElement, executableElement, processor.intercepting());
+    protected void doGenerate(DevkitTypeElement typeElement) {
+        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
+            generateMessageProcessor(typeElement, executableElement);
         }
     }
 
-    private void generateMessageProcessor(TypeElement typeElement, ExecutableElement executableElement, boolean intercepting) {
+    private void generateMessageProcessor(DevkitTypeElement typeElement, ExecutableElement executableElement) {
         // get class
         DefinedClass messageProcessorClass;
 
+        boolean intercepting = executableElement.getAnnotation(Processor.class).intercepting();
         if (intercepting) {
             messageProcessorClass = getInterceptingMessageProcessorClass(executableElement);
         } else {

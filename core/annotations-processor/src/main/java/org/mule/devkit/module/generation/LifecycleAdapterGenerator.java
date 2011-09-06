@@ -26,6 +26,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -41,18 +42,17 @@ import javax.annotation.PreDestroy;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.ElementFilter;
 import java.util.List;
 
 public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
 
     @Override
-    protected boolean shouldGenerate(TypeElement typeElement) {
+    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(TypeElement typeElement) {
+    protected void doGenerate(DevkitTypeElement typeElement) {
         DefinedClass lifecycleAdapter = getLifecycleAdapterClass(typeElement);
         lifecycleAdapter.javadoc().add("A <code>" + lifecycleAdapter.name() + "</code> is a wrapper around ");
         lifecycleAdapter.javadoc().add(ref(typeElement.asType()));
@@ -127,55 +127,23 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         return lifecycleMethod;
     }
 
-    private ExecutableElement getStartElement(TypeElement typeElement) {
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for (ExecutableElement executableElement : executableElements) {
-            Start start = executableElement.getAnnotation(Start.class);
-
-            if (start != null) {
-                return executableElement;
-            }
-        }
-
-        return null;
+    private ExecutableElement getStartElement(DevkitTypeElement typeElement) {
+        List<ExecutableElement> startMethods = typeElement.getMethodsAnnotatedWith(Start.class);
+        return !startMethods.isEmpty() ? startMethods.get(0) : null;
     }
 
-    private ExecutableElement getStopElement(TypeElement typeElement) {
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for (ExecutableElement executableElement : executableElements) {
-            Stop stop = executableElement.getAnnotation(Stop.class);
-
-            if (stop != null) {
-                return executableElement;
-            }
-        }
-
-        return null;
+    private ExecutableElement getStopElement(DevkitTypeElement typeElement) {
+        List<ExecutableElement> stopMethods = typeElement.getMethodsAnnotatedWith(Stop.class);
+        return !stopMethods.isEmpty() ? stopMethods.get(0) : null;
     }
 
-    private ExecutableElement getPostConstructElement(TypeElement typeElement) {
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for (ExecutableElement executableElement : executableElements) {
-            PostConstruct postConstruct = executableElement.getAnnotation(PostConstruct.class);
-
-            if (postConstruct != null) {
-                return executableElement;
-            }
-        }
-
-        return null;
+    private ExecutableElement getPostConstructElement(DevkitTypeElement typeElement) {
+        List<ExecutableElement> postConstructMethods = typeElement.getMethodsAnnotatedWith(PostConstruct.class);
+        return !postConstructMethods.isEmpty() ? postConstructMethods.get(0) : null;
     }
 
-    private ExecutableElement getPreDestroyElement(TypeElement typeElement) {
-        List<ExecutableElement> executableElements = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for (ExecutableElement executableElement : executableElements) {
-            PreDestroy preDestroy = executableElement.getAnnotation(PreDestroy.class);
-
-            if (preDestroy != null) {
-                return executableElement;
-            }
-        }
-
-        return null;
+    private ExecutableElement getPreDestroyElement(DevkitTypeElement typeElement) {
+        List<ExecutableElement> preDestroyMethods = typeElement.getMethodsAnnotatedWith(PreDestroy.class);
+        return !preDestroyMethods.isEmpty() ? preDestroyMethods.get(0) : null;
     }
 }
