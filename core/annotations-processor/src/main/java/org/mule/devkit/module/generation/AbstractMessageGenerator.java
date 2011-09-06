@@ -40,7 +40,6 @@ import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.config.spring.parsers.specific.ConfigurationChildDefinitionParser;
 import org.mule.construct.SimpleFlowConstruct;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
@@ -62,7 +61,6 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.TemplateParser;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -114,16 +112,6 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(poolAdapterName), new Class[]{BeanDefinitionParser.class});
 
         context.setClassRole(context.getNameUtils().generateConfigDefParserRoleKey(typeElement), clazz);
-
-        return clazz;
-    }
-
-    protected DefinedClass getPoolingProfileBeanDefinitionParserClass(Element typeElement) {
-        String poolAdapterName = context.getNameUtils().generateClassName((TypeElement) typeElement, ".config.spring", "PoolingProfileDefinitionParser");
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(poolAdapterName));
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(poolAdapterName), ConfigurationChildDefinitionParser.class);
-
-        context.setClassRole(context.getNameUtils().generatePoolingProfileDefParserRoleKey((TypeElement) typeElement), clazz);
 
         return clazz;
     }

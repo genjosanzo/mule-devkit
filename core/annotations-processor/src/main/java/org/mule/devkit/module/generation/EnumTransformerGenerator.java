@@ -22,9 +22,7 @@ import org.mule.api.annotations.Source;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.DevkitTypeElement;
-import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
@@ -147,18 +145,6 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
         doTransform.body().assign(result, valueOf);
 
         doTransform.body()._return(result);
-    }
-
-    private void generateThrowTransformFailedException(CatchBlock catchBlock, Variable exception, Variable src, TypeReference target) {
-        Invocation transformFailedInvoke = ref(CoreMessages.class).staticInvoke("transformFailed");
-        transformFailedInvoke.arg(src.invoke("getClass").invoke("getName"));
-        transformFailedInvoke.arg(ExpressionFactory.lit(target.fullName()));
-
-        Invocation transformerException = ExpressionFactory._new(ref(TransformerException.class));
-        transformerException.arg(transformFailedInvoke);
-        transformerException.arg(ExpressionFactory._this());
-        transformerException.arg(exception);
-        catchBlock.body()._throw(transformerException);
     }
 
     private void generateConstructor(DefinedClass transformerClass, Element variableElement) {

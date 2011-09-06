@@ -33,7 +33,6 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.config.PoolingProfile;
 import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
-import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.devkit.generation.DevkitTypeElement;
@@ -870,94 +869,6 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         getAttributeValue.body()._return(ExpressionFactory._null());
         return getAttributeValue;
-    }
-
-    private void generateParseChild(DefinedClass beanDefinitionparser, ExecutableElement executableElement) {
-        Method parseChild = beanDefinitionparser.method(Modifier.PROTECTED, context.getCodeModel().VOID, "parseChild");
-        Variable element = parseChild.param(ref(org.w3c.dom.Element.class), "element");
-        Variable parserContext = parseChild.param(ref(ParserContext.class), "parserContext");
-        Variable beanDefinitionBuilder = parseChild.param(ref(BeanDefinitionBuilder.class), "beanDefinitionBuilder");
-
-        generateSetPojoIfConfigRefNotEmpty(parseChild, element, beanDefinitionBuilder);
-
-        for (VariableElement variable : executableElement.getParameters()) {
-            if (variable.asType().toString().contains(SourceCallback.class.getName()))
-                continue;
-
-            if (SchemaTypeConversion.isSupported(variable.asType().toString()) ||
-                    context.getTypeMirrorUtils().isEnum(variable.asType())) {
-                parseChild.body().add(generateAddPropertyValue(element, beanDefinitionBuilder, variable));
-            }
-        }
-
-        Variable assembler = generateBeanAssembler(parseChild, element, beanDefinitionBuilder);
-        generatePostProcessCall(parseChild, element, assembler);
-    }
-
-    private void generateSetPojoIfConfigRefNotEmpty(Method parseChild, Variable element, Variable beanDefinitionBuilder) {
-        Conditional isConfigRefEmpty = parseChild.body()._if(Op.not(generateIsEmptyConfigRef(element)));
-        Invocation addPropertyReference = beanDefinitionBuilder.invoke("addPropertyReference");
-        addPropertyReference.arg("pojo");
-        Invocation getAttributeAlias = generateGetAttributeConfigRef();
-        Invocation getAttribute = element.invoke("getAttribute");
-        getAttribute.arg(getAttributeAlias);
-        addPropertyReference.arg(getAttribute);
-        isConfigRefEmpty._then().add(addPropertyReference);
-    }
-
-    private Invocation generateIsEmptyConfigRef(Variable element) {
-        Invocation getAttributeAlias = generateGetAttributeConfigRef();
-        Invocation getAttribute = element.invoke("getAttribute");
-        getAttribute.arg(getAttributeAlias);
-        Invocation isEmpty = ref(StringUtils.class).staticInvoke("isEmpty");
-        isEmpty.arg(getAttribute);
-        return isEmpty;
-    }
-
-    private Invocation generateGetAttributeConfigRef() {
-        Invocation getTargetPropertyConfiguration = ExpressionFactory.invoke("getTargetPropertyConfiguration");
-        Invocation getAttributeAlias = getTargetPropertyConfiguration.invoke("getAttributeAlias");
-        getAttributeAlias.arg("config-ref");
-        return getAttributeAlias;
-    }
-
-    private Invocation generateAddPropertyValue(Variable element, Variable beanDefinitionBuilder, VariableElement variable) {
-        Invocation getAttributeValue = ExpressionFactory.invoke("getAttributeValue");
-        getAttributeValue.arg(element);
-        getAttributeValue.arg(ExpressionFactory.lit(variable.getSimpleName().toString()));
-        Invocation addPropertyValue = beanDefinitionBuilder.invoke("addPropertyValue");
-        addPropertyValue.arg(ExpressionFactory.lit(variable.getSimpleName().toString()));
-        addPropertyValue.arg(getAttributeValue);
-
-        return addPropertyValue;
-    }
-
-
-    private Invocation generateAddPropertyRefValue(Variable element, Variable beanDefinitionBuilder, VariableElement variable) {
-        Invocation getAttributeValue = ExpressionFactory.invoke("getAttributeValue");
-        getAttributeValue.arg(element);
-        getAttributeValue.arg(ExpressionFactory.lit(variable.getSimpleName().toString() + "-ref"));
-        Invocation addPropertyValue = beanDefinitionBuilder.invoke("addPropertyValue");
-        addPropertyValue.arg(ExpressionFactory.lit(variable.getSimpleName().toString()));
-        addPropertyValue.arg(getAttributeValue);
-
-        return addPropertyValue;
-    }
-
-    private Variable generateBeanAssembler(Method parseChild, Variable element, Variable beanDefinitionBuilder) {
-        Variable assembler = parseChild.body().decl(ref(BeanAssembler.class), "assembler");
-        Invocation getBeanAssembler = ExpressionFactory.invoke("getBeanAssembler");
-        getBeanAssembler.arg(element);
-        getBeanAssembler.arg(beanDefinitionBuilder);
-        parseChild.body().assign(assembler, getBeanAssembler);
-        return assembler;
-    }
-
-    private void generatePostProcessCall(Method parseChild, Variable element, Variable assembler) {
-        Invocation postProcess = parseChild.body().invoke("postProcess");
-        postProcess.arg(ExpressionFactory.invoke("getParserContext"));
-        postProcess.arg(assembler);
-        postProcess.arg(element);
     }
 
     private class UpperBlockClosure {
