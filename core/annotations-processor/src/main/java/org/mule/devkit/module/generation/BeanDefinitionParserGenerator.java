@@ -164,6 +164,16 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 managedMap.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedMap.getManagedCollection()));
             } else if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
                 generateParseEnum(parse.body(), element, builder, fieldName);
+            } else {
+                // not supported use the -ref approach
+                Invocation getAttribute = element.invoke("getAttribute").arg(fieldName + "-ref");
+                Conditional ifNotNull = parse.body()._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
+                        Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(
+                                getAttribute
+                        ))));
+                ifNotNull._then().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
+                        ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(element.invoke("getAttribute").arg(fieldName + "-ref"))
+                ));
             }
         }
 
