@@ -100,7 +100,7 @@ def:tag_list(tags) ?><?cs
 <?cs # Print a list of tags (e.g. description text ?><?cs
 def:op_tag_list(tags) ?><?cs
   each:tag = tags ?><?cs
-      if:tag.name == "Text" ?><?cs var:tag.text?><?cs
+      if:tag.name == "Text" ?><?cs var:tag.text?><br/><?cs
       elif:tag.kind == "@more" ?><p><?cs
       elif:tag.kind == "@see" ?><code><a href="<?cs
         if:tag.isLocal?><?cs var:toroot ?>java/<?cs /if ?><?cs
@@ -108,7 +108,7 @@ def:op_tag_list(tags) ?><?cs
       elif:tag.kind == "@seeHref" ?><a href="<?cs var:tag.href ?>"><?cs var:tag.label ?></a><?cs
       elif:tag.kind == "@seeJustLabel" ?><?cs var:tag.label ?><?cs
       elif:tag.kind == "@code" ?><code><?cs var:tag.text ?></code><?cs
-      elif:tag.name == "@sample.xml" ?><h5 class="jd-tagtitle">XML Sample</h5><pre><?cs var:tag.text ?></pre><?cs
+      elif:tag.name == "@sample.xml" ?><div class="jd-tagdata"><h5 class="jd-tagtitle">XML Sample</h5><pre><?cs var:tag.text ?></pre></div><?cs
       elif:tag.name == "@sample.java" ?><?cs
       elif:tag.name == "@include" ?><?cs var:tag.text ?><?cs
       elif:tag.kind == "@docRoot" ?><?cs var:toroot ?><?cs
@@ -255,16 +255,35 @@ def:op_description(obj) ?><?cs
       <td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i>Specify which configuration to use.</td></tr>
           <?cs set:count = #2 ?>
           <?cs each:attribute=obj.paramTags ?>
+            <?cs if:attribute.isProcessorCallback=="0" ?>
+            <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
+                <td class="jd-linkcol"><nobr><?cs var:attribute.attributeName ?></nobr></td>
+                <td class="jd-descrcol"><?cs var:attribute.defaultValue ?></td>
+                <td class="jd-descrcol" width="100%"><?cs if:attribute.optional=="true" ?><i>Optional.&nbsp;</i><?cs /if ?><?cs call:op_tag_list(attribute.comment) ?></td>
+            </tr>
+            <?cs /if ?>
+            <?cs set:count = count + #1 ?>
+          <?cs /each ?>
+      </table>
+  </div>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Child Elements</h5>
+
+      <table class="jd-tagtable">
+          <?cs set:count = #2 ?>
+          <?cs each:attribute=obj.paramTags ?>
+            <?cs if:attribute.isProcessorCallback=="1" ?>
             <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
                 <td class="jd-linkcol"><nobr><?cs var:attribute.attributeName ?></nobr></td>
                 <td class="jd-descrcol"><?cs var:attribute.defaultValue ?></td>
                 <td class="jd-descrcol" width="100%"><?cs if:attribute.optional=="true" ?><i>Optional.&nbsp;</i><?cs /if ?><?cs call:op_tag_list(attribute.comment) ?></td>
             </tr>
             <?cs set:count = count + #1 ?>
+            <?cs /if ?>
           <?cs /each ?>
       </table>
-  </div><?cs
-  if:subcount(obj.returns) ?>
+  </div>
+  <?cs if:subcount(obj.returns) ?>
   <div class="jd-tagdata">
       <h5 class="jd-tagtitle">Return Payload</h5>
       <ul class="nolist"><li><?cs call:op_tag_list(obj.returns) ?></li></ul>

@@ -48,7 +48,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
     }
 
     public String relativeModulePath() {
-        String s = mContainingClass.name();
+        String s = mContainingClass.moduleName();
         s += ".html";
         s += "#" + elementName();
         return s;
@@ -502,6 +502,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
 
             String[] names = new String[N];
             boolean[] optional = new boolean[N];
+            boolean[] processorCallback = new boolean[N];
             String[] defaultValue = new String[N];
             String[] attributeName = new String[N];
             String[] comments = new String[N];
@@ -511,8 +512,12 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
             // our parent's names.
             for (int i = 0; i < N; i++) {
                 attributeName[i] = mParameters[i].name();
+                processorCallback[i] = false;
                 if (mParameters[i].typeName().contains("HttpCallback")) {
                     attributeName[i] += "-flow-ref";
+                }
+                if (mParameters[i].typeName().contains("ProcessorCallback")) {
+                    processorCallback[i] = true;
                 }
                 optional[i] = false;
                 defaultValue[i] = "";
@@ -527,7 +532,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
                     } else if (annotation.type().qualifiedName().equals("org.mule.api.annotations.param.Optional")) {
                         optional[i] = true;
                         break;
-                    } else if (annotation.type().qualifiedName().equals("org.mule.api.annotations.param.DefaultValue")) {
+                    } else if (annotation.type().qualifiedName().equals("org.mule.api.annotations.param.Default")) {
                         defaultValue[i] = annotation.elementValues()[0].valueString().replace("\"", "");
                         break;
                     }
@@ -567,7 +572,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
             for (int i = 0; i < N; i++) {
                 mParamTags[i] =
                         new ParamTagInfo("@param", "@param", names[i] + " " + comments[i], attributeName[i],
-                                optional[i], defaultValue[i], parent(), positions[i]);
+                                optional[i], defaultValue[i], processorCallback[i], parent(), positions[i]);
 
                 // while we're here, if we find any parameters that are still undocumented at this
                 // point, complain. (this warning is off by default, because it's really, really

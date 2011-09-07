@@ -306,7 +306,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         complexType.setName(name);
 
         ComplexContent complexContent = new ComplexContent();
-        complexContent.setMixed(true);
         complexType.setComplexContent(complexContent);
         ExtensionType complexContentExtension = new ExtensionType();
         complexContentExtension.setBase(base);
@@ -339,6 +338,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                         GroupRef groupRef = generateProcessorCallbackGroup(optional);
                         complexContentExtension.setGroup(groupRef);
                         complexContentExtension.setAll(null);
+                        complexContent.setMixed(true);
                     } else {
                         generateProcessorCallbackElement(all, variable);
                     }
