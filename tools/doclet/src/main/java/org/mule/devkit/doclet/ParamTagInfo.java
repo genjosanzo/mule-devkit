@@ -30,8 +30,10 @@ public class ParamTagInfo extends ParsedTagInfo {
     private boolean mIsOptional;
     private String mAttributeName;
     private String mDefaultValue;
+    private boolean mIsProcessorCallback;
 
-    ParamTagInfo(String name, String kind, String text, String attributeName, boolean isOptional, String defaultValue, ContainerInfo base, SourcePositionInfo sp) {
+    ParamTagInfo(String name, String kind, String text, String attributeName, boolean isOptional, String defaultValue,
+                 boolean isProcessorCallback, ContainerInfo base, SourcePositionInfo sp) {
         super(name, kind, text, base, sp);
 
         Matcher m = PATTERN.matcher(text);
@@ -49,6 +51,7 @@ public class ParamTagInfo extends ParsedTagInfo {
         mIsOptional = isOptional;
         mAttributeName = attributeName;
         mDefaultValue = defaultValue;
+        mIsProcessorCallback = isProcessorCallback;
         setCommentText(mParameterComment);
     }
 
@@ -102,6 +105,10 @@ public class ParamTagInfo extends ParsedTagInfo {
         return mIsOptional;
     }
 
+    public boolean isProcessorCallback() {
+        return mIsProcessorCallback;
+    }
+
     @Override
     public void makeHDF(Data data, String base) {
         data.setValue(base + ".name", parameterName());
@@ -109,15 +116,16 @@ public class ParamTagInfo extends ParsedTagInfo {
         data.setValue(base + ".optional", Boolean.toString(optional()));
         data.setValue(base + ".defaultValue", defaultValue());
         data.setValue(base + ".isTypeParameter", isTypeParameter() ? "1" : "0");
+        data.setValue(base + ".isProcessorCallback", isProcessorCallback() ? "1" : "0");
         TagInfo.makeHDF(data, base + ".comment", commentTags());
     }
 
     public static void makeHDF(Data data, String base, ParamTagInfo[] tags) {
         for (int i = 0; i < tags.length; i++) {
             // don't output if the comment is ""
-            if (!"".equals(tags[i].parameterComment())) {
+            //if (!"".equals(tags[i].parameterComment())) {
                 tags[i].makeHDF(data, base + "." + i);
-            }
+            //}
         }
     }
 }

@@ -120,7 +120,6 @@ public class SampleTagInfo extends TagInfo {
         String end = END_INCLUDE + "(" + id + ")";
 
         try {
-            System.out.println("CWD: " + System.getProperty("user.dir"));
             input = new FileReader(filename);
             LineNumberReader lines = new LineNumberReader(input);
 
