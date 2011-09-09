@@ -19,7 +19,9 @@ package org.mule.devkit.generation;
 
 import org.mule.api.annotations.Processor;
 
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
@@ -104,5 +106,20 @@ public class DevkitTypeElementImpl extends TypeElementImpl implements DevkitType
     @Override
     public List<ExecutableElement> getMethods() {
         return ElementFilter.methodsIn(typeElement.getEnclosedElements());
+    }
+
+    @Override
+    public boolean isInterface() {
+        return typeElement.getKind() == ElementKind.INTERFACE;
+    }
+
+    @Override
+    public boolean isParametrized() {
+        return !typeElement.getTypeParameters().isEmpty();
+    }
+
+    @Override
+    public boolean isPublic() {
+        return typeElement.getModifiers().contains(Modifier.PUBLIC);
     }
 }

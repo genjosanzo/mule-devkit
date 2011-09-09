@@ -40,4 +40,10 @@ public interface DevkitTypeElement extends TypeElement {
     List<ExecutableElement> getMethods();
 
     boolean hasFieldAnnotatedWith(Class<? extends Annotation> annotation);
+
+    boolean isInterface();
+
+    boolean isParametrized();
+
+    boolean isPublic();
 }

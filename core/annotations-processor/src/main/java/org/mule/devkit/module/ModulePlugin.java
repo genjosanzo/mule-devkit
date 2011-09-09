@@ -42,7 +42,12 @@ import org.mule.devkit.module.generation.SpringSchemaGenerator;
 import org.mule.devkit.module.generation.StringProcessorCallbackGenerator;
 import org.mule.devkit.module.generation.StringToDateTransformerGenerator;
 import org.mule.devkit.module.generation.TransformerGenerator;
-import org.mule.devkit.module.validation.ModuleValidator;
+import org.mule.devkit.module.validation.BasicValidator;
+import org.mule.devkit.module.validation.OAuthValidator;
+import org.mule.devkit.module.validation.ProcessorValidator;
+import org.mule.devkit.module.validation.SessionValidator;
+import org.mule.devkit.module.validation.SourceValidator;
+import org.mule.devkit.module.validation.TransformerValidator;
 import org.mule.devkit.validation.Validator;
 
 import java.util.ArrayList;
@@ -80,7 +85,13 @@ public class ModulePlugin implements Plugin {
         generators.add(new RegistryBootstrapGenerator());
 
         validators = new ArrayList<Validator>();
-        validators.add(new ModuleValidator());
+        validators.add(new BasicValidator());
+        validators.add(new OAuthValidator());
+        validators.add(new ProcessorValidator());
+        validators.add(new SessionValidator());
+        validators.add(new SourceValidator());
+        validators.add(new TransformerValidator());
+
     }
 
     public List<Validator> getValidators() {
