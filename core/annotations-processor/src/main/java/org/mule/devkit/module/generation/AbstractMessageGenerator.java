@@ -19,8 +19,8 @@ package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleContext;
+import org.mule.api.annotations.NestedProcessor;
 import org.mule.api.annotations.callback.HttpCallback;
-import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.param.Session;
 import org.mule.api.construct.FlowConstruct;
@@ -183,7 +183,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
             FieldVariable field;
             FieldVariable fieldType;
-            if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
+            if (variable.asType().toString().contains(NestedProcessor.class.getName())) {
                 field = new FieldBuilder(messageProcessorClass).
                         privateVisibility().
                         type(Object.class).
@@ -260,7 +260,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             String fieldName = StringUtils.uncapitalize(methodName.substring(methodName.indexOf("set") + 3));
             TypeMirror fieldTypeMirror = method.getParameters().get(0).asType();
             FieldVariable field = null;
-            if (fieldTypeMirror.toString().contains(ProcessorCallback.class.getName())) {
+            if (fieldTypeMirror.toString().contains(NestedProcessor.class.getName())) {
                 field = transferObjectClass.field(Modifier.PRIVATE, ref(MessageProcessor.class), fieldName);
             } else {
                 field = transferObjectClass.field(Modifier.PRIVATE, ref(Object.class), fieldName);
@@ -310,7 +310,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
-                if (variableElement.getVariableElement().asType().toString().contains(ProcessorCallback.class.getName())) {
+                if (variableElement.getVariableElement().asType().toString().contains(NestedProcessor.class.getName())) {
                     Conditional ifInitialisable = initialise.body()._if(Op._instanceof(variableElement.getField(), ref(Initialisable.class)));
                     ifInitialisable._then().add(
                             ExpressionFactory.cast(ref(Initialisable.class), variableElement.getField()).invoke("initialise")
@@ -344,7 +344,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
-                if (variableElement.getVariableElement().asType().toString().contains(ProcessorCallback.class.getName())) {
+                if (variableElement.getVariableElement().asType().toString().contains(NestedProcessor.class.getName())) {
                     Conditional ifMuleContextAware = setMuleContext.body()._if(Op._instanceof(variableElement.getField(), ref(MuleContextAware.class)));
                     ifMuleContextAware._then().add(
                             ExpressionFactory.cast(ref(MuleContextAware.class), variableElement.getField()).invoke("setMuleContext").arg(muleContextParam)
@@ -371,7 +371,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
-                if (variableElement.getVariableElement().asType().toString().contains(ProcessorCallback.class.getName())) {
+                if (variableElement.getVariableElement().asType().toString().contains(NestedProcessor.class.getName())) {
                     Conditional ifMuleContextAware = setFlowConstruct.body()._if(Op._instanceof(variableElement.getField(), ref(FlowConstructAware.class)));
                     ifMuleContextAware._then().add(
                             ExpressionFactory.cast(ref(FlowConstructAware.class), variableElement.getField()).invoke("setFlowConstruct").arg(newFlowConstruct)

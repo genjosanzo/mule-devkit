@@ -25,10 +25,10 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.annotations.Module;
+import org.mule.api.annotations.NestedProcessor;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.callback.InterceptCallback;
-import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
@@ -206,7 +206,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         for (String fieldName : fields.keySet()) {
             FieldVariableElement variableElement = fields.get(fieldName);
 
-            if (variableElement.getVariableElement().asType().toString().contains(ProcessorCallback.class.getName())) {
+            if (variableElement.getVariableElement().asType().toString().contains(NestedProcessor.class.getName())) {
                 Conditional ifStartable = startMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Startable.class)));
                 ifStartable._then().add(
                         ExpressionFactory.cast(ref(Startable.class), variableElement.getField()).invoke("start")
@@ -224,7 +224,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         for (String fieldName : fields.keySet()) {
             FieldVariableElement variableElement = fields.get(fieldName);
 
-            if (variableElement.getVariableElement().asType().toString().contains(ProcessorCallback.class.getName())) {
+            if (variableElement.getVariableElement().asType().toString().contains(NestedProcessor.class.getName())) {
                 Conditional ifStoppable = stopMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Stoppable.class)));
                 ifStoppable._then().add(
                         ExpressionFactory.cast(ref(Stoppable.class), variableElement.getField()).invoke("stop")
@@ -241,7 +241,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         for (String fieldName : fields.keySet()) {
             FieldVariableElement variableElement = fields.get(fieldName);
 
-            if (variableElement.getVariableElement().asType().toString().contains(ProcessorCallback.class.getName())) {
+            if (variableElement.getVariableElement().asType().toString().contains(NestedProcessor.class.getName())) {
                 Conditional ifDisposable = diposeMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Disposable.class)));
                 ifDisposable._then().add(
                         ExpressionFactory.cast(ref(Disposable.class), variableElement.getField()).invoke("dispose")
@@ -654,12 +654,12 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 Invocation getAccessToken = object.invoke("get" + StringUtils.capitalize(OAuthAdapterGenerator.OAUTH_ACCESS_TOKEN_SECRET_FIELD_NAME));
                 Variable accessTokenSecret = callProcessor.body().decl(ref(String.class), "accessTokenSecret", getAccessToken);
                 parameters.add(accessTokenSecret);
-            } else if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
+            } else if (variable.asType().toString().contains(NestedProcessor.class.getName())) {
 
-                DefinedClass callbackClass = context.getClassForRole(ChainProcessorCallbackGenerator.ROLE);
-                DefinedClass stringCallbackClass = context.getClassForRole(StringProcessorCallbackGenerator.ROLE);
+                DefinedClass callbackClass = context.getClassForRole(NestedProcessorChainGenerator.ROLE);
+                DefinedClass stringCallbackClass = context.getClassForRole(NestedProcessorStringGenerator.ROLE);
 
-                Variable transformed = callProcessor.body().decl(ref(ProcessorCallback.class), "transformed" + StringUtils.capitalize(fieldName),
+                Variable transformed = callProcessor.body().decl(ref(NestedProcessor.class), "transformed" + StringUtils.capitalize(fieldName),
                         ExpressionFactory._null());
 
                 Conditional ifMessageProcessor = callProcessor.body()._if(Op.cand(

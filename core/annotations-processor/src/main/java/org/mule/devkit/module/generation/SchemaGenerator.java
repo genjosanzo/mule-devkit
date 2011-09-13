@@ -19,12 +19,12 @@ package org.mule.devkit.module.generation;
 
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
+import org.mule.api.annotations.NestedProcessor;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
 import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.callback.InterceptCallback;
-import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuthAccessToken;
@@ -320,7 +320,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         if (element.getKind() == ElementKind.METHOD) {
             int requiredChildElements = 0;
             for (VariableElement variable : element.getParameters()) {
-                if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
+                if (variable.asType().toString().contains(NestedProcessor.class.getName())) {
                     requiredChildElements++;
                 } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                     requiredChildElements++;
@@ -332,15 +332,15 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 if (ignoreParameter(variable)) {
                     continue;
                 }
-                if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
+                if (variable.asType().toString().contains(NestedProcessor.class.getName())) {
                     if( requiredChildElements == 1 ) {
                         Optional optional = variable.getAnnotation(Optional.class);
-                        GroupRef groupRef = generateProcessorCallbackGroup(optional);
+                        GroupRef groupRef = generateNestedProcessorGroup(optional);
                         complexContentExtension.setGroup(groupRef);
                         complexContentExtension.setAll(null);
                         complexContent.setMixed(true);
                     } else {
-                        generateProcessorCallbackElement(all, variable);
+                        generateNestedProcessorElement(all, variable);
                     }
                 } else if (variable.getAnnotation(Session.class) != null) {
                     // get the executable element for create session
@@ -381,7 +381,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return false;
     }
 
-    private void generateProcessorCallbackElement(All all, VariableElement variable) {
+    private void generateNestedProcessorElement(All all, VariableElement variable) {
         Optional optional = variable.getAnnotation(Optional.class);
 
         TopLevelElement collectionElement = new TopLevelElement();
@@ -396,15 +396,15 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         collectionElement.setMaxOccurs("1");
 
         LocalComplexType collectionComplexType = new LocalComplexType();
-        GroupRef group = generateProcessorCallbackGroup(optional);
+        GroupRef group = generateNestedProcessorGroup(optional);
 
         collectionComplexType.setGroup(group);
         collectionElement.setComplexType(collectionComplexType);
     }
 
-    private GroupRef generateProcessorCallbackGroup(Optional optional) {
+    private GroupRef generateNestedProcessorGroup(Optional optional) {
         GroupRef group = new GroupRef();
-        group.generateProcessorCallbackGroup(SchemaConstants.MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE);
+        group.generateNestedProcessorGroup(SchemaConstants.MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE);
         if (optional != null) {
             group.setMinOccurs(BigInteger.valueOf(0L));
         } else {

@@ -30,10 +30,10 @@ public class ParamTagInfo extends ParsedTagInfo {
     private boolean mIsOptional;
     private String mAttributeName;
     private String mDefaultValue;
-    private boolean mIsProcessorCallback;
+    private boolean mIsNestedProcessor;
 
     ParamTagInfo(String name, String kind, String text, String attributeName, boolean isOptional, String defaultValue,
-                 boolean isProcessorCallback, ContainerInfo base, SourcePositionInfo sp) {
+                 boolean isNestedProcessor, ContainerInfo base, SourcePositionInfo sp) {
         super(name, kind, text, base, sp);
 
         Matcher m = PATTERN.matcher(text);
@@ -51,7 +51,7 @@ public class ParamTagInfo extends ParsedTagInfo {
         mIsOptional = isOptional;
         mAttributeName = attributeName;
         mDefaultValue = defaultValue;
-        mIsProcessorCallback = isProcessorCallback;
+        mIsNestedProcessor = isNestedProcessor;
         setCommentText(mParameterComment);
     }
 
@@ -105,8 +105,8 @@ public class ParamTagInfo extends ParsedTagInfo {
         return mIsOptional;
     }
 
-    public boolean isProcessorCallback() {
-        return mIsProcessorCallback;
+    public boolean isNestedProcessor() {
+        return mIsNestedProcessor;
     }
 
     @Override
@@ -116,7 +116,7 @@ public class ParamTagInfo extends ParsedTagInfo {
         data.setValue(base + ".optional", Boolean.toString(optional()));
         data.setValue(base + ".defaultValue", defaultValue());
         data.setValue(base + ".isTypeParameter", isTypeParameter() ? "1" : "0");
-        data.setValue(base + ".isProcessorCallback", isProcessorCallback() ? "1" : "0");
+        data.setValue(base + ".isNestedProcessor", isNestedProcessor() ? "1" : "0");
         TagInfo.makeHDF(data, base + ".comment", commentTags());
     }
 

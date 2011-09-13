@@ -21,11 +21,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
+import org.mule.api.annotations.NestedProcessor;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.callback.InterceptCallback;
-import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.lifecycle.Disposable;
@@ -349,7 +349,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         int requiredChildElements = 0;
         for (VariableElement variable : executableElement.getParameters()) {
-            if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
+            if (variable.asType().toString().contains(NestedProcessor.class.getName())) {
                 requiredChildElements++;
             } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                 requiredChildElements++;
@@ -368,11 +368,11 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
             String fieldName = variable.getSimpleName().toString();
 
-            if (variable.asType().toString().contains(ProcessorCallback.class.getName())) {
+            if (variable.asType().toString().contains(NestedProcessor.class.getName())) {
                 if (requiredChildElements == 1) {
-                    generateParseProcessorCallback(parse.body(), element, parserContext, builder, fieldName, true);
+                    generateParseNestedProcessor(parse.body(), element, parserContext, builder, fieldName, true);
                 } else {
-                    generateParseProcessorCallback(parse.body(), element, parserContext, builder, fieldName, false);
+                    generateParseNestedProcessor(parse.body(), element, parserContext, builder, fieldName, false);
                 }
             } else if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
                 generateParseSupportedType(parse.body(), element, builder, fieldName);
@@ -477,7 +477,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         return definition;
     }
 
-    private void generateParseProcessorCallback(Block block, Variable element, Variable parserContext, Variable builder, String fieldName, boolean skipElement) {
+    private void generateParseNestedProcessor(Block block, Variable element, Variable parserContext, Variable builder, String fieldName, boolean skipElement) {
 
         Variable elements = element;
         if (!skipElement) {

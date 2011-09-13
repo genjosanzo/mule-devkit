@@ -502,7 +502,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
 
             String[] names = new String[N];
             boolean[] optional = new boolean[N];
-            boolean[] processorCallback = new boolean[N];
+            boolean[] nestedProcessor = new boolean[N];
             String[] defaultValue = new String[N];
             String[] attributeName = new String[N];
             String[] comments = new String[N];
@@ -512,12 +512,12 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
             // our parent's names.
             for (int i = 0; i < N; i++) {
                 attributeName[i] = mParameters[i].name();
-                processorCallback[i] = false;
+                nestedProcessor[i] = false;
                 if (mParameters[i].typeName().contains("HttpCallback")) {
                     attributeName[i] += "-flow-ref";
                 }
-                if (mParameters[i].typeName().contains("ProcessorCallback")) {
-                    processorCallback[i] = true;
+                if (mParameters[i].typeName().contains("NestedProcessor")) {
+                    nestedProcessor[i] = true;
                 }
                 optional[i] = false;
                 defaultValue[i] = "";
@@ -572,7 +572,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
             for (int i = 0; i < N; i++) {
                 mParamTags[i] =
                         new ParamTagInfo("@param", "@param", names[i] + " " + comments[i], attributeName[i],
-                                optional[i], defaultValue[i], processorCallback[i], parent(), positions[i]);
+                                optional[i], defaultValue[i], nestedProcessor[i], parent(), positions[i]);
 
                 // while we're here, if we find any parameters that are still undocumented at this
                 // point, complain. (this warning is off by default, because it's really, really

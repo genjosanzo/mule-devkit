@@ -17,7 +17,7 @@
 
 package org.mule.devkit.module.generation;
 
-import org.mule.api.annotations.callback.ProcessorCallback;
+import org.mule.api.annotations.NestedProcessor;
 import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
@@ -30,19 +30,19 @@ import org.mule.devkit.model.code.Variable;
 import javax.lang.model.element.TypeElement;
 import java.util.Map;
 
-public class StringProcessorCallbackGenerator extends AbstractModuleGenerator {
+public class NestedProcessorStringGenerator extends AbstractModuleGenerator {
 
-    public static final String ROLE = "StringProcessorCallback";
+    public static final String ROLE = "NestedProcessorString";
 
     @Override
     protected boolean shouldGenerate(DevkitTypeElement typeElement) {
-        return typeElement.hasProcessorMethodWithParameter(ProcessorCallback.class);
+        return typeElement.hasProcessorMethodWithParameter(NestedProcessor.class);
     }
 
     @Override
     protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
-        DefinedClass callbackClass = getProcessorCallbackClass(typeElement);
-        callbackClass._implements(ref(ProcessorCallback.class));
+        DefinedClass callbackClass = getNestedProcessorStringClass(typeElement);
+        callbackClass._implements(ref(NestedProcessor.class));
 
         FieldVariable output = callbackClass.field(Modifier.PRIVATE, ref(String.class), "output");
         output.javadoc().add("Output string to be returned on process");
@@ -101,8 +101,8 @@ public class StringProcessorCallbackGenerator extends AbstractModuleGenerator {
         constructor.body().assign(ExpressionFactory._this().ref(output), output2);
     }
 
-    private DefinedClass getProcessorCallbackClass(TypeElement type) {
-        String processorCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, ".config.spring", "StringProcessorCallback");
+    private DefinedClass getNestedProcessorStringClass(TypeElement type) {
+        String processorCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, ".config.spring", "NestedProcessorString");
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(processorCallbackClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(processorCallbackClassName));
 

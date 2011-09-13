@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-package org.mule.api.annotations.callback;
+package org.mule.api.annotations;
 
 import java.util.Map;
 
 /**
  * Callback interface used by {@link org.mule.api.annotations.Processor} annotated methods.
  *
- * The method paremeters of type {@link ProcessorCallback} will be able to receive other
+ * The method paremeters of type {@link NestedProcessor} will be able to receive other
  * message processors. The {@link org.mule.api.annotations.Processor} annotated method
  * can use the process method to execute them.
  */
-public interface ProcessorCallback {
+public interface NestedProcessor {
     /**
      * Dispatch original message to the processor chain
      *

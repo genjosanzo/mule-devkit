@@ -19,7 +19,7 @@ package org.mule.devkit.it;
 
 import java.io.File;
 
-public class ProcessorCallbackIT extends AbstractMavenIT
+public class NestedProcessorIT extends AbstractMavenIT
 {
 
     protected String getArtifactVersion()
@@ -29,7 +29,7 @@ public class ProcessorCallbackIT extends AbstractMavenIT
 
     protected String getArtifactId()
     {
-        return "processor-callback-integration-test";
+        return "nested-processor-integration-test";
     }
 
     protected String getGroupId()

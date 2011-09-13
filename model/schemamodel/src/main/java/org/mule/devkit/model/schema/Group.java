@@ -234,7 +234,7 @@ public abstract class Group
      *     {@link QName }
      *     
      */
-    public void generateProcessorCallbackGroup(QName value) {
+    public void generateNestedProcessorGroup(QName value) {
         this.ref = value;
     }
 
