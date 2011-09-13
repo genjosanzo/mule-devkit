@@ -15,11 +15,24 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.validation;
+package org.mule.devkit.module.validation;
 
+import org.mule.api.annotations.Module;
 import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.validation.ValidationException;
+import org.mule.devkit.validation.Validator;
 
-public interface Validator {
+public class TransformerValidator implements Validator {
 
-    void validate(DevkitTypeElement typeElement) throws ValidationException;
+    @Override
+    public void validate(DevkitTypeElement typeElement) throws ValidationException {
+        if (!typeElement.hasAnnotation(Module.class)) {
+            return;
+        }
+
+        // TODO implement
+
+        // verify that every @Transformer is public and non-static and non-generic
+        // verify that every @Transformer signature is Object x(Object);
+    }
 }
