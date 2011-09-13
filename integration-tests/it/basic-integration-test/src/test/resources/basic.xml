@@ -29,6 +29,10 @@
 
     <basic:config/>
 
+    <spring:bean id="refObject" class="org.mule.devkit.it.MyComplexObject">
+        <spring:property name="value" value="MuleSoft$"/>
+    </spring:bean>
+
     <flow name="passthruCharFlow">
         <basic:passthru-char value="c"/>
     </flow>
@@ -55,6 +59,10 @@
 
     <flow name="passthruEnumFlow">
         <basic:passthru-enum mode="In"/>
+    </flow>
+
+    <flow name="passthruComplexRef">
+        <basic:passthru-complex-ref myComplexObject-ref="refObject"/>
     </flow>
 
 </mule>

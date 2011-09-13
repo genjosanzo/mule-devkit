@@ -420,6 +420,16 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 Variable callbackFlowName = parse.body().decl(ref(String.class), fieldName + "CallbackFlowName", ExpressionFactory.invoke(getAttributeValue).arg(element).arg(context.getNameUtils().uncamel(fieldName) + "-flow-ref"));
                 Block block = parse.body()._if(Op.ne(callbackFlowName, ExpressionFactory._null()))._then();
                 block.invoke(builder, "addPropertyValue").arg(fieldName + "CallbackFlow").arg(ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(callbackFlowName));
+            } else {
+                // not supported use the -ref approach
+                Invocation getAttribute = element.invoke("getAttribute").arg(fieldName + "-ref");
+                Conditional ifNotNull = parse.body()._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
+                        Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(
+                                getAttribute
+                        ))));
+                ifNotNull._then().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
+                        ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(element.invoke("getAttribute").arg(fieldName + "-ref"))
+                ));
             }
         }
 
