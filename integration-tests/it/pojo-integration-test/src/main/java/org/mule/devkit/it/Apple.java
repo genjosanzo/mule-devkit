@@ -17,7 +17,7 @@
 
 package org.mule.devkit.it;
 
-import org.mule.api.annotations.callback.ProcessorCallback;
+import org.mule.api.annotations.NestedProcessor;
 import org.mule.api.annotations.param.Optional;
 
 public interface Apple {
@@ -32,8 +32,8 @@ public interface Apple {
     @Optional
     void setWeight(int weight);
 
-    ProcessorCallback getWhenBitten();
+    NestedProcessor getWhenBitten();
 
     @Optional
-    public void setWhenBitten(ProcessorCallback whenBitten);
+    public void setWhenBitten(NestedProcessor whenBitten);
 }

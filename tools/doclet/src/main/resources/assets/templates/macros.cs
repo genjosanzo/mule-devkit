@@ -255,7 +255,7 @@ def:op_description(obj) ?><?cs
       <td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i>Specify which configuration to use.</td></tr>
           <?cs set:count = #2 ?>
           <?cs each:attribute=obj.paramTags ?>
-            <?cs if:attribute.isProcessorCallback=="0" ?>
+            <?cs if:attribute.isNestedProcessor=="0" ?>
             <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
                 <td class="jd-linkcol"><nobr><?cs var:attribute.attributeName ?></nobr></td>
                 <td class="jd-descrcol"><?cs var:attribute.defaultValue ?></td>
@@ -272,7 +272,7 @@ def:op_description(obj) ?><?cs
       <table class="jd-tagtable">
           <?cs set:count = #2 ?>
           <?cs each:attribute=obj.paramTags ?>
-            <?cs if:attribute.isProcessorCallback=="1" ?>
+            <?cs if:attribute.isNestedProcessor=="1" ?>
             <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
                 <td class="jd-linkcol"><nobr><?cs var:attribute.attributeName ?></nobr></td>
                 <td class="jd-descrcol"><?cs var:attribute.defaultValue ?></td>

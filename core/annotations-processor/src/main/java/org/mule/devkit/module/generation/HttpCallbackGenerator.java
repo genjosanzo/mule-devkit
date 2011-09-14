@@ -58,7 +58,7 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
     public static final String HTTP_CALLBACK_ROLE = "HttpCallback";
     public static final String PORT_FIELD_NAME = "port";
     public static final String DOMAIN_FIELD_NAME = "domain";
-    private static final String CLASS_NAME = "DefaultPortHttpCallback";
+    private static final String CLASS_NAME = "DefaultHttpCallback";
     private static final String INBOUND_ENDPOINT_EXCHANGE_PATTERN = "REQUEST_RESPONSE";
     private Method buildUrlMethod;
     private FieldVariable muleContextField;
@@ -84,7 +84,7 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
 
     @Override
     protected void doGenerate(DevkitTypeElement typeElement) {
-        DefinedClass callbackClass = getProcessorCallbackClass(typeElement);
+        DefinedClass callbackClass = getDefaultHttpCallbackClass(typeElement);
         generateFields(callbackClass);
         generateConstructorArgSimpleFlowConstruct(callbackClass);
         generateConstructorArgMessageProcessor(callbackClass);
@@ -284,7 +284,7 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
         processMethod.body()._return(ExpressionFactory.invoke(callbackFlowField, "process").arg(processMethod.params().get(0)));
     }
 
-    private DefinedClass getProcessorCallbackClass(TypeElement type) {
+    private DefinedClass getDefaultHttpCallbackClass(TypeElement type) {
         String httpCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, ".config.spring", CLASS_NAME);
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(httpCallbackClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(httpCallbackClassName), new Class[]{HttpCallback.class});

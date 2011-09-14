@@ -19,28 +19,28 @@ package org.mule.devkit.it;
 
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
-import org.mule.api.annotations.callback.ProcessorCallback;
+import org.mule.api.annotations.NestedProcessor;
 import org.mule.api.annotations.param.Optional;
 
 import java.util.List;
 
 @Module(name = "callback")
-public class ProcessorCallbackModule
+public class NestedProcessorModule
 {
     @Processor
-    public Object callbackWithPayload(ProcessorCallback innerProcessor) throws Exception
+    public Object callbackWithPayload(NestedProcessor innerProcessor) throws Exception
     {
 		return innerProcessor.process("payload");
     }
 
     @Processor
-    public Object callback(@Optional ProcessorCallback innerProcessor) throws Exception
+    public Object callback(@Optional NestedProcessor innerProcessor) throws Exception
     {
 		return innerProcessor.process();
     }
 
     @Processor
-    public Object processItems(List<String> items, ProcessorCallback processors) throws Exception
+    public Object processItems(List<String> items, NestedProcessor processors) throws Exception
     {
 		return processors.process();
     }

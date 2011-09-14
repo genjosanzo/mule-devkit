@@ -17,32 +17,28 @@
 
 package org.mule.devkit.it;
 
-public class ProcessorCallbackModuleTest extends AbstractModuleTest
+import java.io.File;
+
+public class NestedProcessorIT extends AbstractMavenIT
 {
 
-    @Override
-    protected String getConfigResources()
+    protected String getArtifactVersion()
     {
-        return "callback.xml";
+        return "1.0";
     }
 
-    public void testCallback() throws Exception
+    protected String getArtifactId()
     {
-        runFlow("callback", "mulesoft");
+        return "nested-processor-integration-test";
     }
 
-    public void testCallbackWithString() throws Exception
+    protected String getGroupId()
     {
-        runFlow("callbackWithString", "mulesoft");
+        return "org.mule.devkit.it";
     }
 
-    public void testProcessItems() throws Exception
+    protected File getRoot()
     {
-        runFlowWithPayload("processItems", "payload", "payload");
-    }
-
-    public void testCallbackWithPayload() throws Exception
-    {
-        runFlowWithPayload("callbackWithPayload", "payload", "payload");
+        return new File("target/integration-tests/" + getArtifactId());
     }
 }

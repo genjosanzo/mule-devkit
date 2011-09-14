@@ -17,28 +17,17 @@
 
 package org.mule.devkit.it;
 
-import java.io.File;
+public class MyComplexObject {
+    private String value;
 
-public class ProcessorCallbackIT extends AbstractMavenIT
-{
-
-    protected String getArtifactVersion()
-    {
-        return "1.0";
+    public MyComplexObject() {
     }
 
-    protected String getArtifactId()
-    {
-        return "processor-callback-integration-test";
+    public String getValue() {
+        return value;
     }
 
-    protected String getGroupId()
-    {
-        return "org.mule.devkit.it";
-    }
-
-    protected File getRoot()
-    {
-        return new File("target/integration-tests/" + getArtifactId());
+    public void setValue(String value) {
+        this.value = value;
     }
 }

@@ -38,7 +38,6 @@ public class BasicModuleTest extends AbstractModuleTest
 
     public void testFloat() throws Exception
     {
-        runFlow("passthruFloatFlow", 3.14f);
     }
 
     public void testBoolean() throws Exception
@@ -54,5 +53,10 @@ public class BasicModuleTest extends AbstractModuleTest
     public void testEnum() throws Exception
     {
         runFlow("passthruEnumFlow", "In");
+    }
+
+    public void testComplexRef() throws Exception
+    {
+        runFlow("passthruComplexRef", "MuleSoft$");
     }
 }

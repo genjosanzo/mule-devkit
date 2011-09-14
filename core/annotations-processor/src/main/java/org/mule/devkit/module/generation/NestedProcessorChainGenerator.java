@@ -22,7 +22,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.annotations.callback.ProcessorCallback;
+import org.mule.api.annotations.NestedProcessor;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.devkit.generation.DevkitTypeElement;
@@ -38,19 +38,19 @@ import org.mule.devkit.model.code.Variable;
 import javax.lang.model.element.TypeElement;
 import java.util.Map;
 
-public class ChainProcessorCallbackGenerator extends AbstractModuleGenerator {
+public class NestedProcessorChainGenerator extends AbstractModuleGenerator {
 
-    public static final String ROLE = "ChainProcessorCallback";
+    public static final String ROLE = "NestedProcessorChain";
 
     @Override
     protected boolean shouldGenerate(DevkitTypeElement typeElement) {
-        return typeElement.hasProcessorMethodWithParameter(ProcessorCallback.class);
+        return typeElement.hasProcessorMethodWithParameter(NestedProcessor.class);
     }
 
     @Override
     protected void doGenerate(DevkitTypeElement typeElement) {
-        DefinedClass callbackClass = getProcessorCallbackClass(typeElement);
-        callbackClass._implements(ref(ProcessorCallback.class));
+        DefinedClass callbackClass = getNestedProcessorChainClass(typeElement);
+        callbackClass._implements(ref(NestedProcessor.class));
 
         FieldVariable muleContext = callbackClass.field(Modifier.PRIVATE, ref(MuleContext.class), "muleContext");
         muleContext.javadoc().add("Mule Context");
@@ -174,8 +174,8 @@ public class ChainProcessorCallbackGenerator extends AbstractModuleGenerator {
         constructor.body().assign(ExpressionFactory._this().ref(muleContext), muleContext2);
     }
 
-    private DefinedClass getProcessorCallbackClass(TypeElement typeElement) {
-        String processorCallbackClassName = context.getNameUtils().generateClassNameInPackage(typeElement, ".config.spring", "ChainProcessorCallback");
+    private DefinedClass getNestedProcessorChainClass(TypeElement typeElement) {
+        String processorCallbackClassName = context.getNameUtils().generateClassNameInPackage(typeElement, ".config.spring", "NestedProcessorChain");
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(processorCallbackClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(processorCallbackClassName), new Class[]{MuleContextAware.class});
 
