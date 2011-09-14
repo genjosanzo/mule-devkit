@@ -19,7 +19,6 @@ package org.mule.devkit.module.generation;
 
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
-import org.mule.api.annotations.NestedProcessor;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
@@ -321,7 +320,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         if (element.getKind() == ElementKind.METHOD) {
             int requiredChildElements = 0;
             for (VariableElement variable : element.getParameters()) {
-                if (variable.asType().toString().contains(NestedProcessor.class.getName())) {
+                if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
                     requiredChildElements++;
                 } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                     requiredChildElements++;
@@ -333,7 +332,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 if (ignoreParameter(variable)) {
                     continue;
                 }
-                if (variable.asType().toString().contains(NestedProcessor.class.getName())) {
+                if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
                     if( requiredChildElements == 1 ) {
                         Optional optional = variable.getAnnotation(Optional.class);
                         GroupRef groupRef = generateNestedProcessorGroup(optional);

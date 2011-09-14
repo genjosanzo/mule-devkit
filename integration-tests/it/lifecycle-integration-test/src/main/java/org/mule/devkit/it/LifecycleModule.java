@@ -23,9 +23,6 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.lifecycle.Start;
 
 import javax.annotation.PostConstruct;
-import java.lang.Exception;
-import java.lang.RuntimeException;
-import java.lang.String;
 
 @Module(name = "lifecycle")
 public class LifecycleModule

@@ -48,6 +48,7 @@ import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
+import org.mule.devkit.model.code.ForEach;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
@@ -68,6 +69,7 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
@@ -310,11 +312,21 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
-                if (variableElement.getVariableElement().asType().toString().contains(NestedProcessor.class.getName())) {
-                    Conditional ifInitialisable = initialise.body()._if(Op._instanceof(variableElement.getField(), ref(Initialisable.class)));
-                    ifInitialisable._then().add(
-                            ExpressionFactory.cast(ref(Initialisable.class), variableElement.getField()).invoke("initialise")
-                    );
+                if (context.getTypeMirrorUtils().isNestedProcessor(variableElement.getVariableElement().asType())) {
+                    boolean isList = context.getTypeMirrorUtils().isArrayOrList(variableElement.getVariableElement().asType());
+
+                    if (!isList) {
+                        Conditional ifInitialisable = initialise.body()._if(Op._instanceof(variableElement.getField(), ref(Initialisable.class)));
+                        ifInitialisable._then().add(
+                                ExpressionFactory.cast(ref(Initialisable.class), variableElement.getField()).invoke("initialise")
+                        );
+                    } else {
+                        Conditional ifIsList = initialise.body()._if(Op._instanceof(variableElement.getField(), ref(List.class)));
+                        ForEach forEachProcessor = ifIsList._then().forEach(ref(MessageProcessor.class), "messageProcessor", ExpressionFactory.cast(ref(List.class).narrow(MessageProcessor.class), fields.get(fieldName).getField()));
+                        forEachProcessor.body().add(
+                                ExpressionFactory.cast(ref(Initialisable.class), forEachProcessor.var()).invoke("initialise")
+                        );
+                    }
                 } else if (variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
                     FieldVariable callbackFlowName = fields.get(fieldName).getField();
                     Block ifCallbackFlowNameIsNull = initialise.body()._if(Op.ne(callbackFlowName, ExpressionFactory._null()))._then();
@@ -344,11 +356,22 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
-                if (variableElement.getVariableElement().asType().toString().contains(NestedProcessor.class.getName())) {
-                    Conditional ifMuleContextAware = setMuleContext.body()._if(Op._instanceof(variableElement.getField(), ref(MuleContextAware.class)));
-                    ifMuleContextAware._then().add(
-                            ExpressionFactory.cast(ref(MuleContextAware.class), variableElement.getField()).invoke("setMuleContext").arg(muleContextParam)
-                    );
+                if (context.getTypeMirrorUtils().isNestedProcessor(variableElement.getVariableElement().asType())) {
+                    boolean isList = context.getTypeMirrorUtils().isArrayOrList(variableElement.getVariableElement().asType());
+
+                    if (!isList) {
+                        Conditional ifMuleContextAware = setMuleContext.body()._if(Op._instanceof(variableElement.getField(), ref(MuleContextAware.class)));
+                        ifMuleContextAware._then().add(
+                                ExpressionFactory.cast(ref(MuleContextAware.class), variableElement.getField()).invoke("setMuleContext").arg(muleContextParam)
+                        );
+                    } else {
+                        Conditional ifIsList = setMuleContext.body()._if(Op._instanceof(variableElement.getField(), ref(List.class)));
+                        ForEach forEachProcessor = ifIsList._then().forEach(ref(MessageProcessor.class), "messageProcessor", ExpressionFactory.cast(ref(List.class).narrow(MessageProcessor.class), fields.get(fieldName).getField()));
+                        Conditional ifMuleContextAware = forEachProcessor.body()._if(Op._instanceof(forEachProcessor.var(), ref(MuleContextAware.class)));
+                        ifMuleContextAware._then().add(
+                                ExpressionFactory.cast(ref(MuleContextAware.class), forEachProcessor.var()).invoke("setMuleContext").arg(muleContextParam)
+                        );
+                    }
                 }
             }
         }
@@ -371,11 +394,23 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
 
-                if (variableElement.getVariableElement().asType().toString().contains(NestedProcessor.class.getName())) {
-                    Conditional ifMuleContextAware = setFlowConstruct.body()._if(Op._instanceof(variableElement.getField(), ref(FlowConstructAware.class)));
-                    ifMuleContextAware._then().add(
-                            ExpressionFactory.cast(ref(FlowConstructAware.class), variableElement.getField()).invoke("setFlowConstruct").arg(newFlowConstruct)
-                    );
+                if (context.getTypeMirrorUtils().isNestedProcessor(variableElement.getVariableElement().asType())) {
+                    boolean isList = context.getTypeMirrorUtils().isArrayOrList(variableElement.getVariableElement().asType());
+
+                    if (!isList) {
+                        Conditional ifMuleContextAware = setFlowConstruct.body()._if(Op._instanceof(variableElement.getField(), ref(FlowConstructAware.class)));
+                        ifMuleContextAware._then().add(
+                                ExpressionFactory.cast(ref(FlowConstructAware.class), variableElement.getField()).invoke("setFlowConstruct").arg(newFlowConstruct)
+                        );
+                    } else {
+                        Conditional ifIsList = setFlowConstruct.body()._if(Op._instanceof(variableElement.getField(), ref(List.class)));
+                        ForEach forEachProcessor = ifIsList._then().forEach(ref(MessageProcessor.class), "messageProcessor", ExpressionFactory.cast(ref(List.class).narrow(MessageProcessor.class), fields.get(fieldName).getField()));
+                        Conditional ifMuleContextAware = forEachProcessor.body()._if(Op._instanceof(forEachProcessor.var(), ref(FlowConstructAware.class)));
+                        ifMuleContextAware._then().add(
+                                ExpressionFactory.cast(ref(FlowConstructAware.class), forEachProcessor.var()).invoke("setFlowConstruct").arg(newFlowConstruct)
+                        );
+
+                    }
                 }
             }
         }

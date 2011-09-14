@@ -18,36 +18,46 @@
 package org.mule.devkit.it;
 
 import org.mule.api.annotations.Module;
-import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.NestedProcessor;
+import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.param.Optional;
 
 import java.util.List;
 
 @Module(name = "callback")
-public class NestedProcessorModule
-{
+public class NestedProcessorModule {
     @Processor
-    public Object callbackWithPayload(NestedProcessor innerProcessor) throws Exception
-    {
-		return innerProcessor.process("payload");
+    public Object callbackWithPayload(NestedProcessor innerProcessor) throws Exception {
+        return innerProcessor.process("payload");
     }
 
     @Processor
-    public Object callback(@Optional NestedProcessor innerProcessor) throws Exception
-    {
-		return innerProcessor.process();
+    public Object callback(@Optional NestedProcessor innerProcessor) throws Exception {
+        return innerProcessor.process();
     }
 
     @Processor
-    public Object processItems(List<String> items, NestedProcessor processors) throws Exception
-    {
-		return processors.process();
+    public Object callbackList(@Optional List<NestedProcessor> innerProcessor) throws Exception {
+        return innerProcessor.get(0).process();
     }
 
-	@Processor
-	public String setPayload(String payload) {
-		return payload;
-	}
+    @Processor
+    public Object processItems(List<String> items, NestedProcessor processors) throws Exception {
+        return processors.process();
+    }
+
+    @Processor
+    public Object processItemsOneByOne(List<String> items, List<NestedProcessor> processors) throws Exception {
+        for (NestedProcessor nestedProcessor : processors) {
+            nestedProcessor.process();
+        }
+
+        return processors.size();
+    }
+
+    @Processor
+    public String setPayload(String payload) {
+        return payload;
+    }
 
 }

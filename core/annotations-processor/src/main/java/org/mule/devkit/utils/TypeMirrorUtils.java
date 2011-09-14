@@ -17,6 +17,7 @@
 
 package org.mule.devkit.utils;
 
+import org.mule.api.annotations.NestedProcessor;
 import org.mule.devkit.module.generation.SchemaTypeConversion;
 
 import javax.lang.model.element.ElementKind;
@@ -91,6 +92,23 @@ public final class TypeMirrorUtils {
 
     public boolean isCollection(TypeMirror type) {
         return isArrayOrList(type) || isMap(type);
+    }
+
+    public boolean isNestedProcessor(TypeMirror type) {
+        if( type.toString().contains(NestedProcessor.class.getName()) )
+            return true;
+
+        if (type.toString().contains(java.util.List.class.getName())) {
+            DeclaredType variableType = (DeclaredType) type;
+            java.util.List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
+            if( variableTypeParameters.size() == 0 )
+                return false;
+
+            if( variableTypeParameters.get(0).toString().contains(NestedProcessor.class.getName()) )
+                return true;
+        }
+
+        return false;
     }
 
     public boolean isArrayOrList(TypeMirror type) {

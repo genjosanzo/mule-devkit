@@ -20,8 +20,6 @@ package org.mule.devkit.it;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 
-import java.lang.String;
-
 @Module(name = "basic")
 public class BasicModule
 {
