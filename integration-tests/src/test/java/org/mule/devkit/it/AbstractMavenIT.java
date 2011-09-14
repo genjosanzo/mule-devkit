@@ -19,6 +19,7 @@ package org.mule.devkit.it;
 
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
+import org.apache.maven.it.util.IOUtil;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,6 +29,14 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public abstract class AbstractMavenIT {
+
+    protected abstract String getArtifactVersion();
+
+    protected abstract String getArtifactId();
+
+    protected abstract String getGroupId();
+
+    protected abstract File getRoot();
 
     @Before
     public void setUp() throws VerificationException, IOException {
@@ -40,35 +49,30 @@ public abstract class AbstractMavenIT {
         verifier.deleteDirectory(getArtifactId());
     }
 
-    protected abstract String getArtifactVersion();
-
-    protected abstract String getArtifactId();
-
-    protected abstract String getGroupId();
-
-    protected abstract File getRoot();
-
     @Test
     public void buildExecutable() throws VerificationException {
+        InputStream systemPropertiesStream = null;
         try {
             Verifier verifier = new Verifier(getRoot().getAbsolutePath(), null, true);
             verifier.setAutoclean(false);
             verifier.setMavenDebug(true);
             verifier.setDebug(true);
 
-            InputStream systemPropertiesStream = getClass().getClassLoader().getResourceAsStream("maven.properties");
+            systemPropertiesStream = getClass().getClassLoader().getResourceAsStream("maven.properties");
             Properties systemProperties = new Properties();
             systemProperties.load(systemPropertiesStream);
-            systemPropertiesStream.close();
 
             verifier.setSystemProperties(systemProperties);
             verifier.getCliOptions().add("-o");
 
+            verifier.executeGoal("clean");
             verifier.executeGoal("package");
 
             verifier.verifyErrorFreeLog();
         } catch (IOException ioe) {
             throw new VerificationException(ioe);
+        } finally {
+            IOUtil.close(systemPropertiesStream);
         }
     }
 }
