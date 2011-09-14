@@ -30,23 +30,23 @@
     <callback:config/>
 
     <flow name="callback">
-		<callback:callback>
+        <callback:callback>
             <callback:set-payload payload="mulesoft"/>
-		</callback:callback>
+        </callback:callback>
     </flow>
 
     <flow name="callbackWithString">
-		<callback:callback>mulesoft</callback:callback>
+        <callback:callback>mulesoft</callback:callback>
     </flow>
 
     <flow name="callbackListWithString">
-		<callback:callback-list>mulesoft</callback:callback-list>
+        <callback:callback-list>mulesoft</callback:callback-list>
     </flow>
 
     <flow name="callbackWithPayload">
-		<callback:callback-with-payload>
+        <callback:callback-with-payload>
             <callback:set-payload payload="#[payload]"/>
-		</callback:callback-with-payload>
+        </callback:callback-with-payload>
     </flow>
 
     <flow name="processItems">
@@ -69,8 +69,10 @@
             </callback:items>
             <callback:processors>
                 <callback:set-payload payload="mulesoft"/>
-                <callback:set-payload payload="muleion"/>
                 <callback:set-payload payload="ftw!"/>
+                <expression-transformer>
+                    <return-argument expression="Hello Mule!" evaluator="string"/>
+                </expression-transformer>
             </callback:processors>
         </callback:process-items-one-by-one>
     </flow>
