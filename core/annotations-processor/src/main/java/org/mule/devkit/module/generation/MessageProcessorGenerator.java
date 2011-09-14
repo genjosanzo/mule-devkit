@@ -30,6 +30,7 @@ import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.callback.InterceptCallback;
 import org.mule.api.annotations.callback.ProcessorCallback;
 import org.mule.api.annotations.oauth.OAuth;
+import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.param.InboundHeaders;
@@ -555,10 +556,11 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             poolObject = process.body().decl(poolObjectClass, "poolObject", ExpressionFactory._null());
         }
 
-        if (executableElement.getEnclosingElement().getAnnotation(OAuth.class) != null) {
+        if (executableElement.getEnclosingElement().getAnnotation(OAuth.class) != null ||
+            executableElement.getEnclosingElement().getAnnotation(OAuth2.class) != null) {
             for (VariableElement variable : executableElement.getParameters()) {
                 if (variable.getAnnotation(OAuthAccessToken.class) != null || variable.getAnnotation(OAuthAccessTokenSecret.class) != null) {
-                    addOauth(process, event, object);
+                    addOauth(process, event, object, executableElement);
                     break;
                 }
             }
@@ -809,7 +811,13 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
     }
 
-    private void addOauth(Method process, Variable event, FieldVariable object) {
+    private void addOauth(Method process, Variable event, FieldVariable object, ExecutableElement executableElement) {
+        OAuth2 oauth2 = executableElement.getEnclosingElement().getAnnotation(OAuth2.class);
+        if(oauth2 != null && !StringUtils.isEmpty(oauth2.expirationRegex())) {
+            Block ifTokenExpired = process.body()._if(object.invoke(OAuth2AdapterGenerator.HAS_TOKEN_EXPIRED_METHOD_NAME))._then();
+            ifTokenExpired.invoke(object, OAuth2AdapterGenerator.RESET_METHOD_NAME);
+        }
+
         Invocation oauthVerifier = object.invoke("get" + StringUtils.capitalize(OAuthAdapterGenerator.OAUTH_VERIFIER_FIELD_NAME));
         Block ifOauthVerifierIsNull = process.body()._if(isNull(oauthVerifier))._then();
         Variable authorizationUrl = ifOauthVerifierIsNull.decl(ref(String.class), "authorizationUrl", ExpressionFactory.invoke(object, OAuthAdapterGenerator.GET_AUTHORIZATION_URL_METHOD_NAME));

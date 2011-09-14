@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Mule Development Kit
+    Copyright 2010-2011 (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:oauth="http://www.mulesoft.org/schema/mule/oauth"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+        http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/1.0/mule-oauth.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd">
+
+    <oauth:config consumerKey="consumerKey123" consumerSecret="consumerSecret123">
+        <oauth:http-callback-config domain="localhost" port="${http.port}" />
+    </oauth:config>
+
+    <flow name="protectedResource">
+        <oauth:protected-resource/>
+    </flow>
+
+    <flow name="nonProtectedResource">
+        <oauth:non-protected-resource/>
+    </flow>
+
+    <flow name="accessToken">
+        <http:inbound-endpoint host="localhost" port="9098" path="accessToken" exchange-pattern="request-response" />
+        <component class="org.mule.devkit.it.AccessTokenComponent"/>
+    </flow>
+
+</mule>

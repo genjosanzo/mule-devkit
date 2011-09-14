@@ -24,6 +24,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.oauth.OAuth;
+import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -72,10 +73,13 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
     private FieldVariable callbackMessageProcessorField;
     private FieldVariable domainField;
     private FieldVariable localUrlField;
+    private FieldVariable callbackPathField;
 
     @Override
     protected boolean shouldGenerate(DevkitTypeElement typeElement) {
-        return typeElement.hasAnnotation(OAuth.class) || typeElement.hasProcessorMethodWithParameter(HttpCallback.class);
+        return typeElement.hasAnnotation(OAuth.class) ||
+               typeElement.hasAnnotation(OAuth2.class) ||
+               typeElement.hasProcessorMethodWithParameter(HttpCallback.class);
     }
 
     @Override
@@ -84,6 +88,7 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
         generateFields(callbackClass);
         generateConstructorArgSimpleFlowConstruct(callbackClass);
         generateConstructorArgMessageProcessor(callbackClass);
+        generateConstructorArgMessageProcessorAndCallbackPath(callbackClass);
         generateBuildUrlMethod(callbackClass);
         generateCreateFlowRefMessageProcessorMethod(callbackClass);
         generateCreateConnectorMethod(callbackClass);
@@ -143,6 +148,11 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
                 name("callbackMessageProcessor").
                 javadoc("The message processor to be called upon the http callback").
                 build();
+        callbackPathField = new FieldBuilder(callbackClass).
+                type(String.class).
+                name("callbackPath").
+                javadoc("Optional path to set up the endpoint").
+                build();
     }
 
     private void generateConstructorArgSimpleFlowConstruct(DefinedClass callbackClass) {
@@ -169,6 +179,20 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
         constructor.body().assign(ExpressionFactory._this().ref(domainField), callbackDomainArg);
     }
 
+    private void generateConstructorArgMessageProcessorAndCallbackPath(DefinedClass callbackClass) {
+        Method constructor = callbackClass.constructor(Modifier.PUBLIC);
+        Variable messageProcessorArg = constructor.param(ref(MessageProcessor.class), "callbackMessageProcessor");
+        Variable muleContextArg = constructor.param(ref(MuleContext.class), "muleContext");
+        Variable callbackDomainArg = constructor.param(ref(String.class), "callbackDomain");
+        Variable callbackPortArg = constructor.param(ref(Integer.class), "callbackPort");
+        Variable callbackPathArg = constructor.param(ref(String.class), "callbackPath");
+        constructor.body().assign(ExpressionFactory._this().ref(callbackMessageProcessorField), messageProcessorArg);
+        constructor.body().assign(ExpressionFactory._this().ref(muleContextField), muleContextArg);
+        constructor.body().assign(ExpressionFactory._this().ref(portField), callbackPortArg);
+        constructor.body().assign(ExpressionFactory._this().ref(domainField), callbackDomainArg);
+        constructor.body().assign(ExpressionFactory._this().ref(callbackPathField), callbackPathArg);
+    }
+
     private void generateBuildUrlMethod(DefinedClass callbackClass) {
         buildUrlMethod = callbackClass.method(Modifier.PRIVATE, ref(String.class), "buildUrl");
         Block body = buildUrlMethod.body();
@@ -179,7 +203,9 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
         body.invoke(urlBuilder, "append").arg(":");
         body.invoke(urlBuilder, "append").arg(portField);
         body.invoke(urlBuilder, "append").arg("/");
-        body.invoke(urlBuilder, "append").arg(ref(UUID.class).staticInvoke("randomUUID"));
+        Conditional ifCallbackPathNotNull = body._if(Op.ne(callbackPathField, ExpressionFactory._null()));
+        ifCallbackPathNotNull._then().invoke(urlBuilder, "append").arg(callbackPathField);
+        ifCallbackPathNotNull._else().invoke(urlBuilder, "append").arg(ref(UUID.class).staticInvoke("randomUUID"));
         body._return(urlBuilder.invoke("toString"));
     }
 

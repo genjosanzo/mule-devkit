@@ -19,6 +19,7 @@ package org.mule.devkit.module.generation;
 
 import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.oauth.OAuth;
+import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.model.code.Block;
@@ -43,7 +44,9 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
 
     @Override
     protected boolean shouldGenerate(DevkitTypeElement typeElement) {
-        return typeElement.hasAnnotation(OAuth.class) || typeElement.hasProcessorMethodWithParameter(HttpCallback.class);
+        return typeElement.hasAnnotation(OAuth.class) ||
+               typeElement.hasAnnotation(OAuth2.class) ||
+               typeElement.hasProcessorMethodWithParameter(HttpCallback.class);
     }
 
     @Override

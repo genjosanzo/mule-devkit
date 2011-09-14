@@ -16,28 +16,7 @@
  */
 package org.mule.api.annotations.oauth;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public enum OAuthVersion {
 
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.SOURCE)
-@Documented
-public @interface OAuth {
-
-    OAuthMessageSigner messageSigner() default OAuthMessageSigner.HMAC_SHA1;
-
-    OAuthSigningStrategy signingStrategy() default OAuthSigningStrategy.AUTHORIZATION_HEADER;
-
-    String requestTokenUrl();
-
-    String accessTokenUrl();
-
-    String authorizationUrl();
-
-    String verifierRegex() default "oauth_verifier=([^&]+)";
-
-    String callbackPath() default "";
+    VERSION_1, VERSION_2
 }

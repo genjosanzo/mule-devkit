@@ -81,7 +81,7 @@ public class OAuthAdapterGenerator extends AbstractModuleGenerator {
 
     @Override
     protected boolean shouldGenerate(DevkitTypeElement typeElement) {
-        return typeElement.getAnnotation(OAuth.class) != null;
+        return typeElement.hasAnnotation(OAuth.class);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class OAuthAdapterGenerator extends AbstractModuleGenerator {
 
         generateStartMethod(oauthAdapter, oauthCallback, redirectUrl);
         generateStopMethod(oauthAdapter, oauthCallback);
-        generateInitialiseMethod(oauthAdapter, oauthCallback, messageProcessor, muleContext, createConsumer);
+        generateInitialiseMethod(oauthAdapter, messageProcessor, muleContext, createConsumer, oauth, oauthCallback);
 
         generateGetAuthorizationUrlMethod(oauthAdapter, requestToken, requestTokenSecret, redirectUrl, consumer, typeElement, oauth);
         generateFetchAccessTokenMethod(oauthAdapter, requestToken, requestTokenSecret, oauthVerifier, consumer, typeElement, oauth);
@@ -206,15 +206,20 @@ public class OAuthAdapterGenerator extends AbstractModuleGenerator {
         start.body().invoke(oauthCallback, "stop");
     }
 
-    private void generateInitialiseMethod(DefinedClass oauthAdapter, FieldVariable oauthCallback, DefinedClass messageProcessor, FieldVariable muleContext, Method createConsumer) {
+    private void generateInitialiseMethod(DefinedClass oauthAdapter, DefinedClass messageProcessor, FieldVariable muleContext, Method createConsumer, OAuth oauth, FieldVariable oauthCallback) {
         Method initialise = oauthAdapter.method(Modifier.PUBLIC, this.context.getCodeModel().VOID, "initialise");
-        if(ref(Initialisable.class).isAssignableFrom(oauthAdapter._extends())) {
+        if (ref(Initialisable.class).isAssignableFrom(oauthAdapter._extends())) {
             initialise.body().invoke(ExpressionFactory._super(), "initialise");
         }
         Invocation domain = ExpressionFactory.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.DOMAIN_FIELD_NAME));
         Invocation port = ExpressionFactory.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.PORT_FIELD_NAME));
-        initialise.body().assign(oauthCallback, ExpressionFactory._new(this.context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
-                arg(ExpressionFactory._new(messageProcessor)).arg(muleContext).arg(domain).arg(port));
+        if (StringUtils.isEmpty(oauth.callbackPath())) {
+            initialise.body().assign(oauthCallback, ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
+                    arg(ExpressionFactory._new(messageProcessor)).arg(muleContext).arg(domain).arg(port));
+        } else {
+            initialise.body().assign(oauthCallback, ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
+                    arg(ExpressionFactory._new(messageProcessor)).arg(muleContext).arg(domain).arg(port).arg(oauth.callbackPath()));
+        }
         initialise.body().invoke(createConsumer);
     }
 

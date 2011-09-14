@@ -17,6 +17,8 @@
 
 package org.mule.devkit.validation;
 
+import org.mule.devkit.generation.DevkitTypeElementImpl;
+
 import javax.lang.model.element.Element;
 
 public class ValidationException extends Exception {
@@ -48,6 +50,9 @@ public class ValidationException extends Exception {
     }
 
     public Element getElement() {
+        if(element instanceof DevkitTypeElementImpl) {
+            return ((DevkitTypeElementImpl) element).unWrap();
+        }
         return element;
     }
 }

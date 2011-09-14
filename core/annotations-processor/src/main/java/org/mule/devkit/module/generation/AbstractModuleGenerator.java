@@ -46,16 +46,18 @@ import java.util.List;
 
 public abstract class AbstractModuleGenerator extends AbstractGenerator {
 
+    protected static final String MULE_CONTEXT_FIELD_NAME = "muleContext";
+
     public Type ref(TypeMirror typeMirror) {
-        return this.context.getCodeModel().ref(typeMirror);
+        return context.getCodeModel().ref(typeMirror);
     }
 
     public TypeReference ref(Class<?> clazz) {
-        return this.context.getCodeModel().ref(clazz);
+        return context.getCodeModel().ref(clazz);
     }
 
     public Type ref(String fullyQualifiedClassName) {
-        return this.context.getCodeModel().ref(fullyQualifiedClassName);
+        return context.getCodeModel().ref(fullyQualifiedClassName);
     }
 
     protected Method generateSetter(DefinedClass clazz, FieldVariable field) {
@@ -77,7 +79,7 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
     }
 
     protected FieldVariable generateFieldForMuleContext(DefinedClass messageProcessorClass) {
-        FieldVariable muleContext = messageProcessorClass.field(Modifier.PRIVATE, ref(MuleContext.class), "muleContext");
+        FieldVariable muleContext = messageProcessorClass.field(Modifier.PRIVATE, ref(MuleContext.class), MULE_CONTEXT_FIELD_NAME);
         muleContext.javadoc().add("Mule Context");
 
         return muleContext;

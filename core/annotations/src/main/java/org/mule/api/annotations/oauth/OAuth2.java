@@ -25,19 +25,17 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 @Documented
-public @interface OAuth {
-
-    OAuthMessageSigner messageSigner() default OAuthMessageSigner.HMAC_SHA1;
-
-    OAuthSigningStrategy signingStrategy() default OAuthSigningStrategy.AUTHORIZATION_HEADER;
-
-    String requestTokenUrl();
+public @interface OAuth2 {
 
     String accessTokenUrl();
 
     String authorizationUrl();
 
-    String verifierRegex() default "oauth_verifier=([^&]+)";
+    String verifierRegex() default "code=([^&]+)";
+
+    String accessTokenRegex() default "\"access_token\":\"([^&]+?)\"";
+
+    String expirationRegex() default "\"expires_in\":([^&]+?),";
 
     String callbackPath() default "";
 }

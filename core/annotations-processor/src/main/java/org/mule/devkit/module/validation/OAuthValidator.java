@@ -19,6 +19,7 @@ package org.mule.devkit.module.validation;
 
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.oauth.OAuth;
+import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.oauth.OAuthConsumerKey;
@@ -40,7 +41,7 @@ public class OAuthValidator implements Validator {
             return;
         }
 
-        if (typeElement.hasAnnotation(OAuth.class)) {
+        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
             checkClassHasFieldWithAnnotation(typeElement, OAuthConsumerKey.class, "@OAuth class must contain a field annotated with @OAuthConsumerKey");
             checkClassHasFieldWithAnnotation(typeElement, OAuthConsumerSecret.class, "@OAuth class must contain a field annotated with @OAuthConsumerSecret");
         } else {
