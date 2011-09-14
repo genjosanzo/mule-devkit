@@ -19,7 +19,7 @@ package org.mule.devkit.it;
 
 import java.io.File;
 
-public class OAuthIT extends AbstractMavenIT
+public class OAuth1IT extends AbstractMavenIT
 {
 
     protected String getArtifactVersion()

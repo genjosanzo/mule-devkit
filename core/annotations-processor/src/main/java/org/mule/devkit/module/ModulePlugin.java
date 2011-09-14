@@ -33,7 +33,7 @@ import org.mule.devkit.module.generation.MessageProcessorGenerator;
 import org.mule.devkit.module.generation.MessageSourceGenerator;
 import org.mule.devkit.module.generation.NamespaceHandlerGenerator;
 import org.mule.devkit.module.generation.OAuth2AdapterGenerator;
-import org.mule.devkit.module.generation.OAuthAdapterGenerator;
+import org.mule.devkit.module.generation.OAuth1AdapterGenerator;
 import org.mule.devkit.module.generation.PoolAdapterGenerator;
 import org.mule.devkit.module.generation.RegistryBootstrapGenerator;
 import org.mule.devkit.module.generation.SchemaGenerator;
@@ -68,7 +68,7 @@ public class ModulePlugin implements Plugin {
         generators.add(new HttpCallbackGenerator());
         generators.add(new LifecycleAdapterGenerator());
         generators.add(new HttpCallbackAdapterGenerator());
-        generators.add(new OAuthAdapterGenerator());
+        generators.add(new OAuth1AdapterGenerator());
         generators.add(new OAuth2AdapterGenerator());
         generators.add(new LifecycleAdapterFactoryGenerator());
         generators.add(new SessionAdapterGenerator());
