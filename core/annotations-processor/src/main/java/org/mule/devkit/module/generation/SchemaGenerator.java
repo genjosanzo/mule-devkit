@@ -26,6 +26,7 @@ import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.callback.InterceptCallback;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.oauth.OAuth;
+import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.param.Default;
@@ -694,7 +695,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
 
         // add oauth callback configuration
-        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasProcessorMethodWithParameter(HttpCallback.class)) {
+        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class) || typeElement.hasProcessorMethodWithParameter(HttpCallback.class)) {
 
             Attribute domainAttribute = new Attribute();
             domainAttribute.setUse(SchemaConstants.USE_OPTIONAL);
