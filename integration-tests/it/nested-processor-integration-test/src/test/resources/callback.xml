@@ -39,6 +39,10 @@
 		<callback:callback>mulesoft</callback:callback>
     </flow>
 
+    <flow name="callbackListWithString">
+		<callback:callback-list>mulesoft</callback:callback-list>
+    </flow>
+
     <flow name="callbackWithPayload">
 		<callback:callback-with-payload>
             <callback:set-payload payload="#[payload]"/>
@@ -55,5 +59,19 @@
                 <callback:set-payload payload="#[payload]"/>
             </callback:processors>
         </callback:process-items>
+    </flow>
+
+    <flow name="processItemsOneByOne">
+        <callback:process-items-one-by-one>
+            <callback:items>
+                <callback:item>orange</callback:item>
+                <callback:item>apple</callback:item>
+            </callback:items>
+            <callback:processors>
+                <callback:set-payload payload="mulesoft"/>
+                <callback:set-payload payload="muleion"/>
+                <callback:set-payload payload="ftw!"/>
+            </callback:processors>
+        </callback:process-items-one-by-one>
     </flow>
 </mule>

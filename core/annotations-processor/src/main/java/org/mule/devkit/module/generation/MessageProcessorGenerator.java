@@ -207,11 +207,22 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         for (String fieldName : fields.keySet()) {
             FieldVariableElement variableElement = fields.get(fieldName);
 
-            if (variableElement.getVariableElement().asType().toString().contains(NestedProcessor.class.getName())) {
-                Conditional ifStartable = startMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Startable.class)));
-                ifStartable._then().add(
-                        ExpressionFactory.cast(ref(Startable.class), variableElement.getField()).invoke("start")
-                );
+            if (context.getTypeMirrorUtils().isNestedProcessor(variableElement.getVariableElement().asType())) {
+                boolean isList = context.getTypeMirrorUtils().isArrayOrList(variableElement.getVariableElement().asType());
+
+                if (!isList) {
+                    Conditional ifStartable = startMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Startable.class)));
+                    ifStartable._then().add(
+                            ExpressionFactory.cast(ref(Startable.class), variableElement.getField()).invoke("start")
+                    );
+                } else {
+                    Conditional ifIsList = startMethod.body()._if(Op._instanceof(variableElement.getField(), ref(List.class)));
+                    ForEach forEachProcessor = ifIsList._then().forEach(ref(MessageProcessor.class), "messageProcessor", ExpressionFactory.cast(ref(List.class).narrow(MessageProcessor.class), fields.get(fieldName).getField()));
+                    Conditional ifStartable = forEachProcessor.body()._if(Op._instanceof(forEachProcessor.var(), ref(Startable.class)));
+                    ifStartable._then().add(
+                            ExpressionFactory.cast(ref(Startable.class), forEachProcessor.var()).invoke("start")
+                    );
+                }
             } else if (variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
                 startMethod.body()._if(Op.ne(variableElement.getFieldType(), ExpressionFactory._null()))._then().invoke(variableElement.getFieldType(), "start");
             }
@@ -225,11 +236,23 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         for (String fieldName : fields.keySet()) {
             FieldVariableElement variableElement = fields.get(fieldName);
 
-            if (variableElement.getVariableElement().asType().toString().contains(NestedProcessor.class.getName())) {
-                Conditional ifStoppable = stopMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Stoppable.class)));
-                ifStoppable._then().add(
-                        ExpressionFactory.cast(ref(Stoppable.class), variableElement.getField()).invoke("stop")
-                );
+            if (context.getTypeMirrorUtils().isNestedProcessor(variableElement.getVariableElement().asType())) {
+                boolean isList = context.getTypeMirrorUtils().isArrayOrList(variableElement.getVariableElement().asType());
+
+                if (!isList) {
+                    Conditional ifStoppable = stopMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Stoppable.class)));
+                    ifStoppable._then().add(
+                            ExpressionFactory.cast(ref(Stoppable.class), variableElement.getField()).invoke("stop")
+                    );
+                } else {
+                    Conditional ifIsList = stopMethod.body()._if(Op._instanceof(variableElement.getField(), ref(List.class)));
+                    ForEach forEachProcessor = ifIsList._then().forEach(ref(MessageProcessor.class), "messageProcessor",
+                            ExpressionFactory.cast(ref(List.class).narrow(MessageProcessor.class), fields.get(fieldName).getField()));
+                    Conditional ifStoppable = forEachProcessor.body()._if(Op._instanceof(forEachProcessor.var(), ref(Stoppable.class)));
+                    ifStoppable._then().add(
+                            ExpressionFactory.cast(ref(Stoppable.class), forEachProcessor.var()).invoke("stop")
+                    );
+                }
             } else if (variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
                 stopMethod.body()._if(Op.ne(variableElement.getFieldType(), ExpressionFactory._null()))._then().invoke(variableElement.getFieldType(), "stop");
             }
@@ -242,11 +265,22 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         for (String fieldName : fields.keySet()) {
             FieldVariableElement variableElement = fields.get(fieldName);
 
-            if (variableElement.getVariableElement().asType().toString().contains(NestedProcessor.class.getName())) {
-                Conditional ifDisposable = diposeMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Disposable.class)));
-                ifDisposable._then().add(
-                        ExpressionFactory.cast(ref(Disposable.class), variableElement.getField()).invoke("dispose")
-                );
+            if (context.getTypeMirrorUtils().isNestedProcessor(variableElement.getVariableElement().asType())) {
+                boolean isList = context.getTypeMirrorUtils().isArrayOrList(variableElement.getVariableElement().asType());
+
+                if (!isList) {
+                    Conditional ifDisposable = diposeMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Disposable.class)));
+                    ifDisposable._then().add(
+                            ExpressionFactory.cast(ref(Disposable.class), variableElement.getField()).invoke("dispose")
+                    );
+                } else {
+                    Conditional ifIsList = diposeMethod.body()._if(Op._instanceof(variableElement.getField(), ref(List.class)));
+                    ForEach forEachProcessor = ifIsList._then().forEach(ref(MessageProcessor.class), "messageProcessor", ExpressionFactory.cast(ref(List.class).narrow(MessageProcessor.class), fields.get(fieldName).getField()));
+                    Conditional ifDisposable = forEachProcessor.body()._if(Op._instanceof(forEachProcessor.var(), ref(Disposable.class)));
+                    ifDisposable._then().add(
+                            ExpressionFactory.cast(ref(Disposable.class), forEachProcessor.var()).invoke("dispose")
+                    );
+                }
             }
         }
     }
@@ -557,7 +591,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
 
         if (executableElement.getEnclosingElement().getAnnotation(OAuth.class) != null ||
-            executableElement.getEnclosingElement().getAnnotation(OAuth2.class) != null) {
+                executableElement.getEnclosingElement().getAnnotation(OAuth2.class) != null) {
             for (VariableElement variable : executableElement.getParameters()) {
                 if (variable.getAnnotation(OAuthAccessToken.class) != null || variable.getAnnotation(OAuthAccessTokenSecret.class) != null) {
                     addOauth(process, event, object, executableElement);
@@ -656,34 +690,65 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 Invocation getAccessToken = object.invoke("get" + StringUtils.capitalize(OAuthAdapterGenerator.OAUTH_ACCESS_TOKEN_SECRET_FIELD_NAME));
                 Variable accessTokenSecret = callProcessor.body().decl(ref(String.class), "accessTokenSecret", getAccessToken);
                 parameters.add(accessTokenSecret);
-            } else if (variable.asType().toString().contains(NestedProcessor.class.getName())) {
-
+            } else if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
                 DefinedClass callbackClass = context.getClassForRole(NestedProcessorChainGenerator.ROLE);
                 DefinedClass stringCallbackClass = context.getClassForRole(NestedProcessorStringGenerator.ROLE);
 
-                Variable transformed = callProcessor.body().decl(ref(NestedProcessor.class), "transformed" + StringUtils.capitalize(fieldName),
-                        ExpressionFactory._null());
+                boolean isList = context.getTypeMirrorUtils().isArrayOrList(variable.asType());
 
-                Conditional ifMessageProcessor = callProcessor.body()._if(Op.cand(
-                        Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()),
-                        Op._instanceof(fields.get(fieldName).getField(), ref(MessageProcessor.class))));
+                if (!isList) {
+                    Variable transformed = callProcessor.body().decl(ref(NestedProcessor.class), "transformed" + StringUtils.capitalize(fieldName),
+                            ExpressionFactory._null());
 
-                ifMessageProcessor._then()
-                        .assign(transformed,
-                                ExpressionFactory._new(callbackClass).arg(event).arg(muleContext).arg(
-                                        ExpressionFactory.cast(ref(MessageProcessor.class), fields.get(fieldName).getField())));
+                    Conditional ifMessageProcessor = callProcessor.body()._if(Op.cand(
+                            Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()),
+                            Op._instanceof(fields.get(fieldName).getField(), ref(MessageProcessor.class))));
 
-                Conditional ifString = ifMessageProcessor._elseif(Op.cand(
-                        Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()),
-                        Op._instanceof(fields.get(fieldName).getField(), ref(String.class))));
+                    ifMessageProcessor._then()
+                            .assign(transformed,
+                                    ExpressionFactory._new(callbackClass).arg(event).arg(muleContext).arg(
+                                            ExpressionFactory.cast(ref(MessageProcessor.class), fields.get(fieldName).getField())));
 
-                ifString._then()
-                        .assign(transformed,
-                                ExpressionFactory._new(stringCallbackClass).arg(
-                                        ExpressionFactory.cast(ref(String.class), fields.get(fieldName).getField())
-                                ));
+                    Conditional ifString = ifMessageProcessor._elseif(Op.cand(
+                            Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()),
+                            Op._instanceof(fields.get(fieldName).getField(), ref(String.class))));
 
-                parameters.add(transformed);
+                    ifString._then()
+                            .assign(transformed,
+                                    ExpressionFactory._new(stringCallbackClass).arg(
+                                            ExpressionFactory.cast(ref(String.class), fields.get(fieldName).getField())
+                                    ));
+
+                    parameters.add(transformed);
+                } else {
+                    Variable transformed = callProcessor.body().decl(ref(List.class).narrow(NestedProcessor.class), "transformed" + StringUtils.capitalize(fieldName),
+                            ExpressionFactory._new(ref(ArrayList.class).narrow(NestedProcessor.class)));
+
+                    Conditional ifMessageProcessor = callProcessor.body()._if(Op.cand(
+                            Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()),
+                            Op._instanceof(fields.get(fieldName).getField(), ref(List.class))));
+
+                    ForEach forEachProcessor = ifMessageProcessor._then().forEach(ref(MessageProcessor.class),
+                            "messageProcessor",
+                            ExpressionFactory.cast(ref(List.class).narrow(MessageProcessor.class),
+                                    fields.get(fieldName).getField()));
+                    forEachProcessor.body().add(transformed.invoke("add").arg(
+                            ExpressionFactory._new(callbackClass).arg(event).arg(muleContext).arg(
+                                    forEachProcessor.var())
+                    ));
+
+                    Conditional ifString = ifMessageProcessor._elseif(Op.cand(
+                            Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()),
+                            Op._instanceof(fields.get(fieldName).getField(), ref(String.class))));
+
+                    ifString._then()
+                            .add(transformed.invoke("add").arg(
+                                    ExpressionFactory._new(stringCallbackClass).arg(
+                                            ExpressionFactory.cast(ref(String.class), fields.get(fieldName).getField())
+                                    )));
+
+                    parameters.add(transformed);
+                }
 
             } else {
                 InboundHeaders inboundHeaders = variable.getAnnotation(InboundHeaders.class);
@@ -813,7 +878,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
     private void addOauth(Method process, Variable event, FieldVariable object, ExecutableElement executableElement) {
         OAuth2 oauth2 = executableElement.getEnclosingElement().getAnnotation(OAuth2.class);
-        if(oauth2 != null && !StringUtils.isEmpty(oauth2.expirationRegex())) {
+        if (oauth2 != null && !StringUtils.isEmpty(oauth2.expirationRegex())) {
             Block ifTokenExpired = process.body()._if(object.invoke(OAuth2AdapterGenerator.HAS_TOKEN_EXPIRED_METHOD_NAME))._then();
             ifTokenExpired.invoke(object, OAuth2AdapterGenerator.RESET_METHOD_NAME);
         }
