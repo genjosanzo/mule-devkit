@@ -686,11 +686,11 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             } else if (variable.asType().toString().contains(HttpCallback.class.getName())) {
                 parameters.add(fields.get(fieldName).getFieldType());
             } else if (variable.getAnnotation(OAuthAccessToken.class) != null) {
-                Invocation getAccessToken = object.invoke("get" + StringUtils.capitalize(OAuthAdapterGenerator.OAUTH_ACCESS_TOKEN_FIELD_NAME));
+                Invocation getAccessToken = object.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_ACCESS_TOKEN_FIELD_NAME));
                 Variable accessToken = callProcessor.body().decl(ref(String.class), "accessToken", getAccessToken);
                 parameters.add(accessToken);
             } else if (variable.getAnnotation(OAuthAccessTokenSecret.class) != null) {
-                Invocation getAccessToken = object.invoke("get" + StringUtils.capitalize(OAuthAdapterGenerator.OAUTH_ACCESS_TOKEN_SECRET_FIELD_NAME));
+                Invocation getAccessToken = object.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_ACCESS_TOKEN_SECRET_FIELD_NAME));
                 Variable accessTokenSecret = callProcessor.body().decl(ref(String.class), "accessTokenSecret", getAccessToken);
                 parameters.add(accessTokenSecret);
             } else if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
@@ -906,16 +906,16 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             ifTokenExpired.invoke(object, OAuth2AdapterGenerator.RESET_METHOD_NAME);
         }
 
-        Invocation oauthVerifier = object.invoke("get" + StringUtils.capitalize(OAuthAdapterGenerator.OAUTH_VERIFIER_FIELD_NAME));
+        Invocation oauthVerifier = object.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_VERIFIER_FIELD_NAME));
         Block ifOauthVerifierIsNull = process.body()._if(isNull(oauthVerifier))._then();
-        Variable authorizationUrl = ifOauthVerifierIsNull.decl(ref(String.class), "authorizationUrl", ExpressionFactory.invoke(object, OAuthAdapterGenerator.GET_AUTHORIZATION_URL_METHOD_NAME));
+        Variable authorizationUrl = ifOauthVerifierIsNull.decl(ref(String.class), "authorizationUrl", ExpressionFactory.invoke(object, OAuth1AdapterGenerator.GET_AUTHORIZATION_URL_METHOD_NAME));
         ifOauthVerifierIsNull.invoke(event.invoke("getMessage"), "setOutboundProperty").arg(HTTP_STATUS_PROPERTY).arg(REDIRECT_HTTP_STATUS);
         ifOauthVerifierIsNull.invoke(event.invoke("getMessage"), "setOutboundProperty").arg(LOCATION_PROPERTY).arg(authorizationUrl);
         ifOauthVerifierIsNull._return(event);
 
-        Invocation accessToken = object.invoke("get" + StringUtils.capitalize(OAuthAdapterGenerator.OAUTH_ACCESS_TOKEN_FIELD_NAME));
+        Invocation accessToken = object.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_ACCESS_TOKEN_FIELD_NAME));
         Block ifAccessTokenIsNull = process.body()._if(isNull(accessToken))._then();
-        ifAccessTokenIsNull.invoke(object, OAuthAdapterGenerator.FETCH_ACCESS_TOKEN_METHOD_NAME);
+        ifAccessTokenIsNull.invoke(object, OAuth1AdapterGenerator.FETCH_ACCESS_TOKEN_METHOD_NAME);
     }
 
     private Variable generateMethodCall(Block body, FieldVariable object, String methodName, List<Expression> parameters, FieldVariable muleContext, Variable event, Type returnType, Variable poolObject, Variable interceptCallback, FieldVariable messageProcessorListener) {

@@ -18,26 +18,14 @@
 package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.StringUtils;
-import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.annotations.oauth.OAuthConsumerKey;
 import org.mule.api.annotations.oauth.OAuthConsumerSecret;
 import org.mule.api.annotations.oauth.OAuthScope;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.config.i18n.MessageFactory;
 import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
-import org.mule.devkit.model.code.ClassAlreadyExistsException;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -46,7 +34,6 @@ import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
-import org.mule.devkit.model.code.Package;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.builders.FieldBuilder;
@@ -61,21 +48,7 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class OAuth2AdapterGenerator extends AbstractModuleGenerator {
-
-    public static final String VERIFIER_FIELD_NAME = "oauthVerifier";
-    public static final String GET_AUTHORIZATION_URL_METHOD_NAME = "getAuthorizationUrl";
-    public static final String HAS_TOKEN_EXPIRED_METHOD_NAME = "hasTokenExpired";
-    public static final String RESET_METHOD_NAME = "reset";
-    private static final String REDIRECT_URL_FIELD_NAME = "redirectUrl";
-    private static final String ACCESS_TOKEN_FIELD_NAME = "accessToken";
-    private static final String ENCODING = "UTF-8";
-    private static final String GRANT_TYPE = "authorization_code";
-    private static final String ACCESS_CODE_PATTERN_FIELD_NAME = "ACCESS_CODE_PATTERN";
-    private static final String CALLBACK_FIELD_NAME = "oauthCallback";
-    private static final String AUTH_CODE_PATTERN_FIELD_NAME = "AUTH_CODE_PATTERN";
-    private static final String EXPIRATION_TIME_PATTERN_FIELD_NAME = "EXPIRATION_TIME_PATTERN";
-    private static final String EXPIRATION_FIELD_NAME = "expiration";
+public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
 
     @Override
     protected boolean shouldGenerate(DevkitTypeElement typeElement) {
@@ -84,12 +57,17 @@ public class OAuth2AdapterGenerator extends AbstractModuleGenerator {
 
     @Override
     protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
-        DefinedClass oauthAdapter = getOAuthAdapterClass(typeElement);
+        DefinedClass oauthAdapter = getOAuthAdapterClass(typeElement, "OAuth2Adapter");
         OAuth2 oauth2 = typeElement.getAnnotation(OAuth2.class);
-        oauthAuthorizationCoderPatternConstant(oauthAdapter, oauth2);
-        oauthAcessTokenPatternConstant(oauthAdapter, oauth2);
+
+        authorizationCodePatternConstant(oauthAdapter, oauth2.verifierRegex());
+
+        accessTokenPatternConstant(oauthAdapter, oauth2);
+
         expirationPatternConstant(oauthAdapter, oauth2);
+
         muleContextField(oauthAdapter);
+
         authorizationCodeField(oauthAdapter);
         redirectUrlField(oauthAdapter);
         oauthCallbackField(oauthAdapter);
@@ -100,7 +78,7 @@ public class OAuth2AdapterGenerator extends AbstractModuleGenerator {
 
         generateStartMethod(oauthAdapter);
         generateStopMethod(oauthAdapter);
-        generateInitialiseMethod(oauthAdapter, messageProcessor, oauth2);
+        generateInitialiseMethod(oauthAdapter, messageProcessor, oauth2.callbackPath());
 
         generateGetAuthorizationUrlMethod(oauthAdapter, typeElement, oauth2);
         generateFetchAccessTokenMethod(oauthAdapter, typeElement, oauth2);
@@ -108,45 +86,7 @@ public class OAuth2AdapterGenerator extends AbstractModuleGenerator {
         generateResetMethod(oauthAdapter, oauth2);
     }
 
-    private DefinedClass getOAuthAdapterClass(DevkitTypeElement typeElement) {
-        String lifecycleAdapterName = context.getNameUtils().generateClassName(typeElement, ".config", "OAuth2Adapter");
-        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(lifecycleAdapterName));
-
-        DefinedClass classToExtend = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
-
-        DefinedClass oauthAdapter = pkg._class(context.getNameUtils().getClassName(lifecycleAdapterName), classToExtend);
-        oauthAdapter._implements(MuleContextAware.class);
-        oauthAdapter._implements(Startable.class);
-        oauthAdapter._implements(Initialisable.class);
-        oauthAdapter._implements(Stoppable.class);
-
-        context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), oauthAdapter);
-
-        oauthAdapter.javadoc().add("A {@code " + oauthAdapter.name() + "} is a wrapper around ");
-        oauthAdapter.javadoc().add(ref(typeElement.asType()));
-        oauthAdapter.javadoc().add(" that adds OAuth capabilites to the pojo.");
-
-        return oauthAdapter;
-    }
-
-    private void muleContextField(DefinedClass oauthAdapter) {
-        new FieldBuilder(oauthAdapter).type(MuleContext.class).name("muleContext").setter().build();
-    }
-
-    private void authorizationCodeField(DefinedClass oauthAdapter) {
-        new FieldBuilder(oauthAdapter).type(String.class).name(VERIFIER_FIELD_NAME).getter().build();
-    }
-
-    private void redirectUrlField(DefinedClass oauthAdapter) {
-        new FieldBuilder(oauthAdapter).type(String.class).name(REDIRECT_URL_FIELD_NAME).getter().build();
-    }
-
-    private void oauthAuthorizationCoderPatternConstant(DefinedClass oauthAdapter, OAuth2 oauth2) {
-        new FieldBuilder(oauthAdapter).type(Pattern.class).name(AUTH_CODE_PATTERN_FIELD_NAME).staticField().finalField().
-                initialValue(ref(Pattern.class).staticInvoke("compile").arg(oauth2.verifierRegex())).build();
-    }
-
-    private void oauthAcessTokenPatternConstant(DefinedClass oauthAdapter, OAuth2 oauth2) {
+    private void accessTokenPatternConstant(DefinedClass oauthAdapter, OAuth2 oauth2) {
         new FieldBuilder(oauthAdapter).type(Pattern.class).name(ACCESS_CODE_PATTERN_FIELD_NAME).staticField().finalField().
                 initialValue(ref(Pattern.class).staticInvoke("compile").arg(oauth2.accessTokenRegex())).build();
     }
@@ -158,84 +98,10 @@ public class OAuth2AdapterGenerator extends AbstractModuleGenerator {
         }
     }
 
-    private void oauthCallbackField(DefinedClass oauthAdapter) {
-        new FieldBuilder(oauthAdapter).type(HttpCallback.class).name(CALLBACK_FIELD_NAME).build();
-    }
-
-    private void accessTokenField(DefinedClass oauthAdapter) {
-        new FieldBuilder(oauthAdapter).type(String.class).name(ACCESS_TOKEN_FIELD_NAME).getterAndSetter().build();
-    }
-
     private void expirationField(DefinedClass oauthAdapter, OAuth2 oauth2) {
         if (!StringUtils.isEmpty(oauth2.expirationRegex())) {
             new FieldBuilder(oauthAdapter).type(Date.class).name(EXPIRATION_FIELD_NAME).setter().build();
         }
-    }
-
-    private void generateStartMethod(DefinedClass oauthAdapter) {
-        Method start = oauthAdapter.method(Modifier.PUBLIC, this.context.getCodeModel().VOID, "start");
-        start._throws(MuleException.class);
-        start.body().invoke(ExpressionFactory._super(), ("start"));
-        FieldVariable callbackField = oauthAdapter.fields().get(CALLBACK_FIELD_NAME);
-        start.body().invoke(callbackField, "start");
-        start.body().assign(oauthAdapter.fields().get(REDIRECT_URL_FIELD_NAME), callbackField.invoke("getUrl"));
-    }
-
-    private void generateStopMethod(DefinedClass oauthAdapter) {
-        Method start = oauthAdapter.method(Modifier.PUBLIC, this.context.getCodeModel().VOID, "stop");
-        start._throws(MuleException.class);
-        start.body().invoke(ExpressionFactory._super(), ("stop"));
-        start.body().invoke(oauthAdapter.fields().get(CALLBACK_FIELD_NAME), "stop");
-    }
-
-    private void generateInitialiseMethod(DefinedClass oauthAdapter, DefinedClass messageProcessor, OAuth2 oauth2) {
-        Method initialise = oauthAdapter.method(Modifier.PUBLIC, this.context.getCodeModel().VOID, "initialise");
-        if (ref(Initialisable.class).isAssignableFrom(oauthAdapter._extends())) {
-            initialise.body().invoke(ExpressionFactory._super(), "initialise");
-        }
-        Invocation domain = ExpressionFactory.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.DOMAIN_FIELD_NAME));
-        Invocation port = ExpressionFactory.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.PORT_FIELD_NAME));
-        FieldVariable callback = oauthAdapter.fields().get(CALLBACK_FIELD_NAME);
-        FieldVariable muleContext = oauthAdapter.fields().get(MULE_CONTEXT_FIELD_NAME);
-        if (StringUtils.isEmpty(oauth2.callbackPath())) {
-            initialise.body().assign(callback, ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
-                    arg(ExpressionFactory._new(messageProcessor)).arg(muleContext).arg(domain).arg(port));
-        } else {
-            initialise.body().assign(callback, ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
-                    arg(ExpressionFactory._new(messageProcessor)).arg(muleContext).arg(domain).arg(port).arg(oauth2.callbackPath()));
-        }
-    }
-
-    private DefinedClass generateMessageProcessorInnerClass(DefinedClass oauthAdapter) throws GenerationException {
-        DefinedClass messageProcessor;
-        try {
-            messageProcessor = oauthAdapter._class(Modifier.PRIVATE, "OnOAuthCallbackMessageProcessor")._implements(ref(MessageProcessor.class));
-        } catch (ClassAlreadyExistsException e) {
-            throw new GenerationException(e); // This wont happen
-        }
-
-        Method processMethod = messageProcessor.method(Modifier.PUBLIC, ref(MuleEvent.class), "process")._throws(ref(MuleException.class));
-        Variable event = processMethod.param(ref(MuleEvent.class), "event");
-
-        TryStatement tryToExtractVerifier = processMethod.body()._try();
-        tryToExtractVerifier.body().assign(oauthAdapter.fields().get(VERIFIER_FIELD_NAME), ExpressionFactory.invoke("extractAuthorizationCode").arg(event.invoke("getMessageAsString")));
-        CatchBlock catchBlock = tryToExtractVerifier._catch(ref(Exception.class));
-        Variable exceptionCaught = catchBlock.param("e");
-        catchBlock.body()._throw(ExpressionFactory._new(
-                ref(MessagingException.class)).
-                arg(ref(MessageFactory.class).staticInvoke("createStaticMessage").arg("Could not extract OAuth verifier")).arg(event).arg(exceptionCaught));
-
-        processMethod.body()._return(event);
-
-        Method extractMethod = messageProcessor.method(Modifier.PRIVATE, ref(String.class), "extractAuthorizationCode")._throws(ref(Exception.class));
-        Variable response = extractMethod.param(String.class, "response");
-        Variable matcher = extractMethod.body().decl(ref(Matcher.class), "matcher", oauthAdapter.fields().get(AUTH_CODE_PATTERN_FIELD_NAME).invoke("matcher").arg(response));
-        Conditional ifVerifierFound = extractMethod.body()._if(Op.cand(matcher.invoke("find"), Op.gte(matcher.invoke("groupCount"), ExpressionFactory.lit(1))));
-        Invocation group = matcher.invoke("group").arg(ExpressionFactory.lit(1));
-        ifVerifierFound._then()._return(ref(URLDecoder.class).staticInvoke("decode").arg(group).arg(ENCODING));
-        ifVerifierFound._else()._throw(ExpressionFactory._new(
-                ref(Exception.class)).arg(ref(String.class).staticInvoke("format").arg("OAuth authorization code could not be extracted from: %s").arg(response)));
-        return messageProcessor;
     }
 
     private void generateGetAuthorizationUrlMethod(DefinedClass oauthAdapter, DevkitTypeElement typeElement, OAuth2 oauth2) {
