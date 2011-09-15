@@ -78,6 +78,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     public static final String DOMAIN_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.DOMAIN_FIELD_NAME;
     public static final String LOCAL_PORT_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.LOCAL_PORT_FIELD_NAME;
     public static final String REMOTE_PORT_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.REMOTE_PORT_FIELD_NAME;
+    public static final String ASYNC_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.ASYNC_FIELD_NAME;
     public static final String HTTP_CALLBACK_CONFIG_ELEMENT_NAME = "http-callback-config";
     private static final String ATTRIBUTE_NAME_KEY = "key";
     private static final String ATTRIBUTE_NAME_REF = "ref";
@@ -97,6 +98,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private static final String TRANSFER_OBJECT_TYPE_SUFFIX = "TransferObjectType";
     private static final String DOMAIN_DEFAULT_VALUE = "${fullDomain}";
     private static final String PORT_DEFAULT_VALUE = "${http.port}";
+    private static final String ASYNC_DEFAULT_VALUE = "true";
     private Schema schema;
     private ObjectFactory objectFactory;
 
@@ -693,6 +695,12 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             remotePortAttribute.setType(SchemaConstants.STRING);
             remotePortAttribute.setDefault(PORT_DEFAULT_VALUE);
 
+            Attribute asyncAttribute = new Attribute();
+            asyncAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+            asyncAttribute.setName(ASYNC_ATTRIBUTE_NAME);
+            asyncAttribute.setType(SchemaConstants.BOOLEAN);
+            asyncAttribute.setDefault(ASYNC_DEFAULT_VALUE);
+
             TopLevelElement httpCallbackConfig = new TopLevelElement();
             httpCallbackConfig.setName(HTTP_CALLBACK_CONFIG_ELEMENT_NAME);
             httpCallbackConfig.setMinOccurs(BigInteger.ZERO);
@@ -709,6 +717,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             extensionType.getAttributeOrAttributeGroup().add(localPortAttribute);
             extensionType.getAttributeOrAttributeGroup().add(remotePortAttribute);
             extensionType.getAttributeOrAttributeGroup().add(domainAttribute);
+            extensionType.getAttributeOrAttributeGroup().add(asyncAttribute);
 
             ComplexContent complextContent = new ComplexContent();
             complextContent.setExtension(extensionType);

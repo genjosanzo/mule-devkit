@@ -61,6 +61,7 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
     public static final String LOCAL_PORT_FIELD_NAME = "localPort";
     public static final String REMOTE_PORT_FIELD_NAME = "remotePort";
     public static final String DOMAIN_FIELD_NAME = "domain";
+    public static final String ASYNC_FIELD_NAME = "async";
     private static final String CLASS_NAME = "DefaultHttpCallback";
     private static final String INBOUND_ENDPOINT_EXCHANGE_PATTERN = "REQUEST_RESPONSE";
     private Method buildUrlMethod;
@@ -69,7 +70,7 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
     private Method createHttpInboundEndpointMethod;
     private FieldVariable urlField;
     private Method createConnectorMethod;
-    private Method createFlowRefMessageProcessorMethod;
+    private Method wrapMessageProcessorInAsyncChain;
     private FieldVariable loggerField;
     private FieldVariable callbackFlowField;
     private FieldVariable localPortField;
@@ -78,6 +79,7 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
     private FieldVariable localUrlField;
     private FieldVariable callbackPathField;
     private FieldVariable remotePortField;
+    private FieldVariable async;
 
     @Override
     protected boolean shouldGenerate(DevkitTypeElement typeElement) {
@@ -94,7 +96,8 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
         generateConstructorArgMessageProcessor(callbackClass);
         generateConstructorArgMessageProcessorAndCallbackPath(callbackClass);
         generateBuildUrlMethod(callbackClass);
-        generateCreateFlowRefMessageProcessorMethod(callbackClass);
+        createMessageProcessorInnerClass(callbackClass);
+        generateWrapMessageProcessorInAsyncChain(callbackClass);
         generateCreateConnectorMethod(callbackClass);
         generateCreateHttpInboundEndpointMethod(callbackClass);
         generateStartMethod(callbackClass);
@@ -162,6 +165,11 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
                 name("callbackPath").
                 javadoc("Optional path to set up the endpoint").
                 build();
+        async = new FieldBuilder(callbackClass).
+                type(Boolean.class).
+                name(ASYNC_FIELD_NAME).
+                javadoc("Whether the the message processor that invokes the callback flow is asynchronous").
+                build();
     }
 
     private void generateConstructorArgSimpleFlowConstruct(DefinedClass callbackClass) {
@@ -171,11 +179,13 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
         Variable callbackDomainArg = constructor.param(ref(String.class), "callbackDomain");
         Variable localPortArg = constructor.param(ref(Integer.class), "localPort");
         Variable remotePortArg = constructor.param(ref(Integer.class), "remotePort");
+        Variable asyncArg = constructor.param(ref(Boolean.class), "async");
         constructor.body().assign(ExpressionFactory._this().ref(callbackFlowField), callbackFlowArg);
         constructor.body().assign(ExpressionFactory._this().ref(muleContextField), muleContextArg);
         constructor.body().assign(ExpressionFactory._this().ref(localPortField), localPortArg);
         constructor.body().assign(ExpressionFactory._this().ref(remotePortField), remotePortArg);
         constructor.body().assign(ExpressionFactory._this().ref(domainField), callbackDomainArg);
+        constructor.body().assign(ExpressionFactory._this().ref(async), asyncArg);
     }
 
     private void generateConstructorArgMessageProcessor(DefinedClass callbackClass) {
@@ -185,11 +195,13 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
         Variable callbackDomainArg = constructor.param(ref(String.class), "callbackDomain");
         Variable localPortArg = constructor.param(ref(Integer.class), "localPort");
         Variable remotePortArg = constructor.param(ref(Integer.class), "remotePort");
+        Variable asyncArg = constructor.param(ref(Boolean.class), "async");
         constructor.body().assign(ExpressionFactory._this().ref(callbackMessageProcessorField), messageProcessorArg);
         constructor.body().assign(ExpressionFactory._this().ref(muleContextField), muleContextArg);
         constructor.body().assign(ExpressionFactory._this().ref(localPortField), localPortArg);
         constructor.body().assign(ExpressionFactory._this().ref(remotePortField), remotePortArg);
         constructor.body().assign(ExpressionFactory._this().ref(domainField), callbackDomainArg);
+        constructor.body().assign(ExpressionFactory._this().ref(async), asyncArg);
     }
 
     private void generateConstructorArgMessageProcessorAndCallbackPath(DefinedClass callbackClass) {
@@ -200,12 +212,14 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
         Variable localPortArg = constructor.param(ref(Integer.class), "localPort");
         Variable remotePortArg = constructor.param(ref(Integer.class), "remotePort");
         Variable callbackPathArg = constructor.param(ref(String.class), "callbackPath");
+        Variable asyncArg = constructor.param(ref(Boolean.class), "async");
         constructor.body().assign(ExpressionFactory._this().ref(callbackMessageProcessorField), messageProcessorArg);
         constructor.body().assign(ExpressionFactory._this().ref(muleContextField), muleContextArg);
         constructor.body().assign(ExpressionFactory._this().ref(localPortField), localPortArg);
         constructor.body().assign(ExpressionFactory._this().ref(domainField), callbackDomainArg);
         constructor.body().assign(ExpressionFactory._this().ref(remotePortField), remotePortArg);
         constructor.body().assign(ExpressionFactory._this().ref(callbackPathField), callbackPathArg);
+        constructor.body().assign(ExpressionFactory._this().ref(async), asyncArg);
     }
 
     private void generateBuildUrlMethod(DefinedClass callbackClass) {
@@ -224,23 +238,15 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
         body._return(urlBuilder.invoke("toString"));
     }
 
-    private void generateCreateFlowRefMessageProcessorMethod(DefinedClass callbackClass) {
-        createMessageProcessorInnerClass(callbackClass);
+    private void generateWrapMessageProcessorInAsyncChain(DefinedClass callbackClass) {
 
-        createFlowRefMessageProcessorMethod = callbackClass.method(Modifier.PRIVATE, ref(MessageProcessor.class), "createFlowRefMessageProcessor")._throws(ref(MuleException.class));
-        Block body = createFlowRefMessageProcessorMethod.body();
-
+        wrapMessageProcessorInAsyncChain = callbackClass.method(Modifier.PRIVATE, ref(MessageProcessor.class), "wrapMessageProcessorInAsyncChain")._throws(ref(MuleException.class));
+        Variable messageProcessorParam = wrapMessageProcessorInAsyncChain.param(ref(MessageProcessor.class), "messageProcessor");
+        Block body = wrapMessageProcessorInAsyncChain.body();
 
         Variable asyncMessageProcessorsFactoryBean = body.decl(ref(AsyncMessageProcessorsFactoryBean.class), "asyncMessageProcessorsFactoryBean", ExpressionFactory._new(ref(AsyncMessageProcessorsFactoryBean.class)));
         body.invoke(asyncMessageProcessorsFactoryBean, "setMuleContext").arg(muleContextField);
-
-        Variable messageProcessor = body.decl(ref(MessageProcessor.class), "messageProcessor");
-
-        Conditional ifCallbackFlowNotNull = body._if(Op.ne(callbackFlowField, ExpressionFactory._null()));
-        ifCallbackFlowNotNull._then().assign(messageProcessor, ExpressionFactory._new(callbackClass.listClasses()[0]));
-        ifCallbackFlowNotNull._else().assign(messageProcessor, callbackMessageProcessorField);
-
-        body.invoke(asyncMessageProcessorsFactoryBean, "setMessageProcessors").arg(ref(Arrays.class).staticInvoke("asList").arg(messageProcessor));
+        body.invoke(asyncMessageProcessorsFactoryBean, "setMessageProcessors").arg(ref(Arrays.class).staticInvoke("asList").arg(messageProcessorParam));
 
         TryStatement tryStatement = body._try();
         tryStatement.body()._return(ExpressionFactory.cast(ref(MessageProcessor.class), asyncMessageProcessorsFactoryBean.invoke("getObject")));
@@ -280,10 +286,11 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
         body.invoke(flowConstructVariable, "setMessageSource").arg(ExpressionFactory.invoke(createHttpInboundEndpointMethod));
 
         Variable messageProcessor = body.decl(ref(MessageProcessor.class), "messageProcessor");
-
         Conditional ifCallbackFlowNotNull = body._if(Op.ne(callbackFlowField, ExpressionFactory._null()));
         ifCallbackFlowNotNull._then().assign(messageProcessor, ExpressionFactory._new(callbackClass.listClasses()[0]));
         ifCallbackFlowNotNull._else().assign(messageProcessor, callbackMessageProcessorField);
+
+        body._if(async)._then().assign(messageProcessor, ExpressionFactory.invoke(wrapMessageProcessorInAsyncChain).arg(messageProcessor));
 
         Variable mps = body.decl(ref(List.class).narrow(ref(MessageProcessor.class)), "messageProcessors", ExpressionFactory._new(ref(ArrayList.class).narrow(MessageProcessor.class)));
         body.invoke(mps, "add").arg(messageProcessor);
