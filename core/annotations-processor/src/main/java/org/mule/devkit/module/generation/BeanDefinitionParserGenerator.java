@@ -27,6 +27,7 @@ import org.mule.api.annotations.callback.HttpCallback;
 import org.mule.api.annotations.callback.InterceptCallback;
 import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.oauth.OAuth;
+import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.config.PoolingProfile;
@@ -213,12 +214,13 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
-        if (element instanceof TypeElement && (typeElement.hasAnnotation(OAuth.class) || typeElement.hasProcessorMethodWithParameter(HttpCallback.class))) {
+        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class) || typeElement.hasProcessorMethodWithParameter(HttpCallback.class)) {
             Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class), "httpCallbackConfigElement", ref(DomUtils.class).staticInvoke("getChildElementByTagName").
                     arg(element).arg(SchemaGenerator.HTTP_CALLBACK_CONFIG_ELEMENT_NAME));
-            generateParseSupportedType(parse.body(), listElement, builder, HttpCallbackAdapterGenerator.DOMAIN_FIELD_NAME);
-            generateParseSupportedType(parse.body(), listElement, builder, HttpCallbackAdapterGenerator.LOCAL_PORT_FIELD_NAME);
-            generateParseSupportedType(parse.body(), listElement, builder, HttpCallbackAdapterGenerator.REMOTE_PORT_FIELD_NAME);
+            Block ifHttpCallbackConfigPresent = parse.body()._if(Op.ne(listElement, ExpressionFactory._null()))._then();
+            generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.DOMAIN_FIELD_NAME);
+            generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.LOCAL_PORT_FIELD_NAME);
+            generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.REMOTE_PORT_FIELD_NAME);
         }
 
         if (sessionCreate != null) {
