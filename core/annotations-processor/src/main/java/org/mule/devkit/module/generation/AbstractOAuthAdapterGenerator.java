@@ -131,15 +131,16 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
             initialise.body().invoke(ExpressionFactory._super(), Initialisable.PHASE_NAME);
         }
         Invocation domain = ExpressionFactory.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.DOMAIN_FIELD_NAME));
-        Invocation port = ExpressionFactory.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.PORT_FIELD_NAME));
+        Invocation localPort = ExpressionFactory.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.LOCAL_PORT_FIELD_NAME));
+        Invocation remotePort = ExpressionFactory.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.REMOTE_PORT_FIELD_NAME));
         FieldVariable callback = oauthAdapter.fields().get(CALLBACK_FIELD_NAME);
         FieldVariable muleContext = oauthAdapter.fields().get(MULE_CONTEXT_FIELD_NAME);
         if (StringUtils.isEmpty(callbackPath)) {
             initialise.body().assign(callback, ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
-                    arg(ExpressionFactory._new(messageProcessor)).arg(muleContext).arg(domain).arg(port));
+                    arg(ExpressionFactory._new(messageProcessor)).arg(muleContext).arg(domain).arg(localPort).arg(remotePort));
         } else {
             initialise.body().assign(callback, ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
-                    arg(ExpressionFactory._new(messageProcessor)).arg(muleContext).arg(domain).arg(port).arg(callbackPath));
+                    arg(ExpressionFactory._new(messageProcessor)).arg(muleContext).arg(domain).arg(localPort).arg(remotePort).arg(callbackPath));
         }
         return initialise;
     }

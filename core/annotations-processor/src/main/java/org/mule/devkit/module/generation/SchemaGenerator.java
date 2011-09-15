@@ -85,7 +85,8 @@ import java.util.Set;
 public class SchemaGenerator extends AbstractModuleGenerator {
 
     public static final String DOMAIN_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.DOMAIN_FIELD_NAME;
-    public static final String PORT_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.PORT_FIELD_NAME;
+    public static final String LOCAL_PORT_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.LOCAL_PORT_FIELD_NAME;
+    public static final String REMOTE_PORT_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.REMOTE_PORT_FIELD_NAME;
     public static final String HTTP_CALLBACK_CONFIG_ELEMENT_NAME = "http-callback-config";
     private static final String ATTRIBUTE_NAME_KEY = "key";
     private static final String ATTRIBUTE_NAME_REF = "ref";
@@ -703,11 +704,17 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             domainAttribute.setType(SchemaConstants.STRING);
             domainAttribute.setDefault(DOMAIN_DEFAULT_VALUE);
 
-            Attribute portAttribute = new Attribute();
-            portAttribute.setUse(SchemaConstants.USE_OPTIONAL);
-            portAttribute.setName(PORT_ATTRIBUTE_NAME);
-            portAttribute.setType(SchemaConstants.STRING);
-            portAttribute.setDefault(PORT_DEFAULT_VALUE);
+            Attribute localPortAttribute = new Attribute();
+            localPortAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+            localPortAttribute.setName(LOCAL_PORT_ATTRIBUTE_NAME);
+            localPortAttribute.setType(SchemaConstants.STRING);
+            localPortAttribute.setDefault(PORT_DEFAULT_VALUE);
+
+            Attribute remotePortAttribute = new Attribute();
+            remotePortAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+            remotePortAttribute.setName(REMOTE_PORT_ATTRIBUTE_NAME);
+            remotePortAttribute.setType(SchemaConstants.STRING);
+            remotePortAttribute.setDefault(PORT_DEFAULT_VALUE);
 
             TopLevelElement httpCallbackConfig = new TopLevelElement();
             httpCallbackConfig.setName(HTTP_CALLBACK_CONFIG_ELEMENT_NAME);
@@ -722,7 +729,8 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
             ExtensionType extensionType = new ExtensionType();
             extensionType.setBase(SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE);
-            extensionType.getAttributeOrAttributeGroup().add(portAttribute);
+            extensionType.getAttributeOrAttributeGroup().add(localPortAttribute);
+            extensionType.getAttributeOrAttributeGroup().add(remotePortAttribute);
             extensionType.getAttributeOrAttributeGroup().add(domainAttribute);
 
             ComplexContent complextContent = new ComplexContent();

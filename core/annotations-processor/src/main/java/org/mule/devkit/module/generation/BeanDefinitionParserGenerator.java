@@ -217,7 +217,8 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class), "httpCallbackConfigElement", ref(DomUtils.class).staticInvoke("getChildElementByTagName").
                     arg(element).arg(SchemaGenerator.HTTP_CALLBACK_CONFIG_ELEMENT_NAME));
             generateParseSupportedType(parse.body(), listElement, builder, HttpCallbackAdapterGenerator.DOMAIN_FIELD_NAME);
-            generateParseSupportedType(parse.body(), listElement, builder, HttpCallbackAdapterGenerator.PORT_FIELD_NAME);
+            generateParseSupportedType(parse.body(), listElement, builder, HttpCallbackAdapterGenerator.LOCAL_PORT_FIELD_NAME);
+            generateParseSupportedType(parse.body(), listElement, builder, HttpCallbackAdapterGenerator.REMOTE_PORT_FIELD_NAME);
         }
 
         if (sessionCreate != null) {

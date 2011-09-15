@@ -39,7 +39,8 @@ import javax.lang.model.element.TypeElement;
 
 public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
 
-    public static final String PORT_FIELD_NAME = "port";
+    public static final String LOCAL_PORT_FIELD_NAME = "localPort";
+    public static final String REMOTE_PORT_FIELD_NAME = "remotePort";
     public static final String DOMAIN_FIELD_NAME = "domain";
 
     @Override
@@ -52,20 +53,24 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
     @Override
     protected void doGenerate(DevkitTypeElement typeElement) {
         DefinedClass httpCallbackAdapter = getHttpCallbackAdapterClass(typeElement);
-        FieldVariable port = portFieldWithGetterAndSetter(httpCallbackAdapter);
+        FieldVariable localPort = localPortFieldWithGetterAndSetter(httpCallbackAdapter);
+        FieldVariable remotePort = remotePortFieldWithGetterAndSetter(httpCallbackAdapter);
         FieldVariable domain = domainFieldWithGetterAndSetter(httpCallbackAdapter);
         FieldVariable logger = FieldBuilder.newLoggerField(httpCallbackAdapter);
-        generateInitialiseMethod(httpCallbackAdapter, port, domain, logger);
+        generateInitialiseMethod(httpCallbackAdapter, localPort, remotePort, domain, logger);
     }
 
-    private void generateInitialiseMethod(DefinedClass httpCallbackAdapter, FieldVariable port, FieldVariable domain, FieldVariable logger) {
+    private void generateInitialiseMethod(DefinedClass httpCallbackAdapter, FieldVariable localPort, FieldVariable remotePort, FieldVariable domain, FieldVariable logger) {
         Method initialise = httpCallbackAdapter.method(Modifier.PUBLIC, this.context.getCodeModel().VOID, "initialise");
         if(ref(Initialisable.class).isAssignableFrom(httpCallbackAdapter._extends())) {
             initialise.body().invoke(ExpressionFactory._super(), "initialise");
         }
 
-        Block ifPortIsNull = initialise.body()._if(Op.eq(port, ExpressionFactory._null()))._then();
-        assignHttpPortSystemVariable(port, logger, ifPortIsNull);
+        Block ifLocalPortIsNull = initialise.body()._if(Op.eq(localPort, ExpressionFactory._null()))._then();
+        assignHttpPortSystemVariable(localPort, logger, ifLocalPortIsNull);
+
+        Block ifRemotePortIsNull = initialise.body()._if(Op.eq(remotePort, ExpressionFactory._null()))._then();
+        assignHttpPortSystemVariable(remotePort, logger, ifRemotePortIsNull);
 
         Block ifDomainIsNull = initialise.body()._if(Op.eq(domain, ExpressionFactory._null()))._then();
         assignDomainSystemVariable(domain, logger, ifDomainIsNull);
@@ -103,8 +108,12 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
         return oauthAdapter;
     }
 
-    private FieldVariable portFieldWithGetterAndSetter(DefinedClass oauthAdapter) {
-        return new FieldBuilder(oauthAdapter).type(Integer.class).name(PORT_FIELD_NAME).getterAndSetter().build();
+    private FieldVariable localPortFieldWithGetterAndSetter(DefinedClass oauthAdapter) {
+        return new FieldBuilder(oauthAdapter).type(Integer.class).name(LOCAL_PORT_FIELD_NAME).getterAndSetter().build();
+    }
+
+    private FieldVariable remotePortFieldWithGetterAndSetter(DefinedClass oauthAdapter) {
+        return new FieldBuilder(oauthAdapter).type(Integer.class).name(REMOTE_PORT_FIELD_NAME).getterAndSetter().build();
     }
 
     private FieldVariable domainFieldWithGetterAndSetter(DefinedClass oauthAdapter) {
