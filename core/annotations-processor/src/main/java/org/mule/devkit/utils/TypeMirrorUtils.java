@@ -18,19 +18,33 @@
 package org.mule.devkit.utils;
 
 import org.mule.api.annotations.NestedProcessor;
+import org.mule.api.annotations.callback.InterceptCallback;
+import org.mule.api.annotations.callback.SourceCallback;
+import org.mule.api.annotations.oauth.OAuthAccessToken;
+import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
+import org.mule.api.annotations.param.InboundHeaders;
+import org.mule.api.annotations.param.InvocationHeaders;
+import org.mule.api.annotations.param.OutboundHeaders;
+import org.mule.api.annotations.param.Payload;
 import org.mule.devkit.module.generation.SchemaTypeConversion;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import javax.xml.bind.annotation.XmlType;
+import java.util.Arrays;
 import java.util.List;
 
 public final class TypeMirrorUtils {
+    private static final List<Class<?>> PARAMETER_TYPES_TO_IGNORE = Arrays.<Class<?>>asList(SourceCallback.class, InterceptCallback.class);
+    private static final List<Class<? extends java.lang.annotation.Annotation>> PARAMETERS_ANNOTATIONS_TO_IGNORE =
+            Arrays.asList(InboundHeaders.class, InvocationHeaders.class, OutboundHeaders.class, Payload.class, OAuthAccessToken.class, OAuthAccessTokenSecret.class);
+
     private Types types;
 
     public TypeMirrorUtils(Types types) {
@@ -157,6 +171,20 @@ public final class TypeMirrorUtils {
             }
         }
 
+        return false;
+    }
+
+    public boolean ignoreParameter(VariableElement variable) {
+        String variableType = variable.asType().toString();
+        for (Class<?> typeToIgnore : PARAMETER_TYPES_TO_IGNORE) {
+            if (variableType.contains(typeToIgnore.getName()))
+                return true;
+        }
+        for (Class<? extends java.lang.annotation.Annotation> annotationToIgnore : PARAMETERS_ANNOTATIONS_TO_IGNORE) {
+            if (variable.getAnnotation(annotationToIgnore) != null) {
+                return true;
+            }
+        }
         return false;
     }
 

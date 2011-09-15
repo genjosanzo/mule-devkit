@@ -35,6 +35,7 @@ import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
+import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.Session;
 import org.mule.api.annotations.session.InvalidateSessionOn;
@@ -45,6 +46,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.model.code.Block;
@@ -656,6 +658,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         List<Expression> parameters = new ArrayList<Expression>();
         Variable interceptCallback = null;
+        Variable outboundHeadersMap = null;
         for (VariableElement variable : executableElement.getParameters()) {
             String fieldName = variable.getSimpleName().toString();
 
@@ -752,48 +755,68 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
             } else {
                 InboundHeaders inboundHeaders = variable.getAnnotation(InboundHeaders.class);
+                OutboundHeaders outboundHeaders = variable.getAnnotation(OutboundHeaders.class);
                 InvocationHeaders invocationHeaders = variable.getAnnotation(InvocationHeaders.class);
                 Payload payload = variable.getAnnotation(Payload.class);
 
-                Type type = ref(fields.get(fieldName).getVariableElement().asType()).boxify();
-                String name = "transformed" + StringUtils.capitalize(fieldName);
-                Invocation getGenericType = messageProcessorClass.dotclass().invoke("getDeclaredField").arg(
-                        ExpressionFactory.lit(fields.get(fieldName).getFieldType().name())
-                ).invoke("getGenericType");
-                Invocation evaluateAndTransform = ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(getGenericType);
+                if( outboundHeaders == null ) {
+                    Type type = ref(fields.get(fieldName).getVariableElement().asType()).boxify();
+                    String name = "transformed" + StringUtils.capitalize(fieldName);
+                    Invocation getGenericType = messageProcessorClass.dotclass().invoke("getDeclaredField").arg(
+                            ExpressionFactory.lit(fields.get(fieldName).getFieldType().name())
+                    ).invoke("getGenericType");
+                    Invocation evaluateAndTransform = ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(getGenericType);
 
-                if (inboundHeaders != null) {
-                    if (context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
-                        evaluateAndTransform.arg("#[" + MessageHeadersListExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
-                    } else if (context.getTypeMirrorUtils().isMap(fields.get(fieldName).getVariableElement().asType())) {
-                        evaluateAndTransform.arg("#[" + MessageHeadersExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
+                    if (inboundHeaders != null) {
+                        if (context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
+                            evaluateAndTransform.arg("#[" + MessageHeadersListExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
+                        } else if (context.getTypeMirrorUtils().isMap(fields.get(fieldName).getVariableElement().asType())) {
+                            evaluateAndTransform.arg("#[" + MessageHeadersExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
+                        } else {
+                            evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
+                        }
+                    } else if (invocationHeaders != null) {
+                        if (context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
+                            evaluateAndTransform.arg("#[" + MessageHeadersListExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
+                        } else if (context.getTypeMirrorUtils().isMap(fields.get(fieldName).getVariableElement().asType())) {
+                            evaluateAndTransform.arg("#[" + MessageHeadersExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
+                        } else {
+                            evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
+                        }
+                    } else if (payload != null) {
+                        evaluateAndTransform.arg("#[payload]");
                     } else {
-                        evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
+                        evaluateAndTransform.arg(fields.get(fieldName).getField());
                     }
-                } else if (invocationHeaders != null) {
-                    if (context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
-                        evaluateAndTransform.arg("#[" + MessageHeadersListExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
-                    } else if (context.getTypeMirrorUtils().isMap(fields.get(fieldName).getVariableElement().asType())) {
-                        evaluateAndTransform.arg("#[" + MessageHeadersExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
-                    } else {
-                        evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
-                    }
-                } else if (payload != null) {
-                    evaluateAndTransform.arg("#[payload]");
+
+                    Cast cast = ExpressionFactory.cast(type, evaluateAndTransform);
+
+                    Variable transformed = callProcessor.body().decl(type, name, cast);
+                    parameters.add(transformed);
                 } else {
-                    evaluateAndTransform.arg(fields.get(fieldName).getField());
+                    Type type = ref(HashMap.class).narrow(ref(String.class), ref(Object.class));
+                    String name = "transformed" + StringUtils.capitalize(fieldName);
+
+                    outboundHeadersMap = callProcessor.body().decl(type, name, ExpressionFactory._new(type));
+                    parameters.add(outboundHeadersMap);
                 }
-
-                Cast cast = ExpressionFactory.cast(type, evaluateAndTransform);
-
-                Variable transformed = callProcessor.body().decl(type, name, cast);
-                parameters.add(transformed);
             }
         }
 
         Type returnType = ref(executableElement.getReturnType());
 
         generateMethodCall(callProcessor.body(), object, methodName, parameters, muleContext, event, returnType, poolObject, interceptCallback, messageProcessorListener);
+
+        for (VariableElement variable : executableElement.getParameters()) {
+            OutboundHeaders outboundHeaders = variable.getAnnotation(OutboundHeaders.class);
+            if( outboundHeaders != null ) {
+                Conditional ifNotEmpty = callProcessor.body()._if(Op.cand(Op.ne(outboundHeadersMap, ExpressionFactory._null()),
+                        Op.not(outboundHeadersMap.invoke("isEmpty"))));
+                ifNotEmpty._then().add(event.invoke("getMessage").invoke("addProperties").arg(outboundHeadersMap)
+                        .arg(ref(PropertyScope.class).staticRef("OUTBOUND")));
+            }
+        }
+
 
         callProcessor.body()._return(event);
 

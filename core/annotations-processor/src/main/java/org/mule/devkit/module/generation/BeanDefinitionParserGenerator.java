@@ -349,6 +349,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         int requiredChildElements = 0;
         for (VariableElement variable : executableElement.getParameters()) {
+            if(context.getTypeMirrorUtils().ignoreParameter(variable)) {
+                continue;
+            }
             if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
                 requiredChildElements++;
             } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
@@ -511,29 +514,25 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         Variable beanDefinition = ifTextElement._else().decl(ref(BeanDefinition.class), fieldName + "BeanDefinition",
                 beanDefinitionBuilder.invoke("getBeanDefinition"));
 
-        if (!isList) {
-            ifTextElement._else().add(parserContext.invoke("getRegistry").invoke("registerBeanDefinition")
-                    .arg(ExpressionFactory.invoke("generateChildBeanName").arg(elements))
-                    .arg(beanDefinition));
+        ifTextElement._else().add(parserContext.invoke("getRegistry").invoke("registerBeanDefinition")
+                .arg(ExpressionFactory.invoke("generateChildBeanName").arg(elements))
+                .arg(beanDefinition));
 
-            ifTextElement._else().add(elements.invoke("setAttribute")
-                    .arg("name").arg(ExpressionFactory.invoke("generateChildBeanName").arg(elements)));
+        ifTextElement._else().add(elements.invoke("setAttribute")
+                .arg("name").arg(ExpressionFactory.invoke("generateChildBeanName").arg(elements)));
 
-            ifTextElement._else().add(beanDefinitionBuilder.invoke("setSource").arg(parserContext.invoke("extractSource")
-                    .arg(elements)));
+        ifTextElement._else().add(beanDefinitionBuilder.invoke("setSource").arg(parserContext.invoke("extractSource")
+                .arg(elements)));
 
-            ifTextElement._else().add(beanDefinitionBuilder.invoke("setScope")
-                    .arg(ref(BeanDefinition.class).staticRef("SCOPE_SINGLETON")));
-        }
+        ifTextElement._else().add(beanDefinitionBuilder.invoke("setScope")
+                .arg(ref(BeanDefinition.class).staticRef("SCOPE_SINGLETON")));
 
         Variable list = ifTextElement._else().decl(ref(List.class), fieldName + "List",
                 parserContext.invoke("getDelegate").invoke("parseListElement")
                         .arg(elements).arg(beanDefinitionBuilder.invoke("getBeanDefinition")));
 
-        if (!isList) {
-            ifTextElement._else().add(parserContext.invoke("getRegistry").invoke("removeBeanDefinition")
-                    .arg(ExpressionFactory.invoke("generateChildBeanName").arg(elements)));
-        }
+        ifTextElement._else().add(parserContext.invoke("getRegistry").invoke("removeBeanDefinition")
+                .arg(ExpressionFactory.invoke("generateChildBeanName").arg(elements)));
 
         if( !isList ) {
             ifTextElement._else().add(builder.invoke("addPropertyValue").arg(fieldName)
