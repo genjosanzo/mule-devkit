@@ -278,9 +278,18 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
         Variable dynamicFlowName = body.decl(ref(String.class), "dynamicFlowName", ref(String.class).staticInvoke("format").arg("DynamicFlow-%s").arg(localUrlField));
         body.assign(flowConstructVariable, ExpressionFactory._new(ref(SimpleFlowConstruct.class)).arg(dynamicFlowName).arg(muleContextField));
         body.invoke(flowConstructVariable, "setMessageSource").arg(ExpressionFactory.invoke(createHttpInboundEndpointMethod));
+
+        Variable messageProcessor = body.decl(ref(MessageProcessor.class), "messageProcessor");
+
+        Conditional ifCallbackFlowNotNull = body._if(Op.ne(callbackFlowField, ExpressionFactory._null()));
+        ifCallbackFlowNotNull._then().assign(messageProcessor, ExpressionFactory._new(callbackClass.listClasses()[0]));
+        ifCallbackFlowNotNull._else().assign(messageProcessor, callbackMessageProcessorField);
+
         Variable mps = body.decl(ref(List.class).narrow(ref(MessageProcessor.class)), "messageProcessors", ExpressionFactory._new(ref(ArrayList.class).narrow(MessageProcessor.class)));
-        body.invoke(mps, "add").arg(ExpressionFactory._new(callbackClass.classes().next()));
+        body.invoke(mps, "add").arg(messageProcessor);
+
         body.invoke(flowConstructVariable, "setMessageProcessors").arg(mps);
+
         body.invoke(flowConstructVariable, "initialise");
         body.invoke(flowConstructVariable, "start");
         body.invoke(loggerField, "debug").arg(ref(String.class).staticInvoke("format").arg("Created flow with http inbound endpoint listening at: %s").arg(urlField));
