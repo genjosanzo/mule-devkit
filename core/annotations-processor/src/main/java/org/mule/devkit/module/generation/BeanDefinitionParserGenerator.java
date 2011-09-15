@@ -348,6 +348,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         int requiredChildElements = 0;
         for (VariableElement variable : executableElement.getParameters()) {
+            if(context.getTypeMirrorUtils().ignoreParameter(variable)) {
+                continue;
+            }
             if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
                 requiredChildElements++;
             } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {

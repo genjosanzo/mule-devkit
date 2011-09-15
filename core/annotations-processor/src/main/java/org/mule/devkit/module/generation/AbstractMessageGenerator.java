@@ -323,7 +323,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                     } else {
                         Conditional ifIsList = initialise.body()._if(Op._instanceof(variableElement.getField(), ref(List.class)));
                         ForEach forEachProcessor = ifIsList._then().forEach(ref(MessageProcessor.class), "messageProcessor", ExpressionFactory.cast(ref(List.class).narrow(MessageProcessor.class), fields.get(fieldName).getField()));
-                        forEachProcessor.body().add(
+                        Conditional ifInitialisable = forEachProcessor.body()._if(Op._instanceof(forEachProcessor.var(), ref(Initialisable.class)));
+                        ifInitialisable._then().add(
                                 ExpressionFactory.cast(ref(Initialisable.class), forEachProcessor.var()).invoke("initialise")
                         );
                     }

@@ -23,17 +23,10 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
 import org.mule.api.annotations.callback.HttpCallback;
-import org.mule.api.annotations.callback.InterceptCallback;
-import org.mule.api.annotations.callback.SourceCallback;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
-import org.mule.api.annotations.oauth.OAuthAccessToken;
-import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.param.Default;
-import org.mule.api.annotations.param.InboundHeaders;
-import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.Optional;
-import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.Session;
 import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.generation.GenerationException;
@@ -77,9 +70,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class SchemaGenerator extends AbstractModuleGenerator {
@@ -105,9 +96,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private static final String TRANSFER_OBJECT_TYPE_SUFFIX = "TransferObjectType";
     private static final String DOMAIN_DEFAULT_VALUE = "${fullDomain}";
     private static final String PORT_DEFAULT_VALUE = "${http.port}";
-    private static final List<Class<? extends java.lang.annotation.Annotation>> PARAMETERS_ANNOTATIONS_TO_IGNORE =
-            Arrays.asList(InboundHeaders.class, InvocationHeaders.class, Payload.class, OAuthAccessToken.class, OAuthAccessTokenSecret.class);
-    private static final List<Class<?>> PARAMETER_TYPES_TO_IGNORE = Arrays.<Class<?>>asList(SourceCallback.class, InterceptCallback.class);
     private Schema schema;
     private ObjectFactory objectFactory;
 
@@ -320,6 +308,9 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         if (element.getKind() == ElementKind.METHOD) {
             int requiredChildElements = 0;
             for (VariableElement variable : element.getParameters()) {
+                if (context.getTypeMirrorUtils().ignoreParameter(variable)) {
+                    continue;
+                }
                 if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
                     requiredChildElements++;
                 } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
@@ -329,7 +320,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 }
             }
             for (VariableElement variable : element.getParameters()) {
-                if (ignoreParameter(variable)) {
+                if (context.getTypeMirrorUtils().ignoreParameter(variable)) {
                     continue;
                 }
                 if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
@@ -365,20 +356,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
 
-    }
-
-    private boolean ignoreParameter(VariableElement variable) {
-        String variableType = variable.asType().toString();
-        for (Class<?> typeToIgnore : PARAMETER_TYPES_TO_IGNORE) {
-            if (variableType.contains(typeToIgnore.getName()))
-                return true;
-        }
-        for (Class<? extends java.lang.annotation.Annotation> annotationToIgnore : PARAMETERS_ANNOTATIONS_TO_IGNORE) {
-            if (variable.getAnnotation(annotationToIgnore) != null) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void generateNestedProcessorElement(All all, VariableElement variable) {
