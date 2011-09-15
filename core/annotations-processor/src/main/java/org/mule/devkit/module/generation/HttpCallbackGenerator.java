@@ -50,7 +50,9 @@ import org.mule.devkit.model.code.builders.FieldBuilder;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 
 import javax.lang.model.element.TypeElement;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class HttpCallbackGenerator extends AbstractModuleGenerator {
@@ -276,7 +278,9 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
         Variable dynamicFlowName = body.decl(ref(String.class), "dynamicFlowName", ref(String.class).staticInvoke("format").arg("DynamicFlow-%s").arg(localUrlField));
         body.assign(flowConstructVariable, ExpressionFactory._new(ref(SimpleFlowConstruct.class)).arg(dynamicFlowName).arg(muleContextField));
         body.invoke(flowConstructVariable, "setMessageSource").arg(ExpressionFactory.invoke(createHttpInboundEndpointMethod));
-        body.invoke(flowConstructVariable, "setMessageProcessors").arg(ref(Arrays.class).staticInvoke("asList").arg(ExpressionFactory.invoke(createFlowRefMessageProcessorMethod)));
+        Variable mps = body.decl(ref(List.class).narrow(ref(MessageProcessor.class)), "messageProcessors", ExpressionFactory._new(ref(ArrayList.class).narrow(MessageProcessor.class)));
+        body.invoke(mps, "add").arg(ExpressionFactory._new(callbackClass.classes().next()));
+        body.invoke(flowConstructVariable, "setMessageProcessors").arg(mps);
         body.invoke(flowConstructVariable, "initialise");
         body.invoke(flowConstructVariable, "start");
         body.invoke(loggerField, "debug").arg(ref(String.class).staticInvoke("format").arg("Created flow with http inbound endpoint listening at: %s").arg(urlField));
