@@ -19,7 +19,7 @@ package org.mule.devkit.it;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
@@ -61,7 +61,7 @@ public class HttpCallbackProcessorModuleTest extends FunctionalTestCase {
     }
 
     private MuleEvent runFlow(String flowName) throws Exception {
-        SimpleFlowConstruct flow = (SimpleFlowConstruct) AbstractMuleTestCase.muleContext.getRegistry().lookupFlowConstruct(flowName);
+        Flow flow = (Flow) AbstractMuleTestCase.muleContext.getRegistry().lookupFlowConstruct(flowName);
         MuleEvent event = AbstractMuleTestCase.getTestEvent("");
         return flow.process(event);
     }

@@ -30,7 +30,6 @@ import org.mule.api.annotations.param.Optional;
 import org.mule.api.annotations.param.Session;
 import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.model.schema.All;
 import org.mule.devkit.model.schema.Annotation;
 import org.mule.devkit.model.schema.Any;
 import org.mule.devkit.model.schema.Attribute;
@@ -303,8 +302,8 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         Attribute configRefAttr = createAttribute(ATTRIBUTE_NAME_CONFIG_REF, true, SchemaConstants.STRING, "Specify which configuration to use for this invocation.");
         complexContentExtension.getAttributeOrAttributeGroup().add(configRefAttr);
 
-        All all = new All();
-        complexContentExtension.setAll(all);
+        ExplicitGroup all = new ExplicitGroup();
+        complexContentExtension.setSequence(all);
 
         if (element.getKind() == ElementKind.METHOD) {
             int requiredChildElements = 0;
@@ -330,7 +329,13 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                         GroupRef groupRef = generateNestedProcessorGroup(optional);
                         complexContentExtension.setGroup(groupRef);
                         complexContentExtension.setAll(null);
-                        complexContent.setMixed(true);
+
+                        Attribute attribute = new Attribute();
+                        attribute.setUse(SchemaConstants.USE_OPTIONAL);
+                        attribute.setName("text");
+                        attribute.setType(SchemaConstants.STRING);
+
+                        complexContentExtension.getAttributeOrAttributeGroup().add(attribute);
                     } else {
                         generateNestedProcessorElement(all, variable);
                     }
@@ -355,11 +360,16 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             }
         }
 
+        if( all.getParticle().size() == 0 ) {
+            complexContentExtension.setSequence(null);
+            //complexContent.setMixed(false);
+        }
+
         schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
 
     }
 
-    private void generateNestedProcessorElement(All all, VariableElement variable) {
+    private void generateNestedProcessorElement(ExplicitGroup all, VariableElement variable) {
         Optional optional = variable.getAnnotation(Optional.class);
 
         TopLevelElement collectionElement = new TopLevelElement();
@@ -368,7 +378,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         if (optional != null) {
             collectionElement.setMinOccurs(BigInteger.valueOf(0L));
-        } else {
+       } else {
             collectionElement.setMinOccurs(BigInteger.valueOf(1L));
         }
         collectionElement.setMaxOccurs("1");
@@ -378,25 +388,33 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         collectionComplexType.setGroup(group);
         collectionElement.setComplexType(collectionComplexType);
+
+        Attribute attribute = new Attribute();
+        attribute.setUse(SchemaConstants.USE_OPTIONAL);
+        attribute.setName("text");
+        attribute.setType(SchemaConstants.STRING);
+
+        collectionComplexType.getAttributeOrAttributeGroup().add(attribute);
+
     }
 
     private GroupRef generateNestedProcessorGroup(Optional optional) {
         GroupRef group = new GroupRef();
         group.generateNestedProcessorGroup(SchemaConstants.MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE);
-        if (optional != null) {
+        //if (optional != null) {
             group.setMinOccurs(BigInteger.valueOf(0L));
-        } else {
-            group.setMinOccurs(BigInteger.valueOf(1L));
-        }
+        //} else {
+        //    group.setMinOccurs(BigInteger.valueOf(1L));
+        //}
         group.setMaxOccurs("unbounded");
         return group;
     }
 
-    private void generateCollectionElement(String targetNamespace, All all, VariableElement variable) {
+    private void generateCollectionElement(String targetNamespace, ExplicitGroup all, VariableElement variable) {
         generateCollectionElement(targetNamespace, all, variable, false);
     }
 
-    private void generateCollectionElement(String targetNamespace, All all, VariableElement variable, boolean forceOptional) {
+    private void generateCollectionElement(String targetNamespace, ExplicitGroup all, VariableElement variable, boolean forceOptional) {
         Optional optional = variable.getAnnotation(Optional.class);
 
         TopLevelElement collectionElement = new TopLevelElement();
@@ -633,8 +651,8 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         Attribute nameAttribute = createAttribute(ATTRIBUTE_NAME_NAME, true, SchemaConstants.STRING, "Give a name to this configuration so it can be later referenced by config-ref.");
         config.getAttributeOrAttributeGroup().add(nameAttribute);
 
-        All all = new All();
-        config.setAll(all);
+        ExplicitGroup all = new ExplicitGroup();
+        config.setSequence(all);
 
         for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
             if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
@@ -736,6 +754,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             poolingProfile.setAnnotation(annotation);
 
             all.getParticle().add(objectFactory.createElement(poolingProfile));
+        }
+
+        if( all.getParticle().size() == 0 ) {
+            config.setSequence(null);
         }
     }
 

@@ -18,7 +18,7 @@
 package org.mule.devkit.it;
 
 import org.mule.api.MuleEvent;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.FunctionalTestCase;
 
@@ -35,12 +35,12 @@ public class EnumModuleTest extends FunctionalTestCase {
         assertEquals("Recio", runFlow("getPropertyValue"));
     }
 
-    private SimpleFlowConstruct lookupFlowConstruct(String name) {
-        return (SimpleFlowConstruct) AbstractMuleTestCase.muleContext.getRegistry().lookupFlowConstruct(name);
+    private Flow lookupFlowConstruct(String name) {
+        return (Flow) AbstractMuleTestCase.muleContext.getRegistry().lookupFlowConstruct(name);
     }
 
     private String runFlow(String flowName) throws Exception {
-        SimpleFlowConstruct flow = lookupFlowConstruct(flowName);
+        Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = AbstractMuleTestCase.getTestEvent("");
         return flow.process(event).getMessage().getPayloadAsString();
     }

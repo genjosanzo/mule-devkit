@@ -12,7 +12,7 @@
         <!--<devkit.version>@project.version@</devkit.version>-->
         <!--<mule.version>@mule.version@</mule.version>-->
         <devkit.version>3.0-SNAPSHOT</devkit.version>
-        <mule.version>3.1.0</mule.version>
+        <mule.version>@mule.version@</mule.version>
     </properties>
 
     <build>

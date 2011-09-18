@@ -32,7 +32,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.transport.Connector;
 import org.mule.config.spring.factories.AsyncMessageProcessorsFactoryBean;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
@@ -142,13 +142,13 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
                 build();
         callbackFlowField = new FieldBuilder(callbackClass).
                 privateVisibility().
-                type(SimpleFlowConstruct.class).
+                type(Flow.class).
                 name("callbackFlow").
                 javadoc("The flow to be called upon the http callback").
                 build();
         flowConstructVariable = new FieldBuilder(callbackClass).
                 privateVisibility().
-                type(SimpleFlowConstruct.class).
+                type(Flow.class).
                 name("flowConstruct").
                 javadoc("The dynamically created flow").
                 build();
@@ -166,7 +166,7 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
 
     private void generateConstructorArgSimpleFlowConstruct(DefinedClass callbackClass) {
         Method constructor = callbackClass.constructor(Modifier.PUBLIC);
-        Variable callbackFlowArg = constructor.param(ref(SimpleFlowConstruct.class), "callbackFlow");
+        Variable callbackFlowArg = constructor.param(ref(Flow.class), "callbackFlow");
         Variable muleContextArg = constructor.param(ref(MuleContext.class), "muleContext");
         Variable callbackDomainArg = constructor.param(ref(String.class), "callbackDomain");
         Variable localPortArg = constructor.param(ref(Integer.class), "localPort");
@@ -276,7 +276,7 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
         body.assign(ExpressionFactory._this().ref(localUrlField), urlField.invoke("replaceFirst").arg(domainField).arg("localhost"));
         body.assign(ExpressionFactory._this().ref(localUrlField), localUrlField.invoke("replaceFirst").arg(ref(String.class).staticInvoke("valueOf").arg(remotePortField)).arg(ref(String.class).staticInvoke("valueOf").arg(localPortField)));
         Variable dynamicFlowName = body.decl(ref(String.class), "dynamicFlowName", ref(String.class).staticInvoke("format").arg("DynamicFlow-%s").arg(localUrlField));
-        body.assign(flowConstructVariable, ExpressionFactory._new(ref(SimpleFlowConstruct.class)).arg(dynamicFlowName).arg(muleContextField));
+        body.assign(flowConstructVariable, ExpressionFactory._new(ref(Flow.class)).arg(dynamicFlowName).arg(muleContextField));
         body.invoke(flowConstructVariable, "setMessageSource").arg(ExpressionFactory.invoke(createHttpInboundEndpointMethod));
 
         Variable messageProcessor = body.decl(ref(MessageProcessor.class), "messageProcessor");

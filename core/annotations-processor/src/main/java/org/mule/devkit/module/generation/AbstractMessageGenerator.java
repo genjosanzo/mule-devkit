@@ -40,7 +40,7 @@ import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -200,7 +200,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                 // for each parameter of type HttpCallback we need two fields: one that will hold a reference to the flow
                 // that is going to be executed upon the callback and the other one to hold the HttpCallback object itself
                 field = new FieldBuilder(messageProcessorClass).
-                        type(SimpleFlowConstruct.class).
+                        type(Flow.class).
                         name(fieldName + "CallbackFlow").
                         javadoc("The flow to be invoked when the http callback is received").build();
                 fieldType = new FieldBuilder(messageProcessorClass).

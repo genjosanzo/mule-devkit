@@ -18,7 +18,7 @@
 package org.mule.devkit.it;
 
 import org.mule.api.MuleEvent;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.NullPayload;
@@ -44,12 +44,12 @@ public class DateModuleTest extends FunctionalTestCase {
         assertEquals(NullPayload.class, responsePayload.getClass());
     }
 
-    private SimpleFlowConstruct lookupFlowConstruct(String name) {
-        return (SimpleFlowConstruct) AbstractMuleTestCase.muleContext.getRegistry().lookupFlowConstruct(name);
+    private Flow lookupFlowConstruct(String name) {
+        return (Flow) AbstractMuleTestCase.muleContext.getRegistry().lookupFlowConstruct(name);
     }
 
     private Object runFlow(String flowName, String payload) throws Exception {
-        SimpleFlowConstruct flow = lookupFlowConstruct(flowName);
+        Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = AbstractMuleTestCase.getTestEvent(payload);
         return flow.process(event).getMessage().getPayload();
     }

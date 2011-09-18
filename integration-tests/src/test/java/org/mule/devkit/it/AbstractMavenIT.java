@@ -63,7 +63,6 @@ public abstract class AbstractMavenIT {
             systemProperties.load(systemPropertiesStream);
 
             verifier.setSystemProperties(systemProperties);
-            verifier.getCliOptions().add("-o");
 
             verifier.executeGoal("clean");
             verifier.executeGoal("package");

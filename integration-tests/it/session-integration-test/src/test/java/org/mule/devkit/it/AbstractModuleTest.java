@@ -18,7 +18,7 @@
 package org.mule.devkit.it;
 
 import org.mule.api.MuleEvent;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.FunctionalTestCase;
 
@@ -26,15 +26,15 @@ public abstract class AbstractModuleTest extends FunctionalTestCase
 {
     private static final String EMPTY_PAYLOAD = "";
 
-    protected SimpleFlowConstruct lookupFlowConstruct(String name)
+    protected Flow lookupFlowConstruct(String name)
     {
-        return (SimpleFlowConstruct) AbstractMuleTestCase.muleContext.getRegistry().lookupFlowConstruct(name);
+        return (Flow) AbstractMuleTestCase.muleContext.getRegistry().lookupFlowConstruct(name);
     }
 
     protected <T> T runFlow(String flowName) throws Exception
     {
         String payload = EMPTY_PAYLOAD;
-        SimpleFlowConstruct flow = lookupFlowConstruct(flowName);
+        Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = AbstractMuleTestCase.getTestEvent(payload);
         MuleEvent responseEvent = flow.process(event);
 
@@ -44,7 +44,7 @@ public abstract class AbstractModuleTest extends FunctionalTestCase
     protected <T> void runFlow(String flowName, T expect) throws Exception
     {
         String payload = EMPTY_PAYLOAD;
-        SimpleFlowConstruct flow = lookupFlowConstruct(flowName);
+        Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = AbstractMuleTestCase.getTestEvent(payload);
         MuleEvent responseEvent = flow.process(event);
 
@@ -53,7 +53,7 @@ public abstract class AbstractModuleTest extends FunctionalTestCase
 
     protected <T, U> void runFlowWithPayload(String flowName, T expect, U payload) throws Exception
     {
-        SimpleFlowConstruct flow = lookupFlowConstruct(flowName);
+        Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = AbstractMuleTestCase.getTestEvent(payload);
         MuleEvent responseEvent = flow.process(event);
 

@@ -36,11 +36,22 @@
     </flow>
 
     <flow name="callbackWithString">
-        <callback:callback>mulesoft</callback:callback>
+        <callback:callback text="mulesoft"/>
     </flow>
 
+    <flow name="callbackWithStringAndChildElements">
+        <callback:process-items>
+            <callback:items>
+                <callback:item>orange</callback:item>
+                <callback:item>apple</callback:item>
+            </callback:items>
+            <callback:processors text="MuleSoft, Inc."/>
+        </callback:process-items>
+    </flow>
+
+
     <flow name="callbackListWithString">
-        <callback:callback-list>mulesoft</callback:callback-list>
+        <callback:callback-list text="mulesoft"/>
     </flow>
 
     <flow name="callbackWithPayload">

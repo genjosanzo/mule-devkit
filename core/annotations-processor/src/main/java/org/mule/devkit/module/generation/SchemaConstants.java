@@ -26,11 +26,10 @@ public final class SchemaConstants {
     public static final String SPRING_FRAMEWORK_NAMESPACE = "http://www.springframework.org/schema/beans";
     public static final String SPRING_FRAMEWORK_SCHEMA_LOCATION = "http://www.springframework.org/schema/beans/spring-beans-3.0.xsd";
     public static final String MULE_NAMESPACE = "http://www.mulesoft.org/schema/mule/core";
-    public static final String MULE_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd";
-    public static final String MULE_SCHEMADOC_NAMESPACE = "http://www.mulesoft.org/schema/mule/schemadoc";
-    public static final String MULE_SCHEMADOC_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/schemadoc/3.1/mule-schemadoc.xsd";
+    public static final String MULE_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
     public static final QName MULE_ABSTRACT_EXTENSION = new QName(MULE_NAMESPACE, "abstract-extension", "mule");
     public static final QName MULE_ABSTRACT_EXTENSION_TYPE = new QName(MULE_NAMESPACE, "abstractExtensionType", "mule");
+    public static final QName MULE_ANNOTATED_MIXED_CONTENT_TYPE = new QName(MULE_NAMESPACE, "annotatedMixedContentType", "mule");
     public static final QName MULE_ABSTRACT_MESSAGE_PROCESSOR = new QName(MULE_NAMESPACE, "abstract-message-processor", "mule");
     public static final QName MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE = new QName(MULE_NAMESPACE, "abstractMessageProcessorType", "mule");
     public static final QName MULE_ABSTRACT_INTERCEPTING_MESSAGE_PROCESSOR = new QName(MULE_NAMESPACE, "abstract-intercepting-message-processor", "mule");

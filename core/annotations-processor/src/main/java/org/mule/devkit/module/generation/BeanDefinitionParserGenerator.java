@@ -43,7 +43,6 @@ import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.ForEach;
-import org.mule.devkit.model.code.ForLoop;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
@@ -60,7 +59,6 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
-import org.w3c.dom.Node;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -494,6 +492,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         Conditional ifNotNull = block._if(Op.ne(elements, ExpressionFactory._null()));
 
+        /*
         Variable containsOnlyText = ifNotNull._then().decl(context.getCodeModel().BOOLEAN, "containsOnlyText", ExpressionFactory.TRUE);
         ForLoop iterateOverNodes = ifNotNull._then()._for();
         Variable i = iterateOverNodes.init(context.getCodeModel().INT, "i", ExpressionFactory.lit(0));
@@ -506,9 +505,20 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         isTextNode._then().assign(containsOnlyText, ExpressionFactory.FALSE);
 
         Conditional ifTextElement = ifNotNull._then()._if(containsOnlyText);
+        */
+
+        /*
+        String text = processorsElement.getAttribute("text");
+        if ((text!= null)&&(!StringUtils.isBlank(text))) {
+            builder.addPropertyValue("processors", text);
+            */
+
+        Variable text = ifNotNull._then().decl(ref(String.class), "text", elements.invoke("getAttribute").arg("text"));
+        Conditional ifTextElement = ifNotNull._then()._if(Op.cand(Op.ne(text, ExpressionFactory._null()),
+                Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(text))));
 
         ifTextElement._then().add(builder.invoke("addPropertyValue")
-                .arg(fieldName).arg(element.invoke("getTextContent")));
+                .arg(fieldName).arg(text));
 
         Variable beanDefinitionBuilder = ifTextElement._else().decl(ref(BeanDefinitionBuilder.class), fieldName + "BeanDefinitionBuilder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition")

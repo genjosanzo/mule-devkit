@@ -20,7 +20,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.registry.RegistrationException;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.devkit.it.config.OAuthModuleOAuth2Adapter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.FunctionalTestCase;
@@ -36,13 +36,6 @@ public class OAuthModuleTest extends FunctionalTestCase {
     @Override
     protected String getConfigResources() {
         return "oauth.xml";
-    }
-
-    @Override
-    protected MuleContext createMuleContext() throws Exception {
-        MuleContext muleContext = super.createMuleContext();
-        muleContext.getRegistry().registerObject("connector.http.mule.default", new HttpConnector(muleContext));
-        return muleContext;
     }
 
     public void testNonProtectedResource() throws Exception {
@@ -98,12 +91,12 @@ public class OAuthModuleTest extends FunctionalTestCase {
         return url;
     }
 
-    private SimpleFlowConstruct lookupFlowConstruct(String name) {
-        return (SimpleFlowConstruct) AbstractMuleTestCase.muleContext.getRegistry().lookupFlowConstruct(name);
+    private Flow lookupFlowConstruct(String name) {
+        return (Flow) AbstractMuleTestCase.muleContext.getRegistry().lookupFlowConstruct(name);
     }
 
     private MuleEvent runFlow(String flowName) throws Exception {
-        SimpleFlowConstruct flow = lookupFlowConstruct(flowName);
+        Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = AbstractMuleTestCase.getTestEvent("");
         return flow.process(event);
     }

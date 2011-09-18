@@ -20,6 +20,7 @@ package org.mule.devkit.module.generation;
 import org.apache.commons.lang.StringUtils;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -317,13 +318,6 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         process.javadoc().add("the actual pojo's method as a callback mechanism.");
         Variable message = process.param(ref(Object.class), "message");
 
-        DefinedClass dummyInboundEndpointClass = context.getClassForRole(DummyInboundEndpointGenerator.DUMMY_INBOUND_ENDPOINT_ROLE);
-
-        Variable dummyImmutableEndpoint = process.body().decl(dummyInboundEndpointClass, "dummyImmutableEndpoint");
-        Invocation newDummyImmutableEndpoint = ExpressionFactory._new(dummyInboundEndpointClass);
-        newDummyImmutableEndpoint.arg(muleContext);
-        process.body().assign(dummyImmutableEndpoint, newDummyImmutableEndpoint);
-
         Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage");
         Invocation newMuleMessage = ExpressionFactory._new(ref(DefaultMuleMessage.class));
         newMuleMessage.arg(message);
@@ -339,7 +333,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         Variable muleEvent = process.body().decl(ref(MuleEvent.class), "muleEvent");
         Invocation newMuleEvent = ExpressionFactory._new(ref(DefaultMuleEvent.class));
         newMuleEvent.arg(muleMessage);
-        newMuleEvent.arg(dummyImmutableEndpoint);
+        newMuleEvent.arg(ref(MessageExchangePattern.class).staticRef("ONE_WAY"));
         newMuleEvent.arg(muleSession);
         process.body().assign(muleEvent, newMuleEvent);
 
