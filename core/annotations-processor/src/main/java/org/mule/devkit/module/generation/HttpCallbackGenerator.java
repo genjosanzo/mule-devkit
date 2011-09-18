@@ -48,6 +48,7 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.builders.FieldBuilder;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.processor.strategy.AsynchronousProcessingStrategy;
 
 import javax.lang.model.element.TypeElement;
 import java.util.ArrayList;
@@ -247,6 +248,7 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
         Variable asyncMessageProcessorsFactoryBean = body.decl(ref(AsyncMessageProcessorsFactoryBean.class), "asyncMessageProcessorsFactoryBean", ExpressionFactory._new(ref(AsyncMessageProcessorsFactoryBean.class)));
         body.invoke(asyncMessageProcessorsFactoryBean, "setMuleContext").arg(muleContextField);
         body.invoke(asyncMessageProcessorsFactoryBean, "setMessageProcessors").arg(ref(Arrays.class).staticInvoke("asList").arg(messageProcessorParam));
+        body.invoke(asyncMessageProcessorsFactoryBean, "setProcessingStrategy").arg(ExpressionFactory._new(ref(AsynchronousProcessingStrategy.class)));
 
         TryStatement tryStatement = body._try();
         tryStatement.body()._return(ExpressionFactory.cast(ref(MessageProcessor.class), asyncMessageProcessorsFactoryBean.invoke("getObject")));
