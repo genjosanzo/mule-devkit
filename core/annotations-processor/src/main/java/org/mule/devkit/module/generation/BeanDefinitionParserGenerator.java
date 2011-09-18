@@ -219,6 +219,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.DOMAIN_FIELD_NAME);
             generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.LOCAL_PORT_FIELD_NAME);
             generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.REMOTE_PORT_FIELD_NAME);
+            generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.ASYNC_FIELD_NAME);
         }
 
         if (sessionCreate != null) {

@@ -334,8 +334,9 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                     Invocation domain = object.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.DOMAIN_FIELD_NAME));
                     Invocation localPort = object.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.LOCAL_PORT_FIELD_NAME));
                     Invocation remotePort = object.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.REMOTE_PORT_FIELD_NAME));
+                    Invocation async = object.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.ASYNC_FIELD_NAME));
                     ifCallbackFlowNameIsNull.assign(variableElement.getFieldType(), ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
-                            arg(callbackFlowName).arg(muleContext).arg(domain).arg(localPort).arg(remotePort));
+                            arg(callbackFlowName).arg(muleContext).arg(domain).arg(localPort).arg(remotePort).arg(async));
                 }
             }
         }

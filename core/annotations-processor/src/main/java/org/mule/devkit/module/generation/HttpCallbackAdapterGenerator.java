@@ -42,6 +42,7 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
     public static final String LOCAL_PORT_FIELD_NAME = "localPort";
     public static final String REMOTE_PORT_FIELD_NAME = "remotePort";
     public static final String DOMAIN_FIELD_NAME = "domain";
+    public static final String ASYNC_FIELD_NAME = "async";
 
     @Override
     protected boolean shouldGenerate(DevkitTypeElement typeElement) {
@@ -57,6 +58,7 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
         FieldVariable remotePort = remotePortFieldWithGetterAndSetter(httpCallbackAdapter);
         FieldVariable domain = domainFieldWithGetterAndSetter(httpCallbackAdapter);
         FieldVariable logger = FieldBuilder.newLoggerField(httpCallbackAdapter);
+        FieldVariable async = asyncFieldWithGetterAndSetter(httpCallbackAdapter);
         generateInitialiseMethod(httpCallbackAdapter, localPort, remotePort, domain, logger);
     }
 
@@ -118,5 +120,9 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
 
     private FieldVariable domainFieldWithGetterAndSetter(DefinedClass oauthAdapter) {
         return new FieldBuilder(oauthAdapter).type(String.class).name(DOMAIN_FIELD_NAME).getterAndSetter().build();
+    }
+
+    private FieldVariable asyncFieldWithGetterAndSetter(DefinedClass oauthAdapter) {
+        return new FieldBuilder(oauthAdapter).type(Boolean.class).name(ASYNC_FIELD_NAME).initialValue(ExpressionFactory.lit(false)).getterAndSetter().build();
     }
 }

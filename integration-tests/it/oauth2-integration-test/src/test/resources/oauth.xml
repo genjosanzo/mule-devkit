@@ -27,7 +27,7 @@
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd">
 
     <oauth:config consumerKey="consumerKey123" consumerSecret="consumerSecret123">
-        <oauth:http-callback-config domain="localhost" localPort="${http.port}" remotePort="${http.port}" />
+        <oauth:http-callback-config domain="localhost" localPort="${http.port}" remotePort="${http.port}" async="true" />
     </oauth:config>
 
     <flow name="protectedResource">
