@@ -68,7 +68,7 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
     protected static final String EXPIRATION_TIME_PATTERN_FIELD_NAME = "EXPIRATION_TIME_PATTERN";
     protected static final String EXPIRATION_FIELD_NAME = "expiration";
 
-    protected DefinedClass getOAuthAdapterClass(TypeElement typeElement, String classSuffix) {
+    protected DefinedClass getOAuthAdapterClass(TypeElement typeElement, String classSuffix, Class<?> interf) {
         String oauthAdapterName = context.getNameUtils().generateClassName(typeElement, ".config", classSuffix);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(oauthAdapterName));
 
@@ -79,6 +79,7 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
         oauthAdapter._implements(Startable.class);
         oauthAdapter._implements(Initialisable.class);
         oauthAdapter._implements(Stoppable.class);
+        oauthAdapter._implements(interf);
 
         context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), oauthAdapter);
 

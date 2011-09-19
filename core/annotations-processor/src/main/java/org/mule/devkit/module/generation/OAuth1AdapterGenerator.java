@@ -25,6 +25,7 @@ import oauth.signpost.signature.AuthorizationHeaderSigningStrategy;
 import oauth.signpost.signature.HmacSha1MessageSigner;
 import oauth.signpost.signature.PlainTextMessageSigner;
 import oauth.signpost.signature.QueryStringSigningStrategy;
+import org.mule.api.annotations.adapter.OAuth1Adapter;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuthConsumerKey;
 import org.mule.api.annotations.oauth.OAuthConsumerSecret;
@@ -64,7 +65,7 @@ public class OAuth1AdapterGenerator extends AbstractOAuthAdapterGenerator {
 
     @Override
     protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
-        DefinedClass oauthAdapter = getOAuthAdapterClass(typeElement, "OAuth1Adapter");
+        DefinedClass oauthAdapter = getOAuthAdapterClass(typeElement, "OAuth1Adapter", OAuth1Adapter.class);
         OAuth oauth = typeElement.getAnnotation(OAuth.class);
         authorizationCodePatternConstant(oauthAdapter, oauth.verifierRegex());
         muleContextField(oauthAdapter);

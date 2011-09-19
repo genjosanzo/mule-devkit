@@ -9,10 +9,10 @@
     <name>Mule DevKit OAuth Integration Tests</name>
 
     <properties>
-        <!--<mule.version>@mule.version@</mule.version>-->
-        <!--<devkit.version>@project.version@</devkit.version>-->
-        <mule.version>@mule.version@</mule.version>
-        <devkit.version>@project.version@</devkit.version>
+        <!--<mule.version>3.2.0</mule.version>-->
+        <!--<devkit.version>3.0-SNAPSHOT</devkit.version>-->
+        <mule.version>3.2.0</mule.version>
+        <devkit.version>3.0-SNAPSHOT</devkit.version>
     </properties>
 
     <build>
@@ -102,7 +102,7 @@
         <dependency>
             <groupId>org.mule.tools.devkit</groupId>
             <artifactId>mule-devkit-annotations</artifactId>
-            <version>@project.version@</version>
+            <version>3.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>

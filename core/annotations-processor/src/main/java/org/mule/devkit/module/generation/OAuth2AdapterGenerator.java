@@ -18,6 +18,7 @@
 package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.StringUtils;
+import org.mule.api.annotations.adapter.OAuth2Adapter;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.annotations.oauth.OAuthConsumerKey;
 import org.mule.api.annotations.oauth.OAuthConsumerSecret;
@@ -57,7 +58,7 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
 
     @Override
     protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
-        DefinedClass oauthAdapter = getOAuthAdapterClass(typeElement, "OAuth2Adapter");
+        DefinedClass oauthAdapter = getOAuthAdapterClass(typeElement, "OAuth2Adapter", OAuth2Adapter.class);
         OAuth2 oauth2 = typeElement.getAnnotation(OAuth2.class);
 
         authorizationCodePatternConstant(oauthAdapter, oauth2.verifierRegex());

@@ -16,13 +16,11 @@
  */
 package org.mule.devkit.it;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.construct.Flow;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.http.HttpConnector;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
