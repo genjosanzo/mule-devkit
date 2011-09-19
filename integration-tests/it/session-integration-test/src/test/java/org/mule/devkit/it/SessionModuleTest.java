@@ -17,6 +17,9 @@
 
 package org.mule.devkit.it;
 
+import org.mule.api.Capabilities;
+import org.mule.api.Capability;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +28,12 @@ public class SessionModuleTest extends AbstractModuleTest {
     @Override
     protected String getConfigResources() {
         return "session.xml";
+    }
+
+    public void testEnsureCapability() throws Exception {
+        Capabilities capabilities = (Capabilities)muleContext.getRegistry().lookupObject("configA");
+
+        assertTrue(capabilities.isCapableOf(Capability.SESSION_MANAGEMENT_CAPABLE));
     }
 
     public void testVerifySessionWithPassword() throws Exception {

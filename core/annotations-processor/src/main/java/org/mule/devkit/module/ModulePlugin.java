@@ -20,6 +20,7 @@ package org.mule.devkit.module;
 import org.mule.devkit.Plugin;
 import org.mule.devkit.generation.Generator;
 import org.mule.devkit.module.generation.BeanDefinitionParserGenerator;
+import org.mule.devkit.module.generation.CapabilitiesAdapterGenerator;
 import org.mule.devkit.module.generation.EnumTransformerGenerator;
 import org.mule.devkit.module.generation.HttpCallbackAdapterGenerator;
 import org.mule.devkit.module.generation.HttpCallbackGenerator;
@@ -64,6 +65,7 @@ public class ModulePlugin implements Plugin {
         generators.add(new SchemaGenerator());
         generators.add(new StringToDateTransformerGenerator());
         generators.add(new HttpCallbackGenerator());
+        generators.add(new CapabilitiesAdapterGenerator());
         generators.add(new LifecycleAdapterGenerator());
         generators.add(new HttpCallbackAdapterGenerator());
         generators.add(new OAuth1AdapterGenerator());

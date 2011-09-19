@@ -26,7 +26,7 @@
         http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/1.0/mule-oauth.xsd
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd">
 
-    <oauth:config consumerKey="consumerKey123" consumerSecret="consumerSecret123">
+    <oauth:config name="default-oauth" consumerKey="consumerKey123" consumerSecret="consumerSecret123">
         <oauth:http-callback-config domain="localhost" localPort="${http.port}" remotePort="${http.port}" async="false"/>
     </oauth:config>
 

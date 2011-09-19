@@ -14,7 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mule.api.annotations;
+package org.mule.api;
 
-public enum Capabilities {
+/**
+ * This interface is implemented for every {@link org.mule.api.annotations.Module} annotated class, to
+ * dynamically query what its capabilities are.
+ */
+public interface Capabilities {
+
+    /**
+     * Returns true if this module implements such
+     * capability
+     *
+     * @param capability The capability to test for
+     * @return True if it does, false otherwise
+     */
+    boolean isCapableOf(Capability capability);
 }

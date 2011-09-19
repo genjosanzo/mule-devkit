@@ -18,6 +18,7 @@
 package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.StringUtils;
+import org.mule.api.Capabilities;
 import org.mule.api.MuleException;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
@@ -77,6 +78,7 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
 
         generateStartMethod(typeElement, poolAdapter, lifecyleEnabledObjectPool, muleContext, poolingProfile);
         generateStopMethod(poolAdapter, lifecyleEnabledObjectPool);
+        generateIsCapableOf(typeElement, poolAdapter);
     }
 
     private void generateStopMethod(DefinedClass poolAdapter, FieldVariable lifecyleEnabledObjectPool) {
@@ -113,11 +115,13 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
     private DefinedClass getPoolAdapterClass(TypeElement typeElement) {
         String poolAdapterName = context.getNameUtils().generateClassName(typeElement, ".config", "PoolAdapter");
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(poolAdapterName));
+
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(poolAdapterName));
         clazz._implements(Startable.class);
         clazz._implements(Stoppable.class);
         clazz._implements(MuleContextAware.class);
         clazz._implements(FlowConstructAware.class);
+        clazz._implements(Capabilities.class);
         context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
 
         return clazz;

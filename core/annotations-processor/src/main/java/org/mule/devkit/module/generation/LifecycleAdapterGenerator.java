@@ -34,7 +34,6 @@ import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.TryStatement;
-import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 
 import javax.annotation.PostConstruct;
@@ -80,7 +79,10 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
     private DefinedClass getLifecycleAdapterClass(TypeElement typeElement) {
         String lifecycleAdapterName = context.getNameUtils().generateClassName(typeElement, ".config", "LifecycleAdapter");
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(lifecycleAdapterName));
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(lifecycleAdapterName), (TypeReference) ref(typeElement.asType()));
+
+        DefinedClass previous = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
+
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(lifecycleAdapterName), previous);
 
         context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
 

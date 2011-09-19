@@ -18,15 +18,21 @@
 package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.StringUtils;
+import org.mule.api.Capability;
 import org.mule.api.MuleContext;
+import org.mule.api.annotations.Module;
+import org.mule.api.annotations.oauth.OAuth;
+import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.annotations.session.SessionCreate;
 import org.mule.api.annotations.session.SessionDestroy;
 import org.mule.devkit.generation.AbstractGenerator;
 import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.generation.DevkitTypeElementImpl;
+import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
+import org.mule.devkit.model.code.FieldRef;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
@@ -115,5 +121,39 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
 
     protected ExecutableElement createSessionForMethod(ExecutableElement executableElement) {
         return createSessionForClass(new DevkitTypeElementImpl((TypeElement) executableElement.getEnclosingElement()));
+    }
+
+    protected void generateIsCapableOf(DevkitTypeElement typeElement, DefinedClass capabilitiesAdapter) {
+        Method isCapableOf = capabilitiesAdapter.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "isCapableOf");
+        Variable capability = isCapableOf.param(ref(Capability.class), "capability");
+        isCapableOf.javadoc().add("Returns true if this module implements such capability");
+
+        addCapability(isCapableOf, capability, ref(Capability.class).staticRef("LIFECYCLE_CAPABLE"));
+
+        if(typeElement.hasAnnotation(OAuth2.class)) {
+            addCapability(isCapableOf, capability, ref(Capability.class).staticRef("OAUTH2_CAPABLE"));
+        }
+
+        if(typeElement.hasAnnotation(OAuth.class)) {
+            addCapability(isCapableOf, capability, ref(Capability.class).staticRef("OAUTH1_CAPABLE"));
+        }
+
+        if(typeElement.getAnnotation(Module.class).poolable()) {
+            addCapability(isCapableOf, capability, ref(Capability.class).staticRef("POOLING_CAPABLE"));
+        }
+
+        ExecutableElement sessionCreate = createSessionForClass(typeElement);
+        ExecutableElement sessionDestroy = destroySessionForClass(typeElement);
+
+        if( sessionCreate != null && sessionDestroy != null ) {
+            addCapability(isCapableOf, capability, ref(Capability.class).staticRef("SESSION_MANAGEMENT_CAPABLE"));
+        }
+
+        isCapableOf.body()._return(ExpressionFactory.FALSE);
+    }
+
+    private void addCapability(Method capableOf, Variable capability, FieldRef capabilityToCheckFor) {
+        Conditional isCapable = capableOf.body()._if(Op.eq(capability, capabilityToCheckFor));
+        isCapable._then()._return(ExpressionFactory.TRUE);
     }
 }

@@ -273,7 +273,6 @@ public class NameUtils {
         return pkg + "." + className + "PoolObject";
     }
 
-
     public String generateClassName(TypeElement typeElement, String extraPackage, String classNameAppend) {
         String typeFullName = getBinaryName(typeElement);
         String pkg = getPackageName(typeFullName);

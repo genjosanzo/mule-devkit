@@ -17,12 +17,23 @@
 
 package org.mule.devkit.it;
 
+import org.mule.api.Capabilities;
+import org.mule.api.Capability;
+import org.mule.tck.AbstractMuleTestCase;
+
 public class PoolModuleTest extends AbstractModuleTest {
 
     @Override
     protected String getConfigResources() {
         return "pool.xml";
     }
+
+    public void testEnsureCapability() throws Exception {
+        Capabilities capabilities = (Capabilities)AbstractMuleTestCase.muleContext.getRegistry().lookupObject("poolConfig");
+
+        assertTrue(capabilities.isCapableOf(Capability.POOLING_CAPABLE));
+    }
+
 
     public void testProcessor() throws Exception {
         runFlow("sumMultiplyAndDivide", 5);

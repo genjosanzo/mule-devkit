@@ -47,6 +47,12 @@ public class SessionAdapterGenerator extends AbstractMessageGenerator {
 
     @Override
     protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+        ExecutableElement sessionCreate = createSessionForClass(typeElement);
+        ExecutableElement sessionDestroy = destroySessionForClass(typeElement);
+
+        if (sessionCreate == null || sessionDestroy == null)
+            return false;
+
         return true;
     }
 
@@ -54,9 +60,6 @@ public class SessionAdapterGenerator extends AbstractMessageGenerator {
     protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
         ExecutableElement sessionCreate = createSessionForClass(typeElement);
         ExecutableElement sessionDestroy = destroySessionForClass(typeElement);
-
-        if (sessionCreate == null || sessionDestroy == null)
-            return;
 
         DefinedClass sessionAdapter = getSessionAdapterClass(typeElement);
 

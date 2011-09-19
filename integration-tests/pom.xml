@@ -62,11 +62,11 @@
                     </includes>
                     <replacements>
                         <replacement>
-                            <token>@project.version@</token>
+                            <token>3.0-SNAPSHOT</token>
                             <value>${project.version}</value>
                         </replacement>
                         <replacement>
-                            <token>@mule.version@</token>
+                            <token>3.2.0</token>
                             <value>${mule.version}</value>
                         </replacement>
                         <replacement>

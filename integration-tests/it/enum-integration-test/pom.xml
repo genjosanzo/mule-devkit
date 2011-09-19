@@ -9,8 +9,8 @@
     <name>Mule DevKit Collection Integration Tests</name>
 
     <properties>
-        <devkit.version>@project.version@</devkit.version>
-        <mule.version>@mule.version@</mule.version>
+        <devkit.version>3.0-SNAPSHOT</devkit.version>
+        <mule.version>3.2.0</mule.version>
     </properties>
 
     <build>

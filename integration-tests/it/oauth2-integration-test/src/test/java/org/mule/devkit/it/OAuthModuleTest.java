@@ -16,6 +16,8 @@
  */
 package org.mule.devkit.it;
 
+import org.mule.api.Capabilities;
+import org.mule.api.Capability;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.registry.RegistrationException;
@@ -34,6 +36,12 @@ public class OAuthModuleTest extends FunctionalTestCase {
     @Override
     protected String getConfigResources() {
         return "oauth.xml";
+    }
+
+    public void testEnsureCapability() throws Exception {
+        Capabilities capabilities = (Capabilities)AbstractMuleTestCase.muleContext.getRegistry().lookupObject("default-oauth");
+
+        assertTrue(capabilities.isCapableOf(Capability.OAUTH2_CAPABLE));
     }
 
     public void testNonProtectedResource() throws Exception {
