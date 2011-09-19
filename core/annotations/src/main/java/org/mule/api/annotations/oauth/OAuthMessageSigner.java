@@ -16,6 +16,10 @@
  */
 package org.mule.api.annotations.oauth;
 
+/**
+ * The signature method to be used in the OAuth 1.0a flow. This method will be included in the auth_signature_method parameter.
+ * The Service Provider will verify the signature as specified in each method.
+ */
 public enum OAuthMessageSigner {
 
     HMAC_SHA1,

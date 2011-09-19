@@ -16,6 +16,10 @@
  */
 package org.mule.api.annotations.oauth;
 
+/**
+ * The enum defines where to include the OAuth 1.0a parameters. This configuration will be used throughout the OAuth 1.0a
+ * flow.
+ */
 public enum OAuthSigningStrategy {
 
     AUTHORIZATION_HEADER,

@@ -22,6 +22,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Parameters annotated with @OAuthAccessTokenSecret need to be inside a class annotated with {@link OAuth}.
+ * The parameter must be of type String. When the method that contains this annotated parameter is invoked, a OAuth
+ * access token secret will be passed in case the Resource Owner already authorized the Consumer, otherwise the method
+ * will not be invoked and the Resource Owner will be redirected to the {@link OAuth#authorizationUrl()}.
+ */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.SOURCE)
 @Documented

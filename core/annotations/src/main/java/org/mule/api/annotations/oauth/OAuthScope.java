@@ -22,6 +22,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * In case the access to the Protected Resources needs to be restricted in scope a field annotated with @OAuthScope
+ * must be present and contain a String indicating the desired scope.
+ */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.SOURCE)
 @Documented

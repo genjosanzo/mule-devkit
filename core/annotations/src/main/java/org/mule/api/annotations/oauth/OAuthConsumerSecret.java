@@ -22,6 +22,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * A class annotated with {@link OAuth} or {@link OAuth2} needs to have exactly one field annotated with @OAuthConsumerKeySecret
+ * and this field must be of type String. It is a responsability of the developer to make sure this field contains the OAuth
+ * Consumer Secret as provided by the Service Provider and described in the OAuth specification.
+ */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.SOURCE)
 @Documented
