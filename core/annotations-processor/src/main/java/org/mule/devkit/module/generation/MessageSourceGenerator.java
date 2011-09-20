@@ -220,11 +220,14 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
                 parameters.add(ExpressionFactory._this());
             } else if (variable.getAnnotation(Session.class) != null) {
                 if (createSession != null) {
-                    Invocation createSessionInvoke = object.invoke("borrowSession");
+                    DefinedClass sessionKey = context.getClassForRole(context.getNameUtils().generateSessionKeyRoleKey((TypeElement)executableElement.getEnclosingElement()));
+                    Invocation newKey = ExpressionFactory._new(sessionKey);
                     for (String field : sessionParameters.keySet()) {
-                        createSessionInvoke.arg(sessionParameters.get(field));
+                        newKey.arg(sessionParameters.get(field));
                     }
 
+                    Invocation createSessionInvoke = object.invoke("borrowSession");
+                    createSessionInvoke.arg(newKey);
                     callSource.body().assign(session, createSessionInvoke);
 
                     parameters.add(session);
@@ -275,18 +278,19 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
             TryStatement tryToReleaseSession = sessionNotNull._try();
 
-            Invocation releaseSession = object.invoke("returnSession");
+            DefinedClass sessionKey = context.getClassForRole(context.getNameUtils().generateSessionKeyRoleKey((TypeElement)executableElement.getEnclosingElement()));
+            Invocation newKey = ExpressionFactory._new(sessionKey);
             for (String field : sessionParameters.keySet()) {
-                releaseSession.arg(sessionParameters.get(field));
+                newKey.arg(sessionParameters.get(field));
             }
+
+            Invocation releaseSession = object.invoke("returnSession");
+            releaseSession.arg(newKey);
             releaseSession.arg(session);
 
             tryToReleaseSession.body().add(releaseSession);
 
             tryToReleaseSession._catch(ref(Exception.class));
-
-            //generateThrow("failedToInvoke", MessagingException.class,
-            //        tryToReleaseSession._catch((TypeReference) ref(Exception.class)), event, methodName);
         }
     }
 

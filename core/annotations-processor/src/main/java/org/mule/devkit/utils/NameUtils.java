@@ -234,6 +234,14 @@ public class NameUtils {
         return pkg + "." + className + "ModuleObject";
     }
 
+    public String generateSessionKeyRoleKey(TypeElement typeElement) {
+        String typeFullName = getBinaryName(typeElement);
+        String pkg = getPackageName(typeFullName);
+        String className = getClassName(typeFullName);
+
+        return pkg + "." + className + "SessionKey";
+    }
+
     public String getBinaryName(TypeElement typeElement) {
         if(typeElement instanceof TypeElementImpl) {
             typeElement = ((DevkitTypeElementImpl) typeElement).unWrap();

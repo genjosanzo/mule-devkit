@@ -672,11 +672,14 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 parameters.add(interceptCallback);
             } else if (variable.getAnnotation(Session.class) != null) {
                 if (createSession != null) {
+
+                    DefinedClass sessionKey = context.getClassForRole(context.getNameUtils().generateSessionKeyRoleKey((TypeElement)executableElement.getEnclosingElement()));
+                    Invocation newKey = ExpressionFactory._new(sessionKey);
                     Invocation createSessionInvoke = object.invoke("borrowSession");
                     for (String field : sessionParameters.keySet()) {
-                        createSessionInvoke.arg(sessionParameters.get(field));
+                        newKey.arg(sessionParameters.get(field));
                     }
-
+                    createSessionInvoke.arg(newKey);
                     callProcessor.body().assign(session, createSessionInvoke);
 
                     parameters.add(session);
@@ -843,10 +846,14 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
             TryStatement innerTry = catchBlock.body()._try();
 
-            Invocation destroySession = object.invoke("destroySession");
+            DefinedClass sessionKey = context.getClassForRole(context.getNameUtils().generateSessionKeyRoleKey((TypeElement)executableElement.getEnclosingElement()));
+            Invocation newKey = ExpressionFactory._new(sessionKey);
             for (String field : sessionParameters.keySet()) {
-                destroySession.arg(sessionParameters.get(field));
+                newKey.arg(sessionParameters.get(field));
             }
+
+            Invocation destroySession = object.invoke("destroySession");
+            destroySession.arg(newKey);
             destroySession.arg(session);
 
             innerTry.body().add(destroySession);
@@ -885,10 +892,14 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
             TryStatement tryToReleaseSession = sessionNotNull._try();
 
-            Invocation releaseSession = object.invoke("returnSession");
+            DefinedClass sessionKey = context.getClassForRole(context.getNameUtils().generateSessionKeyRoleKey((TypeElement)executableElement.getEnclosingElement()));
+            Invocation newKey = ExpressionFactory._new(sessionKey);
             for (String field : sessionParameters.keySet()) {
-                releaseSession.arg(sessionParameters.get(field));
+                newKey.arg(sessionParameters.get(field));
             }
+
+            Invocation releaseSession = object.invoke("returnSession");
+            releaseSession.arg(newKey);
             releaseSession.arg(session);
 
             tryToReleaseSession.body().add(releaseSession);

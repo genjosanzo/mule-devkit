@@ -38,7 +38,7 @@ import org.mule.devkit.module.generation.OAuth2AdapterGenerator;
 import org.mule.devkit.module.generation.PoolAdapterGenerator;
 import org.mule.devkit.module.generation.RegistryBootstrapGenerator;
 import org.mule.devkit.module.generation.SchemaGenerator;
-import org.mule.devkit.module.generation.SessionAdapterGenerator;
+import org.mule.devkit.module.generation.SessionManagerAdapterGenerator;
 import org.mule.devkit.module.generation.SpringNamespaceHandlerGenerator;
 import org.mule.devkit.module.generation.SpringSchemaGenerator;
 import org.mule.devkit.module.generation.StringToDateTransformerGenerator;
@@ -71,7 +71,7 @@ public class ModulePlugin implements Plugin {
         generators.add(new OAuth1AdapterGenerator());
         generators.add(new OAuth2AdapterGenerator());
         generators.add(new LifecycleAdapterFactoryGenerator());
-        generators.add(new SessionAdapterGenerator());
+        generators.add(new SessionManagerAdapterGenerator());
         generators.add(new PoolAdapterGenerator());
         generators.add(new JaxbTransformerGenerator());
         generators.add(new TransformerGenerator());

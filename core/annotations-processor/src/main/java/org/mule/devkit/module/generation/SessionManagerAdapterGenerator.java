@@ -19,6 +19,7 @@ package org.mule.devkit.module.generation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
+import org.mule.api.annotations.adapter.SessionManagerAdapter;
 import org.mule.api.annotations.param.SessionKey;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.config.PoolingProfile;
@@ -40,10 +41,10 @@ import org.mule.devkit.model.code.Variable;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
-public class SessionAdapterGenerator extends AbstractMessageGenerator {
+public class SessionManagerAdapterGenerator extends AbstractMessageGenerator {
 
     @Override
     protected boolean shouldGenerate(DevkitTypeElement typeElement) {
@@ -61,7 +62,7 @@ public class SessionAdapterGenerator extends AbstractMessageGenerator {
         ExecutableElement sessionCreate = createSessionForClass(typeElement);
         ExecutableElement sessionDestroy = destroySessionForClass(typeElement);
 
-        DefinedClass sessionAdapter = getSessionAdapterClass(typeElement);
+        DefinedClass sessionAdapter = getSessionAdapterClass(typeElement, sessionCreate.getReturnType());
 
         // generate fields for each session
         Map<String, AbstractMessageGenerator.FieldVariableElement> fields = generateStandardFieldForEachParameter(sessionAdapter, sessionCreate);
@@ -80,7 +81,7 @@ public class SessionAdapterGenerator extends AbstractMessageGenerator {
             generateGetter(sessionAdapter, fields.get(fieldName).getField());
         }
 
-        DefinedClass sessionAdapterKey = getSessionAdapterKeyClass(sessionAdapter);
+        DefinedClass sessionAdapterKey = getSessionAdapterKeyClass(typeElement, sessionAdapter);
 
         // generate key fields
         Map<String, AbstractMessageGenerator.FieldVariableElement> keyFields = generateStandardFieldForEachParameter(sessionAdapterKey, sessionCreate);
@@ -162,57 +163,59 @@ public class SessionAdapterGenerator extends AbstractMessageGenerator {
 
     private void generateBorrowSessionMethod(ExecutableElement sessionCreate, DefinedClass sessionAdapter, FieldVariable sessionPool, DefinedClass sessionAdapterKey) {
         Method borrowSession = sessionAdapter.method(Modifier.PUBLIC, ref(sessionCreate.getReturnType()), "borrowSession");
+        Variable key = borrowSession.param(sessionAdapterKey, "key");
         borrowSession._throws(ref(Exception.class));
-        borrowSession._throws(ref(NoSuchElementException.class));
-        borrowSession._throws(ref(IllegalStateException.class));
+        /*
         Invocation newKey = ExpressionFactory._new(sessionAdapterKey);
         for (VariableElement variable : sessionCreate.getParameters()) {
             String fieldName = variable.getSimpleName().toString();
             Variable parameter = borrowSession.param(ref(variable.asType()), fieldName);
             newKey.arg(parameter);
-        }
+        } */
         borrowSession.body()._return(
                 ExpressionFactory.cast(ref(sessionCreate.getReturnType()),
                         sessionPool.invoke("borrowObject").arg(
-                                newKey
+                                key
                         ))
         );
     }
 
     private void generateReturnSessionMethod(ExecutableElement sessionCreate, DefinedClass sessionAdapter, FieldVariable sessionPool, DefinedClass sessionAdapterKey) {
         Method returnSession = sessionAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, "returnSession");
+        Variable key = returnSession.param(sessionAdapterKey, "key");
         returnSession._throws(ref(Exception.class));
-        returnSession._throws(ref(NoSuchElementException.class));
-        returnSession._throws(ref(IllegalStateException.class));
+        /*
         Invocation newKey = ExpressionFactory._new(sessionAdapterKey);
         for (VariableElement variable : sessionCreate.getParameters()) {
             String fieldName = variable.getSimpleName().toString();
             Variable parameter = returnSession.param(ref(variable.asType()), fieldName);
             newKey.arg(parameter);
         }
+        */
         Variable session = returnSession.param(ref(sessionCreate.getReturnType()), "session");
         returnSession.body().add(
                 sessionPool.invoke("returnObject").arg(
-                        newKey
+                        key
                 ).arg(session)
         );
     }
 
     private void generateDestroySessionMethod(ExecutableElement sessionCreate, DefinedClass sessionAdapter, FieldVariable sessionPool, DefinedClass sessionAdapterKey) {
         Method destroySessin = sessionAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, "destroySession");
+        Variable key = destroySessin.param(sessionAdapterKey, "key");
         destroySessin._throws(ref(Exception.class));
-        destroySessin._throws(ref(NoSuchElementException.class));
-        destroySessin._throws(ref(IllegalStateException.class));
+        /*
         Invocation newKey = ExpressionFactory._new(sessionAdapterKey);
         for (VariableElement variable : sessionCreate.getParameters()) {
             String fieldName = variable.getSimpleName().toString();
             Variable parameter = destroySessin.param(ref(variable.asType()), fieldName);
             newKey.arg(parameter);
         }
+        */
         Variable session = destroySessin.param(ref(sessionCreate.getReturnType()), "session");
         destroySessin.body().add(
                 sessionPool.invoke("invalidateObject").arg(
-                        newKey
+                        key
                 ).arg(session)
         );
     }
@@ -229,7 +232,7 @@ public class SessionAdapterGenerator extends AbstractMessageGenerator {
         ifNotNull._then().assign(config.ref("maxIdle"), sessionPoolingProfile.invoke("getMaxIdle"));
         ifNotNull._then().assign(config.ref("maxActive"), sessionPoolingProfile.invoke("getMaxActive"));
         ifNotNull._then().assign(config.ref("maxWait"), sessionPoolingProfile.invoke("getMaxWait"));
-        ifNotNull._then().assign(config.ref("whenExhaustedAction"), ExpressionFactory.cast(context.getCodeModel().BYTE,sessionPoolingProfile.invoke("getExhaustedAction")));
+        ifNotNull._then().assign(config.ref("whenExhaustedAction"), ExpressionFactory.cast(context.getCodeModel().BYTE, sessionPoolingProfile.invoke("getExhaustedAction")));
 
         Invocation newObjectFactory = ExpressionFactory._new(sessionAdapterObjectFactory).arg(ExpressionFactory._this());
         initialisableMethod.body().assign(sessionPool, ExpressionFactory._new(ref(GenericKeyedObjectPool.class)).arg(
@@ -321,14 +324,15 @@ public class SessionAdapterGenerator extends AbstractMessageGenerator {
         return sessionAdapterField;
     }
 
-    private DefinedClass getSessionAdapterClass(TypeElement typeElement) {
-        String sessionAdapterName = context.getNameUtils().generateClassName(typeElement, ".config", "SessionAdapter");
+    private DefinedClass getSessionAdapterClass(TypeElement typeElement, TypeMirror session) {
+        String sessionAdapterName = context.getNameUtils().generateClassName(typeElement, ".config", "SessionManagerAdapter");
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(sessionAdapterName));
 
         DefinedClass classToExtend = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
 
         DefinedClass sessionAdapter = pkg._class(context.getNameUtils().getClassName(sessionAdapterName), classToExtend);
         sessionAdapter._implements(ref(Initialisable.class));
+        sessionAdapter._implements(ref(SessionManagerAdapter.class).narrow(getSessionAdapterKeyClass(typeElement, sessionAdapter)).narrow(ref(session)));
 
         context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), sessionAdapter);
 
@@ -339,9 +343,11 @@ public class SessionAdapterGenerator extends AbstractMessageGenerator {
         return sessionAdapter;
     }
 
-    private DefinedClass getSessionAdapterKeyClass(DefinedClass sessionAdapter) {
+    private DefinedClass getSessionAdapterKeyClass(TypeElement typeElement, DefinedClass sessionAdapter) {
         try {
-            return sessionAdapter._class(Modifier.PRIVATE, "SessionKey");
+            DefinedClass sessionKey = sessionAdapter._class(Modifier.PUBLIC | Modifier.STATIC, "SessionKey");
+            context.setClassRole(context.getNameUtils().generateSessionKeyRoleKey(typeElement), sessionKey);
+            return sessionKey;
         } catch (ClassAlreadyExistsException e) {
             return e.getExistingClass();
         }
@@ -349,7 +355,7 @@ public class SessionAdapterGenerator extends AbstractMessageGenerator {
 
     private DefinedClass getSessionAdapterFactoryClass(DefinedClass sessionAdapter) {
         try {
-            DefinedClass objectFactory = sessionAdapter._class(Modifier.PRIVATE, "SessionFactory");
+            DefinedClass objectFactory = sessionAdapter._class(Modifier.PRIVATE | Modifier.STATIC, "SessionFactory");
             objectFactory._implements(KeyedPoolableObjectFactory.class);
             return objectFactory;
         } catch (ClassAlreadyExistsException e) {
