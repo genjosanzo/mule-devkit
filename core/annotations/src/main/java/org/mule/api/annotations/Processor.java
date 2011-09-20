@@ -39,7 +39,7 @@ public @interface Processor {
 
     /**
      * Setting this value to true will trigger the generation of an {@link org.mule.api.processor.InterceptingMessageProcessor} rather than
-     * a {@link org.mule.api.processor.MessageProcessor}. An intercepting processor must receive a {@link org.mule.api.annotations.callback.SourceCallback} to trigger the
+     * a {@link org.mule.api.processor.MessageProcessor}. An intercepting processor must receive a {@link org.mule.api.callback.SourceCallback} to trigger the
      * next portion of the chain.
      * @return
      */

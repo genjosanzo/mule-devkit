@@ -27,7 +27,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Source;
-import org.mule.api.annotations.callback.SourceCallback;
+import org.mule.api.callback.SourceCallback;
 import org.mule.api.annotations.param.Session;
 import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.model.code.Block;

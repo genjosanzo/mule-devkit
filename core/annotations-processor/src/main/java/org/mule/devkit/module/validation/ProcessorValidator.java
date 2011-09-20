@@ -19,7 +19,7 @@ package org.mule.devkit.module.validation;
 
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
-import org.mule.api.annotations.callback.InterceptCallback;
+import org.mule.api.callback.InterceptCallback;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.OutboundHeaders;

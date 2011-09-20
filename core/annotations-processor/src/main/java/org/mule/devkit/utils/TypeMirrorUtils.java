@@ -17,9 +17,9 @@
 
 package org.mule.devkit.utils;
 
-import org.mule.api.annotations.NestedProcessor;
-import org.mule.api.annotations.callback.InterceptCallback;
-import org.mule.api.annotations.callback.SourceCallback;
+import org.mule.api.NestedProcessor;
+import org.mule.api.callback.InterceptCallback;
+import org.mule.api.callback.SourceCallback;
 import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.param.InboundHeaders;

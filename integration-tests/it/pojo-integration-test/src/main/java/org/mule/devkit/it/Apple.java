@@ -17,7 +17,7 @@
 
 package org.mule.devkit.it;
 
-import org.mule.api.annotations.NestedProcessor;
+import org.mule.api.NestedProcessor;
 import org.mule.api.annotations.param.Optional;
 
 public interface Apple {

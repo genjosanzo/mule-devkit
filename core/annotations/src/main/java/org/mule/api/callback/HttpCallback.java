@@ -15,17 +15,13 @@
  * limitations under the License.
  */
 
-package org.mule.api.annotations.callback;
+package org.mule.api.callback;
 
-/**
- * Callback interface used by {@link org.mule.api.annotations.Source} annotated methods to dispatch messages.
- */
-public interface SourceCallback {
-    /**
-     * Dispatch message to the flow
-     *
-     * @param payload The payload of the message
-     * @return The response of the flow
-     */
-    Object process(Object payload) throws Exception;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
+
+public interface HttpCallback extends Startable, Stoppable, MuleContextAware {
+
+    String getUrl();
 }

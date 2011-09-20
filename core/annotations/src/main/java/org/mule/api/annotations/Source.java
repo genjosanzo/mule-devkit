@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
  * This annotation marks a method inside a {@link Module} as a callable from within a Mule flow and capable of
  * generating Mule events. Each marked method will have a {@link org.mule.api.source.MessageSource} generated.
  *
- * The method must receive a {@link org.mule.api.annotations.callback.SourceCallback} as one of its arguments. It does not matter which parameter it is
+ * The method must receive a {@link org.mule.api.callback.SourceCallback} as one of its arguments. It does not matter which parameter it is
  * as long it is there.
  */
 @Target(ElementType.METHOD)

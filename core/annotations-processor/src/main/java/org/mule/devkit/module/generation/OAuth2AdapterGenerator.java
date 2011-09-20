@@ -18,7 +18,7 @@
 package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.StringUtils;
-import org.mule.api.annotations.adapter.OAuth2Adapter;
+import org.mule.api.adapter.OAuth2Adapter;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.annotations.oauth.OAuthConsumerKey;
 import org.mule.api.annotations.oauth.OAuthConsumerSecret;

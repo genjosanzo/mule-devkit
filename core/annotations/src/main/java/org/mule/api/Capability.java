@@ -29,22 +29,22 @@ public enum Capability {
     LIFECYCLE_CAPABLE(0),
 
     /**
-     * This capability indicates that the module implements {@link org.mule.api.annotations.adapter.SessionManagerAdapter}
+     * This capability indicates that the module implements {@link org.mule.api.adapter.SessionManagerAdapter}
      */
     SESSION_MANAGEMENT_CAPABLE(1),
 
     /**
-     * This capability indicates that the module implements {@link org.mule.api.annotations.adapter.OAuth1Adapter}
+     * This capability indicates that the module implements {@link org.mule.api.adapter.OAuth1Adapter}
      */
     OAUTH1_CAPABLE(2),
 
     /**
-     * This capability indicates that the module implements {@link org.mule.api.annotations.adapter.OAuth2Adapter}
+     * This capability indicates that the module implements {@link org.mule.api.adapter.OAuth2Adapter}
      */
     OAUTH2_CAPABLE(3),
 
     /**
-     * This capability indicates that the module implements {@link org.mule.api.annotations.adapter.PoolingAdapter}
+     * This capability indicates that the module implements {@link org.mule.api.adapter.PoolingAdapter}
      */
     POOLING_CAPABLE(4);
 

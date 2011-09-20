@@ -14,20 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.mule.api.adapter;
 
-package org.mule.api.annotations.callback;
+import java.util.Date;
 
-/**
- * Callback interface used by {@link org.mule.api.annotations.Processor} annotated methods which also are
- * declared as intercepting.
- *
- * This callback is there to facilitate the decision made by the processor to continue the chain or to stop
- * it.
- */
-public interface InterceptCallback {
-    /**
-     * Message processors that call this method indicate that they wish the
-     * processing to stop.
-     */
-    void doNotContinue();
+public interface OAuth2Adapter {
+    String getOauthVerifier();
+
+    void setOauthVerifier(String value);
+
+    String getRedirectUrl();
+
+    String getAccessToken();
+
+    void setAccessToken(String value);
+
+    void setExpiration(Date value);
+
+    String getAuthorizationUrl();
+
+    void fetchAccessToken();
+
+    boolean hasTokenExpired();
 }

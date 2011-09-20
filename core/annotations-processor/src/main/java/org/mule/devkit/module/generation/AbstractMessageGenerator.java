@@ -19,9 +19,9 @@ package org.mule.devkit.module.generation;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleContext;
-import org.mule.api.annotations.NestedProcessor;
-import org.mule.api.annotations.callback.HttpCallback;
-import org.mule.api.annotations.callback.SourceCallback;
+import org.mule.api.NestedProcessor;
+import org.mule.api.callback.HttpCallback;
+import org.mule.api.callback.SourceCallback;
 import org.mule.api.annotations.param.Session;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;

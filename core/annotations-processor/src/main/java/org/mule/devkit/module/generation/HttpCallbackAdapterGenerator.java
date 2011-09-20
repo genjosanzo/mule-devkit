@@ -17,7 +17,7 @@
 
 package org.mule.devkit.module.generation;
 
-import org.mule.api.annotations.callback.HttpCallback;
+import org.mule.api.callback.HttpCallback;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.lifecycle.Initialisable;

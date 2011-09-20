@@ -22,7 +22,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.annotations.NestedProcessor;
+import org.mule.api.NestedProcessor;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.devkit.generation.DevkitTypeElement;

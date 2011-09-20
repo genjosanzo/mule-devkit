@@ -24,11 +24,11 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.NestedProcessor;
 import org.mule.api.annotations.Module;
-import org.mule.api.annotations.NestedProcessor;
 import org.mule.api.annotations.Processor;
-import org.mule.api.annotations.callback.HttpCallback;
-import org.mule.api.annotations.callback.InterceptCallback;
+import org.mule.api.callback.HttpCallback;
+import org.mule.api.callback.InterceptCallback;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.annotations.oauth.OAuthAccessToken;
@@ -892,7 +892,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
             TryStatement tryToReleaseSession = sessionNotNull._try();
 
-            DefinedClass sessionKey = context.getClassForRole(context.getNameUtils().generateSessionKeyRoleKey((TypeElement)executableElement.getEnclosingElement()));
+            DefinedClass sessionKey = context.getClassForRole(context.getNameUtils().generateSessionKeyRoleKey((TypeElement) executableElement.getEnclosingElement()));
             Invocation newKey = ExpressionFactory._new(sessionKey);
             for (String field : sessionParameters.keySet()) {
                 newKey.arg(sessionParameters.get(field));

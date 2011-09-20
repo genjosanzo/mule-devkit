@@ -14,26 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mule.api.annotations.adapter;
 
-import java.util.Date;
+package org.mule.api.callback;
 
-public interface OAuth2Adapter {
-    String getOauthVerifier();
-
-    void setOauthVerifier(String value);
-
-    String getRedirectUrl();
-
-    String getAccessToken();
-
-    void setAccessToken(String value);
-
-    void setExpiration(Date value);
-
-    String getAuthorizationUrl();
-
-    void fetchAccessToken();
-
-    boolean hasTokenExpired();
+/**
+ * Callback interface used by {@link org.mule.api.annotations.Source} annotated methods to dispatch messages.
+ */
+public interface SourceCallback {
+    /**
+     * Dispatch message to the flow
+     *
+     * @param payload The payload of the message
+     * @return The response of the flow
+     */
+    Object process(Object payload) throws Exception;
 }

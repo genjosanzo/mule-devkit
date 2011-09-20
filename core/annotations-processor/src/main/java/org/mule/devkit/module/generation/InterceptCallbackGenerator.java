@@ -18,7 +18,7 @@
 package org.mule.devkit.module.generation;
 
 import org.mule.api.annotations.Processor;
-import org.mule.api.annotations.callback.InterceptCallback;
+import org.mule.api.callback.InterceptCallback;
 import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;

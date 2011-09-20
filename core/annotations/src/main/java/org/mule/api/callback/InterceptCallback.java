@@ -15,13 +15,19 @@
  * limitations under the License.
  */
 
-package org.mule.api.annotations.callback;
+package org.mule.api.callback;
 
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
-
-public interface HttpCallback extends Startable, Stoppable, MuleContextAware {
-
-    String getUrl();
+/**
+ * Callback interface used by {@link org.mule.api.annotations.Processor} annotated methods which also are
+ * declared as intercepting.
+ *
+ * This callback is there to facilitate the decision made by the processor to continue the chain or to stop
+ * it.
+ */
+public interface InterceptCallback {
+    /**
+     * Message processors that call this method indicate that they wish the
+     * processing to stop.
+     */
+    void doNotContinue();
 }

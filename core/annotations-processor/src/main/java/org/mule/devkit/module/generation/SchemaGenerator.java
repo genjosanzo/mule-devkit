@@ -22,7 +22,7 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
-import org.mule.api.annotations.callback.HttpCallback;
+import org.mule.api.callback.HttpCallback;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.annotations.param.Default;

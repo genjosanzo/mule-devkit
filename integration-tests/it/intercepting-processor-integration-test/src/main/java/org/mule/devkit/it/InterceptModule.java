@@ -19,7 +19,7 @@ package org.mule.devkit.it;
 
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
-import org.mule.api.annotations.callback.InterceptCallback;
+import org.mule.api.callback.InterceptCallback;
 
 @Module(name = "intercept")
 public class InterceptModule

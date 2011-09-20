@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.mule.api.annotations;
+package org.mule.api;
 
 import java.util.Map;
 

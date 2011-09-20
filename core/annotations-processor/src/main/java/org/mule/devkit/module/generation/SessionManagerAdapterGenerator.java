@@ -19,7 +19,7 @@ package org.mule.devkit.module.generation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
-import org.mule.api.annotations.adapter.SessionManagerAdapter;
+import org.mule.api.adapter.SessionManagerAdapter;
 import org.mule.api.annotations.param.SessionKey;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.config.PoolingProfile;
