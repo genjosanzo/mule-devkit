@@ -20,12 +20,12 @@ package org.mule.devkit.it;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
-import org.mule.api.callback.SourceCallback;
 import org.mule.api.annotations.param.Session;
 import org.mule.api.annotations.param.SessionKey;
 import org.mule.api.annotations.session.InvalidateSessionOn;
 import org.mule.api.annotations.session.SessionCreate;
 import org.mule.api.annotations.session.SessionDestroy;
+import org.mule.api.callback.SourceCallback;
 
 import java.util.Random;
 

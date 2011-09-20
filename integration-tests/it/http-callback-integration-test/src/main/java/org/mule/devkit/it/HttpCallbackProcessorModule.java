@@ -19,8 +19,8 @@ package org.mule.devkit.it;
 
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
-import org.mule.api.callback.HttpCallback;
 import org.mule.api.annotations.param.Optional;
+import org.mule.api.callback.HttpCallback;
 
 import java.io.IOException;
 import java.net.URL;

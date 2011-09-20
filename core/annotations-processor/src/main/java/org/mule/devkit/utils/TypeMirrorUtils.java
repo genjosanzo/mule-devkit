@@ -18,15 +18,15 @@
 package org.mule.devkit.utils;
 
 import org.mule.api.NestedProcessor;
-import org.mule.api.callback.InterceptCallback;
-import org.mule.api.callback.SourceCallback;
 import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
-import org.mule.devkit.module.generation.SchemaTypeConversion;
+import org.mule.api.callback.InterceptCallback;
+import org.mule.api.callback.SourceCallback;
+import org.mule.devkit.generation.spring.SchemaTypeConversion;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
