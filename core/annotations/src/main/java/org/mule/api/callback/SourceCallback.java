@@ -17,6 +17,8 @@
 
 package org.mule.api.callback;
 
+import java.util.Map;
+
 /**
  * Callback interface used by {@link org.mule.api.annotations.Source} annotated methods to dispatch messages.
  */
@@ -28,4 +30,14 @@ public interface SourceCallback {
      * @return The response of the flow
      */
     Object process(Object payload) throws Exception;
+
+    /**
+     * Dispatch message to the flow with properties
+     *
+     * @param payload The payload of the message
+     * @param properties Properties to be attached with inbound scope
+     * @return The response of the flow
+     */
+    Object process(Object payload, Map<String, Object> properties) throws Exception;
+
 }

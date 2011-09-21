@@ -30,4 +30,10 @@ public class SourceModuleTest extends AbstractModuleTest
     {
         runFlow("source");
     }
+
+    public void testSourceWithProperties() throws Exception
+    {
+        runFlow("sourceWithProperties");
+    }
+
 }
