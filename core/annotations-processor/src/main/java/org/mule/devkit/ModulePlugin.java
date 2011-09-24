@@ -37,6 +37,7 @@ import org.mule.devkit.generation.mule.transfomer.EnumTransformerGenerator;
 import org.mule.devkit.generation.mule.transfomer.JaxbTransformerGenerator;
 import org.mule.devkit.generation.mule.transfomer.StringToDateTransformerGenerator;
 import org.mule.devkit.generation.mule.transfomer.TransformerGenerator;
+import org.mule.devkit.module.generation.DSLWrapperGenerator;
 import org.mule.devkit.generation.spring.BeanDefinitionParserGenerator;
 import org.mule.devkit.generation.spring.NamespaceHandlerGenerator;
 import org.mule.devkit.generation.spring.SchemaGenerator;
@@ -85,6 +86,7 @@ public class ModulePlugin implements Plugin {
         generators.add(new SpringNamespaceHandlerGenerator());
         generators.add(new SpringSchemaGenerator());
         generators.add(new RegistryBootstrapGenerator());
+        generators.add(new DSLWrapperGenerator());
 
         validators = new ArrayList<Validator>();
         validators.add(new BasicValidator());

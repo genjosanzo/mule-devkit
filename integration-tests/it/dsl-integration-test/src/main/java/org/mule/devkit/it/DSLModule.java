@@ -22,55 +22,51 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.param.Optional;
 
-import java.util.List;
-import java.util.Map;
+import java.lang.RuntimeException;
 
-@Module(name = "pojo")
-public class PojoModule {
+@Module(name = "dsltst")
+public class DSLModule {
     @Configurable
     @Optional
-    private Apple apple;
+    private String configValue = "";
+
+    private boolean isExecuted = false;
+    private String processedParamValue = null;
 
     @Processor
-    public void bite(Apple apple) throws Exception {
-        apple.setIsBitten(true);
-
-        apple.getWhenBitten().process();
+    public void processSometing(String param) throws Exception {
+        this.processedParamValue = param;
+        isExecuted = true;
     }
 
     @Processor
-    public String setPayload(String payload) {
-        return payload;
+    public String getParamValue() {
+        return processedParamValue;
     }
 
     @Processor
-    public boolean isBitten(Apple apple) {
-        return apple.getIsBitten();
+    public String getConfigValue() {
+        return configValue;
     }
 
     @Processor
-    public boolean areAllBitten(List<Apple> apples) {
-        for (Apple apple : apples) {
-            if (!apple.getIsBitten()) {
-                return false;
-            }
+    public void checkProcessValue(String param) {
+        if (!isExecuted){
+            throw new RuntimeException("Never Executed!");
         }
-
-        return true;
+        if (!param.equalsIgnoreCase(processedParamValue)){
+            throw new RuntimeException("Error");
+        }
     }
 
     @Processor
-    public boolean areAllBittenMap(Map<String, Apple> apples) {
-        for (String key : apples.keySet()) {
-            if (!apples.get(key).getIsBitten()) {
-                return false;
-            }
+    public void checkConfigValue(String param) {
+        if (!param.equalsIgnoreCase(configValue)){
+            throw new RuntimeException("Error");
         }
-
-        return true;
     }
 
-    public void setApple(Apple apple) {
-        this.apple = apple;
+    public void setConfigValue(String configValue) {
+        this.configValue = configValue;
     }
 }

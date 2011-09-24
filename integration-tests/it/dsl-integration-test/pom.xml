@@ -3,10 +3,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.mule.devkit.it</groupId>
-    <artifactId>jaxb-integration-test</artifactId>
+    <artifactId>dsl-integration-test</artifactId>
     <version>1.0</version>
     <packaging>mule-module</packaging>
-    <name>Mule DevKit JAXB Integration Tests</name>
+    <name>Mule DevKit DSL Integration Tests</name>
 
     <build>
         <pluginManagement>
@@ -14,7 +14,7 @@
                 <plugin>
                     <groupId>org.mule.tools.devkit</groupId>
                     <artifactId>mule-devkit-maven-plugin</artifactId>
-                    <version>3.0-SNAPSHOT</version>
+                    <version>@project.version@</version>
                     <extensions>true</extensions>
                 </plugin>
                 <plugin>
@@ -40,7 +40,7 @@
             <plugin>
                 <groupId>org.mule.tools.devkit</groupId>
                 <artifactId>mule-devkit-maven-plugin</artifactId>
-                <version>3.0-SNAPSHOT</version>
+                <version>@project.version@</version>
                 <extensions>true</extensions>
             </plugin>
         </plugins>
@@ -81,21 +81,21 @@
            </exclusions>
        </dependency>
         <dependency>
+           <groupId>org.mule.dsl</groupId>
+           <artifactId>dsl-core</artifactId>
+           <version>0.7-SNAPSHOT</version>
+           <exclusions>
+               <exclusion>
+                   <groupId>org.mule</groupId>
+                   <artifactId>core</artifactId>
+               </exclusion>
+           </exclusions>
+       </dependency>
+        <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>3.2.0</version>
+            <version>3.1.2</version>
             <optional>true</optional>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.safehaus.jug</groupId>
-                    <artifactId>jug</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-spring-config</artifactId>
-            <version>3.2.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.safehaus.jug</groupId>
@@ -106,12 +106,12 @@
         <dependency>
             <groupId>org.mule.tools.devkit</groupId>
             <artifactId>mule-devkit-annotations</artifactId>
-            <version>3.0-SNAPSHOT</version>
+            <version>@project.version@</version>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
-            <version>3.2.0</version>
+            <version>@mule.version@</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -127,19 +127,4 @@
             <classifier>asl</classifier>
         </dependency>
     </dependencies>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>maven2-repository.dev.java.net</id>
-            <url>http://download.java.net/maven/2</url>
-        </pluginRepository>
-    </pluginRepositories>
-
-    <repositories>
-        <repository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Maven 2 Repository</name>
-            <url>http://download.java.net/maven/2</url>
-        </repository>
-    </repositories>
 </project>

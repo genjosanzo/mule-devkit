@@ -205,6 +205,14 @@ public class NameUtils {
         return packageName + "." + className;
     }
 
+    public String generateClassName(ExecutableElement executableElement, String extraPackage, String append) {
+        TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(executableElement.getEnclosingElement())).get(0);
+        String packageName = getPackageName(elements.getBinaryName(parentClass).toString());
+        String className = StringUtils.capitalize(executableElement.getSimpleName().toString()) + append;
+
+        return packageName + extraPackage + "." + className;
+    }
+
     public String generateClassNameInPackage(Element element, String className) {
         Element enclosingElement = element.getEnclosingElement();
         String packageName;

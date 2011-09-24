@@ -118,6 +118,17 @@
 
     <dependencies>
         <dependency>
+           <groupId>org.mule.dsl</groupId>
+           <artifactId>dsl-api</artifactId>
+           <version>0.7-SNAPSHOT</version>
+           <exclusions>
+               <exclusion>
+                   <groupId>org.mule</groupId>
+                   <artifactId>core</artifactId>
+               </exclusion>
+           </exclusions>
+       </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${D}{junit.version}</version>
