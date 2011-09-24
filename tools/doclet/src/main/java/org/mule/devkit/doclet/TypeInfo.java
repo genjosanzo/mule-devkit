@@ -281,7 +281,7 @@ public class TypeInfo {
         makeHDFRecursive(data, base, true, false, new HashSet<String>());
     }
 
-    public void makeHDF(Data data, String base, boolean isLastVararg, HashSet<String> typeVariables) {
+    public void makeHDF(Data data, String base, boolean isLastVararg, Set<String> typeVariables) {
         makeHDFRecursive(data, base, false, isLastVararg, typeVariables);
     }
 
@@ -290,7 +290,7 @@ public class TypeInfo {
     }
 
     private void makeHDFRecursive(Data data, String base, boolean qualified, boolean isLastVararg,
-                                  HashSet<String> typeVars) {
+                                  Set<String> typeVars) {
         String label = qualified ? qualifiedTypeName() : simpleTypeName();
         label += (isLastVararg) ? "..." : dimension();
         data.setValue(base + ".label", label);
@@ -333,7 +333,7 @@ public class TypeInfo {
     }
 
     public static void makeHDF(Data data, String base, TypeInfo[] types, boolean qualified,
-                               HashSet<String> typeVariables) {
+                               Set<String> typeVariables) {
         final int N = types.length;
         for (int i = 0; i < N; i++) {
             types[i].makeHDFRecursive(data, base + "." + i, qualified, false, typeVariables);

@@ -18,7 +18,7 @@ package org.mule.devkit.doclet;
 
 import com.google.clearsilver.jsilver.data.Data;
 
-import java.util.HashSet;
+import java.util.Set;
 
 public class ParameterInfo {
     public ParameterInfo(String name, String typeName, TypeInfo type, boolean isVarArg,
@@ -29,6 +29,7 @@ public class ParameterInfo {
         mIsVarArg = isVarArg;
         mPosition = position;
     }
+
     public ParameterInfo(String name, String typeName, TypeInfo type, boolean isVarArg,
                          SourcePositionInfo position, AnnotationInstanceInfo[] annotations) {
         mName = name;
@@ -63,9 +64,9 @@ public class ParameterInfo {
         return mIsVarArg;
     }
 
-    public void makeHDF(Data data, String base, boolean isLastVararg, HashSet<String> typeVariables) {
+    public void makeHDF(Data data, String base, boolean isLastVararg, Set<String> typeVariables) {
         data.setValue(base + ".name", this.name());
-        if( mTypeName.contains("HttpCallback") ) {
+        if (mTypeName.contains("HttpCallback")) {
             data.setValue(base + ".attributeName", this.name() + "-flow-ref");
         } else {
             data.setValue(base + ".attributeName", this.name());
@@ -74,7 +75,7 @@ public class ParameterInfo {
     }
 
     public static void makeHDF(Data data, String base, ParameterInfo[] params, boolean isVararg,
-                               HashSet<String> typeVariables) {
+                               Set<String> typeVariables) {
         for (int i = 0; i < params.length; i++) {
             params[i].makeHDF(data, base + "." + i, isVararg && (i == params.length - 1), typeVariables);
         }

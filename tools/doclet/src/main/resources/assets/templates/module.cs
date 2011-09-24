@@ -112,7 +112,7 @@ Summary:
 	 <?cs # The apilevel-N class MUST BE LAST in the sequence of class names ?>
     <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:method.since.key ?>" >
         <td class="jd-linkcol" width="100%"><nobr>
-        <span class="sympad">&lt;<?cs var:class.moduleName ?>:config&gt;</nobr>
+        <span class="sympad"><?cs call:link("&lt;" + class.moduleName + ":config&gt;", toroot + "mule/", class.moduleName + ".html#config") ?></nobr>
         <div class="jd-descrdiv">Configure an instance of this module</div>
   </td></tr>
 </table>
@@ -148,8 +148,25 @@ Summary:
 
 <?cs if:subcount(class.config) ?>
 <?cs # this next line must be exactly like this to be parsed by eclipse ?>
-<!-- ========= FIELD DETAIL ======== -->
+<!-- ========= CONFIGURATION DETAIL ======== -->
+<A NAME="config"></A>
 <h2>Configuration</h2>
+<p>To use the this module within a flow the namespace to the module must be included. The resulting flow will look
+similar to the following:</p>
+<pre>
+&lt;mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:<?cs var:class.moduleName ?>="<?cs var:class.moduleNamespace ?>"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core
+               http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               <?cs var:class.moduleNamespace ?>
+               <?cs var:class.moduleSchemaLocation ?>"&gt;
+
+      &lt;!-- here goes your flows and configuration elements --&gt;
+
+&lt;/mule&gt;
+</pre>
 <p>This module is configured using the <i>config</i> element. This element must be placed outside of your flows and at
 the root of your Mule application. You can create as many configurations as you deem necesary as long as each carries
 its own name.</p>
@@ -173,8 +190,39 @@ specify which configuration to use.</p>
       </tr>
       <?cs set:count = count + #1 ?>
     <?cs /each ?>
-<?cs /if ?>
 </table>
+<?cs /if ?>
+
+<?cs if:class.moduleSessionAware=="true" ?>
+<?cs # this next line must be exactly like this to be parsed by eclipse ?>
+<!-- ========= SESSION MANAGEMENT DETAIL ======== -->
+<h2>Session Management</h2>
+<p>This module offers automatic session management via the use of a session pool. The session pool is fully configurable
+by the user of the module. The pool will act a storage mechanism for all the sessions that are currently being
+handled by different module processors.</p>
+<p>Prior to execution of a processor, the module will attempt to lookup a session and if one doesn't exists it will
+create one. That lookup mechanism is done in the session pool via the use of session variables declared as keys.</p>
+<p>The user of the connector can configure the pool by adding a <code>session-pooling-profile</code> to the connector configuration like this:</p>
+<pre>
+    &lt;<?cs var:class.moduleName ?>:session-pooling-profile maxActive="10" maxIdle="10"
+                             exhaustedAction="WHEN_EXHAUSTED_GROW" maxWait="120"/&gt;
+</pre>
+<p>The following is a list of session variables, each session variable can be configured at the config element level or
+they can also be added to each processor. If they are used at the processor level they get the benefit of full expression
+resolution.</p>
+<table id="lconfig" class="jd-sumtable">
+<tr><th colspan="12">Session Variables</th></tr>
+<tr><th>Name</th><th>Description</th></tr>
+<?cs set:count = #2 ?>
+    <?cs each:sessionVariable=class.moduleSessionVariables ?>
+      <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
+          <td class="jd-linkcol"><nobr><?cs var:sessionVariable.name ?></nobr></td>
+          <td class="jd-descrcol" width="100%"><?cs if:sessionVariable.optional=="true" ?><i>Optional.&nbsp;</i><?cs /if ?><?cs call:op_tag_list(sessionVariable.comment) ?></td>
+      </tr>
+      <?cs set:count = count + #1 ?>
+    <?cs /each ?>
+</table>
+<?cs /if ?>
 
 <?cs def:write_op_details(methods) ?>
 <?cs each:method=methods ?>

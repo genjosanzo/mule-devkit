@@ -56,6 +56,13 @@ def:cond_link(text, root, path, condition) ?><?cs
   if:condition ?><a href="<?cs var:root ?><?cs var:path ?>"><?cs /if ?><?cs var:text ?><?cs if:condition ?></a><?cs /if ?><?cs
 /def ?>
 
+<?cs # a conditional link.
+      if the "condition" parameter evals to true then the link is displayed
+      otherwise only the text is displayed
+?><?cs
+def:link(text, root, path) ?><a href="<?cs var:root ?><?cs var:path ?>"><?cs var:text ?></a><?cs
+/def ?>
+
 <?cs # A comma separated parameter list ?><?cs 
 def:parameter_list(params) ?><?cs
   each:param = params ?><?cs
@@ -249,20 +256,30 @@ def:op_description(obj) ?><?cs
       <h5 class="jd-tagtitle">Attributes</h5>
 
       <table class="jd-tagtable">
-      <tr><th>Name</th><th>Default Value</th><th>Description</th></tr><tr>
       <td class="jd-linkcol"><nobr>config-ref</nobr></td>
       <td class="jd-descrcol"></td>
       <td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i>Specify which configuration to use.</td></tr>
           <?cs set:count = #2 ?>
           <?cs each:attribute=obj.paramTags ?>
-            <?cs if:attribute.isNestedProcessor=="0" ?>
-            <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
-                <td class="jd-linkcol"><nobr><?cs var:attribute.attributeName ?></nobr></td>
-                <td class="jd-descrcol"><?cs var:attribute.defaultValue ?></td>
-                <td class="jd-descrcol" width="100%"><?cs if:attribute.optional=="true" ?><i>Optional.&nbsp;</i><?cs /if ?><?cs call:op_tag_list(attribute.comment) ?></td>
-            </tr>
+            <?cs if:attribute.isSession=="1" ?>
+                <?cs each:attribute=obj.sessionTags ?>
+                    <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
+                        <td class="jd-linkcol"><nobr><?cs var:attribute.attributeName ?></nobr></td>
+                        <td class="jd-descrcol"><?cs var:attribute.defaultValue ?></td>
+                        <td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i><?cs call:op_tag_list(attribute.comment) ?></td>
+                    </tr>
+                    <?cs set:count = count + #1 ?>
+                <?cs /each ?>
+            <?cs else ?>
+                <?cs if:attribute.isNestedProcessor=="0" ?>
+                <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
+                    <td class="jd-linkcol"><nobr><?cs var:attribute.attributeName ?></nobr></td>
+                    <td class="jd-descrcol"><?cs var:attribute.defaultValue ?></td>
+                    <td class="jd-descrcol" width="100%"><?cs if:attribute.optional=="true" ?><i>Optional.&nbsp;</i><?cs /if ?><?cs call:op_tag_list(attribute.comment) ?></td>
+                </tr>
+                <?cs set:count = count + #1 ?>
+                <?cs /if ?>
             <?cs /if ?>
-            <?cs set:count = count + #1 ?>
           <?cs /each ?>
       </table>
   </div>

@@ -503,6 +503,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
             String[] names = new String[N];
             boolean[] optional = new boolean[N];
             boolean[] nestedProcessor = new boolean[N];
+            boolean[] session = new boolean[N];
             String[] defaultValue = new String[N];
             String[] attributeName = new String[N];
             String[] comments = new String[N];
@@ -520,8 +521,12 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
                     nestedProcessor[i] = true;
                 }
                 optional[i] = false;
+                session[i] = false;
                 defaultValue[i] = "";
                 for (AnnotationInstanceInfo annotation : mParameters[i].annotations()) {
+                    if (annotation.type().qualifiedName().equals("org.mule.api.annotations.param.Session")) {
+                        session[i] = true;
+                    }
                     if (annotation.type().qualifiedName().equals("org.mule.api.annotations.Parameter")) {
                         for (AnnotationValueInfo value : annotation.elementValues()) {
                             if ("name".equals(value.element().name())) {
@@ -572,7 +577,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
             for (int i = 0; i < N; i++) {
                 mParamTags[i] =
                         new ParamTagInfo("@param", "@param", names[i] + " " + comments[i], attributeName[i],
-                                optional[i], defaultValue[i], nestedProcessor[i], parent(), positions[i]);
+                                optional[i], defaultValue[i], nestedProcessor[i], session[i], parent(), positions[i]);
 
                 // while we're here, if we find any parameters that are still undocumented at this
                 // point, complain. (this warning is off by default, because it's really, really
@@ -676,6 +681,9 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
         data.setValue(base + ".since.key", SinceTagger.keyForName(getSince()));
         data.setValue(base + ".since.name", getSince());
         ParamTagInfo.makeHDF(data, base + ".paramTags", paramTags());
+        if( containingClass().isSessionAware() ) {
+            ParamTagInfo.makeHDF(data, base + ".sessionTags", containingClass().sessionTags());
+        }
         AttrTagInfo.makeReferenceHDF(data, base + ".attrRefs", comment().attrTags());
         ThrowsTagInfo.makeHDF(data, base + ".throws", throwsTags());
         ParameterInfo.makeHDF(data, base + ".params", parameters(), isVarArgs(), typeVariables());
