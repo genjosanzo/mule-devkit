@@ -18,37 +18,17 @@
 package org.mule.devkit;
 
 import org.mule.devkit.generation.Generator;
-import org.mule.devkit.generation.adapter.CapabilitiesAdapterGenerator;
-import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
-import org.mule.devkit.generation.adapter.LifecycleAdapterFactoryGenerator;
-import org.mule.devkit.generation.adapter.LifecycleAdapterGenerator;
-import org.mule.devkit.generation.adapter.OAuth1AdapterGenerator;
-import org.mule.devkit.generation.adapter.OAuth2AdapterGenerator;
-import org.mule.devkit.generation.adapter.PoolAdapterGenerator;
-import org.mule.devkit.generation.adapter.SessionManagerAdapterGenerator;
+import org.mule.devkit.generation.adapter.*;
 import org.mule.devkit.generation.callback.HttpCallbackGenerator;
 import org.mule.devkit.generation.callback.InterceptCallbackGenerator;
-import org.mule.devkit.generation.mule.MessageProcessorGenerator;
-import org.mule.devkit.generation.mule.MessageSourceGenerator;
-import org.mule.devkit.generation.mule.NestedProcessorChainGenerator;
-import org.mule.devkit.generation.mule.NestedProcessorStringGenerator;
-import org.mule.devkit.generation.mule.RegistryBootstrapGenerator;
+import org.mule.devkit.generation.dsl.DSLWrapperGenerator;
+import org.mule.devkit.generation.mule.*;
 import org.mule.devkit.generation.mule.transfomer.EnumTransformerGenerator;
 import org.mule.devkit.generation.mule.transfomer.JaxbTransformerGenerator;
 import org.mule.devkit.generation.mule.transfomer.StringToDateTransformerGenerator;
 import org.mule.devkit.generation.mule.transfomer.TransformerGenerator;
-import org.mule.devkit.generation.spring.BeanDefinitionParserGenerator;
-import org.mule.devkit.generation.spring.NamespaceHandlerGenerator;
-import org.mule.devkit.generation.spring.SchemaGenerator;
-import org.mule.devkit.generation.spring.SpringNamespaceHandlerGenerator;
-import org.mule.devkit.generation.spring.SpringSchemaGenerator;
-import org.mule.devkit.validation.BasicValidator;
-import org.mule.devkit.validation.OAuthValidator;
-import org.mule.devkit.validation.ProcessorValidator;
-import org.mule.devkit.validation.SessionValidator;
-import org.mule.devkit.validation.SourceValidator;
-import org.mule.devkit.validation.TransformerValidator;
-import org.mule.devkit.validation.Validator;
+import org.mule.devkit.generation.spring.*;
+import org.mule.devkit.validation.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,7 +65,7 @@ public class ModulePlugin implements Plugin {
         generators.add(new SpringNamespaceHandlerGenerator());
         generators.add(new SpringSchemaGenerator());
         generators.add(new RegistryBootstrapGenerator());
-        //generators.add(new DSLWrapperGenerator());
+        generators.add(new DSLWrapperGenerator());
 
         validators = new ArrayList<Validator>();
         validators.add(new BasicValidator());

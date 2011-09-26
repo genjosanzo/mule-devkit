@@ -72,7 +72,7 @@
         <dependency>
             <groupId>org.mule.dsl</groupId>
             <artifactId>dsl-api</artifactId>
-            <version>0.7-SNAPSHOT</version>
+            <version>0.7</version>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>

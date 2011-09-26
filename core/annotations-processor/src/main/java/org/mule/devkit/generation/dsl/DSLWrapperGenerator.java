@@ -284,7 +284,7 @@ public class DSLWrapperGenerator extends AbstractModuleGenerator {
     }
 
     private TypeReference builderInterface() {
-        return ref("org.mule.config.dsl.internal.Builder").boxify();
+        return ref("org.mule.config.dsl.internal.DSLBuilder").boxify();
     }
 
     private TypeReference expressionType() {
