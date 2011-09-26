@@ -13,7 +13,7 @@
         <!--<devkit.version>3.0-SNAPSHOT</devkit.version>-->
         <mule.version>3.2.0</mule.version>
         <devkit.version>3.0-SNAPSHOT</devkit.version>
-        <dsl.version>0.7-SNAPSHOT</dsl.version>
+        <dsl.version>0.7</dsl.version>
     </properties>
 
     <build>
