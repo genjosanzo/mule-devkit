@@ -98,6 +98,9 @@
                     <systemPropertyVariables>
                         <archetypeVersion>${project.version}</archetypeVersion>
                     </systemPropertyVariables>
+                    <excludes>
+                        <exclude>**/DSLIT</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
