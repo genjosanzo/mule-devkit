@@ -86,7 +86,7 @@ public class ModulePlugin implements Plugin {
         generators.add(new SpringNamespaceHandlerGenerator());
         generators.add(new SpringSchemaGenerator());
         generators.add(new RegistryBootstrapGenerator());
-        generators.add(new DSLWrapperGenerator());
+        //generators.add(new DSLWrapperGenerator());
 
         validators = new ArrayList<Validator>();
         validators.add(new BasicValidator());
