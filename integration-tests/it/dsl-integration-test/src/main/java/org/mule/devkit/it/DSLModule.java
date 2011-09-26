@@ -22,8 +22,6 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.param.Optional;
 
-import java.lang.RuntimeException;
-
 @Module(name = "dsl")
 public class DSLModule {
     @Configurable

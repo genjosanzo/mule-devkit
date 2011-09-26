@@ -120,7 +120,7 @@
       <file leaf-file-name="CallbackListMessageProcessorDefinition.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/target/generated-sources/mule/org/mule/devkit/it/dsl/CallbackListMessageProcessorDefinition.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="42" selection-start="302" selection-end="302" vertical-scroll-proportion="0.17964073">
+            <state line="10" column="38" selection-start="303" selection-end="303" vertical-scroll-proportion="0.17964073">
               <folding />
             </state>
           </provider>
@@ -754,7 +754,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/target/generated-sources/mule/org/mule/devkit/it/dsl/CallbackListMessageProcessorDefinition.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="42" selection-start="302" selection-end="302" vertical-scroll-proportion="0.17964073">
+        <state line="10" column="38" selection-start="303" selection-end="303" vertical-scroll-proportion="0.17964073">
           <folding />
         </state>
       </provider>

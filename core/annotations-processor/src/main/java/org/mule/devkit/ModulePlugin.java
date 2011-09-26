@@ -28,7 +28,6 @@ import org.mule.devkit.generation.adapter.PoolAdapterGenerator;
 import org.mule.devkit.generation.adapter.SessionManagerAdapterGenerator;
 import org.mule.devkit.generation.callback.HttpCallbackGenerator;
 import org.mule.devkit.generation.callback.InterceptCallbackGenerator;
-import org.mule.devkit.generation.dsl.DSLWrapperGenerator;
 import org.mule.devkit.generation.mule.MessageProcessorGenerator;
 import org.mule.devkit.generation.mule.MessageSourceGenerator;
 import org.mule.devkit.generation.mule.NestedProcessorChainGenerator;
