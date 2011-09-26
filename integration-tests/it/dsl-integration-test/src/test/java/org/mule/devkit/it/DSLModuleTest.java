@@ -18,11 +18,12 @@
 package org.mule.devkit.it;
 
 import org.junit.Test;
+import org.mule.config.dsl.AbstractModule;
+import org.mule.config.dsl.Mule;
 import org.mule.devkit.it.dsl.DSLModule;
-import org.mule.config.dsl.*;
 
+import static org.junit.Assert.assertEquals;
 import static org.mule.config.dsl.expression.CoreExpr.payload;
-import static org.junit.Assert.*;
 
 public class DSLModuleTest {
 
@@ -62,7 +63,7 @@ public class DSLModuleTest {
     public static class Simple {
         boolean executed = false;
 
-		public void invoke() {
+        public void invoke() {
             executed = true;
         }
 

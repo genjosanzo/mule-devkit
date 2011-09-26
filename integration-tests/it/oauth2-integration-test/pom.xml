@@ -13,6 +13,7 @@
         <!--<devkit.version>3.0-SNAPSHOT</devkit.version>-->
         <mule.version>3.2.0</mule.version>
         <devkit.version>3.0-SNAPSHOT</devkit.version>
+        <dsl.version>0.7-SNAPSHOT</dsl.version>
     </properties>
 
     <build>
@@ -75,6 +76,11 @@
             <artifactId>mockito-all</artifactId>
             <version>1.8.5</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.dsl</groupId>
+            <artifactId>dsl-api</artifactId>
+            <version>${dsl.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>

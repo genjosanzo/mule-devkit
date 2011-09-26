@@ -62,11 +62,11 @@
                     </includes>
                     <replacements>
                         <replacement>
-                            <token>3.0-SNAPSHOT</token>
+                            <token>@project.version@</token>
                             <value>${project.version}</value>
                         </replacement>
                         <replacement>
-                            <token>3.2.0</token>
+                            <token>@mule.version@</token>
                             <value>${mule.version}</value>
                         </replacement>
                         <replacement>
@@ -152,6 +152,17 @@
             <artifactId>maven-verifier</artifactId>
             <version>1.2</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.dsl</groupId>
+            <artifactId>dsl-api</artifactId>
+            <version>0.7-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mule</groupId>
+                    <artifactId>core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>

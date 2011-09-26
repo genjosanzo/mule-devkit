@@ -24,7 +24,7 @@
 package ${package};
 
 import org.mule.api.MuleEvent;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.AbstractMuleTestCase;
 
@@ -52,7 +52,7 @@ public class ${muleModuleName}ModuleTest extends FunctionalTestCase
     */
     protected <T> void runFlowAndExpect(String flowName, T expect) throws Exception
     {
-        SimpleFlowConstruct flow = lookupFlowConstruct(flowName);
+        Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = AbstractMuleTestCase.getTestEvent(null);
         MuleEvent responseEvent = flow.process(event);
 
@@ -69,7 +69,7 @@ public class ${muleModuleName}ModuleTest extends FunctionalTestCase
     */
     protected <T, U> void runFlowWithPayloadAndExpect(String flowName, T expect, U payload) throws Exception
     {
-        SimpleFlowConstruct flow = lookupFlowConstruct(flowName);
+        Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = AbstractMuleTestCase.getTestEvent(payload);
         MuleEvent responseEvent = flow.process(event);
 
@@ -81,8 +81,8 @@ public class ${muleModuleName}ModuleTest extends FunctionalTestCase
      *
      * @param name Name of the flow to retrieve
      */
-    protected SimpleFlowConstruct lookupFlowConstruct(String name)
+    protected Flow lookupFlowConstruct(String name)
     {
-        return (SimpleFlowConstruct) AbstractMuleTestCase.muleContext.getRegistry().lookupFlowConstruct(name);
+        return (Flow) AbstractMuleTestCase.muleContext.getRegistry().lookupFlowConstruct(name);
     }
 }

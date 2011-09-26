@@ -24,7 +24,7 @@ import org.mule.api.annotations.param.Optional;
 
 import java.lang.RuntimeException;
 
-@Module(name = "dsltst")
+@Module(name = "dsl")
 public class DSLModule {
     @Configurable
     @Optional

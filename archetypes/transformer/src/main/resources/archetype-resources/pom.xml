@@ -10,7 +10,7 @@
     <name>Mule Transformer</name>
 
     <properties>
-        <mule.version>${muleVersion}</mule.version>
+        <mule.version>3.2.0</mule.version>
         <mule.devkit.version>3.0-SNAPSHOT</mule.devkit.version>
         <junit.version>4.8.2</junit.version>
         <mockito.version>1.8.2</mockito.version>
@@ -117,6 +117,18 @@
     </build>
 
     <dependencies>
+        <dependency>
+           <groupId>org.mule.dsl</groupId>
+           <artifactId>dsl-api</artifactId>
+           <version>0.7-SNAPSHOT</version>
+           <exclusions>
+               <exclusion>
+                   <groupId>org.mule</groupId>
+                   <artifactId>core</artifactId>
+               </exclusion>
+           </exclusions>
+           <scope>provided</scope>
+       </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

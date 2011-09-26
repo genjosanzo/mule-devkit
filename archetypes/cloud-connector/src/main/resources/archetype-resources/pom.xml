@@ -10,7 +10,7 @@
     <name>Mule Cloud Connector</name>
 
     <properties>
-        <mule.version>${muleVersion}</mule.version>
+        <mule.version>3.2.0</mule.version>
         <mule.devkit.version>3.0-SNAPSHOT</mule.devkit.version>
         <junit.version>4.8.2</junit.version>
         <mockito.version>1.8.2</mockito.version>
@@ -127,6 +127,7 @@
                    <artifactId>core</artifactId>
                </exclusion>
            </exclusions>
+           <scope>provided</scope>
        </dependency>
         <dependency>
             <groupId>junit</groupId>

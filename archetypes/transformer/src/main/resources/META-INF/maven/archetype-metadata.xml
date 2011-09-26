@@ -29,14 +29,14 @@
             <defaultValue>org.mule.modules</defaultValue>
         </requiredProperty>
         <requiredProperty key="muleModuleName"/>
-        <requiredProperty key="muleVersion">
-            <defaultValue>3.1.0</defaultValue>
-        </requiredProperty>
     </requiredProperties>
 
     <fileSets>
         <fileSet filtered="true" packaged="true" encoding="UTF-8">
             <directory>src/main/java</directory>
+        </fileSet>
+        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+            <directory>src/main/app</directory>
         </fileSet>
         <fileSet filtered="true">
             <directory>src/main/resources</directory>

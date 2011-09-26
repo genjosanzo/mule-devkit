@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.module.generation;
+package org.mule.devkit.generation.dsl;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleContext;
@@ -24,10 +24,21 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.api.annotations.param.Session;
+import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.DevkitTypeElement;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.model.code.*;
+import org.mule.devkit.model.code.ClassAlreadyExistsException;
+import org.mule.devkit.model.code.Conditional;
+import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.ExpressionFactory;
+import org.mule.devkit.model.code.FieldVariable;
+import org.mule.devkit.model.code.Invocation;
+import org.mule.devkit.model.code.Method;
+import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Package;
+import org.mule.devkit.model.code.Type;
+import org.mule.devkit.model.code.TypeReference;
+import org.mule.devkit.model.code.Variable;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -41,7 +52,7 @@ public class DSLWrapperGenerator extends AbstractModuleGenerator {
 
     @Override
     protected boolean shouldGenerate(DevkitTypeElement typeElement) {
-        if (getPojoType(typeElement).fullName().endsWith("HttpCallbackAdapter")){
+        if (getPojoType(typeElement).fullName().endsWith("HttpCallbackAdapter")) {
             return false;
         }
         return true;
