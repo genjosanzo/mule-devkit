@@ -28,4 +28,10 @@ public class PayloadModule {
     public Object returnPayload(@Payload Object payload) {
         return payload;
     }
+
+    @Processor
+    public String returnPayloadByteArray(@Payload final byte[] payload) {
+        return new String(payload);
+    }
+
 }

@@ -30,5 +30,10 @@ public class PayloadModuleTest extends AbstractModuleTest
     {
         runFlowWithPayload("returnPayload", "MULESOFT", "MULESOFT");
     }
+
+    public void testReturnPayloadByteArray() throws Exception
+    {
+        runFlowWithPayload("returnPayloadByteArray", "MULESOFT", "MULESOFT");
+    }
 }
 

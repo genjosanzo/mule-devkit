@@ -143,6 +143,11 @@
             <name>JBoss</name>
             <url>http://repository.jboss.com/</url>
         </repository>
+        <repository>
+            <id>mulesoft-releases</id>
+            <name>MuleSoft Releases</name>
+            <url>http://repository.mulesoft.org/releases/</url>
+        </repository>
     </repositories>
 
     <distributionManagement>

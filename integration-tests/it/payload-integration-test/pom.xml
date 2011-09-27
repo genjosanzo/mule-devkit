@@ -6,7 +6,7 @@
     <artifactId>payload-integration-test</artifactId>
     <version>1.0</version>
     <packaging>mule-module</packaging>
-    <name>Mule DevKit Inbound Headers Integration Tests</name>
+    <name>Mule DevKit Payload Integration Tests</name>
 
     <build>
         <pluginManagement>
