@@ -118,8 +118,8 @@
 
 	<repositories>
 		<repository>
-			<id>mulesoft-snapshots</id>
-			<url>http://repository.mulesoft.org/snapshots</url>
+			<id>mulesoft-releases</id>
+			<url>http://repository.mulesoft.org/releases</url>
 		</repository>
 	</repositories>
 </project>
