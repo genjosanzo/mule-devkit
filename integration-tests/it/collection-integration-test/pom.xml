@@ -72,7 +72,7 @@
         <dependency>
            <groupId>org.mule.dsl</groupId>
            <artifactId>dsl-api</artifactId>
-           <version>0.7</version>
+           <version>0.7-SNAPSHOT</version>
            <exclusions>
                <exclusion>
                    <groupId>org.mule</groupId>
@@ -127,4 +127,12 @@
             <classifier>asl</classifier>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>mulesoft-releases</id>
+            <name>MuleSoft Releases</name>
+            <url>http://repository.mulesoft.org/releases/</url>
+        </repository>
+    </repositories>
 </project>

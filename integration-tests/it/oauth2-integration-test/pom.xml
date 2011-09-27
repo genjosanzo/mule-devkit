@@ -140,4 +140,12 @@
             <version>1.2</version>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>mulesoft-releases</id>
+            <name>MuleSoft Releases</name>
+            <url>http://repository.mulesoft.org/releases/</url>
+        </repository>
+    </repositories>
 </project>
