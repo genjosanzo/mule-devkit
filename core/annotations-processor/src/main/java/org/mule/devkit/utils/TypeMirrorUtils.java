@@ -126,6 +126,10 @@ public final class TypeMirrorUtils {
     }
 
     public boolean isArrayOrList(TypeMirror type) {
+        if( type.toString().equals("byte[]") ) {
+            return false;
+        }
+
         if (type.getKind() == TypeKind.ARRAY) {
             return true;
         }
