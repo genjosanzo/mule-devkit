@@ -173,7 +173,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
         FileInputStream stream = null;
         try {
             stream = new FileInputStream(file);
-            final byte[] buffer = new byte[65536];
+            final byte[] buffer = new byte[8192];
             int read;
             while ((read = stream.read(buffer)) != -1)
                 output.write(buffer, 0, read);
@@ -203,6 +203,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
             if (isDebug())
                 debug(MessageFormat.format("Creating blob from {0}",
                         file.getAbsolutePath()));
+
             if (!dryRun)
                 return service.createBlob(repository, blob);
             else
