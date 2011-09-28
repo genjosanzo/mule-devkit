@@ -74,37 +74,37 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
     /**
      * Name of repository
      */
-    @MojoParameter(expression = "${github.site.repositoryName}")
+    @MojoParameter(expression = "${github.repositoryName}")
     private String repositoryName;
 
     /**
      * Owner of repository
      */
-    @MojoParameter(expression = "${github.site.repositoryOwner}")
+    @MojoParameter(expression = "${github.repositoryOwner}")
     private String repositoryOwner;
 
     /**
      * User name for authentication
      */
-    @MojoParameter(expression = "${github.site.userName}", defaultValue = "${github.global.userName}")
+    @MojoParameter(expression = "${github.userName}")
     private String userName;
 
     /**
      * User name for authentication
      */
-    @MojoParameter(expression = "${github.site.password}", defaultValue = "${github.global.password}")
+    @MojoParameter(expression = "${github.password}")
     private String password;
 
     /**
      * User name for authentication
      */
-    @MojoParameter(expression = "${github.site.oauth2Token}", defaultValue = "${github.global.oauth2Token}")
+    @MojoParameter(expression = "${github.oauth2Token}")
     private String oauth2Token;
 
     /**
      * Host for API calls
      */
-    @MojoParameter(expression = "${github.site.host}", defaultValue = "api.github.com")
+    @MojoParameter(expression = "${github.host}", defaultValue = "api.github.com")
     private String host;
 
     /**
@@ -117,7 +117,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
      * Paths and patterns to exclude
      */
     @MojoParameter
-    private String[] excludes;
+    private String[] excludes = new String[] { "**/current.xml" };
 
     /**
      * Base directory to commit files from
@@ -136,14 +136,14 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
     /**
      * Force reference update
      */
-    @MojoParameter(expression = "${github.site.force}")
+    @MojoParameter(expression = "${github.force}")
     private boolean force;
 
     /**
      * Merge with existing the existing tree that is referenced by the commit
      * that the ref currently points to
      */
-    @MojoParameter(expression = "${github.site.merge}")
+    @MojoParameter(expression = "${github.merge}")
     private boolean merge;
 
     /**
@@ -151,7 +151,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
      * but don't actually perform any operations on the target GitHub
      * repository.
      */
-    @MojoParameter(expression = "${github.site.dryRun}")
+    @MojoParameter(expression = "${github.dryRun}")
     private boolean dryRun;
 
     /**
