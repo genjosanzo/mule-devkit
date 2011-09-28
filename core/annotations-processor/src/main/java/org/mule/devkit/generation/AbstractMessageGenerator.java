@@ -195,7 +195,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                 fieldType = new FieldBuilder(messageProcessorClass).
                         privateVisibility().
                         type(ref(variable.asType())).
-                        name(fieldName + "Type").
+                        name("_" + fieldName + "Type").
                         build();
             } else if (variable.asType().toString().contains(HttpCallback.class.getName())) {
                 // for each parameter of type HttpCallback we need two fields: one that will hold a reference to the flow
@@ -217,7 +217,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                 fieldType = new FieldBuilder(messageProcessorClass).
                         privateVisibility().
                         type(ref(variable.asType())).
-                        name(fieldName + "Type").
+                        name("_" + fieldName + "Type").
                         build();
             }
             fields.put(variable.getSimpleName().toString(), new AbstractMessageGenerator.FieldVariableElement(field, fieldType, variable));
