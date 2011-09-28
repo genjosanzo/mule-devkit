@@ -21,7 +21,6 @@ import org.mule.devkit.generation.Generator;
 import org.mule.devkit.generation.adapter.*;
 import org.mule.devkit.generation.callback.HttpCallbackGenerator;
 import org.mule.devkit.generation.callback.InterceptCallbackGenerator;
-import org.mule.devkit.generation.dsl.DSLWrapperGenerator;
 import org.mule.devkit.generation.mule.*;
 import org.mule.devkit.generation.mule.transfomer.EnumTransformerGenerator;
 import org.mule.devkit.generation.mule.transfomer.JaxbTransformerGenerator;
