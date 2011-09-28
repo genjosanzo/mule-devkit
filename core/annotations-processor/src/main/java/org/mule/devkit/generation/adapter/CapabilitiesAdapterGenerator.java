@@ -37,7 +37,7 @@ public class CapabilitiesAdapterGenerator extends AbstractModuleGenerator {
         DefinedClass capabilitiesAdapter = getCapabilitiesAdapterClass(typeElement);
         capabilitiesAdapter.javadoc().add("A <code>" + capabilitiesAdapter.name() + "</code> is a wrapper around ");
         capabilitiesAdapter.javadoc().add(ref(typeElement.asType()));
-        capabilitiesAdapter.javadoc().add(" that implements {@link Capabilities} interface.");
+        capabilitiesAdapter.javadoc().add(" that implements {@link org.mule.api.Capabilities} interface.");
 
         generateIsCapableOf(typeElement, capabilitiesAdapter);
 
