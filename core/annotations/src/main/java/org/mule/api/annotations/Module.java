@@ -60,6 +60,11 @@ public @interface Module {
      */
     boolean poolable() default false;
 
+    /**
+     * Minimum Mule version required
+     */
+    String minMuleVersion() default "3.2";
+
     String DEFAULT_VERSION = "1.0";
 
 }

@@ -19,6 +19,7 @@ package org.mule.devkit.generation.adapter;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
+import org.mule.api.annotations.Module;
 import org.mule.api.annotations.lifecycle.Start;
 import org.mule.api.annotations.lifecycle.Stop;
 import org.mule.api.lifecycle.Disposable;
@@ -26,16 +27,23 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.config.MuleManifest;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
+import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
+import org.mule.devkit.model.code.ForLoop;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -60,21 +68,21 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
 
         ExecutableElement startElement = getStartElement(typeElement);
         lifecycleAdapter._implements(Startable.class);
-        Method start = generateLifecycleInvocation(lifecycleAdapter, startElement, "start", DefaultMuleException.class, false);
+        Method start = generateLifecycleInvocation(lifecycleAdapter, typeElement, startElement, "start", DefaultMuleException.class, false);
         start._throws(ref(MuleException.class));
 
         ExecutableElement stopElement = getStopElement(typeElement);
         lifecycleAdapter._implements(Stoppable.class);
-        Method stop = generateLifecycleInvocation(lifecycleAdapter, stopElement, "stop", DefaultMuleException.class, false);
+        Method stop = generateLifecycleInvocation(lifecycleAdapter, typeElement, stopElement, "stop", DefaultMuleException.class, false);
         stop._throws(ref(MuleException.class));
 
         ExecutableElement postConstructElement = getPostConstructElement(typeElement);
         lifecycleAdapter._implements(Initialisable.class);
-        generateLifecycleInvocation(lifecycleAdapter, postConstructElement, "initialise", InitialisationException.class, true);
+        generateLifecycleInvocation(lifecycleAdapter, typeElement, postConstructElement, "initialise", InitialisationException.class, true);
 
         ExecutableElement preDestroyElement = getPreDestroyElement(typeElement);
         lifecycleAdapter._implements(Disposable.class);
-        generateLifecycleInvocation(lifecycleAdapter, preDestroyElement, "dispose", null, false);
+        generateLifecycleInvocation(lifecycleAdapter, typeElement, preDestroyElement, "dispose", null, false);
     }
 
     private DefinedClass getLifecycleAdapterClass(TypeElement typeElement) {
@@ -90,8 +98,30 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         return clazz;
     }
 
-    private Method generateLifecycleInvocation(DefinedClass lifecycleWrapper, ExecutableElement superExecutableElement, String name, Class<?> catchException, boolean addThis) {
+    private Method generateLifecycleInvocation(DefinedClass lifecycleWrapper, DevkitTypeElement typeElement, ExecutableElement superExecutableElement, String name, Class<?> catchException, boolean addThis) {
         Method lifecycleMethod = lifecycleWrapper.method(Modifier.PUBLIC, context.getCodeModel().VOID, name);
+
+        if (name.equals("initialise")) {
+            Module module = typeElement.getAnnotation(Module.class);
+            Variable log = lifecycleMethod.body().decl(ref(Logger.class), "log", ref(LoggerFactory.class).staticInvoke("getLogger").arg(lifecycleWrapper.dotclass()));
+            Variable runtimeVersion = lifecycleMethod.body().decl(ref(String.class), "runtimeVersion", ref(MuleManifest.class).staticInvoke("getProductVersion"));
+            Conditional ifUnkownVersion = lifecycleMethod.body()._if(runtimeVersion.invoke("equals").arg("Unknown"));
+            ifUnkownVersion._then().add(log.invoke("warn").arg(ExpressionFactory.lit("Unknown Mule runtime version. This module may not work properly!")));
+            Block ifKnownVersion = ifUnkownVersion._else();
+
+            Variable expectedMinVersion = ifKnownVersion.decl(ref(String[].class), "expectedMinVersion", ExpressionFactory.lit(module.minMuleVersion()).invoke("split").arg("\\."));
+            Variable currentRuntimeVersion = ifKnownVersion.decl(ref(String[].class), "currentRuntimeVersion", runtimeVersion.invoke("split").arg("\\."));
+
+            ForLoop forEachVersionComponent = ifKnownVersion._for();
+            Variable i = forEachVersionComponent.init(context.getCodeModel().INT, "i", ExpressionFactory.lit(0));
+            forEachVersionComponent.test(Op.lt(i, expectedMinVersion.ref("length")));
+            forEachVersionComponent.update(Op.incr(i));
+
+            forEachVersionComponent.body()._if(Op.lt(
+                    ref(Integer.class).staticInvoke("parseInt").arg(currentRuntimeVersion.component(i)),
+                    ref(Integer.class).staticInvoke("parseInt").arg(expectedMinVersion.component(i))))._then()
+                    ._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg("This module is only valid for Mule " + module.minMuleVersion()));
+        }
 
         if (catchException != null &&
                 superExecutableElement != null &&
