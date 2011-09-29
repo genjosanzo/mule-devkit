@@ -60,7 +60,10 @@ Summary:
 <tr>
           <th>Version</th><td><?cs var:class.moduleVersion ?></td>
         </tr>
-      </tbody></table>
+<tr>
+          <th>Minimum Mule Version</th><td><?cs var:class.moduleMinMuleVersion ?></td>
+        </tr>
+    </tbody></table>
   </div>
 
 <div class="jd-descr">

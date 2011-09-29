@@ -865,6 +865,7 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
         data.setValue(base + ".kind", this.kind());
         data.setValue(base + ".name", this.moduleName());
         data.setValue(base + ".version", this.moduleVersion());
+        data.setValue(base + ".minMuleVersion", this.moduleMinMuleVersion());
         data.setValue(base + ".namespace", this.moduleNamespace());
         data.setValue(base + ".schemaloc", this.moduleSchemaLocation());
         data.setValue(base + ".link", this.modulePath());
@@ -914,6 +915,7 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
         data.setValue("class.moduleNamespace", this.moduleNamespace());
         data.setValue("class.moduleSchemaLocation", this.moduleSchemaLocation());
         data.setValue("class.moduleVersion", this.moduleVersion());
+        data.setValue("class.moduleMinMuleVersion", this.moduleMinMuleVersion());
         data.setValue("class.moduleSessionAware", Boolean.toString(this.moduleSessionAware()));
 
         if( moduleSessionAware() ) {
@@ -1508,6 +1510,7 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
     private boolean mModuleKnown;
     private String mModuleName;
     private String mModuleVersion;
+    private String mModuleMinMuleVersion;
     private String mModuleNamespace;
     private String mModuleSchemaLocation;
     private boolean mModuleSessionAware;
@@ -1831,6 +1834,10 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
         return mModuleVersion;
     }
 
+    public String moduleMinMuleVersion() {
+        return mModuleMinMuleVersion;
+    }
+
     public String moduleNamespace() {
         return mModuleNamespace;
     }
@@ -1885,6 +1892,12 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
                     for (AnnotationValueInfo value : annotation.elementValues()) {
                         if ("version".equals(value.element().name())) {
                             mModuleVersion = value.valueString().replace("\"", "");
+                        }
+                    }
+                    mModuleMinMuleVersion = "3.2";
+                    for (AnnotationValueInfo value : annotation.elementValues()) {
+                        if ("minMuleVersion".equals(value.element().name())) {
+                            mModuleMinMuleVersion = value.valueString().replace("\"", "");
                         }
                     }
                     mModuleNamespace = "http://www.mulesoft.org/schema/mule/" + mModuleName;
