@@ -33,6 +33,13 @@
         <spring:property name="value" value="MuleSoft$"/>
     </spring:bean>
 
+    <flow name="pollPassthruStringFlow">
+        <poll frequency="60000">
+            <basic:passthru-string value="mulesoft"/>
+        </poll>
+        <basic:passthru-string value="mulesoft"/>
+    </flow>
+
     <flow name="passthruCharFlow">
         <basic:passthru-char value="c"/>
     </flow>

@@ -17,6 +17,8 @@
 
 package org.mule.devkit.it;
 
+import java.lang.Exception;
+
 public class BasicModuleTest extends AbstractModuleTest
 {
 
@@ -24,6 +26,11 @@ public class BasicModuleTest extends AbstractModuleTest
     protected String getConfigResources()
     {
         return "basic.xml";
+    }
+
+    public void testPollString() throws Exception
+    {
+        runFlow("pollPassthruStringFlow", "mulesoft");
     }
 
     public void testString() throws Exception

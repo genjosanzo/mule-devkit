@@ -861,14 +861,20 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     private void generateAttachMessageProcessor(Method parse, Variable definition, Variable parserContext) {
         Variable propertyValues = parse.body().decl(ref(MutablePropertyValues.class), "propertyValues",
                 parserContext.invoke("getContainingBeanDefinition").invoke("getPropertyValues"));
-        Variable messageProcessors = parse.body().decl(ref(PropertyValue.class), "messageProcessors",
+
+        Conditional ifIsPoll = parse.body()._if(parserContext.invoke("getContainingBeanDefinition").invoke("getBeanClassName")
+                .invoke("equals").arg("org.mule.config.spring.factories.PollingMessageSourceFactoryBean"));
+
+        ifIsPoll._then().add(propertyValues.invoke("addPropertyValue").arg("messageProcessor").arg(definition));
+
+        Variable messageProcessors = ifIsPoll._else().decl(ref(PropertyValue.class), "messageProcessors",
                 propertyValues.invoke("getPropertyValue").arg("messageProcessors"));
-        Conditional noList = parse.body()._if(Op.cor(Op.eq(messageProcessors, ExpressionFactory._null()), Op.eq(messageProcessors.invoke("getValue"),
+        Conditional noList = ifIsPoll._else()._if(Op.cor(Op.eq(messageProcessors, ExpressionFactory._null()), Op.eq(messageProcessors.invoke("getValue"),
                 ExpressionFactory._null())));
         noList._then().add(propertyValues.invoke("addPropertyValue").arg("messageProcessors").arg(ExpressionFactory._new(ref(ManagedList.class))));
-        Variable listMessageProcessors = parse.body().decl(ref(List.class), "listMessageProcessors",
+        Variable listMessageProcessors = ifIsPoll._else().decl(ref(List.class), "listMessageProcessors",
                 ExpressionFactory.cast(ref(List.class), propertyValues.invoke("getPropertyValue").arg("messageProcessors").invoke("getValue")));
-        parse.body().add(listMessageProcessors.invoke("add").arg(
+        ifIsPoll._else().add(listMessageProcessors.invoke("add").arg(
                 definition
         ));
     }
