@@ -127,6 +127,26 @@ def:op_tag_list(tags) ?><?cs
   /each ?><?cs
 /def ?>
 
+<?cs # Print a list of tags (e.g. description text ?><?cs
+def:op_tag_list_no_sample(tags) ?><?cs
+  each:tag = tags ?><?cs
+      if:tag.name == "Text" ?><?cs var:tag.text?><br/><?cs
+      elif:tag.kind == "@more" ?><p><?cs
+      elif:tag.kind == "@see" ?><code><a href="<?cs
+        if:tag.isLocal?><?cs var:toroot ?>java/<?cs /if ?><?cs
+        var:tag.href ?>"><?cs var:tag.label ?></a></code><?cs
+      elif:tag.kind == "@seeHref" ?><a href="<?cs var:tag.href ?>"><?cs var:tag.label ?></a><?cs
+      elif:tag.kind == "@seeJustLabel" ?><?cs var:tag.label ?><?cs
+      elif:tag.name == "@sample.xml" ?><?cs elif:tag.name == "@sample.java" ?><?cs elif:tag.name == "@include" ?><?cs var:tag.text ?><?cs
+      elif:tag.kind == "@docRoot" ?><?cs var:toroot ?><?cs
+      elif:tag.kind == "@inheritDoc" ?><?cs # This is the case when @inheritDoc is in something
+                                              that doesn't inherit from anything?><?cs
+      elif:tag.kind == "@attr" ?><?cs
+      else ?>{<?cs var:tag.name?> <?cs var:tag.text ?>}<?cs
+      /if ?><?cs
+  /each ?><?cs
+/def ?>
+
 <?cs # The message about This xxx is deprecated. ?><?cs 
 def:deprecated_text(kind) ?>
   This <?cs var:kind ?> is deprecated.<?cs 
@@ -145,8 +165,8 @@ def:short_descr(obj) ?><?cs
 def:op_short_descr(obj) ?><?cs
   if:subcount(obj.deprecated) ?>
       <em><?cs call:deprecated_text(obj.kind) ?>
-      <?cs call:op_tag_list(obj.deprecated) ?></em><?cs
-  else ?><?cs call:op_tag_list(obj.shortDescr) ?><?cs
+      <?cs call:op_tag_list_no_sample(obj.deprecated) ?></em><?cs
+  else ?><?cs call:op_tag_list_no_sample(obj.shortDescr) ?><?cs
   /if ?><?cs
 /def ?>
 

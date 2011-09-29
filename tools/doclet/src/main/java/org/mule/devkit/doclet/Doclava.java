@@ -87,7 +87,7 @@ public class Doclava {
 
     public static final String javadocDir = "java/";
     public static final String muleXmlDir = "mule/";
-    public static final String guideDir = "guide";
+    public static final String guideDir = "guide/";
     public static String assetsOutputDir = "assets";
     public static String htmlExtension;
 
@@ -146,13 +146,10 @@ public class Doclava {
         String keepListFile = null;
         String proofreadFile = null;
         String todoFile = null;
-        String sdkValuePath = null;
-        ArrayList<SampleCode> sampleCodes = new ArrayList<SampleCode>();
         String stubsDir = null;
         // Create the dependency graph for the stubs directory
         boolean offlineMode = false;
         String apiFile = null;
-        String debugStubsFile = "";
         HashSet<String> stubPackages = null;
         ArrayList<String> knownTagsFiles = new ArrayList<String>();
 
@@ -170,8 +167,6 @@ public class Doclava {
                 knownTagsFiles.add(a[1]);
             } else if (a[0].equals("-toroot")) {
                 ClearPage.toroot = a[1];
-            } else if (a[0].equals("-samplecode")) {
-                sampleCodes.add(new SampleCode(a[1], a[2], a[3]));
             } else if (a[0].equals("-htmldir")) {
                 ClearPage.htmlDirs.add(a[1]);
             } else if (a[0].equals("-title")) {
@@ -216,8 +211,6 @@ public class Doclava {
                 for (String pkg : a[1].split(":")) {
                     stubPackages.add(pkg);
                 }
-            } else if (a[0].equals("-sdkvalues")) {
-                sdkValuePath = a[1];
             } else if (a[0].equals("-apixml")) {
                 apiFile = a[1];
             } else if (a[0].equals("-nodocs")) {
@@ -319,6 +312,7 @@ public class Doclava {
             }
 
             // HTML Pages
+            /*
             if (!ClearPage.htmlDirs.isEmpty()) {
                 for (String htmlDir : ClearPage.htmlDirs) {
                     File f = new File(htmlDir);
@@ -335,6 +329,7 @@ public class Doclava {
                     }
                 }
             }
+            */
 
             writeAssets();
 
@@ -363,19 +358,13 @@ public class Doclava {
                 writeKeepList(keepListFile);
             }
 
-            // Sample Code
-            for (SampleCode sc : sampleCodes) {
-                sc.write(offlineMode);
-            }
-
             // Index page
             writeIndex();
 
-            Proofread.finishProofread(proofreadFile);
+            // Installation page
+            writeInstall();
 
-            if (sdkValuePath != null) {
-                writeSdkValues(sdkValuePath);
-            }
+            Proofread.finishProofread(proofreadFile);
 
             long time = System.nanoTime() - startTime;
             System.out.println("Mule DevKit took " + (time / 1000000000) + " sec. to write docs to "
@@ -389,7 +378,12 @@ public class Doclava {
 
     private static void writeIndex() {
         Data data = makeHDF();
-        ClearPage.write(data, "index.cs", javadocDir + "index" + htmlExtension);
+        ClearPage.write(data, "index.cs", "index" + htmlExtension);
+    }
+
+    private static void writeInstall() {
+        Data data = makeHDF();
+        ClearPage.write(data, "install.cs", guideDir + "install" + htmlExtension);
     }
 
     private static boolean readTemplateSettings() {

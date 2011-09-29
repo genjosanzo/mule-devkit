@@ -44,18 +44,17 @@ public class ClearPage {
   public static String toroot = null;
 
   public static String getPathToRoot(String path) {
-    String toroot;
+    String toroot = "";
     if (ClearPage.toroot != null) {
       toroot = ClearPage.toroot;
     } else {
-      int slashcount = countSlashes(path) - 1;
+      int slashcount = countSlashes(path);
       if (slashcount > 0) {
-        toroot = "../";
         for (int i = 0; i < slashcount; i++) {
           toroot += "../";
         }
       } else {
-        toroot = "../";
+        toroot = "./";
       }
     }
     return toroot;
@@ -108,6 +107,8 @@ public class ClearPage {
     }
 
     String rootPath = getPathToRoot(filename);
+
+    System.out.println("Filename " + filename + " toroot " + rootPath);
 
     data.setValue("toroot", rootPath);
     data.setValue("toassets", rootPath + Doclava.assetsOutputDir + "/");
