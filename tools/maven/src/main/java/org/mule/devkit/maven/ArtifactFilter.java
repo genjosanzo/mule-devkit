@@ -76,8 +76,12 @@ public class ArtifactFilter {
         Set<Artifact> filteredArtifacts = new HashSet<Artifact>();
 
         for (Artifact artifact : artifacts) {
-            if (isDependencyWithMuleGroupId(artifact) == false) {
+            if (artifact.getArtifactId().equals("mule-devkit-annotations")) {
                 filteredArtifacts.add(artifact);
+            } else {
+                if (isDependencyWithMuleGroupId(artifact) == false) {
+                    filteredArtifacts.add(artifact);
+                }
             }
         }
 
