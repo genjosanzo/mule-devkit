@@ -154,4 +154,12 @@
         </collection:count-two-lists>
     </flow>
 
+    <flow name="flowRetrieveKey">
+        <collection:retrieve-key key="b" config-ref="configC">
+            <collection:map-strings>
+                <collection:map-string key="a">#[map-payload:a]</collection:map-string>
+                <collection:map-string key="b">#[map-payload:b]</collection:map-string>
+            </collection:map-strings>
+        </collection:retrieve-key>
+    </flow>
 </mule>

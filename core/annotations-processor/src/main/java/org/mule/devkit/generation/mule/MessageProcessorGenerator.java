@@ -340,31 +340,31 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         Variable map = isExpectedMapBlock.decl(ref(Map.class), "map", ExpressionFactory.cast(ref(Map.class), source));
 
-        Conditional ifKeysNotOfSameType = isExpectedMapBlock._if(Op.cand(
-                Op.not(map.invoke("isEmpty")),
-                Op.not(ExpressionFactory.invoke(expectedType, "equals").arg(ExpressionFactory.invoke(ExpressionFactory.invoke(ExpressionFactory.invoke(map.invoke("keySet"), "iterator"), "next"), "getClass")))));
-        Block ifKeysNotOfSameTypeThen = ifKeysNotOfSameType._then().block();
+        //Conditional ifKeysNotOfSameType = isExpectedMapBlock._if(Op.cand(
+        //        Op.not(map.invoke("isEmpty")),
+        //        Op.not(ExpressionFactory.invoke(keyType.invoke("toString"), "equals").arg(ExpressionFactory.invoke(ExpressionFactory.invoke((ExpressionFactory.invoke(ExpressionFactory.invoke(map.invoke("keySet"), "iterator"), "next"), "getClass", "toString"))))));
+        //Block ifKeysNotOfSameTypeThen = ifKeysNotOfSameType._then().block();
 
-        Variable newMap = ifKeysNotOfSameTypeThen.decl(ref(Map.class), "newMap", ExpressionFactory._new(ref(HashMap.class)));
-        ForEach forEach = ifKeysNotOfSameTypeThen.forEach(ref(Object.class), "entryObj", map.invoke("entrySet"));
+        Variable newMap = isExpectedMapBlock.decl(ref(Map.class), "newMap", ExpressionFactory._new(ref(HashMap.class)));
+        ForEach forEach = isExpectedMapBlock.forEach(ref(Object.class), "entryObj", map.invoke("entrySet"));
         Block forEachBlock = forEach.body().block();
         Variable entry = forEachBlock.decl(ref(Map.Entry.class), "entry", ExpressionFactory.cast(ref(Map.Entry.class), forEach.var()));
         Variable newKey = forEachBlock.decl(ref(Object.class), "newKey", ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(keyType).arg(entry.invoke("getKey")));
         Variable newValue = forEachBlock.decl(ref(Object.class), "newValue", ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(valueType).arg(entry.invoke("getValue")));
         forEachBlock.invoke(newMap, "put").arg(newKey).arg(newValue);
 
-        ifKeysNotOfSameTypeThen.assign(source, newMap);
+        isExpectedMapBlock.assign(source, newMap);
 
         Cast mapCast = ExpressionFactory.cast(ref(Map.class), source);
 
-        ForEach keyLoop = ifKeysNotOfSameType._else().forEach(ref(Object.class), "key", mapCast.invoke("entrySet"));
+        //ForEach keyLoop = ifKeysNotOfSameType._else().forEach(ref(Object.class), "key", mapCast.invoke("entrySet"));
 
-        Cast entryCast = ExpressionFactory.cast(ref(Map.Entry.class), keyLoop.var());
+        //Cast entryCast = ExpressionFactory.cast(ref(Map.Entry.class), keyLoop.var());
 
-        Variable value = keyLoop.body().decl(ref(Object.class), "value", mapCast.invoke("get").arg(entryCast.invoke("getKey")));
-        keyLoop.body().add(entryCast.invoke("setValue").arg(
-                ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(valueType).arg(value)
-        ));
+        //Variable value = keyLoop.body().decl(ref(Object.class), "value", mapCast.invoke("get").arg(entryCast.invoke("getKey")));
+        //keyLoop.body().add(entryCast.invoke("setValue").arg(
+        //        ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(valueType).arg(value)
+        //));
 
         isMap._then().assign(target, source);
 

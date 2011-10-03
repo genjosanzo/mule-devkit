@@ -69,6 +69,11 @@ public class CollectionModule
     }
 
     @Processor
+    public String retrieveKey(String key, Map<String, String> mapStrings)
+    {
+        return mapStrings.get(key);
+    }
+    @Processor
     public int countConfigMapStrings()
     {
         return this.mapStrings.size();

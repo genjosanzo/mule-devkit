@@ -17,6 +17,9 @@
 
 package org.mule.devkit.it;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class CollectionModuleTest extends AbstractModuleTest {
 
     @Override
@@ -62,6 +65,17 @@ public class CollectionModuleTest extends AbstractModuleTest {
 
     public void testCountTwoLists() throws Exception {
         runFlow("flowCountTwoLists", 5);
+    }
+
+    public void testRetrieveKey() throws Exception {
+        Map<String, String> a1 = new HashMap<String, String>();
+        a1.put("a", "Mule");
+        a1.put("b", "Soft");
+        Map<String, String> a2 = new HashMap<String, String>();
+        a2.put("a", "Soft");
+        a2.put("b", "Mule");
+        runFlowWithPayload("flowRetrieveKey", "Soft", a1);
+        runFlowWithPayload("flowRetrieveKey", "Mule", a2);
     }
 
 }
