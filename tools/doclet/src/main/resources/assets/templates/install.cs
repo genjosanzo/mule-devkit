@@ -54,6 +54,28 @@ element your POM:
 &lt;/dependency&gt;
 </pre>
 
+If you plan to use this module inside a Mule application, you need add it to the packaging process. That way the final
+ZIP file which will contain your flows and Java code will also contain this module and its dependencies.
+
+Add an special inclusion to the configuration of the Mule Maven plugin for this module as follows:
+
+<pre>
+&lt;plugin&gt;
+    &lt;groupId&gt;org.mule.tools&lt;/groupId&gt;
+    &lt;artifactId&gt;maven-mule-plugin&lt;/artifactId&gt;
+    &lt;extensions&gt;true&lt;/extensions&gt;
+    &lt;configuration&gt;
+        &lt;excludeMuleDependencies&gt;false&lt;/excludeMuleDependencies&gt;
+        &lt;inclusions&gt;
+            &lt;inclusion&gt;
+                &lt;groupId&gt;<?cs var:project.groupId ?>&lt;/groupId&gt;
+                &lt;artifactId&gt;<?cs var:project.artifactId ?>&lt;/artifactId&gt;
+            &lt;/inclusion&gt;
+        &lt;/inclusions&gt;
+    &lt;/configuration&gt;
+&lt;/plugin&gt;
+</pre>
+
 <?cs include:"footer.cs" ?>
 </div><!-- end jd-content -->
 </div> <!-- end doc-content -->
