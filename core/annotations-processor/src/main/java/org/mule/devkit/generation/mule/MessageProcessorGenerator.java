@@ -305,6 +305,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 ExpressionFactory.invoke("isList").arg(source.invoke("getClass")));
         Conditional isExpectedList = isList._then()._if(
                 ExpressionFactory.invoke("isList").arg(expectedType));
+        Variable newList = isExpectedList._then().decl(ref(List.class), "newList", ExpressionFactory._new(ref(ArrayList.class)));
         Variable listParameterizedType = isExpectedList._then().decl(ref(java.lang.reflect.Type.class), "valueType",
                 ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).
                         invoke("getActualTypeArguments").component(ExpressionFactory.lit(0)));
@@ -314,11 +315,12 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         Block whileHasNext = isExpectedList._then()._while(listIterator.invoke("hasNext")).body();
         Variable subTarget = whileHasNext.decl(ref(Object.class), "subTarget", listIterator.invoke("next"));
-        whileHasNext.add(listIterator.invoke("set").arg(
+        whileHasNext.add(newList.invoke("add").arg(
                 ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(listParameterizedType).
                         arg(subTarget)
         ));
-        isList._then().assign(target, source);
+        isExpectedList._then().assign(target, newList);
+        isExpectedList._else().assign(target, source);
 
         Conditional isMap = isList._elseif(
                 ExpressionFactory.invoke("isMap").arg(source.invoke("getClass")));
@@ -353,9 +355,9 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         Variable newValue = forEachBlock.decl(ref(Object.class), "newValue", ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(valueType).arg(entry.invoke("getValue")));
         forEachBlock.invoke(newMap, "put").arg(newKey).arg(newValue);
 
-        isExpectedMapBlock.assign(source, newMap);
+        isExpectedMapBlock.assign(target, newMap);
 
-        Cast mapCast = ExpressionFactory.cast(ref(Map.class), source);
+        //Cast mapCast = ExpressionFactory.cast(ref(Map.class), source);
 
         //ForEach keyLoop = ifKeysNotOfSameType._else().forEach(ref(Object.class), "key", mapCast.invoke("entrySet"));
 
@@ -366,7 +368,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         //        ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(valueType).arg(value)
         //));
 
-        isMap._then().assign(target, source);
+        isExpectedMap._else().assign(target, source);
 
         Block otherwise = isMap._else();
         otherwise.assign(target, ExpressionFactory.invoke("evaluate").arg(muleMessage).arg(source));
