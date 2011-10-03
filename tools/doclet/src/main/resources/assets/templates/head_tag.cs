@@ -17,6 +17,7 @@
 <link href="<?cs var:toassets ?>mule-developer-docs.css" rel="stylesheet" type="text/css" />
 <link href="<?cs var:toassets ?>mule-developer-prettify.css" rel="stylesheet" type="text/css" />
 <link href="<?cs var:toassets ?>customizations.css" rel="stylesheet" type="text/css" />
+<link href='http://fonts.googleapis.com/css?family=Ubuntu:300' rel='stylesheet' type='text/css'>
 <script src="<?cs var:toassets ?>search_autocomplete.js" type="text/javascript"></script>
 <script src="<?cs var:toassets ?>jquery-resizable.min.js" type="text/javascript"></script>
 <script src="<?cs var:toassets ?>mule-developer-docs.js" type="text/javascript"></script>
