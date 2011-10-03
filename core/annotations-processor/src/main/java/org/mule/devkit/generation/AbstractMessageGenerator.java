@@ -68,9 +68,7 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.ElementFilter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -255,32 +253,6 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         }
         return fields;
     }
-
-    protected Map<String, FieldVariableElement> generateFieldForEachSetter(DefinedClass transferObjectClass, TypeElement transferObject) {
-        Map<String, AbstractMessageGenerator.FieldVariableElement> fields = new HashMap<String, FieldVariableElement>();
-        java.util.List<ExecutableElement> methods = ElementFilter.methodsIn(transferObject.getEnclosedElements());
-        for (ExecutableElement method : methods) {
-            String methodName = method.getSimpleName().toString();
-            if (!methodName.startsWith("set") ||
-                    method.getReturnType().getKind() != TypeKind.VOID ||
-                    method.getParameters().size() != 1) {
-                continue;
-            }
-
-            String fieldName = StringUtils.uncapitalize(methodName.substring(methodName.indexOf("set") + 3));
-            TypeMirror fieldTypeMirror = method.getParameters().get(0).asType();
-            FieldVariable field = null;
-            if (fieldTypeMirror.toString().contains(NestedProcessor.class.getName())) {
-                field = transferObjectClass.field(Modifier.PRIVATE, ref(MessageProcessor.class), fieldName);
-            } else {
-                field = transferObjectClass.field(Modifier.PRIVATE, ref(Object.class), fieldName);
-            }
-            FieldVariable fieldType = transferObjectClass.field(Modifier.PRIVATE, ref(fieldTypeMirror), fieldName + "Type");
-            fields.put(fieldName, new AbstractMessageGenerator.FieldVariableElement(field, fieldType, null));
-        }
-        return fields;
-    }
-
 
     protected Method generateInitialiseMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, TypeElement typeElement, FieldVariable muleContext, FieldVariable expressionManager, FieldVariable patternInfo, FieldVariable object) {
         DefinedClass pojoClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));

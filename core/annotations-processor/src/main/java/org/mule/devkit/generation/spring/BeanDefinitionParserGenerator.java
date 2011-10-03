@@ -63,11 +63,9 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
 
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.ElementFilter;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -383,18 +381,6 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 }
             } else if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
                 generateParseSupportedType(parse.body(), element, builder, fieldName);
-            } else if (context.getTypeMirrorUtils().isTransferObject(variable.asType())) {
-                Variable transferObjectElement = parse.body().decl(ref(org.w3c.dom.Element.class),
-                        fieldName + "TransferObjectElement",
-                        ExpressionFactory._null());
-
-                parse.body().assign(transferObjectElement, ref(DomUtils.class).staticInvoke("getChildElementByTagName")
-                        .arg(element)
-                        .arg(context.getNameUtils().uncamel(fieldName)));
-
-                Variable beanDefinitionBuilder = generateParseTransferObject(variable.asType(), parse.body(), transferObjectElement, patternInfo, parserContext);
-
-                parse.body().add(builder.invoke("addPropertyValue").arg(fieldName).arg(beanDefinitionBuilder.invoke("getBeanDefinition")));
             } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                 generateParseXmlType(parse.body(), element, builder, fieldName);
             } else if (context.getTypeMirrorUtils().isArrayOrList(variable.asType())) {
@@ -494,27 +480,6 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         }
 
         Conditional ifNotNull = block._if(Op.ne(elements, ExpressionFactory._null()));
-
-        /*
-        Variable containsOnlyText = ifNotNull._then().decl(context.getCodeModel().BOOLEAN, "containsOnlyText", ExpressionFactory.TRUE);
-        ForLoop iterateOverNodes = ifNotNull._then()._for();
-        Variable i = iterateOverNodes.init(context.getCodeModel().INT, "i", ExpressionFactory.lit(0));
-        iterateOverNodes.test(Op.lt(i, element.invoke("getChildNodes").invoke("getLength")));
-        iterateOverNodes.update(Op.incr(i));
-
-        Conditional isTextNode = iterateOverNodes.body()._if(Op.ne(element.invoke("getChildNodes").invoke("item").arg(i).invoke("getNodeType"),
-                ref(Node.class).staticRef("TEXT_NODE")));
-
-        isTextNode._then().assign(containsOnlyText, ExpressionFactory.FALSE);
-
-        Conditional ifTextElement = ifNotNull._then()._if(containsOnlyText);
-        */
-
-        /*
-        String text = processorsElement.getAttribute("text");
-        if ((text!= null)&&(!StringUtils.isBlank(text))) {
-            builder.addPropertyValue("processors", text);
-            */
 
         Variable text = ifNotNull._then().decl(ref(String.class), "text", elements.invoke("getAttribute").arg("text"));
         Conditional ifTextElement = ifNotNull._then()._if(Op.cand(Op.ne(text, ExpressionFactory._null()),
@@ -623,7 +588,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
     private UpperBlockClosure generateParseMap(Block body, TypeMirror typeMirror, Variable listElement, Variable builder, String fieldName, Variable patternInfo, Variable parserContext) {
         DeclaredType variableType = (DeclaredType) typeMirror;
-        java.util.List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
+        List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
 
         Variable listChilds = body.decl(ref(List.class).narrow(ref(org.w3c.dom.Element.class)),
                 fieldName.replace("-", "") + "ListChilds",
@@ -693,11 +658,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(valueRef));
 
 
-        if (variableTypeParameters.size() > 1 && context.getTypeMirrorUtils().isTransferObject(variableTypeParameters.get(1))) {
-            Variable pojoBuilder = generateParseTransferObject(variableTypeParameters.get(1), ifValueRef._else(), forEach.var(), patternInfo, parserContext);
-
-            ifValueRef._else().assign(valueObject, pojoBuilder.invoke("getBeanDefinition"));
-        } else if (variableTypeParameters.size() > 1 && context.getTypeMirrorUtils().isArrayOrList(variableTypeParameters.get(1))) {
+        if (variableTypeParameters.size() > 1 && context.getTypeMirrorUtils().isArrayOrList(variableTypeParameters.get(1))) {
             UpperBlockClosure subList = generateParseArrayOrList(forEach.body(), variableTypeParameters.get(1), forEach.var(), builder, "inner-" + childName, patternInfo, parserContext);
 
             subList.getNotRefBlock().assign(valueObject, subList.getManagedCollection());
@@ -736,7 +697,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
     private UpperBlockClosure generateParseArrayOrList(Block body, TypeMirror typeMirror, Variable listElement, Variable builder, String fieldName, Variable patternInfo, Variable parserContext) {
         DeclaredType variableType = (DeclaredType) typeMirror;
-        java.util.List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
+        List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
 
         Variable listChilds = body.decl(ref(List.class).narrow(ref(org.w3c.dom.Element.class)),
                 fieldName.replace("-", "") + "ListChilds",
@@ -788,17 +749,12 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 managedList.invoke("add").arg(
                         ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(valueRef)));
 
-        if (variableTypeParameters.size() > 0 && context.getTypeMirrorUtils().isTransferObject(variableTypeParameters.get(0))) {
-            Variable pojoBeanDefinitionBuilder = generateParseTransferObject(variableTypeParameters.get(0), ifValueRef._else(), forEach.var(), patternInfo, parserContext);
-
-            ifValueRef._else().add(
-                    managedList.invoke("add").arg(pojoBeanDefinitionBuilder.invoke("getBeanDefinition")));
-        } else if (variableTypeParameters.size() > 0 && context.getTypeMirrorUtils().isArrayOrList(variableTypeParameters.get(0))) {
+        if (!variableTypeParameters.isEmpty() && context.getTypeMirrorUtils().isArrayOrList(variableTypeParameters.get(0))) {
             UpperBlockClosure subList = generateParseArrayOrList(ifValueRef._else(), variableTypeParameters.get(0), forEach.var(), builder, "inner-" + childName, patternInfo, parserContext);
 
             subList.getNotRefBlock().add(
                     managedList.invoke("add").arg(subList.getManagedCollection()));
-        } else if (variableTypeParameters.size() > 0 && context.getTypeMirrorUtils().isMap(variableTypeParameters.get(0))) {
+        } else if (!variableTypeParameters.isEmpty() && context.getTypeMirrorUtils().isMap(variableTypeParameters.get(0))) {
             UpperBlockClosure subMap = generateParseMap(ifValueRef._else(), variableTypeParameters.get(0), forEach.var(), builder, "inner-" + childName, patternInfo, parserContext);
 
             subMap.getNotRefBlock().add(
@@ -809,53 +765,6 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         }
 
         return new UpperBlockClosure(managedList, ifRef._else());
-    }
-
-    private Variable generateParseTransferObject(TypeMirror transferObjectType, Block block, Variable element, Variable patternInfo, Variable parserContext) {
-        DeclaredType declaredType = (DeclaredType) transferObjectType;
-        String baseName = declaredType.asElement().getSimpleName().toString().toLowerCase();
-        Variable builder = block.decl(ref(BeanDefinitionBuilder.class), baseName + "BeanDefinitionBuilder",
-                ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition").arg(ref(transferObjectType).boxify().dotclass()));
-
-        TypeElement typeElement = (TypeElement) declaredType.asElement();
-        java.util.List<VariableElement> variables = ElementFilter.fieldsIn(typeElement.getEnclosedElements());
-        for (VariableElement variable : variables) {
-            String fieldName = variable.getSimpleName().toString();
-
-            if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
-                generateParseSupportedType(block, element, builder, fieldName);
-            } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
-                generateParseXmlType(block, element, builder, fieldName);
-            } else if (context.getTypeMirrorUtils().isArrayOrList(variable.asType())) {
-                Variable listElement = block.decl(ref(org.w3c.dom.Element.class),
-                        fieldName + "ListElement",
-                        ExpressionFactory._null());
-
-                block.assign(listElement, ref(DomUtils.class).staticInvoke("getChildElementByTagName")
-                        .arg(element)
-                        .arg(context.getNameUtils().uncamel(fieldName)));
-
-                UpperBlockClosure managedList = generateParseArrayOrList(block, variable.asType(), listElement, builder, fieldName, patternInfo, parserContext);
-
-                managedList.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedList.getManagedCollection()));
-            } else if (context.getTypeMirrorUtils().isMap(variable.asType())) {
-                Variable listElement = block.decl(ref(org.w3c.dom.Element.class),
-                        fieldName + "ListElement",
-                        ExpressionFactory._null());
-
-                block.assign(listElement, ref(DomUtils.class).staticInvoke("getChildElementByTagName")
-                        .arg(element)
-                        .arg(context.getNameUtils().uncamel(fieldName)));
-
-                UpperBlockClosure managedMap = generateParseMap(block, variable.asType(), listElement, builder, fieldName, patternInfo, parserContext);
-
-                managedMap.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedMap.getManagedCollection()));
-            } else if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
-                generateParseEnum(block, element, builder, fieldName);
-            }
-        }
-
-        return builder;
     }
 
     private void generateAttachMessageProcessor(Method parse, Variable definition, Variable parserContext) {

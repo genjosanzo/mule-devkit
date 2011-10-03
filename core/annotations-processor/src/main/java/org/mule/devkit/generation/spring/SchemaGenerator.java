@@ -96,7 +96,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private static final String ELEMENT_NAME_CONFIG = "config";
     private static final String ATTRIBUTE_NAME_NAME = "name";
     private static final String REF_SUFFIX = "-ref";
-    private static final String TRANSFER_OBJECT_TYPE_SUFFIX = "TransferObjectType";
     private static final String DOMAIN_DEFAULT_VALUE = "${fullDomain}";
     private static final String PORT_DEFAULT_VALUE = "${http.port}";
     private static final String ASYNC_DEFAULT_VALUE = "true";
@@ -492,8 +491,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 } else if (context.getTypeMirrorUtils().isArrayOrList(genericType) ||
                         context.getTypeMirrorUtils().isMap(genericType)) {
                     return generateCollectionComplexType(targetNamespace, "inner-" + name, genericType);
-                } else if (context.getTypeMirrorUtils().isTransferObject(genericType)) {
-                    return generatePojoComplexTypeWithRef(targetNamespace, genericType);
                 } else if (context.getTypeMirrorUtils().isEnum(genericType)) {
                     return genereateEnumComplexType(genericType, targetNamespace);
                 } else {
@@ -535,22 +532,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
                 complexContentExtension.getAttributeOrAttributeGroup().add(refAttribute);
                 complexContentExtension.getAttributeOrAttributeGroup().add(keyAttribute);
-            } else if (variableTypeParameters.size() > 1 && context.getTypeMirrorUtils().isTransferObject(variableTypeParameters.get(1))) {
-                ComplexContent simpleContent = new ComplexContent();
-                mapComplexType.setComplexContent(simpleContent);
-                ExtensionType complexContentExtension = new ExtensionType();
-                QName qname = new QName(targetNamespace, ref(variableTypeParameters.get(1)).name() + TRANSFER_OBJECT_TYPE_SUFFIX);
-                complexContentExtension.setBase(qname);
-                simpleContent.setExtension(complexContentExtension);
-
-                Attribute refAttribute = new Attribute();
-                refAttribute.setUse(SchemaConstants.USE_OPTIONAL);
-                refAttribute.setName(ATTRIBUTE_NAME_VALUE_REF);
-                refAttribute.setType(SchemaConstants.STRING);
-
-                complexContentExtension.getAttributeOrAttributeGroup().add(refAttribute);
-                complexContentExtension.getAttributeOrAttributeGroup().add(keyAttribute);
-
             } else {
                 Attribute refAttribute = new Attribute();
                 refAttribute.setUse(SchemaConstants.USE_REQUIRED);
@@ -575,24 +556,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(genericType);
         simpleContentExtension.setBase(new QName(targetNamespace, enumElement.getSimpleName() + ENUM_TYPE_SUFFIX));
         simpleContent.setExtension(simpleContentExtension);
-        return complexType;
-    }
-
-    private LocalComplexType generatePojoComplexTypeWithRef(String targetNamespace, TypeMirror genericType) {
-        LocalComplexType complexType = new LocalComplexType();
-        ComplexContent simpleContent = new ComplexContent();
-        complexType.setComplexContent(simpleContent);
-        ExtensionType simpleContentExtension = new ExtensionType();
-        QName qname = new QName(targetNamespace, ref(genericType).name() + TRANSFER_OBJECT_TYPE_SUFFIX);
-        simpleContentExtension.setBase(qname);
-        simpleContent.setExtension(simpleContentExtension);
-
-        Attribute refAttribute = new Attribute();
-        refAttribute.setUse(SchemaConstants.USE_OPTIONAL);
-        refAttribute.setName(ATTRIBUTE_NAME_VALUE_REF);
-        refAttribute.setType(SchemaConstants.STRING);
-
-        simpleContentExtension.getAttributeOrAttributeGroup().add(refAttribute);
         return complexType;
     }
 

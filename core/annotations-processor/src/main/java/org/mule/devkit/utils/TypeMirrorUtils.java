@@ -26,11 +26,7 @@ import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.callback.InterceptCallback;
 import org.mule.api.callback.SourceCallback;
-import org.mule.devkit.generation.spring.SchemaTypeConversion;
 
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
@@ -49,45 +45,6 @@ public final class TypeMirrorUtils {
 
     public TypeMirrorUtils(Types types) {
         this.types = types;
-    }
-
-    public boolean isTransferObject(TypeMirror type) {
-        if (SchemaTypeConversion.isSupported(type.toString())) {
-            return false;
-        }
-
-        if (isXmlType(type)) {
-            return false;
-        }
-
-        if (type.getKind() != TypeKind.DECLARED) {
-            return false;
-        }
-
-        DeclaredType declaredType = (DeclaredType) type;
-        TypeElement typeElement = (TypeElement) ((DeclaredType) type).asElement();
-
-        // only interfaces can be transfer objects
-        if( typeElement.getKind() != ElementKind.INTERFACE ) {
-            return false;
-        }
-
-        // generic interfaces not supported
-        if (typeElement.getTypeParameters().size() > 0) {
-            return false;
-        }
-
-        // we do not support interfaces that extend other interfaces
-        if (typeElement.getInterfaces().size() > 0) {
-            return false;
-        }
-
-        // if its no public cannot be used
-        if (!typeElement.getModifiers().contains(Modifier.PUBLIC)) {
-            return false;
-        }
-
-        return true;
     }
 
     public boolean isXmlType(TypeMirror type) {
