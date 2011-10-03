@@ -17,8 +17,6 @@
 
 package org.mule.devkit.it;
 
-import java.lang.Exception;
-
 public class BasicModuleTest extends AbstractModuleTest
 {
 

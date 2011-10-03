@@ -16,13 +16,13 @@
  */
 package org.mule.devkit.maven;
 
-import static org.eclipse.egit.github.core.client.IGitHubConstants.HOST_DEFAULT;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.SUFFIX_GIT;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.model.Scm;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.egit.github.core.RepositoryId;
+
+import static org.eclipse.egit.github.core.client.IGitHubConstants.HOST_DEFAULT;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SUFFIX_GIT;
 
 /**
  * Repository utilities

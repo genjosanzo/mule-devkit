@@ -61,6 +61,8 @@ import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.builders.FieldBuilder;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.TemplateParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 
 import javax.lang.model.element.ExecutableElement;
@@ -74,6 +76,11 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
+
+    protected FieldVariable generateLoggerField(DefinedClass clazz) {
+        return clazz.field(Modifier.PRIVATE | Modifier.STATIC, ref(Logger.class), "logger",
+                ref(LoggerFactory.class).staticInvoke("getLogger").arg(clazz.dotclass()));
+    }
 
     protected FieldVariable generateFieldForPatternInfo(DefinedClass messageProcessorClass) {
         FieldVariable patternInfo = messageProcessorClass.field(Modifier.PRIVATE, ref(TemplateParser.PatternInfo.class), "patternInfo");

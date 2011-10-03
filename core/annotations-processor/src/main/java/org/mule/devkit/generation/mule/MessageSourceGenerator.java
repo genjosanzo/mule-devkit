@@ -91,6 +91,8 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         messageSourceClass.javadoc().add(" as a message source capable of generating Mule events. ");
         messageSourceClass.javadoc().add(" The POJO's method is invoked in its own thread.");
 
+        FieldVariable logger = generateLoggerField(messageSourceClass);
+
         // add a field for each argument of the method
         Map<String, FieldVariableElement> fields = generateProcessorFieldForEachParameter(messageSourceClass, executableElement);
 
@@ -151,19 +153,19 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
             DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey(typeElement));
 
             // add run method
-            generateRunMethod(messageSourceClass, executableElement, fields, sessionFields, object, muleContext, poolObjectClass);
+            generateRunMethod(messageSourceClass, executableElement, fields, sessionFields, object, muleContext, poolObjectClass, logger);
         } else {
             // add run method
-            generateRunMethod(messageSourceClass, executableElement, fields, sessionFields, object, muleContext);
+            generateRunMethod(messageSourceClass, executableElement, fields, sessionFields, object, muleContext, logger);
         }
     }
 
-    private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> sessionFields, FieldVariable object, FieldVariable muleContext) {
-        generateRunMethod(messageSourceClass, executableElement, fields, sessionFields, object, muleContext, null);
+    private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> sessionFields, FieldVariable object, FieldVariable muleContext, FieldVariable logger) {
+        generateRunMethod(messageSourceClass, executableElement, fields, sessionFields, object, muleContext, null, logger);
     }
 
 
-    private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> sessionFields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass) {
+    private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> sessionFields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass, FieldVariable logger) {
         Method run = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "run");
         run.javadoc().add("Implementation {@link Runnable#run()} that will invoke the method on the pojo that this message source wraps.");
 
@@ -267,7 +269,9 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
         callSource.body().add(methodCall);
 
-        CatchBlock swallowCatch = callSource._catch(ref(Exception.class));
+        CatchBlock logCatch = callSource._catch(ref(Exception.class));
+        Variable exception = logCatch.param("e");
+        logCatch.body().add(logger.invoke("error").arg(exception.invoke("getMessage")).arg(exception));
 
         if (poolObjectClass != null) {
             Block fin = callSource._finally();
