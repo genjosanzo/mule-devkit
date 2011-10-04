@@ -39,7 +39,7 @@ information about how the Mule Plugin System works see <a href="http://www.mules
         &lt;name&gt;<?cs var:project.snapshotRepo.name ?>&lt;/name&gt;
         &lt;url&gt;<?cs var:project.snapshotRepo.url ?>&lt;/url&gt;
         &lt;layout&gt;default&lt;/layout&gt;
-    &lt;/repsitory&gt;
+    &lt;/repository&gt;
 &lt;/repositories&gt;
 </pre>
 
