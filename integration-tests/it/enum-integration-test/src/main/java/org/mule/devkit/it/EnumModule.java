@@ -26,6 +26,7 @@ import java.util.Map;
 public class EnumModule {
 
     private Map<Property, String> properties;
+    private Property myProperty;
 
     @Processor
     public void setProperties(Map<Property, String> properties) {
@@ -45,5 +46,13 @@ public class EnumModule {
             }
         }
         return true;
+    }
+
+    public Property getMyProperty() {
+        return myProperty;
+    }
+
+    public void setMyProperty(Property myProperty) {
+        this.myProperty = myProperty;
     }
 }
