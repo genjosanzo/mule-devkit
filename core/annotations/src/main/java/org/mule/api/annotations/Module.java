@@ -43,7 +43,7 @@ public @interface Module {
     /**
      * The version of the module. Defaults to 1.0.
      */
-    String version() default DEFAULT_VERSION;
+    String schemaVersion() default DEFAULT_VERSION;
 
     /**
      * Namespace of the module
@@ -66,5 +66,4 @@ public @interface Module {
     String minMuleVersion() default "3.2";
 
     String DEFAULT_VERSION = "1.0";
-
 }

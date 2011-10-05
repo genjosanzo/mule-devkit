@@ -138,7 +138,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         String location = module.schemaLocation();
         if (location == null || location.length() == 0) {
-            location = schema.getTargetNamespace() + "/" + module.version() + "/mule-" + module.name() + XSD_EXTENSION;
+            location = schema.getTargetNamespace() + "/" + module.schemaVersion() + "/mule-" + module.name() + XSD_EXTENSION;
         }
 
         // TODO: replace with a class role
