@@ -22,6 +22,7 @@ import org.mule.devkit.generation.DevkitTypeElementImpl;
 import org.mule.devkit.generation.TypeElementImpl;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
@@ -216,7 +217,9 @@ public class NameUtils {
     public String generateClassNameInPackage(Element element, String className) {
         Element enclosingElement = element.getEnclosingElement();
         String packageName;
-        if (enclosingElement != null && enclosingElement.getEnclosingElement() != null) {
+        if(enclosingElement.getKind() == ElementKind.CLASS) {
+            packageName = getPackageName(getBinaryName((TypeElement) enclosingElement));
+        } else if (enclosingElement.getEnclosingElement() != null) {
             TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(enclosingElement.getEnclosingElement())).get(0);
             packageName = getPackageName(getBinaryName(parentClass));
         } else {

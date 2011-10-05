@@ -16,6 +16,7 @@
  */
 package org.mule.devkit.it;
 
+import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 
@@ -26,6 +27,7 @@ import java.util.Map;
 public class EnumModule {
 
     private Map<Property, String> properties;
+    @Configurable
     private Property myProperty;
 
     @Processor
