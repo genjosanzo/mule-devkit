@@ -76,17 +76,18 @@ public class JavaDocUtils {
 
     public boolean hasTag(String tagName, Element element) {
         String comment = elements.getDocComment(element);
-        if (comment == null || StringUtils.isBlank(comment)) {
+        if (StringUtils.isBlank(comment)) {
             return false;
         }
 
-        comment = comment.trim();
-
-        StringTokenizer st = new StringTokenizer(comment, "\n\r");
+        StringTokenizer st = new StringTokenizer(comment.trim(), "\n\r");
         while (st.hasMoreTokens()) {
             String nextToken = st.nextToken().trim();
-            if (nextToken.startsWith("@" + tagName) ||
-                    nextToken.startsWith("{@" + tagName)) {
+            if (nextToken.startsWith("@" + tagName) ) {
+                String tagContent = StringUtils.difference("@" + tagName, nextToken);
+                return !StringUtils.isBlank(tagContent);
+            }
+            if(nextToken.startsWith("{@" + tagName)) {
                 return true;
             }
         }
