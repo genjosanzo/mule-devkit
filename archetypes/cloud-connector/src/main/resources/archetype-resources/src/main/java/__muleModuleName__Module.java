@@ -27,19 +27,40 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Processor;
 
+/**
+ * Module
+ *
+ * @author MuleSoft, Inc.
+ */
 @Module(name="${moduleNameLower}",
         namespace="http://repository.mulesoft.org/releases/${moduleGroupIdPath}/${artifactId}",
         schemaLocation="http://repository.mulesoft.org/releases/${moduleGroupIdPath}/${artifactId}/${version}/mule-${moduleNameLower}.xsd")
 public class ${muleModuleName}Module
 {
+    /**
+     * Configurable
+     */
     @Configurable
     private String myProperty;
 
+    /**
+     * Set property
+     *
+     * @param myProperty My property
+     */
     public void setMyProperty(String myProperty)
     {
         this.myProperty = myProperty;
     }
 
+    /**
+     * Custom processor
+     *
+     * {@sample.xml mysample.xml ${moduleNameLower}:my-processor}
+     *
+     * @param content Content to be processed
+     * @return Some string
+     */
     @Processor
     public String myProcessor(String content)
     {

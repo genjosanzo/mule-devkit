@@ -21,17 +21,24 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.param.Session;
 import org.mule.api.annotations.session.SessionCreate;
 import org.mule.api.annotations.session.SessionDestroy;
+import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevkitTypeElement;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import java.util.List;
+import java.util.Map;
 
 public class SessionValidator implements Validator {
 
     @Override
-    public void validate(DevkitTypeElement typeElement) throws ValidationException {
+    public boolean shouldValidate(Map<String, String> options) {
+        return true;
+    }
+
+    @Override
+    public void validate(DevkitTypeElement typeElement, GeneratorContext context) throws ValidationException {
 
         if (!typeElement.hasAnnotation(Module.class)) {
             return;

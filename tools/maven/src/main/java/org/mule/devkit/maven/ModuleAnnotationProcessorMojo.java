@@ -48,6 +48,9 @@ public class ModuleAnnotationProcessorMojo extends AbstractAnnotationProcessorMo
     @MojoParameter(required = false, expression = "${project.build.outputDirectory}", description = "Set the destination directory for class files (same behaviour of -d option)")
     private File outputClassDirectory;
 
+    @MojoParameter(required = false, expression = "${devkit.javadoc.check.skip}", description = "Skip JavaDoc validation", defaultValue = "false")
+    private boolean skipJavaDocValidation;
+
     @Override
     public File getSourceDirectory() {
         return sourceDirectory;
@@ -88,5 +91,13 @@ public class ModuleAnnotationProcessorMojo extends AbstractAnnotationProcessorMo
         return result;
     }
 
+    @Override
+    protected void addCompilerArguments(List<String> options) {
+        if (skipJavaDocValidation) {
+            options.add("-AskipJavaDocValidation=true");
+        }
+
+        super.addCompilerArguments(options);
+    }
 
 }

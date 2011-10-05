@@ -21,15 +21,22 @@ import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
+import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevkitTypeElement;
 
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
+import java.util.Map;
 
 public class BasicValidator implements Validator {
 
     @Override
-    public void validate(DevkitTypeElement typeElement) throws ValidationException {
+    public boolean shouldValidate(Map<String, String> options) {
+        return true;
+    }
+
+    @Override
+    public void validate(DevkitTypeElement typeElement, GeneratorContext context) throws ValidationException {
 
         if (typeElement.hasAnnotation(Module.class)) {
             return;

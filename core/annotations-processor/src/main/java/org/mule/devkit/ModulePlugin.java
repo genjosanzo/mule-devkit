@@ -43,6 +43,7 @@ import org.mule.devkit.generation.spring.SchemaGenerator;
 import org.mule.devkit.generation.spring.SpringNamespaceHandlerGenerator;
 import org.mule.devkit.generation.spring.SpringSchemaGenerator;
 import org.mule.devkit.validation.BasicValidator;
+import org.mule.devkit.validation.JavaDocValidator;
 import org.mule.devkit.validation.OAuthValidator;
 import org.mule.devkit.validation.ProcessorValidator;
 import org.mule.devkit.validation.SessionValidator;
@@ -88,6 +89,7 @@ public class ModulePlugin implements Plugin {
         //generators.add(new DSLWrapperGenerator());
 
         validators = new ArrayList<Validator>();
+        validators.add(new JavaDocValidator());
         validators.add(new BasicValidator());
         validators.add(new OAuthValidator());
         validators.add(new ProcessorValidator());

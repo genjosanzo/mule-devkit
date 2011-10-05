@@ -23,12 +23,25 @@ import org.mule.api.annotations.Processor;
 
 import java.util.jar.Manifest;
 
+/**
+ * Jar Module
+ *
+ * @author MuleSoft, Inc.
+ */
 @Module(name = "jar")
 public class JarModule
 {
+    /**
+     * Configurable manifest
+     */
 	@Configurable
 	private Manifest manifest;
-	
+
+    /**
+     * Update manifest
+     *
+     * @param manifest Manifest to update
+     */
     @Processor
     public void updateManifest(Manifest manifest)
     {

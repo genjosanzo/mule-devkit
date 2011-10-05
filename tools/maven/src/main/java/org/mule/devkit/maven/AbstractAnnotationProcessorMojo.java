@@ -258,7 +258,7 @@ public abstract class AbstractAnnotationProcessorMojo extends AbstractMojo {
         }
     }
 
-    private void addCompilerArguments(List<String> options) {
+    protected void addCompilerArguments(List<String> options) {
         if (!StringUtils.isEmpty(compilerArguments)) {
             for (String arg : compilerArguments.split(" ")) {
                 if (!StringUtils.isEmpty(arg)) {

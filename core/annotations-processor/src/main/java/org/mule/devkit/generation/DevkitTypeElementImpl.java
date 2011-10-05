@@ -122,4 +122,9 @@ public class DevkitTypeElementImpl extends TypeElementImpl implements DevkitType
     public boolean isPublic() {
         return typeElement.getModifiers().contains(Modifier.PUBLIC);
     }
+
+    @Override
+    public TypeElement getInnerTypeElement() {
+        return typeElement;
+    }
 }

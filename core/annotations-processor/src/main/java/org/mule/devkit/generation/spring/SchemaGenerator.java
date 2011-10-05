@@ -239,7 +239,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 name = processor.name();
             String typeName = StringUtils.capitalize(name) + TYPE_SUFFIX;
 
-            registerProcessorElement(processor.intercepting(), targetNamespace, name, typeName);
+            registerProcessorElement(processor.intercepting(), targetNamespace, name, typeName, method);
 
             registerProcessorType(processor.intercepting(), targetNamespace, typeName, method);
         }
@@ -251,14 +251,14 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 name = source.name();
             String typeName = StringUtils.capitalize(name) + TYPE_SUFFIX;
 
-            registerSourceElement(targetNamespace, name, typeName);
+            registerSourceElement(targetNamespace, name, typeName, method);
 
             registerSourceType(targetNamespace, typeName, method);
         }
 
     }
 
-    private void registerProcessorElement(boolean intercepting, String targetNamespace, String name, String typeName) {
+    private void registerProcessorElement(boolean intercepting, String targetNamespace, String name, String typeName, ExecutableElement executableElement) {
         Element element = new TopLevelElement();
         element.setName(context.getNameUtils().uncamel(name));
         if (intercepting) {
@@ -268,14 +268,30 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
         element.setType(new QName(targetNamespace, typeName));
 
+        // add doc
+        Annotation annotation = new Annotation();
+        Documentation doc = new Documentation();
+        doc.getContent().add(context.getJavaDocUtils().getSummary(executableElement));
+        annotation.getAppinfoOrDocumentation().add(doc);
+
+        element.setAnnotation(annotation);
+
         schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
     }
 
-    private void registerSourceElement(String targetNamespace, String name, String typeName) {
+    private void registerSourceElement(String targetNamespace, String name, String typeName, ExecutableElement executableElement) {
         Element element = new TopLevelElement();
         element.setName(context.getNameUtils().uncamel(name));
         element.setSubstitutionGroup(SchemaConstants.MULE_ABSTRACT_INBOUND_ENDPOINT);
         element.setType(new QName(targetNamespace, typeName));
+
+        // add doc
+        Annotation annotation = new Annotation();
+        Documentation doc = new Documentation();
+        doc.getContent().add(context.getJavaDocUtils().getSummary(executableElement));
+        annotation.getAppinfoOrDocumentation().add(doc);
+
+        element.setAnnotation(annotation);
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
     }
@@ -327,7 +343,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                     continue;
                 }
                 if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
-                    if( requiredChildElements == 1 ) {
+                    if (requiredChildElements == 1) {
                         Optional optional = variable.getAnnotation(Optional.class);
                         GroupRef groupRef = generateNestedProcessorGroup(optional);
                         complexContentExtension.setGroup(groupRef);
@@ -363,7 +379,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             }
         }
 
-        if( all.getParticle().size() == 0 ) {
+        if (all.getParticle().size() == 0) {
             complexContentExtension.setSequence(null);
             //complexContent.setMixed(false);
         }
@@ -381,7 +397,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         if (optional != null) {
             collectionElement.setMinOccurs(BigInteger.valueOf(0L));
-       } else {
+        } else {
             collectionElement.setMinOccurs(BigInteger.valueOf(1L));
         }
         collectionElement.setMaxOccurs("1");
@@ -391,6 +407,14 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         collectionComplexType.setGroup(group);
         collectionElement.setComplexType(collectionComplexType);
+
+        // add doc
+        Annotation annotation = new Annotation();
+        Documentation doc = new Documentation();
+        doc.getContent().add(context.getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.getEnclosingElement()));
+        annotation.getAppinfoOrDocumentation().add(doc);
+
+        collectionElement.setAnnotation(annotation);
 
         Attribute attribute = new Attribute();
         attribute.setUse(SchemaConstants.USE_OPTIONAL);
@@ -405,7 +429,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         GroupRef group = new GroupRef();
         group.generateNestedProcessorGroup(SchemaConstants.MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE);
         //if (optional != null) {
-            group.setMinOccurs(BigInteger.valueOf(0L));
+        group.setMinOccurs(BigInteger.valueOf(0L));
         //} else {
         //    group.setMinOccurs(BigInteger.valueOf(1L));
         //}
@@ -434,6 +458,14 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             collectionElement.setMinOccurs(BigInteger.valueOf(0L));
         }
         collectionElement.setMaxOccurs("1");
+
+       // add doc
+        Annotation annotation = new Annotation();
+        Documentation doc = new Documentation();
+        doc.getContent().add(context.getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.getEnclosingElement()));
+        annotation.getAppinfoOrDocumentation().add(doc);
+
+        collectionElement.setAnnotation(annotation);
 
         String collectionName = context.getNameUtils().uncamel(context.getNameUtils().singularize(collectionElement.getName()));
         LocalComplexType collectionComplexType = generateCollectionComplexType(targetNamespace, collectionName, variable.asType());
@@ -649,7 +681,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
             Annotation annotation = new Annotation();
             Documentation doc = new Documentation();
-            doc.setSource("Characteristics of the session pool.");
+            doc.getContent().add("Characteristics of the session pool.");
             annotation.getAppinfoOrDocumentation().add(doc);
 
             poolingProfile.setAnnotation(annotation);
@@ -691,7 +723,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
             Annotation annotation = new Annotation();
             Documentation doc = new Documentation();
-            doc.setSource("Config for http callbacks.");
+            doc.getContent().add("Config for http callbacks.");
             annotation.getAppinfoOrDocumentation().add(doc);
             httpCallbackConfig.setAnnotation(annotation);
 
@@ -722,7 +754,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
             Annotation annotation = new Annotation();
             Documentation doc = new Documentation();
-            doc.setSource("Characteristics of the object pool.");
+            doc.getContent().add("Characteristics of the object pool.");
             annotation.getAppinfoOrDocumentation().add(doc);
 
             poolingProfile.setAnnotation(annotation);
@@ -730,7 +762,13 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             all.getParticle().add(objectFactory.createElement(poolingProfile));
         }
 
-        if( all.getParticle().size() == 0 ) {
+        Annotation annotation = new Annotation();
+        Documentation doc = new Documentation();
+        doc.getContent().add(context.getJavaDocUtils().getSummary(typeElement.getInnerTypeElement()));
+        annotation.getAppinfoOrDocumentation().add(doc);
+        config.setAnnotation(annotation);
+
+        if (all.getParticle().size() == 0) {
             config.setSequence(null);
         }
     }
@@ -761,6 +799,14 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             attribute.setName(name + REF_SUFFIX);
             attribute.setType(SchemaConstants.STRING);
         }
+
+        // add doc
+        Annotation annotation = new Annotation();
+        Documentation doc = new Documentation();
+        doc.getContent().add(context.getJavaDocUtils().getSummary(variable));
+        annotation.getAppinfoOrDocumentation().add(doc);
+
+        attribute.setAnnotation(annotation);
 
         // add default value
         if (def != null && def.value().length() > 0) {
@@ -807,6 +853,14 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             attribute.setName(name + REF_SUFFIX);
             attribute.setType(SchemaConstants.STRING);
         }
+
+        // add doc
+        Annotation annotation = new Annotation();
+        Documentation doc = new Documentation();
+        doc.getContent().add(context.getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.getEnclosingElement()));
+        annotation.getAppinfoOrDocumentation().add(doc);
+
+        attribute.setAnnotation(annotation);
 
         // add default value
         if (def != null && def.value().length() > 0) {

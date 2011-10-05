@@ -46,4 +46,6 @@ public interface DevkitTypeElement extends TypeElement {
     boolean isParametrized();
 
     boolean isPublic();
+
+    TypeElement getInnerTypeElement();
 }

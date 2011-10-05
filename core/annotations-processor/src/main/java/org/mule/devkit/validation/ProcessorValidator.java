@@ -24,17 +24,24 @@ import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.callback.InterceptCallback;
+import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevkitTypeElement;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import java.util.List;
+import java.util.Map;
 
 public class ProcessorValidator implements Validator {
 
     @Override
-    public void validate(DevkitTypeElement typeElement) throws ValidationException {
+    public boolean shouldValidate(Map<String, String> options) {
+        return true;
+    }
+
+    @Override
+    public void validate(DevkitTypeElement typeElement, GeneratorContext context) throws ValidationException {
         if (!typeElement.hasAnnotation(Module.class)) {
             return;
         }

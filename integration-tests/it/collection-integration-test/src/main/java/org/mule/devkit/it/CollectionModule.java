@@ -25,37 +25,70 @@ import org.mule.api.annotations.param.Optional;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Collection module
+ *
+ * @author MuleSoft, Inc.
+ */
 @Module(name = "collection")
 public class CollectionModule
 {
+    /**
+     * Configurable strings
+     */
 	@Configurable
     @Optional
 	private List<String> strings;
 
+    /**
+     * Configurable items
+     */
 	@Configurable
     @Optional
 	private List items;
 
+    /**
+     * Configurable map of strings
+     */
 	@Configurable
     @Optional
 	private Map<String, String> mapStrings;
 
+    /**
+     * Configurable list of strings
+     */
 	@Configurable
     @Optional
 	private Map mapItems;
 
+    /**
+     * Count list of strings
+     *
+     * @param strings Strigns to count
+     * @return Count
+     */
     @Processor
     public int countListOfStrings(List<String> strings)
     {
         return strings.size();
     }
 
+    /**
+     * Count strings in config
+     *
+     * @return Count
+     */
     @Processor
     public int countConfigStrings()
     {
         return this.strings.size();
     }
 
+    /**
+     * Count items in config
+     *
+     * @return Count
+     */
     @Processor
     public int countConfigItems()
     {

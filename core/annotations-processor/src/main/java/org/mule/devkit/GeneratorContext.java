@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.generation;
+package org.mule.devkit;
 
 import org.mule.devkit.model.code.CodeModel;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.writer.FilerCodeWriter;
 import org.mule.devkit.model.schema.SchemaModel;
+import org.mule.devkit.utils.JavaDocUtils;
 import org.mule.devkit.utils.NameUtils;
 import org.mule.devkit.utils.TypeMirrorUtils;
 
@@ -41,6 +42,7 @@ public class GeneratorContext {
     private Elements elements;
     private TypeMirrorUtils typeMirrorUtils;
     private NameUtils nameUtils;
+    private JavaDocUtils javaDocUtils;
 
     public GeneratorContext(Filer filer, Types types, Elements elements) {
         this.registerAtBoot = new ArrayList<DefinedClass>();
@@ -51,6 +53,7 @@ public class GeneratorContext {
         this.types = types;
         this.typeMirrorUtils = new TypeMirrorUtils(this.types);
         this.nameUtils = new NameUtils(this.elements);
+        this.javaDocUtils = new JavaDocUtils(this.elements);
     }
 
     public CodeModel getCodeModel() {
@@ -91,5 +94,9 @@ public class GeneratorContext {
 
     public NameUtils getNameUtils() {
         return nameUtils;
+    }
+
+    public JavaDocUtils getJavaDocUtils() {
+        return javaDocUtils;
     }
 }

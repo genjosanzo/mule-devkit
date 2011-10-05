@@ -18,12 +18,20 @@
 package org.mule.devkit.validation;
 
 import org.mule.api.annotations.Module;
+import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevkitTypeElement;
+
+import java.util.Map;
 
 public class TransformerValidator implements Validator {
 
     @Override
-    public void validate(DevkitTypeElement typeElement) throws ValidationException {
+    public boolean shouldValidate(Map<String, String> options) {
+        return true;
+    }
+
+    @Override
+    public void validate(DevkitTypeElement typeElement, GeneratorContext context) throws ValidationException {
         if (!typeElement.hasAnnotation(Module.class)) {
             return;
         }

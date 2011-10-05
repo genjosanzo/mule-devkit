@@ -24,16 +24,23 @@ import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.oauth.OAuthConsumerKey;
 import org.mule.api.annotations.oauth.OAuthConsumerSecret;
+import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevkitTypeElement;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import java.lang.annotation.Annotation;
+import java.util.Map;
 
 public class OAuthValidator implements Validator {
 
     @Override
-    public void validate(DevkitTypeElement typeElement) throws ValidationException {
+    public boolean shouldValidate(Map<String, String> options) {
+        return true;
+    }
+
+    @Override
+    public void validate(DevkitTypeElement typeElement, GeneratorContext context) throws ValidationException {
 
         if (!typeElement.hasAnnotation(Module.class)) {
             return;
