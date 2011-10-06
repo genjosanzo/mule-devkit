@@ -68,7 +68,7 @@ public class CollectionModuleTest extends AbstractModuleTest {
     }
 
     public void testMapOfObjects() throws Exception {
-        runFlow("flowMapOfObjects", 2);
+        runFlowWithPayload("flowMapOfObjects", 2, "SOFT");
     }
 
     public void testRetrieveKey() throws Exception {

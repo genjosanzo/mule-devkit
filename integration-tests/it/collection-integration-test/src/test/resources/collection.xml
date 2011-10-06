@@ -111,7 +111,7 @@
         <collection:count-map-of-objects config-ref="configC">
             <collection:map-objects>
                 <collection:map-object key="a">mulesoft</collection:map-object>
-                <collection:map-object key="b">#[payload]"</collection:map-object>
+                <collection:map-object key="b">#[payload]</collection:map-object>
             </collection:map-objects>
         </collection:count-map-of-objects>
     </flow>
