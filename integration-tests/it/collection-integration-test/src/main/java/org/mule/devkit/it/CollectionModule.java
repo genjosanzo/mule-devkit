@@ -102,6 +102,12 @@ public class CollectionModule
     }
 
     @Processor
+    public int countMapOfObjects(Map<String, Object> mapObjects)
+    {
+        return mapObjects.size();
+    }
+
+    @Processor
     public String retrieveKey(String key, Map<String, String> mapStrings)
     {
         return mapStrings.get(key);

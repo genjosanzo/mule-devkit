@@ -565,13 +565,29 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 complexContentExtension.getAttributeOrAttributeGroup().add(refAttribute);
                 complexContentExtension.getAttributeOrAttributeGroup().add(keyAttribute);
             } else {
+                SimpleContent simpleContent = new SimpleContent();
+                mapComplexType.setSimpleContent(simpleContent);
+                SimpleExtensionType complexContentExtension = new SimpleExtensionType();
+                complexContentExtension.setBase(new QName(SchemaConstants.XSD_NAMESPACE, "string", "xs"));
+                simpleContent.setExtension(complexContentExtension);
+
                 Attribute refAttribute = new Attribute();
-                refAttribute.setUse(SchemaConstants.USE_REQUIRED);
+                refAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+                refAttribute.setName(ATTRIBUTE_NAME_VALUE_REF);
+                refAttribute.setType(SchemaConstants.STRING);
+
+                complexContentExtension.getAttributeOrAttributeGroup().add(refAttribute);
+                complexContentExtension.getAttributeOrAttributeGroup().add(keyAttribute);
+
+                /*
+                Attribute refAttribute = new Attribute();
+                refAttribute.setUse(SchemaConstants.USE_OPTIONAL);
                 refAttribute.setName(ATTRIBUTE_NAME_VALUE_REF);
                 refAttribute.setType(SchemaConstants.STRING);
 
                 mapComplexType.getAttributeOrAttributeGroup().add(refAttribute);
                 mapComplexType.getAttributeOrAttributeGroup().add(keyAttribute);
+                */
             }
 
             return mapComplexType;

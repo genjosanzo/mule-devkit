@@ -170,7 +170,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                                 getAttribute
                         ))));
                 ifNotNull._then().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
-                        ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(element.invoke("getAttribute").arg(fieldName + "-ref"))
+                    ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(element.invoke("getAttribute").arg(fieldName + "-ref"))
                 ));
             }
         }
@@ -421,7 +421,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                                 getAttribute
                         ))));
                 ifNotNull._then().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
-                        ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(element.invoke("getAttribute").arg(fieldName + "-ref"))
+                        Op.plus(Op.plus(ExpressionFactory.lit("#[registry:"),
+                        element.invoke("getAttribute").arg(fieldName + "-ref")),
+                        ExpressionFactory.lit("]"))
                 ));
             }
         }
