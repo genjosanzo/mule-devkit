@@ -47,7 +47,7 @@ public class JavaDocValidator implements Validator {
         }
 
         if (!hasComment(typeElement.getInnerTypeElement(), context)) {
-            throw new ValidationException(typeElement, "Class " + typeElement.getQualifiedName().toString() + " is not properly documented.");
+            throw new ValidationException(typeElement, "Class " + typeElement.getQualifiedName().toString() + " is not properly documented. A summary is missing.");
         }
 
         if (!context.getJavaDocUtils().hasTag("author", typeElement.getInnerTypeElement())) {
@@ -56,7 +56,7 @@ public class JavaDocValidator implements Validator {
 
         for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
             if (!hasComment(variable, context)) {
-                throw new ValidationException(variable, "Field " + variable.getSimpleName().toString() + " is not properly documented.");
+                throw new ValidationException(variable, "Field " + variable.getSimpleName().toString() + " is not properly documented. The description is missing.");
             }
         }
 
@@ -84,14 +84,14 @@ public class JavaDocValidator implements Validator {
     private void validateAllParameters(GeneratorContext context, ExecutableElement method) throws ValidationException {
         for (VariableElement variable : method.getParameters()) {
             if (!hasParameterComment(variable.getSimpleName().toString(), variable.getEnclosingElement(), context)) {
-                throw new ValidationException(variable, "Parameter " + variable.getSimpleName().toString() + " of method " + method.getSimpleName().toString() + " is not properly documented.");
+                throw new ValidationException(variable, "Parameter " + variable.getSimpleName().toString() + " of method " + method.getSimpleName().toString() + " is not properly documented. A matching @param in the method documentation was not found. ");
             }
         }
     }
 
     private void validateMethod(DevkitTypeElement typeElement, GeneratorContext context, ExecutableElement method) throws ValidationException {
         if (!hasComment(method, context)) {
-            throw new ValidationException(method, "Method " + method.getSimpleName().toString() + " is not properly documented.");
+            throw new ValidationException(method, "Method " + method.getSimpleName().toString() + " is not properly documented. A description of what it can do is missing.");
         }
 
         if (!context.getJavaDocUtils().hasTag("sample.xml", method)) {
@@ -100,7 +100,7 @@ public class JavaDocValidator implements Validator {
 
         if( !method.getReturnType().toString().equals("void") ) {
             if( !context.getJavaDocUtils().hasTag("return", method) ) {
-                throw new ValidationException(typeElement, "The return type of a non-void method must be documented. Method " + method.getSimpleName().toString() + " is at fault.");
+                throw new ValidationException(typeElement, "The return type of a non-void method must be documented. Method " + method.getSimpleName().toString() + " is at fault. Missing @return.");
             }
         }
 
