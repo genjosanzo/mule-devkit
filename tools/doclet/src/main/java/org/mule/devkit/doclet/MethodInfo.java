@@ -515,7 +515,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
                 attributeName[i] = mParameters[i].name();
                 nestedProcessor[i] = false;
                 if (mParameters[i].typeName().contains("HttpCallback")) {
-                    attributeName[i] += "-flow-ref";
+                    attributeName[i] = uncamel(attributeName[i]) + "-flow-ref";
                 }
                 if (mParameters[i].typeName().contains("NestedProcessor")) {
                     nestedProcessor[i] = true;
