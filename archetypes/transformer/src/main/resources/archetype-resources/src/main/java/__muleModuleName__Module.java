@@ -32,9 +32,7 @@ import org.mule.api.annotations.Transformer;
  *
  * @author MuleSoft, Inc.
  */
-@Module(name="${moduleNameLower}",
-        namespace="http://repository.mulesoft.org/releases/${moduleGroupIdPath}/${artifactId}",
-        schemaLocation="http://repository.mulesoft.org/releases/${moduleGroupIdPath}/${artifactId}/${version}/mule-${moduleNameLower}.xsd")
+@Module(name="${moduleNameLower}", schemaVersion="${version}")
 public class ${muleModuleName}Module
 {
     /**
