@@ -23,7 +23,7 @@ import javax.lang.model.element.VariableElement;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-public interface DevkitTypeElement extends TypeElement {
+public interface DevKitTypeElement extends TypeElement {
 
     boolean hasProcessorMethodWithParameter(Class<?> parameterType);
 
@@ -48,4 +48,18 @@ public interface DevkitTypeElement extends TypeElement {
     boolean isPublic();
 
     TypeElement getInnerTypeElement();
+
+    boolean isModuleOrConnector();
+
+    boolean isPoolable();
+
+    String minMuleVersion();
+
+    String namespace();
+
+    String name();
+
+    String schemaLocation();
+
+    String schemaVersion();
 }

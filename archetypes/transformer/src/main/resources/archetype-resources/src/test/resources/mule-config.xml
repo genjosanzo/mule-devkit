@@ -24,11 +24,11 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:${moduleNameLower}="http://repository.mulesoft.org/releases/${moduleGroupIdPath}/${artifactId}"
+      xmlns:${moduleNameLower}="http://www.mulesoft.org/schema/mule/${moduleNameLower}"
       xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
-        http://repository.mulesoft.org/releases/${moduleGroupIdPath}/${artifactId} http://repository.mulesoft.org/releases/${moduleGroupIdPath}/${artifactId}/${version}/mule-${moduleNameLower}.xsd">
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/${moduleNameLower} http://www.mulesoft.org/schema/mule/${moduleNameLower}/${version}/mule-${moduleNameLower}.xsd">
 
     <${moduleNameLower}:config myProperty="Some string"/>
 

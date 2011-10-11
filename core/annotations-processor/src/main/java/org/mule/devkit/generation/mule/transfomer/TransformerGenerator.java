@@ -17,7 +17,6 @@
 
 package org.mule.devkit.generation.mule.transfomer;
 
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Transformer;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
@@ -25,7 +24,7 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
@@ -54,12 +53,12 @@ import java.util.Map;
 public class TransformerGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
+    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
         for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
 
             // get class
@@ -86,7 +85,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             generateSetModuleObjectMethod(transformerClass, object);
 
             // get pool object if poolable
-            if (typeElement.getAnnotation(Module.class).poolable()) {
+            if (typeElement.isPoolable()) {
                 DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey(typeElement));
 
                 // doTransform

@@ -17,13 +17,12 @@
 
 package org.mule.devkit.generation.spring;
 
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.Invocation;
@@ -32,19 +31,18 @@ import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Package;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 
 public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) {
+    protected void doGenerate(DevKitTypeElement typeElement) {
         DefinedClass namespaceHandlerClass = getNamespaceHandlerClass(typeElement);
 
         Method init = namespaceHandlerClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "init");
@@ -56,15 +54,14 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
         registerBeanDefinitionParserForEachTransformer(typeElement, init);
     }
 
-    private DefinedClass getNamespaceHandlerClass(Element typeElement) {
+    private DefinedClass getNamespaceHandlerClass(DevKitTypeElement typeElement) {
         String namespaceHandlerName = context.getNameUtils().generateClassName((TypeElement) typeElement, ".config.spring", "NamespaceHandler");
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(namespaceHandlerName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(namespaceHandlerName), NamespaceHandlerSupport.class);
 
-        Module module = typeElement.getAnnotation(Module.class);
-        String targetNamespace = module.namespace();
+        String targetNamespace = typeElement.namespace();
         if (targetNamespace == null || targetNamespace.length() == 0) {
-            targetNamespace = SchemaConstants.BASE_NAMESPACE + module.name();
+            targetNamespace = SchemaConstants.BASE_NAMESPACE + typeElement.name();
         }
         clazz.javadoc().add("Registers bean definitions parsers for handling elements in <code>" + targetNamespace + "</code>.");
 
@@ -76,19 +73,19 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
         init.body().invoke("registerBeanDefinitionParser").arg("config").arg(ExpressionFactory._new(configBeanDefinitionParser));
     }
 
-    private void registerBeanDefinitionParserForEachProcessor(DevkitTypeElement typeElement, Method init) {
+    private void registerBeanDefinitionParserForEachProcessor(DevKitTypeElement typeElement, Method init) {
         for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             registerBeanDefinitionParserForProcessor(init, executableElement);
         }
     }
 
-    private void registerBeanDefinitionParserForEachSource(DevkitTypeElement typeElement, Method init) {
+    private void registerBeanDefinitionParserForEachSource(DevKitTypeElement typeElement, Method init) {
         for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Source.class)) {
             registerBeanDefinitionParserForSource(init, executableElement);
         }
     }
 
-    private void registerBeanDefinitionParserForEachTransformer(DevkitTypeElement typeElement, Method init) {
+    private void registerBeanDefinitionParserForEachTransformer(DevKitTypeElement typeElement, Method init) {
         for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
             Invocation registerMuleBeanDefinitionParser = init.body().invoke("registerBeanDefinitionParser");
             registerMuleBeanDefinitionParser.arg(ExpressionFactory.lit(context.getNameUtils().uncamel(executableElement.getSimpleName().toString())));

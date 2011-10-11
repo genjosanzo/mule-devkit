@@ -21,5 +21,5 @@ import org.mule.devkit.GeneratorContext;
 
 public interface Generator {
 
-    void generate(DevkitTypeElement typeElement, GeneratorContext context) throws GenerationException;
+    void generate(DevKitTypeElement typeElement, GeneratorContext context) throws GenerationException;
 }

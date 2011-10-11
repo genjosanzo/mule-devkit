@@ -25,7 +25,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NestedProcessor;
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
@@ -49,7 +48,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.adapter.OAuth1AdapterGenerator;
 import org.mule.devkit.generation.adapter.OAuth2AdapterGenerator;
 import org.mule.devkit.generation.callback.InterceptCallbackGenerator;
@@ -99,18 +98,18 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
     private static final String LOCATION_PROPERTY = "Location";
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) {
+    protected void doGenerate(DevKitTypeElement typeElement) {
         for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             generateMessageProcessor(typeElement, executableElement);
         }
     }
 
-    private void generateMessageProcessor(DevkitTypeElement typeElement, ExecutableElement executableElement) {
+    private void generateMessageProcessor(DevKitTypeElement typeElement, ExecutableElement executableElement) {
         // get class
         DefinedClass messageProcessorClass;
 
@@ -195,7 +194,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         generateEvaluateAndTransformMethod(messageProcessorClass, muleContext);
 
         // get pool object if poolable
-        if (typeElement.getAnnotation(Module.class).poolable()) {
+        if (typeElement.isPoolable()) {
             DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey(typeElement));
 
             // add process method

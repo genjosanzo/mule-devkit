@@ -33,7 +33,7 @@ import org.mule.api.annotations.oauth.OAuthMessageSigner;
 import org.mule.api.annotations.oauth.OAuthScope;
 import org.mule.api.annotations.oauth.OAuthSigningStrategy;
 import org.mule.devkit.generation.AbstractOAuthAdapterGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
@@ -60,12 +60,12 @@ public class OAuth1AdapterGenerator extends AbstractOAuthAdapterGenerator {
     private static final String CONSUMER_FIELD_NAME = "consumer";
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(OAuth.class);
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
+    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass oauthAdapter = getOAuthAdapterClass(typeElement, "OAuth1Adapter", OAuth1Adapter.class);
         OAuth oauth = typeElement.getAnnotation(OAuth.class);
         authorizationCodePatternConstant(oauthAdapter, oauth.verifierRegex());
@@ -131,7 +131,7 @@ public class OAuth1AdapterGenerator extends AbstractOAuthAdapterGenerator {
         initialise.body().invoke(createConsumer);
     }
 
-    private void generateGetAuthorizationUrlMethod(DefinedClass oauthAdapter, FieldVariable requestToken, FieldVariable requestTokenSecret, FieldVariable redirectUrl, DevkitTypeElement typeElement, OAuth oauth) {
+    private void generateGetAuthorizationUrlMethod(DefinedClass oauthAdapter, FieldVariable requestToken, FieldVariable requestTokenSecret, FieldVariable redirectUrl, DevKitTypeElement typeElement, OAuth oauth) {
         Method getAuthorizationUrl = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, GET_AUTHORIZATION_URL_METHOD_NAME);
         getAuthorizationUrl.type(ref(String.class));
         Variable provider = generateProvider(oauth, getAuthorizationUrl.body(), typeElement);
@@ -145,7 +145,7 @@ public class OAuth1AdapterGenerator extends AbstractOAuthAdapterGenerator {
         getAuthorizationUrl.body()._return(authorizationUrl);
     }
 
-    private void generateFetchAccessTokenMethod(DefinedClass oauthAdapter, FieldVariable requestToken, FieldVariable requestTokenSecret, FieldVariable oauthVerifier, DevkitTypeElement typeElement, OAuth oauth) {
+    private void generateFetchAccessTokenMethod(DefinedClass oauthAdapter, FieldVariable requestToken, FieldVariable requestTokenSecret, FieldVariable oauthVerifier, DevKitTypeElement typeElement, OAuth oauth) {
         Method fetchAccessToken = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, FETCH_ACCESS_TOKEN_METHOD_NAME);
         Variable provider = generateProvider(oauth, fetchAccessToken.body(), typeElement);
         FieldVariable consumer = oauthAdapter.fields().get(CONSUMER_FIELD_NAME);
@@ -157,7 +157,7 @@ public class OAuth1AdapterGenerator extends AbstractOAuthAdapterGenerator {
         fetchAccessToken.body().assign(oauthAdapter.fields().get(OAUTH_ACCESS_TOKEN_SECRET_FIELD_NAME), consumer.invoke("getTokenSecret"));
     }
 
-    private Variable generateProvider(OAuth oauth, Block block, DevkitTypeElement typeElement) {
+    private Variable generateProvider(OAuth oauth, Block block, DevKitTypeElement typeElement) {
         Variable requestTokenUrl = block.decl(ref(String.class), "requestTokenUrl", ExpressionFactory.lit(oauth.requestTokenUrl()));
 
         if (typeElement.hasFieldAnnotatedWith(OAuthScope.class)) {

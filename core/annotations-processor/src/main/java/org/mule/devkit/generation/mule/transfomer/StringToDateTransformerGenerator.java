@@ -22,7 +22,7 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -50,12 +50,12 @@ public class StringToDateTransformerGenerator extends AbstractMessageGenerator {
     private static final String TRANSFORMER_CLASS_NAME = "StringToDateTransformer";
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasProcessorMethodWithParameter(Date.class);
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) {
+    protected void doGenerate(DevKitTypeElement typeElement) {
         DefinedClass transformerClass = getTransformerClass(typeElement);
         FieldVariable muleContext = generateFieldForMuleContext(transformerClass);
         FieldVariable simpleDateFormat = generateSimpleDateFormatField(transformerClass);

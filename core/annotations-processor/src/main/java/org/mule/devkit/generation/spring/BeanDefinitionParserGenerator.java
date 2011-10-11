@@ -20,7 +20,6 @@ package org.mule.devkit.generation.spring;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.mule.api.annotations.Configurable;
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.oauth.OAuth;
@@ -36,7 +35,7 @@ import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
@@ -79,12 +78,12 @@ import java.util.List;
 public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) {
+    protected void doGenerate(DevKitTypeElement typeElement) {
         generateConfigBeanDefinitionParserFor(typeElement);
 
         for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
@@ -96,7 +95,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private void generateConfigBeanDefinitionParserFor(DevkitTypeElement typeElement) {
+    private void generateConfigBeanDefinitionParserFor(DevKitTypeElement typeElement) {
         DefinedClass beanDefinitionparser = getConfigBeanDefinitionParserClass(typeElement);
         DefinedClass pojo = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
 
@@ -226,8 +225,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             generateParsePoolingProfile("session-pooling-profile", "sessionPoolingProfile", parse, element, builder);
         }
 
-        Module module = typeElement.getAnnotation(Module.class);
-        if (module.poolable()) {
+        if (typeElement.isPoolable()) {
             generateParsePoolingProfile("pooling-profile", "poolingProfile", parse, element, builder);
         }
 

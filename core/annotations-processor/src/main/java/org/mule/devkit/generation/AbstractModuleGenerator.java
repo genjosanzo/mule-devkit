@@ -20,7 +20,6 @@ package org.mule.devkit.generation;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.Capability;
 import org.mule.api.MuleContext;
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.annotations.session.SessionCreate;
@@ -106,21 +105,21 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
         return null;
     }
 
-    protected ExecutableElement createSessionForClass(DevkitTypeElement typeElement) {
+    protected ExecutableElement createSessionForClass(DevKitTypeElement typeElement) {
         List<ExecutableElement> sessionCreateMethods = typeElement.getMethodsAnnotatedWith(SessionCreate.class);
         return !sessionCreateMethods.isEmpty() ? sessionCreateMethods.get(0) : null;
     }
 
-    protected ExecutableElement destroySessionForClass(DevkitTypeElement typeElement) {
+    protected ExecutableElement destroySessionForClass(DevKitTypeElement typeElement) {
         List<ExecutableElement> sessionDestroyMethods = typeElement.getMethodsAnnotatedWith(SessionDestroy.class);
         return !sessionDestroyMethods.isEmpty() ? sessionDestroyMethods.get(0) : null;
     }
 
     protected ExecutableElement createSessionForMethod(ExecutableElement executableElement) {
-        return createSessionForClass(new DevkitTypeElementImpl((TypeElement) executableElement.getEnclosingElement()));
+        return createSessionForClass(new DefaultDevKitTypeElement((TypeElement) executableElement.getEnclosingElement()));
     }
 
-    protected void generateIsCapableOf(DevkitTypeElement typeElement, DefinedClass capabilitiesAdapter) {
+    protected void generateIsCapableOf(DevKitTypeElement typeElement, DefinedClass capabilitiesAdapter) {
         Method isCapableOf = capabilitiesAdapter.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "isCapableOf");
         Variable capability = isCapableOf.param(ref(Capability.class), "capability");
         isCapableOf.javadoc().add("Returns true if this module implements such capability");
@@ -135,7 +134,7 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
             addCapability(isCapableOf, capability, ref(Capability.class).staticRef("OAUTH1_CAPABLE"));
         }
 
-        if(typeElement.getAnnotation(Module.class).poolable()) {
+        if(typeElement.isPoolable()) {
             addCapability(isCapableOf, capability, ref(Capability.class).staticRef("POOLING_CAPABLE"));
         }
 

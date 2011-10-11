@@ -28,7 +28,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.config.PoolingProfile;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.DefinedClass;
@@ -48,13 +48,13 @@ import javax.lang.model.element.VariableElement;
 public class PoolAdapterGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         Module module = typeElement.getAnnotation(Module.class);
         return module.poolable();
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
+    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass poolAdapter = getPoolAdapterClass(typeElement);
         poolAdapter.javadoc().add("A <code>" + poolAdapter.name() + "</code> is a wrapper around ");
         poolAdapter.javadoc().add(ref(typeElement.asType()));
@@ -92,7 +92,7 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
         newBody.assign(lifecyleEnabledObjectPool, ExpressionFactory._null());
     }
 
-    private void generateStartMethod(DevkitTypeElement typeElement, DefinedClass poolAdapter, FieldVariable lifecyleEnabledObjectPool, FieldVariable muleContext, FieldVariable poolingProfile) {
+    private void generateStartMethod(DevKitTypeElement typeElement, DefinedClass poolAdapter, FieldVariable lifecyleEnabledObjectPool, FieldVariable muleContext, FieldVariable poolingProfile) {
         DefinedClass objectFactory = context.getClassForRole(context.getNameUtils().generatePojoFactoryKey(typeElement));
 
         Method startMethod = poolAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");

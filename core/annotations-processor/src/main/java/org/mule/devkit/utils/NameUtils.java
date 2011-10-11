@@ -18,7 +18,7 @@
 package org.mule.devkit.utils;
 
 import org.apache.commons.lang.StringUtils;
-import org.mule.devkit.generation.DevkitTypeElementImpl;
+import org.mule.devkit.generation.DefaultDevKitTypeElement;
 import org.mule.devkit.generation.TypeElementImpl;
 
 import javax.lang.model.element.Element;
@@ -259,7 +259,7 @@ public class NameUtils {
 
     public String getBinaryName(TypeElement typeElement) {
         if(typeElement instanceof TypeElementImpl) {
-            typeElement = ((DevkitTypeElementImpl) typeElement).unWrap();
+            typeElement = ((DefaultDevKitTypeElement) typeElement).unWrap();
         }
         return elements.getBinaryName(typeElement).toString();
     }

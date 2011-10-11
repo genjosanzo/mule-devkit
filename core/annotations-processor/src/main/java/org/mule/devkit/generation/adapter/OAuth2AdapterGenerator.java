@@ -24,7 +24,7 @@ import org.mule.api.annotations.oauth.OAuthConsumerKey;
 import org.mule.api.annotations.oauth.OAuthConsumerSecret;
 import org.mule.api.annotations.oauth.OAuthScope;
 import org.mule.devkit.generation.AbstractOAuthAdapterGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
@@ -53,12 +53,12 @@ import java.util.regex.Pattern;
 public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(OAuth2.class);
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
+    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass oauthAdapter = getOAuthAdapterClass(typeElement, "OAuth2Adapter", OAuth2Adapter.class);
         OAuth2 oauth2 = typeElement.getAnnotation(OAuth2.class);
 
@@ -106,7 +106,7 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
         }
     }
 
-    private void generateGetAuthorizationUrlMethod(DefinedClass oauthAdapter, DevkitTypeElement typeElement, OAuth2 oauth2) {
+    private void generateGetAuthorizationUrlMethod(DefinedClass oauthAdapter, DevKitTypeElement typeElement, OAuth2 oauth2) {
         Method getAuthorizationUrl = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, GET_AUTHORIZATION_URL_METHOD_NAME);
         getAuthorizationUrl.type(ref(String.class));
 
@@ -129,7 +129,7 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
         getAuthorizationUrl.body()._return(urlBuilder.invoke("toString"));
     }
 
-    private void generateFetchAccessTokenMethod(DefinedClass oauthAdapter, DevkitTypeElement typeElement, OAuth2 oauth2) {
+    private void generateFetchAccessTokenMethod(DefinedClass oauthAdapter, DevKitTypeElement typeElement, OAuth2 oauth2) {
         Method fetchAccessToken = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, "fetchAccessToken");
 
         TryStatement tryStatement = fetchAccessToken.body()._try();

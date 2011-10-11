@@ -17,6 +17,8 @@
 
 package org.mule.devkit.generation;
 
+import org.mule.api.annotations.Connector;
+import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 
 import javax.lang.model.element.ElementKind;
@@ -29,9 +31,9 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DevkitTypeElementImpl extends TypeElementImpl implements DevkitTypeElement{
+public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitTypeElement {
 
-    public DevkitTypeElementImpl(TypeElement typeElement) {
+    public DefaultDevKitTypeElement(TypeElement typeElement) {
         super(typeElement);
     }
 
@@ -127,4 +129,85 @@ public class DevkitTypeElementImpl extends TypeElementImpl implements DevkitType
     public TypeElement getInnerTypeElement() {
         return typeElement;
     }
+
+    @Override
+    public boolean isModuleOrConnector() {
+        if (hasAnnotation(Module.class) ||
+                hasAnnotation(Connector.class)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean isPoolable() {
+        if (hasAnnotation(Module.class) &&
+                getAnnotation(Module.class).poolable()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public String minMuleVersion() {
+        if (hasAnnotation(Module.class)) {
+            return getAnnotation(Module.class).minMuleVersion();
+        }
+        if (hasAnnotation(Connector.class)) {
+            return getAnnotation(Connector.class).minMuleVersion();
+        }
+
+        return null;
+    }
+
+    @Override
+    public String namespace() {
+        if (hasAnnotation(Module.class)) {
+            return getAnnotation(Module.class).namespace();
+        }
+        if (hasAnnotation(Connector.class)) {
+            return getAnnotation(Connector.class).namespace();
+        }
+
+        return null;
+    }
+
+    @Override
+    public String name() {
+        if (hasAnnotation(Module.class)) {
+            return getAnnotation(Module.class).name();
+        }
+        if (hasAnnotation(Connector.class)) {
+            return getAnnotation(Connector.class).name();
+        }
+
+        return null;
+    }
+
+    @Override
+    public String schemaLocation() {
+        if (hasAnnotation(Module.class)) {
+            return getAnnotation(Module.class).schemaLocation();
+        }
+        if (hasAnnotation(Connector.class)) {
+            return getAnnotation(Connector.class).schemaLocation();
+        }
+
+        return null;
+    }
+
+    @Override
+    public String schemaVersion() {
+        if (hasAnnotation(Module.class)) {
+            return getAnnotation(Module.class).schemaVersion();
+        }
+        if (hasAnnotation(Connector.class)) {
+            return getAnnotation(Connector.class).schemaVersion();
+        }
+
+        return null;
+    }
+
 }

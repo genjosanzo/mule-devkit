@@ -19,6 +19,7 @@ package org.mule.devkit.validation;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.annotations.Configurable;
+import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
@@ -26,7 +27,7 @@ import org.mule.api.annotations.Transformer;
 import org.mule.api.annotations.session.SessionCreate;
 import org.mule.api.annotations.session.SessionDestroy;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -41,8 +42,9 @@ public class JavaDocValidator implements Validator {
     }
 
     @Override
-    public void validate(DevkitTypeElement typeElement, GeneratorContext context) throws ValidationException {
-        if (!typeElement.hasAnnotation(Module.class)) {
+    public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
+        if (!typeElement.hasAnnotation(Module.class) &&
+            !typeElement.hasAnnotation(Connector.class)) {
             return;
         }
 
@@ -89,7 +91,7 @@ public class JavaDocValidator implements Validator {
         }
     }
 
-    private void validateMethod(DevkitTypeElement typeElement, GeneratorContext context, ExecutableElement method) throws ValidationException {
+    private void validateMethod(DevKitTypeElement typeElement, GeneratorContext context, ExecutableElement method) throws ValidationException {
         if (!hasComment(method, context)) {
             throw new ValidationException(method, "Method " + method.getSimpleName().toString() + " is not properly documented. A description of what it can do is missing.");
         }

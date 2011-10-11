@@ -22,7 +22,7 @@ import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
@@ -46,14 +46,14 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
     public static final String ASYNC_FIELD_NAME = "async";
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(OAuth.class) ||
                typeElement.hasAnnotation(OAuth2.class) ||
                typeElement.hasProcessorMethodWithParameter(HttpCallback.class);
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) {
+    protected void doGenerate(DevKitTypeElement typeElement) {
         DefinedClass httpCallbackAdapter = getHttpCallbackAdapterClass(typeElement);
         FieldVariable localPort = localPortFieldWithGetterAndSetter(httpCallbackAdapter);
         FieldVariable remotePort = remotePortFieldWithGetterAndSetter(httpCallbackAdapter);

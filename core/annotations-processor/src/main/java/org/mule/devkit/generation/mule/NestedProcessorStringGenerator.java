@@ -19,7 +19,7 @@ package org.mule.devkit.generation.mule;
 
 import org.mule.api.NestedProcessor;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -36,12 +36,12 @@ public class NestedProcessorStringGenerator extends AbstractModuleGenerator {
     public static final String ROLE = "NestedProcessorString";
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasProcessorMethodWithParameter(NestedProcessor.class);
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
+    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass callbackClass = getNestedProcessorStringClass(typeElement);
         callbackClass._implements(ref(NestedProcessor.class));
 

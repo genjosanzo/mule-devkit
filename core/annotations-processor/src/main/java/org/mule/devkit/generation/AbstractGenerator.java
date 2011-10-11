@@ -24,12 +24,12 @@ public abstract class AbstractGenerator implements Generator {
 
     protected GeneratorContext context;
 
-    protected abstract boolean shouldGenerate(DevkitTypeElement typeElement);
+    protected abstract boolean shouldGenerate(DevKitTypeElement typeElement);
 
-    protected abstract void doGenerate(DevkitTypeElement typeElement) throws GenerationException;
+    protected abstract void doGenerate(DevKitTypeElement typeElement) throws GenerationException;
 
     @Override
-    public final void generate(DevkitTypeElement typeElement, GeneratorContext context) throws GenerationException {
+    public final void generate(DevKitTypeElement typeElement, GeneratorContext context) throws GenerationException {
         this.context = context;
         if(shouldGenerate(typeElement)) {
            doGenerate(typeElement);
