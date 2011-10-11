@@ -17,10 +17,12 @@
 
 package org.mule.devkit;
 
+import com.thoughtworks.xstream.XStream;
 import org.mule.devkit.model.code.CodeModel;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.writer.FilerCodeWriter;
 import org.mule.devkit.model.schema.SchemaModel;
+import org.mule.devkit.model.studio.StudioModel;
 import org.mule.devkit.utils.JavaDocUtils;
 import org.mule.devkit.utils.NameUtils;
 import org.mule.devkit.utils.TypeMirrorUtils;
@@ -36,6 +38,7 @@ import java.util.Map;
 public class GeneratorContext {
     private CodeModel codeModel;
     private SchemaModel schemaModel;
+    private StudioModel studioModel;
     private List<DefinedClass> registerAtBoot;
     private Map<String, DefinedClass> roles;
     private Types types;
@@ -43,8 +46,9 @@ public class GeneratorContext {
     private TypeMirrorUtils typeMirrorUtils;
     private NameUtils nameUtils;
     private JavaDocUtils javaDocUtils;
+    private Map<String, String> options;
 
-    public GeneratorContext(Filer filer, Types types, Elements elements) {
+    public GeneratorContext(Filer filer, Types types, Elements elements, Map<String, String> options) {
         this.registerAtBoot = new ArrayList<DefinedClass>();
         this.codeModel = new CodeModel(new FilerCodeWriter(filer));
         this.schemaModel = new SchemaModel(new FilerCodeWriter(filer));
@@ -54,6 +58,8 @@ public class GeneratorContext {
         this.typeMirrorUtils = new TypeMirrorUtils(this.types);
         this.nameUtils = new NameUtils(this.elements);
         this.javaDocUtils = new JavaDocUtils(this.elements);
+        this.studioModel = new StudioModel(new FilerCodeWriter(filer), new XStream());
+        this.options = options;
     }
 
     public CodeModel getCodeModel() {
@@ -98,5 +104,13 @@ public class GeneratorContext {
 
     public JavaDocUtils getJavaDocUtils() {
         return javaDocUtils;
+    }
+
+    public StudioModel getStudioModel() {
+        return studioModel;
+    }
+
+    public boolean hasOption(String option) {
+        return options.containsKey(option);
     }
 }

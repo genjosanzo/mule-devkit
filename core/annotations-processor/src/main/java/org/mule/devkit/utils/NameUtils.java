@@ -135,6 +135,10 @@ public class NameUtils {
         return result;
     }
 
+    public String friendlyNameFromCamelCase(String camelCaseName) {
+        return StringUtils.capitalize(uncamel(camelCaseName)).replaceAll("-", " ");
+    }
+
     public String getClassName(String fullyQualifiedClassName) {
         int lastDot = fullyQualifiedClassName.lastIndexOf('.');
         return fullyQualifiedClassName.substring(lastDot + 1);

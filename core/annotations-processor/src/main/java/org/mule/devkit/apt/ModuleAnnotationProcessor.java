@@ -151,11 +151,18 @@ public class ModuleAnnotationProcessor extends AbstractProcessor {
             return false;
         }
 
+        try {
+            context.getStudioModel().build();
+        } catch (IOException e) {
+            error(e.getMessage());
+            return false;
+        }
+
         return true;
     }
 
     private void createContext() {
-        context = new GeneratorContext(processingEnv.getFiler(), processingEnv.getTypeUtils(), processingEnv.getElementUtils());
+        context = new GeneratorContext(processingEnv.getFiler(), processingEnv.getTypeUtils(), processingEnv.getElementUtils(), processingEnv.getOptions());
     }
 
     protected GeneratorContext getContext() {

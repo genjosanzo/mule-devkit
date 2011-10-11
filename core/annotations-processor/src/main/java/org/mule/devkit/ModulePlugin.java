@@ -30,6 +30,7 @@ import org.mule.devkit.generation.callback.HttpCallbackGenerator;
 import org.mule.devkit.generation.callback.InterceptCallbackGenerator;
 import org.mule.devkit.generation.mule.MessageProcessorGenerator;
 import org.mule.devkit.generation.mule.MessageSourceGenerator;
+import org.mule.devkit.generation.mule.MuleStudioXmlGenerator;
 import org.mule.devkit.generation.mule.NestedProcessorChainGenerator;
 import org.mule.devkit.generation.mule.NestedProcessorStringGenerator;
 import org.mule.devkit.generation.mule.RegistryBootstrapGenerator;
@@ -86,6 +87,7 @@ public class ModulePlugin implements Plugin {
         generators.add(new SpringNamespaceHandlerGenerator());
         generators.add(new SpringSchemaGenerator());
         generators.add(new RegistryBootstrapGenerator());
+        generators.add(new MuleStudioXmlGenerator());
         //generators.add(new DSLWrapperGenerator());
 
         validators = new ArrayList<Validator>();

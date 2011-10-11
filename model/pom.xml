@@ -19,5 +19,6 @@
 	<modules>
         <module>codemodel</module>
         <module>schemamodel</module>
+        <module>studiomodel</module>
 	</modules>
 </project>

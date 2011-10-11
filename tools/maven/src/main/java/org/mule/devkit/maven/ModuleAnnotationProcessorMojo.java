@@ -26,17 +26,20 @@ import org.jfrog.maven.annomojo.annotations.MojoRequiresDependencyResolution;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 @MojoGoal("generate-sources")
 @MojoRequiresDependencyResolution(value = "compile")
 @MojoPhase("generate-sources")
 public class ModuleAnnotationProcessorMojo extends AbstractAnnotationProcessorMojo {
-    private static String[] processors = new String[]{"org.mule.devkit.apt.ModuleAnnotationProcessor"};
+
+    private static String[] processors = {"org.mule.devkit.apt.ModuleAnnotationProcessor"};
 
     /**
      * project classpath
      */
     @MojoParameter(expression = "${project.compileClasspathElements}", required = true, readonly = true)
+    @SuppressWarnings("unchecked")
     private List classpathElements;
 
     @MojoParameter(expression = "${project.build.sourceDirectory}", required = true)
@@ -50,6 +53,9 @@ public class ModuleAnnotationProcessorMojo extends AbstractAnnotationProcessorMo
 
     @MojoParameter(required = false, expression = "${devkit.javadoc.check.skip}", description = "Skip JavaDoc validation", defaultValue = "false")
     private boolean skipJavaDocValidation;
+
+    @MojoParameter(required = false, expression = "${devkit.generate.studio.xml}", description = "Generate Mule Studio XML file", defaultValue = "false")
+    private boolean generateStudioXml;
 
     @Override
     public File getSourceDirectory() {
@@ -66,6 +72,7 @@ public class ModuleAnnotationProcessorMojo extends AbstractAnnotationProcessorMo
         return processors;
     }
 
+    @Override
     protected void addCompileSourceRoot(MavenProject project, String dir) {
         project.addCompileSourceRoot(dir);
     }
@@ -77,7 +84,7 @@ public class ModuleAnnotationProcessorMojo extends AbstractAnnotationProcessorMo
 
     @Override
     @SuppressWarnings("unchecked")
-    protected java.util.Set<String> getClasspathElements(java.util.Set<String> result) {
+    protected Set<String> getClasspathElements(Set<String> result) {
         List<Resource> resources = project.getResources();
 
         if (resources != null) {
@@ -96,8 +103,10 @@ public class ModuleAnnotationProcessorMojo extends AbstractAnnotationProcessorMo
         if (skipJavaDocValidation) {
             options.add("-AskipJavaDocValidation=true");
         }
+        if (generateStudioXml) {
+            options.add("-AgenerateStudioXml=true");
+        }
 
         super.addCompilerArguments(options);
     }
-
 }

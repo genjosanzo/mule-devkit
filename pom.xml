@@ -25,6 +25,7 @@
 
     <properties>
         <mule.version>3.2.0</mule.version>
+        <xstream.version>1.2.2</xstream.version>
     </properties>
 
     <modules>
