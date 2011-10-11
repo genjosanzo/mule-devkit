@@ -29,7 +29,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.config.MuleManifest;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -55,12 +55,12 @@ import java.util.List;
 public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) {
+    protected void doGenerate(DevKitTypeElement typeElement) {
         DefinedClass lifecycleAdapter = getLifecycleAdapterClass(typeElement);
         lifecycleAdapter.javadoc().add("A <code>" + lifecycleAdapter.name() + "</code> is a wrapper around ");
         lifecycleAdapter.javadoc().add(ref(typeElement.asType()));
@@ -98,7 +98,7 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         return clazz;
     }
 
-    private Method generateLifecycleInvocation(DefinedClass lifecycleWrapper, DevkitTypeElement typeElement, ExecutableElement superExecutableElement, String name, Class<?> catchException, boolean addThis) {
+    private Method generateLifecycleInvocation(DefinedClass lifecycleWrapper, DevKitTypeElement typeElement, ExecutableElement superExecutableElement, String name, Class<?> catchException, boolean addThis) {
         Method lifecycleMethod = lifecycleWrapper.method(Modifier.PUBLIC, context.getCodeModel().VOID, name);
 
         if (name.equals("initialise")) {
@@ -160,22 +160,22 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         return lifecycleMethod;
     }
 
-    private ExecutableElement getStartElement(DevkitTypeElement typeElement) {
+    private ExecutableElement getStartElement(DevKitTypeElement typeElement) {
         List<ExecutableElement> startMethods = typeElement.getMethodsAnnotatedWith(Start.class);
         return !startMethods.isEmpty() ? startMethods.get(0) : null;
     }
 
-    private ExecutableElement getStopElement(DevkitTypeElement typeElement) {
+    private ExecutableElement getStopElement(DevKitTypeElement typeElement) {
         List<ExecutableElement> stopMethods = typeElement.getMethodsAnnotatedWith(Stop.class);
         return !stopMethods.isEmpty() ? stopMethods.get(0) : null;
     }
 
-    private ExecutableElement getPostConstructElement(DevkitTypeElement typeElement) {
+    private ExecutableElement getPostConstructElement(DevKitTypeElement typeElement) {
         List<ExecutableElement> postConstructMethods = typeElement.getMethodsAnnotatedWith(PostConstruct.class);
         return !postConstructMethods.isEmpty() ? postConstructMethods.get(0) : null;
     }
 
-    private ExecutableElement getPreDestroyElement(DevkitTypeElement typeElement) {
+    private ExecutableElement getPreDestroyElement(DevKitTypeElement typeElement) {
         List<ExecutableElement> preDestroyMethods = typeElement.getMethodsAnnotatedWith(PreDestroy.class);
         return !preDestroyMethods.isEmpty() ? preDestroyMethods.get(0) : null;
     }

@@ -18,7 +18,7 @@
 package org.mule.devkit.generation.mule;
 
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
 
@@ -29,12 +29,12 @@ import java.io.OutputStreamWriter;
 public class RegistryBootstrapGenerator extends AbstractModuleGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
+    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
         try {
             OutputStream registryBootstrapStream = context.getCodeModel().getCodeWriter().openBinary(null, "META-INF/services/org/mule/config/registry-bootstrap.properties");
             OutputStreamWriter registryBootstrapStreamOut = new OutputStreamWriter(registryBootstrapStream, "UTF-8");

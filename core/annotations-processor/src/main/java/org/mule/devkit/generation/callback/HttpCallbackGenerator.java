@@ -34,7 +34,7 @@ import org.mule.api.transport.Connector;
 import org.mule.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.construct.Flow;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -84,14 +84,14 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
     private FieldVariable async;
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(OAuth.class) ||
                 typeElement.hasAnnotation(OAuth2.class) ||
                 typeElement.hasProcessorMethodWithParameter(HttpCallback.class);
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) {
+    protected void doGenerate(DevKitTypeElement typeElement) {
         DefinedClass callbackClass = getDefaultHttpCallbackClass(typeElement);
         generateFields(callbackClass);
         generateConstructorArgSimpleFlowConstruct(callbackClass);

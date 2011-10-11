@@ -26,7 +26,7 @@ import org.mule.api.annotations.Transformer;
 import org.mule.api.annotations.session.SessionCreate;
 import org.mule.api.annotations.session.SessionDestroy;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -41,7 +41,7 @@ public class JavaDocValidator implements Validator {
     }
 
     @Override
-    public void validate(DevkitTypeElement typeElement, GeneratorContext context) throws ValidationException {
+    public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
         if (!typeElement.hasAnnotation(Module.class)) {
             return;
         }
@@ -89,7 +89,7 @@ public class JavaDocValidator implements Validator {
         }
     }
 
-    private void validateMethod(DevkitTypeElement typeElement, GeneratorContext context, ExecutableElement method) throws ValidationException {
+    private void validateMethod(DevKitTypeElement typeElement, GeneratorContext context, ExecutableElement method) throws ValidationException {
         if (!hasComment(method, context)) {
             throw new ValidationException(method, "Method " + method.getSimpleName().toString() + " is not properly documented. A description of what it can do is missing.");
         }

@@ -23,7 +23,7 @@ import javax.lang.model.element.VariableElement;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-public interface DevkitTypeElement extends TypeElement {
+public interface DevKitTypeElement extends TypeElement {
 
     boolean hasProcessorMethodWithParameter(Class<?> parameterType);
 

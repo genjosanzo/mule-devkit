@@ -24,7 +24,7 @@ import org.mule.api.annotations.param.SessionKey;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.config.PoolingProfile;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.ClassAlreadyExistsException;
@@ -48,7 +48,7 @@ import java.util.Map;
 public class SessionManagerAdapterGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         ExecutableElement sessionCreate = createSessionForClass(typeElement);
         ExecutableElement sessionDestroy = destroySessionForClass(typeElement);
 
@@ -59,7 +59,7 @@ public class SessionManagerAdapterGenerator extends AbstractMessageGenerator {
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
+    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
         ExecutableElement sessionCreate = createSessionForClass(typeElement);
         ExecutableElement sessionDestroy = destroySessionForClass(typeElement);
 

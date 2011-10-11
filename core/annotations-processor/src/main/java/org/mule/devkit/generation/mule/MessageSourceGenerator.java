@@ -30,7 +30,7 @@ import org.mule.api.annotations.Source;
 import org.mule.api.annotations.param.Session;
 import org.mule.api.callback.SourceCallback;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.spring.SchemaTypeConversion;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Cast;
@@ -60,18 +60,18 @@ import java.util.Map;
 public class MessageSourceGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) {
+    protected void doGenerate(DevKitTypeElement typeElement) {
         for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Source.class)) {
             generateMessageSource(typeElement, executableElement);
         }
     }
 
-    private void generateMessageSource(DevkitTypeElement typeElement, ExecutableElement executableElement) {
+    private void generateMessageSource(DevKitTypeElement typeElement, ExecutableElement executableElement) {
         // get class
         DefinedClass messageSourceClass = getMessageSourceClass(executableElement);
 

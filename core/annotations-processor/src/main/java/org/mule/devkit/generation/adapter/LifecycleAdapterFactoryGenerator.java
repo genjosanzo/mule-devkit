@@ -25,7 +25,7 @@ import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.object.ObjectFactory;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
@@ -39,13 +39,13 @@ import javax.lang.model.element.VariableElement;
 public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         Module module = typeElement.getAnnotation(Module.class);
         return module.poolable();
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) {
+    protected void doGenerate(DevKitTypeElement typeElement) {
         DefinedClass lifecycleAdapterFactory = getLifecycleAdapterFactoryClass(typeElement);
         lifecycleAdapterFactory.javadoc().add("A <code>" + lifecycleAdapterFactory.name() + "</code> is an implementation  ");
         lifecycleAdapterFactory.javadoc().add(" of {@link ObjectFactory} interface for ");
@@ -92,7 +92,7 @@ public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
         getObjectClass.body()._return(poolObjectClass.dotclass());
     }
 
-    private void generateGetInstanceMethod(DevkitTypeElement typeElement, DefinedClass lifecycleAdapterFactory, DefinedClass poolObjectClass) {
+    private void generateGetInstanceMethod(DevKitTypeElement typeElement, DefinedClass lifecycleAdapterFactory, DefinedClass poolObjectClass) {
         Method getInstance = lifecycleAdapterFactory.method(Modifier.PUBLIC, ref(Object.class), "getInstance");
         getInstance.param(ref(MuleContext.class), "muleContext");
 
@@ -113,7 +113,7 @@ public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
         initialise._throws(ref(InitialisationException.class));
     }
 
-    private void generateFields(DevkitTypeElement typeElement, DefinedClass lifecycleAdapterFactory) {
+    private void generateFields(DevKitTypeElement typeElement, DefinedClass lifecycleAdapterFactory) {
         for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
             FieldVariable configField = lifecycleAdapterFactory.field(Modifier.PRIVATE, ref(variable.asType()), variable.getSimpleName().toString());
             generateSetter(lifecycleAdapterFactory, configField);

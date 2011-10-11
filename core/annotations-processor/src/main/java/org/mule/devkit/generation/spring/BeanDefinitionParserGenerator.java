@@ -36,7 +36,7 @@ import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
@@ -79,12 +79,12 @@ import java.util.List;
 public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) {
+    protected void doGenerate(DevKitTypeElement typeElement) {
         generateConfigBeanDefinitionParserFor(typeElement);
 
         for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
@@ -96,7 +96,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private void generateConfigBeanDefinitionParserFor(DevkitTypeElement typeElement) {
+    private void generateConfigBeanDefinitionParserFor(DevKitTypeElement typeElement) {
         DefinedClass beanDefinitionparser = getConfigBeanDefinitionParserClass(typeElement);
         DefinedClass pojo = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
 

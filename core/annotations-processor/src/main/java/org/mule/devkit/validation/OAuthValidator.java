@@ -25,7 +25,7 @@ import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.oauth.OAuthConsumerKey;
 import org.mule.api.annotations.oauth.OAuthConsumerSecret;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
@@ -40,7 +40,7 @@ public class OAuthValidator implements Validator {
     }
 
     @Override
-    public void validate(DevkitTypeElement typeElement, GeneratorContext context) throws ValidationException {
+    public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
 
         if (!typeElement.hasAnnotation(Module.class)) {
             return;
@@ -59,13 +59,13 @@ public class OAuthValidator implements Validator {
         }
     }
 
-    private void checkClassHasFieldWithAnnotation(DevkitTypeElement typeElement, Class<? extends Annotation> annotation, String errorMessage) throws ValidationException {
+    private void checkClassHasFieldWithAnnotation(DevKitTypeElement typeElement, Class<? extends Annotation> annotation, String errorMessage) throws ValidationException {
         if(typeElement.getFieldsAnnotatedWith(annotation).isEmpty()) {
             throw new ValidationException(typeElement, errorMessage);
         }
     }
 
-    private boolean classHasMethodWithParameterAnnotated(DevkitTypeElement typeElement, Class<? extends Annotation> annotation) {
+    private boolean classHasMethodWithParameterAnnotated(DevKitTypeElement typeElement, Class<? extends Annotation> annotation) {
         for (ExecutableElement method : typeElement.getMethods()) {
             for (VariableElement parameter : method.getParameters()) {
                 if (parameter.getAnnotation(annotation) != null) {

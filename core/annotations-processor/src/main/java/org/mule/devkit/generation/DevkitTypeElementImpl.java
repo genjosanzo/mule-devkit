@@ -29,9 +29,9 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DevkitTypeElementImpl extends TypeElementImpl implements DevkitTypeElement{
+public class DevKitTypeElementImpl extends TypeElementImpl implements DevKitTypeElement {
 
-    public DevkitTypeElementImpl(TypeElement typeElement) {
+    public DevKitTypeElementImpl(TypeElement typeElement) {
         super(typeElement);
     }
 

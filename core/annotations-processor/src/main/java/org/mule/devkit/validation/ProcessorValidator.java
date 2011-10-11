@@ -25,7 +25,7 @@ import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.callback.InterceptCallback;
 import org.mule.devkit.GeneratorContext;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -41,7 +41,7 @@ public class ProcessorValidator implements Validator {
     }
 
     @Override
-    public void validate(DevkitTypeElement typeElement, GeneratorContext context) throws ValidationException {
+    public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
         if (!typeElement.hasAnnotation(Module.class)) {
             return;
         }

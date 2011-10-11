@@ -19,7 +19,7 @@ package org.mule.devkit.generation.adapter;
 
 import org.mule.api.Capabilities;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.TypeReference;
 
@@ -28,12 +28,12 @@ import javax.lang.model.element.TypeElement;
 public class CapabilitiesAdapterGenerator extends AbstractModuleGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return true;
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) {
+    protected void doGenerate(DevKitTypeElement typeElement) {
         DefinedClass capabilitiesAdapter = getCapabilitiesAdapterClass(typeElement);
         capabilitiesAdapter.javadoc().add("A <code>" + capabilitiesAdapter.name() + "</code> is a wrapper around ");
         capabilitiesAdapter.javadoc().add(ref(typeElement.asType()));

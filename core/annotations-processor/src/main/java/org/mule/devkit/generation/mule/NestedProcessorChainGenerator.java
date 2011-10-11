@@ -26,7 +26,7 @@ import org.mule.api.NestedProcessor;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
@@ -44,12 +44,12 @@ public class NestedProcessorChainGenerator extends AbstractModuleGenerator {
     public static final String ROLE = "NestedProcessorChain";
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasProcessorMethodWithParameter(NestedProcessor.class);
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) {
+    protected void doGenerate(DevKitTypeElement typeElement) {
         DefinedClass callbackClass = getNestedProcessorChainClass(typeElement);
         callbackClass._implements(ref(NestedProcessor.class));
 

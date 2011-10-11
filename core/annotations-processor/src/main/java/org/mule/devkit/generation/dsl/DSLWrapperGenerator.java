@@ -25,7 +25,7 @@ import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.api.annotations.param.Session;
 import org.mule.devkit.generation.AbstractModuleGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.ClassAlreadyExistsException;
 import org.mule.devkit.model.code.Conditional;
@@ -51,7 +51,7 @@ import java.util.List;
 public class DSLWrapperGenerator extends AbstractModuleGenerator {
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         if (getPojoType(typeElement).fullName().endsWith("HttpCallbackAdapter")) {
             return false;
         }
@@ -59,7 +59,7 @@ public class DSLWrapperGenerator extends AbstractModuleGenerator {
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) throws GenerationException {
+    protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
 
         final DefinedClass wrapperClass = buildWrapperClass(typeElement);
         final FieldVariable object = generateFieldForPojo(typeElement, wrapperClass);
