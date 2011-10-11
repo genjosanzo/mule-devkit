@@ -19,7 +19,6 @@ package org.mule.devkit.generation.mule;
 
 import com.thoughtworks.xstream.XStream;
 import org.mule.api.annotations.Configurable;
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
@@ -69,7 +68,7 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
         XStream xStream = context.getStudioModel().getXStream();
 
         Namespace namespace = new Namespace(xStream);
-        String moduleName = typeElement.getAnnotation(Module.class).name();
+        String moduleName = typeElement.name();
         namespace.setPrefix(moduleName);
         namespace.setXmlns(TOOLING_NS);
         namespace.setUrl(URI_PREFIX + moduleName);
