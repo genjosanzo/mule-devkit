@@ -23,8 +23,10 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
+import org.mule.api.annotations.param.Session;
+import org.mule.api.annotations.session.SessionCreate;
 import org.mule.devkit.generation.AbstractMessageGenerator;
-import org.mule.devkit.generation.DevkitTypeElement;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.BooleanParameter;
 import org.mule.devkit.model.studio.ChildElement;
@@ -58,12 +60,12 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
     public static final String GLOBAL_CLOUD_CONNECTOR_LOCAL_ID = "config";
 
     @Override
-    protected boolean shouldGenerate(DevkitTypeElement typeElement) {
+    protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return context.hasOption("generateStudioXml");
     }
 
     @Override
-    protected void doGenerate(DevkitTypeElement typeElement) {
+    protected void doGenerate(DevKitTypeElement typeElement) {
         XStream xStream = context.getStudioModel().getXStream();
 
         Namespace namespace = new Namespace(xStream);
@@ -80,9 +82,10 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
 
         List<String> parsedLocalIds = new ArrayList<String>();
         for (ExecutableElement executableElement : processorMethods) {
-            generateCloudConnectorElement(executableElement, namespace, xStream, moduleName, parsedLocalIds);
+            generateCloudConnectorElement(executableElement, namespace, xStream, moduleName, parsedLocalIds, typeElement);
         }
         context.getStudioModel().setNamespace(namespace);
+        context.getStudioModel().setModuleName(moduleName);
     }
 
     private CloudConnector createConfigRefAbstractCloudConnector(XStream xStream, String moduleName) {
@@ -107,7 +110,7 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
         return cloudConnector;
     }
 
-    private GlobalCloudConnector createGlobalCloudConnector(XStream xStream, String moduleName, DevkitTypeElement typeElement) {
+    private GlobalCloudConnector createGlobalCloudConnector(XStream xStream, String moduleName, DevKitTypeElement typeElement) {
 
         List<Parameter> fields = new ArrayList<Parameter>();
         for (VariableElement field : typeElement.getFieldsAnnotatedWith(Configurable.class)) {
@@ -183,8 +186,8 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
         return cloudConnector;
     }
 
-    private void generateCloudConnectorElement(ExecutableElement executableElement, Namespace namespace, XStream xStream, String moduleName, List<String> parsedLocalIds) {
-        List<Parameter> simpleTypeParameters = getSimpleTypeParameters(executableElement, xStream);
+    private void generateCloudConnectorElement(ExecutableElement executableElement, Namespace namespace, XStream xStream, String moduleName, List<String> parsedLocalIds, DevKitTypeElement typeElement) {
+        List<Parameter> simpleTypeParameters = getSimpleTypeParameters(executableElement, xStream, typeElement);
 
         List<ChildElement> childElementParameters = getChildElementsParameters(executableElement, xStream, moduleName);
 
@@ -282,33 +285,48 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
                 context.getTypeMirrorUtils().isArrayOrList(parameter.asType());
     }
 
-    private List<Parameter> getSimpleTypeParameters(ExecutableElement executableElement, XStream xStream) {
+    private List<Parameter> getSimpleTypeParameters(ExecutableElement executableElement, XStream xStream, DevKitTypeElement typeElement) {
         List<Parameter> parameters = new ArrayList<Parameter>();
         for (VariableElement variableElement : executableElement.getParameters()) {
             Parameter parameter = getParameter(xStream, variableElement);
             String parameterName = variableElement.getSimpleName().toString();
             if (parameter != null) {
-                parameter.setCaption(context.getNameUtils().friendlyNameFromCamelCase(parameterName));
-                parameter.setDescription(context.getJavaDocUtils().getParameterSummary(parameterName, executableElement));
-                parameter.setName(parameterName);
-                setOptionalOrRequired(variableElement, parameter);
-                setDefaultValueIfAvailable(variableElement, parameter);
-                parameters.add(parameter);
+                setParameterInfo(executableElement, parameters, variableElement, parameter, parameterName);
+            } else if (variableElement.getAnnotation(Session.class) != null) {
+                ExecutableElement sessionCreateMethod = typeElement.getMethodsAnnotatedWith(SessionCreate.class).get(0);
+                for (VariableElement sessionCreateParameter : sessionCreateMethod.getParameters()) {
+                    parameter = getParameter(xStream, sessionCreateParameter);
+                    parameterName = sessionCreateParameter.getSimpleName().toString();
+                    setParameterInfo(sessionCreateMethod, parameters, sessionCreateParameter, parameter, parameterName);
+                    parameter.setRequired("false");
+                }
             }
         }
         return parameters;
+    }
+
+    private void setParameterInfo(ExecutableElement executableElement, List<Parameter> parameters, VariableElement variableElement, Parameter parameter, String parameterName) {
+        parameter.setCaption(context.getNameUtils().friendlyNameFromCamelCase(parameterName));
+        parameter.setDescription(context.getJavaDocUtils().getParameterSummary(parameterName, executableElement));
+        parameter.setName(parameterName);
+        setOptionalOrRequired(variableElement, parameter);
+        setDefaultValueIfAvailable(variableElement, parameter);
+        parameters.add(parameter);
     }
 
     private List<ChildElement> getChildElementsParameters(ExecutableElement executableElement, XStream xStream, String moduleName) {
         List<ChildElement> parameters = new ArrayList<ChildElement>();
         for (VariableElement variableElement : executableElement.getParameters()) {
             if (context.getTypeMirrorUtils().isCollection(variableElement.asType())) {
-                checkNoNestedCollections(variableElement);
                 ChildElement childElement = new ChildElement(xStream);
                 childElement.setName(URI_PREFIX + moduleName + "/" + context.getNameUtils().uncamel(variableElement.getSimpleName().toString()));
                 childElement.setDescription(context.getJavaDocUtils().getParameterSummary(variableElement.getSimpleName().toString(), executableElement));
                 childElement.setCaption(context.getNameUtils().friendlyNameFromCamelCase(variableElement.getSimpleName().toString()));
-                childElement.setAllowMultiple("false");
+                if (isNestedCollection(variableElement)) {
+                    childElement.setAllowMultiple("true");
+                } else {
+                    childElement.setAllowMultiple("false");
+                }
                 childElement.setInplace("true");
                 parameters.add(childElement);
             }
@@ -316,14 +334,15 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
         return parameters;
     }
 
-    private void checkNoNestedCollections(VariableElement variableElement) {
+    private boolean isNestedCollection(VariableElement variableElement) {
         DeclaredType declaredType = (DeclaredType) variableElement.asType();
         List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
         for (TypeMirror typeArgument : typeArguments) {
             if (context.getTypeMirrorUtils().isCollection(typeArgument)) {
-                throw new UnsupportedOperationException("Nested collections are not supported yet");
+                return true;
             }
         }
+        return false;
     }
 
     private void setDefaultValueIfAvailable(VariableElement variableElement, Parameter parameter) {

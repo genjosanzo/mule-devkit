@@ -26,9 +26,11 @@ import java.io.UnsupportedEncodingException;
 
 public class StudioModel {
 
+    private static final String XML_FILE_NAME = "META-INF/%s-studio.xml";
     private CodeWriter codeWriter;
     private XStream xStream;
     private Namespace namespace;
+    private String moduleName;
 
     public StudioModel(CodeWriter codeWriter, XStream xStream) {
         this.codeWriter = codeWriter;
@@ -41,8 +43,7 @@ public class StudioModel {
         }
         try {
             String studioXml = xStream.toXML(namespace).replaceAll("__abstract", "abstract").replaceAll("__extends", "extends"); // TODO;
-
-            OutputStream springSchemasStream = codeWriter.openBinary(null, "META-INF/studio.xml");
+            OutputStream springSchemasStream = codeWriter.openBinary(null, String.format(XML_FILE_NAME, moduleName));
             OutputStreamWriter springSchemasOut = new OutputStreamWriter(springSchemasStream, "UTF-8");
             springSchemasOut.write(studioXml);
             springSchemasOut.flush();
@@ -58,5 +59,9 @@ public class StudioModel {
 
     public void setNamespace(Namespace namespace) {
         this.namespace = namespace;
+    }
+
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
     }
 }

@@ -79,7 +79,7 @@
                         <exclude>**/assets/**</exclude>
                         <exclude>**/*.xsd</exclude>
                         <exclude>**/*.properties</exclude>
-                        <exclude>**/pmd.xml</exclude>
+                        <exclude>**/*.xml</exclude>
                     </excludes>
                 </configuration>
                 <executions>

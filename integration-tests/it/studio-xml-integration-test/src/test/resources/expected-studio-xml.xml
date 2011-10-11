@@ -1,0 +1,99 @@
+<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" prefix="mymodule"
+           url="http://www.mulesoft.org/schema/mule/mymodule">
+    <global-cloud-connector image="icons/large/mymodule-connector-48x32.png"
+                            icon="icons/small/mymodule-connector-24x16.png" localId="config"
+                            extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
+                            caption="Mymodule" description="Global Mymodule configuration information">
+        <attribute-category caption="Mymodule" description="Mymodule configuration properties">
+            <group caption="Generic" id="mymoduleGenericProperties">
+                <name required="false" name="name" caption="Name"
+                      description="Give a name to this configuration so it can be later referenced by config-ref."/>
+            </group>
+        </attribute-category>
+    </global-cloud-connector>
+    <cloud-connector localId="mymodule-connector" icon="icons/small/mymodule-connector-24x16.png"
+                     image="icons/large/mymodule-connector-48x32.png"
+                     aliasId="org.mule.tooling.ui.modules.core.pattern.mymodule"
+                     extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
+                     caption="Mymodule" description="Mymodule Integration">
+        <attribute-category caption="General" description="General properties">
+            <group caption="Generic" id="mymoduleConnectorGeneric">
+                <modeSwitch name="Mymodule operations to execute" caption="Operation" description="Operation">
+                    <mode modeId="http://www.mulesoft.org/schema/mule/mymodule/operation1" modeLabel="Operation1"/>
+                    <mode modeId="http://www.mulesoft.org/schema/mule/mymodule/operation2" modeLabel="Operation2"/>
+                    <mode modeId="http://www.mulesoft.org/schema/mule/mymodule/operation3" modeLabel="Operation3"/>
+                    <mode modeId="http://www.mulesoft.org/schema/mule/mymodule/operation4" modeLabel="Operation4"/>
+                </modeSwitch>
+            </group>
+        </attribute-category>
+    </cloud-connector>
+    <cloud-connector localId="abstractMymoduleConnectorGeneric" icon="icons/small/mymodule-connector-24x16.png"
+                     image="icons/large/mymodule-connector-48x32.png" abstract="true"
+                     caption="abstractMymoduleConnectorGeneric" description="Interact with Mymodule">
+        <attribute-category caption="General" description="General properties">
+            <group caption="Generic" id="abstractMymoduleConnectorGeneric">
+                <globalRef requiredType="http://www.mulesoft.org/schema/mule/mymodule/config" name="config-ref"
+                           caption="Config reference"
+                           description="Specify which configuration to use for this invocation."/>
+            </group>
+        </attribute-category>
+    </cloud-connector>
+    <cloud-connector localId="operation1" icon="icons/small/mymodule-connector-24x16.png"
+                     image="icons/large/mymodule-connector-48x32.png" abstract="true"
+                     extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
+                     caption="operation1">
+        <attribute-category caption="General" description="General properties">
+            <group caption="operation1 method description" id="general">
+                <string required="true" name="stringParameter" caption="String parameter"
+                        description="stringParameter description"/>
+                <integer required="true" name="intParameter" caption="Int parameter"
+                         description="intParameter description"/>
+                <boolean required="true" name="booleanParameter" caption="Boolean parameter"
+                         description="booleanParameter description"/>
+            </group>
+        </attribute-category>
+    </cloud-connector>
+    <cloud-connector localId="operation2" icon="icons/small/mymodule-connector-24x16.png"
+                     image="icons/large/mymodule-connector-48x32.png" abstract="true"
+                     extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
+                     caption="operation2">
+        <attribute-category caption="General" description="General properties">
+            <group caption="operation2 method description" id="general">
+                <string required="false" name="stringParameter" caption="String parameter"
+                        description="stringParameter description"/>
+                <integer required="false" name="intParameter" caption="Int parameter"
+                         description="intParameter description"/>
+                <boolean required="false" name="booleanParameter" caption="Boolean parameter"
+                         description="booleanParameter description"/>
+            </group>
+        </attribute-category>
+    </cloud-connector>
+    <cloud-connector localId="operation3" icon="icons/small/mymodule-connector-24x16.png"
+                     image="icons/large/mymodule-connector-48x32.png" abstract="true"
+                     extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
+                     caption="operation3">
+        <attribute-category caption="General" description="General properties">
+            <group caption="operation3 method description" id="general">
+                <string required="false" defaultValue="fede" name="stringParameter" caption="String parameter"
+                        description="stringParameter description"/>
+                <integer required="false" defaultValue="10" name="intParameter" caption="Int parameter"
+                         description="intParameter description"/>
+                <boolean required="false" defaultValue="true" name="booleanParameter" caption="Boolean parameter"
+                         description="booleanParameter description"/>
+            </group>
+        </attribute-category>
+    </cloud-connector>
+    <cloud-connector localId="operation4" icon="icons/small/mymodule-connector-24x16.png"
+                     image="icons/large/mymodule-connector-48x32.png" abstract="true"
+                     extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
+                     caption="operation4">
+        <attribute-category caption="General" description="General properties">
+            <group caption="operation4 method description" id="general">
+                <string required="false" name="user" caption="User" description="the user name to use"/>
+                <string required="false" name="password" caption="Password" description="the password to use"/>
+                <string required="true" name="stringParameter" caption="String parameter"
+                        description="stringParameter description"/>
+            </group>
+        </attribute-category>
+    </cloud-connector>
+</namespace>
