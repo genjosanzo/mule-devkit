@@ -19,6 +19,7 @@ package org.mule.devkit.validation;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.annotations.Configurable;
+import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
@@ -42,7 +43,8 @@ public class JavaDocValidator implements Validator {
 
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
-        if (!typeElement.hasAnnotation(Module.class)) {
+        if (!typeElement.hasAnnotation(Module.class) &&
+            !typeElement.hasAnnotation(Connector.class)) {
             return;
         }
 

@@ -25,7 +25,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NestedProcessor;
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
@@ -195,7 +194,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         generateEvaluateAndTransformMethod(messageProcessorClass, muleContext);
 
         // get pool object if poolable
-        if (typeElement.getAnnotation(Module.class).poolable()) {
+        if (typeElement.isPoolable()) {
             DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey(typeElement));
 
             // add process method

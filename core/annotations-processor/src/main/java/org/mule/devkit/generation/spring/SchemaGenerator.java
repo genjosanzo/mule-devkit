@@ -18,7 +18,6 @@
 package org.mule.devkit.generation.spring;
 
 import org.mule.api.annotations.Configurable;
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
@@ -114,10 +113,9 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     @Override
     protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
-        Module module = typeElement.getAnnotation(Module.class);
-        String targetNamespace = module.namespace();
+        String targetNamespace = typeElement.namespace();
         if (targetNamespace == null || targetNamespace.length() == 0) {
-            targetNamespace = SchemaConstants.BASE_NAMESPACE + module.name();
+            targetNamespace = SchemaConstants.BASE_NAMESPACE + typeElement.name();
         }
 
         schema.setTargetNamespace(targetNamespace);
@@ -134,11 +132,11 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         registerTransformers(typeElement);
         registerEnums(typeElement);
 
-        String fileName = "META-INF/mule-" + module.name() + XSD_EXTENSION;
+        String fileName = "META-INF/mule-" + typeElement.name() + XSD_EXTENSION;
 
-        String location = module.schemaLocation();
+        String location = typeElement.schemaLocation();
         if (location == null || location.length() == 0) {
-            location = schema.getTargetNamespace() + "/" + module.schemaVersion() + "/mule-" + module.name() + XSD_EXTENSION;
+            location = schema.getTargetNamespace() + "/" + typeElement.schemaVersion() + "/mule-" + typeElement.name() + XSD_EXTENSION;
         }
 
         // TODO: replace with a class role
@@ -760,7 +758,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             all.getParticle().add(objectFactory.createElement(httpCallbackConfig));
         }
 
-        if (typeElement.getAnnotation(Module.class).poolable()) {
+        if (typeElement.isPoolable()) {
             //<xsd:element name="abstract-pooling-profile" abstract="true" type="abstractPoolingProfileType"/>
 
             TopLevelElement poolingProfile = new TopLevelElement();

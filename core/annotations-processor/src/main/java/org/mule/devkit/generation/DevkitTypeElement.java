@@ -48,4 +48,18 @@ public interface DevKitTypeElement extends TypeElement {
     boolean isPublic();
 
     TypeElement getInnerTypeElement();
+
+    boolean isModuleOrConnector();
+
+    boolean isPoolable();
+
+    String minMuleVersion();
+
+    String namespace();
+
+    String name();
+
+    String schemaLocation();
+
+    String schemaVersion();
 }

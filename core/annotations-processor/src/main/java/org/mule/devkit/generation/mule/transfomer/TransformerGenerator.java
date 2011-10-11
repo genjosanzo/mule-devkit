@@ -17,7 +17,6 @@
 
 package org.mule.devkit.generation.mule.transfomer;
 
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Transformer;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
@@ -86,7 +85,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             generateSetModuleObjectMethod(transformerClass, object);
 
             // get pool object if poolable
-            if (typeElement.getAnnotation(Module.class).poolable()) {
+            if (typeElement.isPoolable()) {
                 DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey(typeElement));
 
                 // doTransform

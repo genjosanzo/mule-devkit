@@ -17,7 +17,6 @@
 
 package org.mule.devkit.generation.spring;
 
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
@@ -32,7 +31,6 @@ import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Package;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 
@@ -56,15 +54,14 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
         registerBeanDefinitionParserForEachTransformer(typeElement, init);
     }
 
-    private DefinedClass getNamespaceHandlerClass(Element typeElement) {
+    private DefinedClass getNamespaceHandlerClass(DevKitTypeElement typeElement) {
         String namespaceHandlerName = context.getNameUtils().generateClassName((TypeElement) typeElement, ".config.spring", "NamespaceHandler");
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(namespaceHandlerName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(namespaceHandlerName), NamespaceHandlerSupport.class);
 
-        Module module = typeElement.getAnnotation(Module.class);
-        String targetNamespace = module.namespace();
+        String targetNamespace = typeElement.namespace();
         if (targetNamespace == null || targetNamespace.length() == 0) {
-            targetNamespace = SchemaConstants.BASE_NAMESPACE + module.name();
+            targetNamespace = SchemaConstants.BASE_NAMESPACE + typeElement.name();
         }
         clazz.javadoc().add("Registers bean definitions parsers for handling elements in <code>" + targetNamespace + "</code>.");
 

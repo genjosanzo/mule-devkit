@@ -25,7 +25,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.param.Session;
 import org.mule.api.callback.SourceCallback;
@@ -149,7 +148,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         generateStopMethod(messageSourceClass, thread);
 
         // get pool object if poolable
-        if (typeElement.getAnnotation(Module.class).poolable()) {
+        if (typeElement.isPoolable()) {
             DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey(typeElement));
 
             // add run method

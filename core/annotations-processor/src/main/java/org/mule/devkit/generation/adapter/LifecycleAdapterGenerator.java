@@ -19,7 +19,6 @@ package org.mule.devkit.generation.adapter;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.lifecycle.Start;
 import org.mule.api.annotations.lifecycle.Stop;
 import org.mule.api.lifecycle.Disposable;
@@ -102,14 +101,13 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         Method lifecycleMethod = lifecycleWrapper.method(Modifier.PUBLIC, context.getCodeModel().VOID, name);
 
         if (name.equals("initialise")) {
-            Module module = typeElement.getAnnotation(Module.class);
             Variable log = lifecycleMethod.body().decl(ref(Logger.class), "log", ref(LoggerFactory.class).staticInvoke("getLogger").arg(lifecycleWrapper.dotclass()));
             Variable runtimeVersion = lifecycleMethod.body().decl(ref(String.class), "runtimeVersion", ref(MuleManifest.class).staticInvoke("getProductVersion"));
             Conditional ifUnkownVersion = lifecycleMethod.body()._if(runtimeVersion.invoke("equals").arg("Unknown"));
             ifUnkownVersion._then().add(log.invoke("warn").arg(ExpressionFactory.lit("Unknown Mule runtime version. This module may not work properly!")));
             Block ifKnownVersion = ifUnkownVersion._else();
 
-            Variable expectedMinVersion = ifKnownVersion.decl(ref(String[].class), "expectedMinVersion", ExpressionFactory.lit(module.minMuleVersion()).invoke("split").arg("\\."));
+            Variable expectedMinVersion = ifKnownVersion.decl(ref(String[].class), "expectedMinVersion", ExpressionFactory.lit(typeElement.minMuleVersion()).invoke("split").arg("\\."));
             Variable currentRuntimeVersion = ifKnownVersion.decl(ref(String[].class), "currentRuntimeVersion", runtimeVersion.invoke("split").arg("\\."));
 
             ForLoop forEachVersionComponent = ifKnownVersion._for();
@@ -120,7 +118,7 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
             forEachVersionComponent.body()._if(Op.lt(
                     ref(Integer.class).staticInvoke("parseInt").arg(currentRuntimeVersion.component(i)),
                     ref(Integer.class).staticInvoke("parseInt").arg(expectedMinVersion.component(i))))._then()
-                    ._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg("This module is only valid for Mule " + module.minMuleVersion()));
+                    ._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg("This module is only valid for Mule " + typeElement.minMuleVersion()));
         }
 
         if (catchException != null &&

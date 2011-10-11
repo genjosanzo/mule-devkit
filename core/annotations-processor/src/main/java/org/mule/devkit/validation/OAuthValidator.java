@@ -17,6 +17,7 @@
 
 package org.mule.devkit.validation;
 
+import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
@@ -42,7 +43,8 @@ public class OAuthValidator implements Validator {
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
 
-        if (!typeElement.hasAnnotation(Module.class)) {
+        if (!typeElement.hasAnnotation(Module.class) &&
+            !typeElement.hasAnnotation(Connector.class)) {
             return;
         }
 

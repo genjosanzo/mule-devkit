@@ -17,7 +17,7 @@
 
 package org.mule.devkit.validation;
 
-import org.mule.devkit.generation.DevKitTypeElementImpl;
+import org.mule.devkit.generation.DefaultDevKitTypeElement;
 
 import javax.lang.model.element.Element;
 
@@ -50,8 +50,8 @@ public class ValidationException extends Exception {
     }
 
     public Element getElement() {
-        if(element instanceof DevKitTypeElementImpl) {
-            return ((DevKitTypeElementImpl) element).unWrap();
+        if(element instanceof DefaultDevKitTypeElement) {
+            return ((DefaultDevKitTypeElement) element).unWrap();
         }
         return element;
     }

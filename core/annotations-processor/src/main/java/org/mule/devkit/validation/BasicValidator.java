@@ -18,6 +18,7 @@
 package org.mule.devkit.validation;
 
 import org.mule.api.annotations.Configurable;
+import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
@@ -38,20 +39,21 @@ public class BasicValidator implements Validator {
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
 
-        if (typeElement.hasAnnotation(Module.class)) {
+        if (!typeElement.hasAnnotation(Module.class) &&
+                !typeElement.hasAnnotation(Connector.class)) {
             return;
         }
 
         if (typeElement.isInterface()) {
-            throw new ValidationException(typeElement, "@Module cannot be applied to an interface");
+            throw new ValidationException(typeElement, "@Module/@Connector cannot be applied to an interface");
         }
 
-        if (!typeElement.isParametrized()) {
-            throw new ValidationException(typeElement, "@Module type cannot have type parameters");
+        if (typeElement.isParametrized()) {
+            throw new ValidationException(typeElement, "@Module/@Connector type cannot have type parameters");
         }
 
         if (!typeElement.isPublic()) {
-            throw new ValidationException(typeElement, "@Module must be public");
+            throw new ValidationException(typeElement, "@Module/@Connector must be public");
         }
 
         for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Configurable.class)) {

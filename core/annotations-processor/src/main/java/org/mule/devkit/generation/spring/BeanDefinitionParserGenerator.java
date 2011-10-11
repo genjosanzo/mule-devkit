@@ -20,7 +20,6 @@ package org.mule.devkit.generation.spring;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.UnhandledException;
 import org.mule.api.annotations.Configurable;
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.oauth.OAuth;
@@ -226,8 +225,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             generateParsePoolingProfile("session-pooling-profile", "sessionPoolingProfile", parse, element, builder);
         }
 
-        Module module = typeElement.getAnnotation(Module.class);
-        if (module.poolable()) {
+        if (typeElement.isPoolable()) {
             generateParsePoolingProfile("pooling-profile", "poolingProfile", parse, element, builder);
         }
 
