@@ -27,6 +27,7 @@ import org.mule.api.annotations.param.Payload;
 import org.mule.api.callback.InterceptCallback;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.utils.ValidatorUtils;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -43,8 +44,7 @@ public class ProcessorValidator implements Validator {
 
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
-        if (!typeElement.hasAnnotation(Module.class) &&
-            !typeElement.hasAnnotation(Connector.class)) {
+        if (!typeElement.hasAnnotation(Module.class) && !typeElement.hasAnnotation(Connector.class)) {
             return;
         }
 
@@ -62,10 +62,13 @@ public class ProcessorValidator implements Validator {
                 throw new ValidationException(method, "@Processor cannot be applied to a non-public method");
             }
 
+            if(ValidatorUtils.isTypeForbidden(method.getReturnType())) {
+                throw new ValidationException(method, "@Processor return type unsupported type");
+            }
+
             validateIntercepting(method);
 
-            List<? extends VariableElement> parameters = method.getParameters();
-            for (VariableElement parameter : parameters) {
+            for (VariableElement parameter : method.getParameters()) {
                 int count = 0;
                 if (parameter.getAnnotation(InboundHeaders.class) != null) {
                     count++;
@@ -83,13 +86,16 @@ public class ProcessorValidator implements Validator {
                 if (count > 1) {
                     throw new ValidationException(parameter, "You cannot have more than one of InboundHeader, InvocationHeaders or Payload annotation");
                 }
+
+                if (ValidatorUtils.isTypeForbidden(parameter)) {
+                    throw new ValidationException(parameter, "@Processor parameter of unsupported type");
+                }
             }
         }
     }
 
     private void validateIntercepting(ExecutableElement method) throws ValidationException {
         if (method.getAnnotation(Processor.class).intercepting()) {
-            // verify that every @Processor(intercepting=true) receives a SourceCallback   // TODO check this
             boolean containsInterceptCallback = false;
             List<? extends VariableElement> parameters = method.getParameters();
             for (VariableElement parameter : parameters) {

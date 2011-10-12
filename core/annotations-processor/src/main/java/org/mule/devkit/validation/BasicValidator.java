@@ -24,6 +24,7 @@ import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.utils.ValidatorUtils;
 
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
@@ -64,6 +65,10 @@ public class BasicValidator implements Validator {
 
             if (variable.getModifiers().contains(Modifier.STATIC)) {
                 throw new ValidationException(variable, "@Configurable cannot be applied to field with static modifier");
+            }
+
+            if(ValidatorUtils.isTypeForbidden(variable)) {
+                throw new ValidationException(variable, "@Configurable of unsupported type");
             }
 
             Optional optional = variable.getAnnotation(Optional.class);
