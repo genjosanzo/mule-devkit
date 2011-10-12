@@ -128,6 +128,11 @@ public class JavaDocValidator implements Validator {
     private boolean exampleDoesNotExist(GeneratorContext context, ExecutableElement method) throws ValidationException {
         String sample = context.getJavaDocUtils().getTagContent("sample.xml", method);
         String[] split = sample.split(" ");
+
+        if(split.length != 2) {
+            throw new ValidationException(method, "Check @sample.xml javadoc tag because is not well formed for method: " + method.getSimpleName());
+        }
+
         String pathToExamplesFile = split[0];
         String exampleName = split[1];
 
@@ -137,7 +142,7 @@ public class JavaDocValidator implements Validator {
 
         try {
             String examplesFileContent = IOUtils.getResourceAsString(pathToExamplesFile, getClass());
-            return !examplesFileContent.contains("BEGIN_INCLUDE(" + exampleName);
+            return !examplesFileContent.contains("BEGIN_INCLUDE(" + exampleName + ")");
         } catch (IOException e) {
             throw new ValidationException(method, "Error loading examples file from path: " + pathToExamplesFile, e);
         }
