@@ -33,7 +33,7 @@ import org.mule.util.IOUtils;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
-import java.io.InputStream;
+import java.io.IOException;
 import java.util.Map;
 
 public class JavaDocValidator implements Validator {
@@ -45,8 +45,7 @@ public class JavaDocValidator implements Validator {
 
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
-        if (!typeElement.hasAnnotation(Module.class) &&
-                !typeElement.hasAnnotation(Connector.class)) {
+        if (!typeElement.hasAnnotation(Module.class) && !typeElement.hasAnnotation(Connector.class)) {
             return;
         }
 
@@ -117,20 +116,13 @@ public class JavaDocValidator implements Validator {
 
     private boolean hasComment(Element element, GeneratorContext context) {
         String comment = context.getJavaDocUtils().getSummary(element);
-        if (comment != null && StringUtils.isNotBlank(comment)) {
-            return true;
-        }
+        return StringUtils.isNotBlank(comment);
 
-        return false;
     }
 
     private boolean hasParameterComment(String paramName, Element element, GeneratorContext context) {
         String comment = context.getJavaDocUtils().getParameterSummary(paramName, element);
-        if (comment != null && StringUtils.isNotBlank(comment)) {
-            return true;
-        }
-
-        return false;
+        return StringUtils.isNotBlank(comment);
     }
 
     private boolean exampleDoesNotExist(GeneratorContext context, ExecutableElement method) throws ValidationException {
@@ -140,15 +132,14 @@ public class JavaDocValidator implements Validator {
         String exampleName = split[1];
 
         if (pathToExamplesFile.contains("../")) {
-            pathToExamplesFile = pathToExamplesFile.substring(pathToExamplesFile.lastIndexOf("../") + 2);
+            pathToExamplesFile = pathToExamplesFile.substring(pathToExamplesFile.lastIndexOf("../") + 3);
         }
 
-        InputStream examplesFileStream = getClass().getClassLoader().getResourceAsStream(pathToExamplesFile);
-        if(examplesFileStream == null) {
-            throw new ValidationException(method, "Examples file does not exist in path: " + pathToExamplesFile);
+        try {
+            String examplesFileContent = IOUtils.getResourceAsString(pathToExamplesFile, getClass());
+            return !examplesFileContent.contains("BEGIN_INCLUDE(" + exampleName);
+        } catch (IOException e) {
+            throw new ValidationException(method, "Error loading examples file from path: " + pathToExamplesFile, e);
         }
-        String examplesFileContent = IOUtils.toString(examplesFileStream);
-
-        return !examplesFileContent.contains("BEGIN_INCLUDE(" + exampleName);
     }
 }
