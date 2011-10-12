@@ -57,5 +57,11 @@
                 <include>LICENSE.md</include>
             </includes>
         </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+            <directory>doc</directory>
+            <includes>
+                <include>**/*.xml.sample</include>
+            </includes>
+        </fileSet>
     </fileSets>
 </archetype-descriptor>

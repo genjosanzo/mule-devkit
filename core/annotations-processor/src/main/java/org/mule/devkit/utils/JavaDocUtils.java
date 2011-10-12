@@ -19,6 +19,7 @@ package org.mule.devkit.utils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.util.Elements;
 import java.util.StringTokenizer;
 
@@ -83,16 +84,36 @@ public class JavaDocUtils {
         StringTokenizer st = new StringTokenizer(comment.trim(), "\n\r");
         while (st.hasMoreTokens()) {
             String nextToken = st.nextToken().trim();
-            if (nextToken.startsWith("@" + tagName) ) {
+            if (nextToken.startsWith("@" + tagName)) {
                 String tagContent = StringUtils.difference("@" + tagName, nextToken);
                 return !StringUtils.isBlank(tagContent);
             }
-            if(nextToken.startsWith("{@" + tagName)) {
+            if (nextToken.startsWith("{@" + tagName)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    public String getTagContent(String tagName, ExecutableElement method) {
+        String comment = elements.getDocComment(method);
+        if (StringUtils.isBlank(comment)) {
+            return "";
+        }
+
+        StringTokenizer st = new StringTokenizer(comment.trim(), "\n\r");
+        while (st.hasMoreTokens()) {
+            String nextToken = st.nextToken().trim();
+            if (nextToken.startsWith("@" + tagName)) {
+                return StringUtils.difference("@" + tagName, nextToken).trim();
+            }
+            if (nextToken.startsWith("{@" + tagName)) {
+                return StringUtils.difference("{@" + tagName, nextToken).replaceAll("}", "").trim();
+            }
+        }
+
+        return "";
     }
 
     public String getParameterSummary(String paramName, Element element) {

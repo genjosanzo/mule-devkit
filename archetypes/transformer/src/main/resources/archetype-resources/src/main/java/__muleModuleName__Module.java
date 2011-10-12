@@ -52,7 +52,7 @@ public class ${muleModuleName}Module
     /**
      * Transformer
      *
-     * {@sample.xml mysample.xml ${moduleNameLower}:my-transform}
+     * {@sample.xml doc/${moduleNameLower}-connector.xml.sample ${moduleNameLower}:my-transform}
      * @param source Source object
      * @return Transformed object
      */

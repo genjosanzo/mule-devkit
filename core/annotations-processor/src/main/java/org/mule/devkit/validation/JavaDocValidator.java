@@ -28,6 +28,7 @@ import org.mule.api.annotations.session.SessionCreate;
 import org.mule.api.annotations.session.SessionDestroy;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.util.IOUtils;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -44,7 +45,7 @@ public class JavaDocValidator implements Validator {
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
         if (!typeElement.hasAnnotation(Module.class) &&
-            !typeElement.hasAnnotation(Connector.class)) {
+                !typeElement.hasAnnotation(Connector.class)) {
             return;
         }
 
@@ -100,10 +101,14 @@ public class JavaDocValidator implements Validator {
             throw new ValidationException(typeElement, "Method " + method.getSimpleName().toString() + " does not contain an example using {@sample.xml} tag.");
         }
 
-        if( !method.getReturnType().toString().equals("void") ) {
-            if( !context.getJavaDocUtils().hasTag("return", method) ) {
+        if (!method.getReturnType().toString().equals("void")) {
+            if (!context.getJavaDocUtils().hasTag("return", method)) {
                 throw new ValidationException(typeElement, "The return type of a non-void method must be documented. Method " + method.getSimpleName().toString() + " is at fault. Missing @return.");
             }
+        }
+
+        if (exampleDoesNotExist(context, method)) {
+            throw new ValidationException(typeElement, "Method " + method.getSimpleName().toString() + " does not have the example pointed by the {@sample.xml} tag");
         }
 
         validateAllParameters(context, method);
@@ -125,5 +130,21 @@ public class JavaDocValidator implements Validator {
         }
 
         return false;
+    }
+
+    private boolean exampleDoesNotExist(GeneratorContext context, ExecutableElement method) {
+        String sample = context.getJavaDocUtils().getTagContent("sample.xml", method);
+        String[] split = sample.split(" ");
+        String pathToExamplesFile = split[0];
+        String exampleName = split[1];
+
+        if (pathToExamplesFile.contains("../")) {
+            pathToExamplesFile = pathToExamplesFile.substring(pathToExamplesFile.lastIndexOf("../") + 3);
+        }
+
+        System.out.println("\n\n\n" + pathToExamplesFile + "\n\n\n");
+        String examplesFileContent = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(pathToExamplesFile));
+
+        return !examplesFileContent.contains("BEGIN_INCLUDE(" + exampleName);
     }
 }

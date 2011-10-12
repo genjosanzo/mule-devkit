@@ -54,7 +54,7 @@ public class ${muleModuleName}Module
     /**
      * Custom processor
      *
-     * {@sample.xml mysample.xml ${moduleNameLower}:my-processor}
+     * {@sample.xml doc/${moduleNameLower}-connector.xml.sample ${moduleNameLower}:my-processor}
      *
      * @param content Content to be processed
      * @return Some string

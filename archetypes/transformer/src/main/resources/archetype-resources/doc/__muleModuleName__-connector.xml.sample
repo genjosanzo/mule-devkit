@@ -1,0 +1,3 @@
+<!-- BEGIN_INCLUDE(${muleModuleName.toLowerCase()}:my-transform) -->
+    <${muleModuleName.toLowerCase()}:my-transform source-ref="#[map-payload:source]" />
+<!-- END_INCLUDE(${muleModuleName.toLowerCase()}:my-transform) -->
