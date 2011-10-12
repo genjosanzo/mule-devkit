@@ -33,6 +33,7 @@ import org.mule.util.IOUtils;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
+import java.io.InputStream;
 import java.util.Map;
 
 public class JavaDocValidator implements Validator {
@@ -132,18 +133,21 @@ public class JavaDocValidator implements Validator {
         return false;
     }
 
-    private boolean exampleDoesNotExist(GeneratorContext context, ExecutableElement method) {
+    private boolean exampleDoesNotExist(GeneratorContext context, ExecutableElement method) throws ValidationException {
         String sample = context.getJavaDocUtils().getTagContent("sample.xml", method);
         String[] split = sample.split(" ");
         String pathToExamplesFile = split[0];
         String exampleName = split[1];
 
         if (pathToExamplesFile.contains("../")) {
-            pathToExamplesFile = pathToExamplesFile.substring(pathToExamplesFile.lastIndexOf("../") + 3);
+            pathToExamplesFile = pathToExamplesFile.substring(pathToExamplesFile.lastIndexOf("../") + 2);
         }
 
-        System.out.println("\n\n\n" + pathToExamplesFile + "\n\n\n");
-        String examplesFileContent = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(pathToExamplesFile));
+        InputStream examplesFileStream = getClass().getClassLoader().getResourceAsStream(pathToExamplesFile);
+        if(examplesFileStream == null) {
+            throw new ValidationException(method, "Examples file does not exist in path: " + pathToExamplesFile);
+        }
+        String examplesFileContent = IOUtils.toString(examplesFileStream);
 
         return !examplesFileContent.contains("BEGIN_INCLUDE(" + exampleName);
     }
