@@ -20,6 +20,7 @@ package org.mule.devkit.generation;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.session.SessionCreate;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -210,4 +211,8 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
         return null;
     }
 
+    @Override
+    public boolean usesSessionManagement() {
+        return hasMethodsAnnotatedWith(SessionCreate.class);
+    }
 }

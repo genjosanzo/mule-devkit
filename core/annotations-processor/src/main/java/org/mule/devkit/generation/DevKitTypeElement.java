@@ -62,4 +62,6 @@ public interface DevKitTypeElement extends TypeElement {
     String schemaLocation();
 
     String schemaVersion();
+
+    boolean usesSessionManagement();
 }
