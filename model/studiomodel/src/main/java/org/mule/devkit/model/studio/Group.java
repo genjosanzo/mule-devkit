@@ -29,12 +29,14 @@ public class Group {
     private List<Parameter> parameters = new ArrayList<Parameter>();
     private ModeSwitch modeSwitch;
     private Name name;
+    private String description;
 
     public Group(XStream xStream) {
         xStream.alias("group", Group.class);
         xStream.addImplicitCollection(Group.class, "parameters");
         xStream.useAttributeFor(Group.class, "caption");
         xStream.useAttributeFor(Group.class, "id");
+        xStream.useAttributeFor(Group.class, "description");
         caption = "Generic";
     }
 
@@ -76,5 +78,9 @@ public class Group {
 
     public void setName(Name name) {
         this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

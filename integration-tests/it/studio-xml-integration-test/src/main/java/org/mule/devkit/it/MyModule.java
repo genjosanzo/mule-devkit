@@ -17,6 +17,7 @@
 
 package org.mule.devkit.it;
 
+import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.param.Default;
@@ -26,8 +27,35 @@ import org.mule.api.annotations.param.SessionKey;
 import org.mule.api.annotations.session.SessionCreate;
 import org.mule.api.annotations.session.SessionDestroy;
 
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Simple Module for testing
+ *
+ * @author Mulesoft, inc.
+ */
 @Module(name = "mymodule")
 public class MyModule {
+
+    /**
+     * Configurable String
+     */
+    @Configurable
+    private String configurableString;
+    /**
+     * Configurable optional String
+     */
+    @Configurable
+    @Optional
+    private String optionalConfigurableString;
+    /**
+     * Configurable optional String with default value
+     */
+    @Configurable
+    @Optional
+    @Default("a default")
+    private String optionalWithDefaultConfigurableString;
 
     /**
      * operation1 method description
@@ -67,11 +95,34 @@ public class MyModule {
     /**
      * operation4 method description
      *
-     * @param sesion represents the session
-     * @param stringParameter  stringParameter description
+     * @param sesion          represents the session
+     * @param stringParameter stringParameter description
      */
     @Processor
     public void operation4(@Session MySession sesion, String stringParameter) {
+
+    }
+
+    /**
+     * operation5 method description
+     *
+     * @param integers represents the integers
+     * @param strings  represents the strings
+     * @param booleans represents the booleans
+     */
+    @Processor
+    public void operation5(List<Integer> integers, List<String> strings, List<Boolean> booleans) {
+
+    }
+
+    /**
+     * operation6 method description
+     *
+     * @param stringStringMap represents the stringStringMap
+     * @param stringObjectMap represents the stringObjectMap
+     */
+    @Processor
+    public void operation6(Map<String, String> stringStringMap, Map<String, Object> stringObjectMap) {
 
     }
 
@@ -94,5 +145,17 @@ public class MyModule {
     @SessionDestroy
     public void destroySession(MySession session) {
         // nothing to do here
+    }
+
+    public void setConfigurableString(String configurableString) {
+        this.configurableString = configurableString;
+    }
+
+    public void setOptionalConfigurableString(String optionalConfigurableString) {
+        this.optionalConfigurableString = optionalConfigurableString;
+    }
+
+    public void setOptionalWithDefaultConfigurableString(String optionalWithDefaultConfigurableString) {
+        this.optionalWithDefaultConfigurableString = optionalWithDefaultConfigurableString;
     }
 }

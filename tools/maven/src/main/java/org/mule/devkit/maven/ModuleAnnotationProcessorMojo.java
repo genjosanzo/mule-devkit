@@ -17,6 +17,7 @@
 
 package org.mule.devkit.maven;
 
+import org.apache.log4j.Logger;
 import org.apache.maven.model.Resource;
 import org.apache.maven.project.MavenProject;
 import org.jfrog.maven.annomojo.annotations.MojoGoal;
@@ -33,6 +34,7 @@ import java.util.Set;
 @MojoPhase("generate-sources")
 public class ModuleAnnotationProcessorMojo extends AbstractAnnotationProcessorMojo {
 
+    private static final Logger LOGGER = Logger.getLogger(ModuleAnnotationProcessorMojo.class);
     private static String[] processors = {"org.mule.devkit.apt.ModuleAnnotationProcessor"};
 
     /**
@@ -101,9 +103,11 @@ public class ModuleAnnotationProcessorMojo extends AbstractAnnotationProcessorMo
     @Override
     protected void addCompilerArguments(List<String> options) {
         if (skipJavaDocValidation) {
+            LOGGER.warn("Javadoc validation will be skipped");
             options.add("-AskipJavaDocValidation=true");
         }
         if (generateStudioXml) {
+            LOGGER.info("Studio XML will be generated");
             options.add("-AgenerateStudioXml=true");
         }
 

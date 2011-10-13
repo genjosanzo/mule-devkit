@@ -18,6 +18,7 @@
 package org.mule.devkit.generation.mule;
 
 import com.thoughtworks.xstream.XStream;
+import org.apache.commons.lang.WordUtils;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.param.Default;
@@ -100,10 +101,10 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
 
         CloudConnector cloudConnector = new CloudConnector(xStream, moduleName);
         cloudConnector.setAttributeCategory(attributeCategory);
-        cloudConnector.setCaption(getGlobalRefId(moduleName));
+        cloudConnector.setCaption(formatCaption(getGlobalRefId(moduleName)));
 
         cloudConnector.setLocalId(getGlobalRefId(moduleName));
-        cloudConnector.setDescription("Interact with " + StringUtils.capitalize(moduleName));
+        cloudConnector.setDescription(formatDescription("Interact with " + StringUtils.capitalize(moduleName)));
         cloudConnector.setAbstract("true");
 
         return cloudConnector;
@@ -118,18 +119,22 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
                 continue;
             }
             String parameterName = field.getSimpleName().toString();
-            parameter.setCaption(context.getNameUtils().friendlyNameFromCamelCase(parameterName));
-            parameter.setDescription(context.getJavaDocUtils().getSummary(field));
+            parameter.setCaption(formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameterName)));
+            parameter.setDescription(formatDescription(context.getJavaDocUtils().getSummary(field)));
             parameter.setName(parameterName);
             setOptionalOrRequired(field, parameter);
             setDefaultValueIfAvailable(field, parameter);
             fields.add(parameter);
         }
 
+        if(typeElement.usesSessionManagement()) {
+            addSessionParameters(xStream, typeElement, fields);
+        }
+
         Name name = new Name(xStream);
         name.setName("name");
-        name.setDescription("Give a name to this configuration so it can be later referenced by config-ref.");
-        name.setCaption("Name");
+        name.setDescription(formatDescription("Give a name to this configuration so it can be later referenced by config-ref."));
+        name.setCaption(formatCaption("Name"));
         name.setRequired("false");
 
         Group group = new Group(xStream);
@@ -138,15 +143,15 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
         group.setParameters(fields);
 
         AttributeCategory attributeCategory = new AttributeCategory(xStream);
-        attributeCategory.setCaption(StringUtils.capitalize(moduleName));
-        attributeCategory.setDescription(StringUtils.capitalize(moduleName) + " configuration properties");
+        attributeCategory.setCaption(formatCaption(moduleName));
+        attributeCategory.setDescription(formatDescription(moduleName + " configuration properties"));
         attributeCategory.setGroup(group);
 
         GlobalCloudConnector globalCloudConnector = new GlobalCloudConnector(xStream, moduleName);
         globalCloudConnector.setAttributeCategory(attributeCategory);
-        globalCloudConnector.setCaption(context.getNameUtils().friendlyNameFromCamelCase(moduleName));
+        globalCloudConnector.setCaption(formatCaption(context.getNameUtils().friendlyNameFromCamelCase(moduleName)));
         globalCloudConnector.setLocalId(GLOBAL_CLOUD_CONNECTOR_LOCAL_ID);
-        globalCloudConnector.setDescription("Global " + context.getNameUtils().friendlyNameFromCamelCase(moduleName) + " configuration information");
+        globalCloudConnector.setDescription(formatDescription("Global " + context.getNameUtils().friendlyNameFromCamelCase(moduleName) + " configuration information"));
         globalCloudConnector.setExtends(URI_PREFIX + moduleName + '/' + getGlobalRefId(moduleName));
         return globalCloudConnector;
     }
@@ -163,9 +168,9 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
 
         ModeSwitch modeSwitch = new ModeSwitch(xStream);
         modeSwitch.setModes(modes);
-        modeSwitch.setCaption("Operation");
+        modeSwitch.setCaption(formatCaption("Operation"));
         modeSwitch.setName(StringUtils.capitalize(moduleName) + " operations to execute");
-        modeSwitch.setDescription("Operation");
+        modeSwitch.setDescription(formatDescription("Operation"));
 
         Group group = new Group(xStream);
         group.setId(moduleName + "ConnectorGeneric");
@@ -176,10 +181,10 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
 
         CloudConnector cloudConnector = new CloudConnector(xStream, moduleName);
         cloudConnector.setAttributeCategory(attributeCategory);
-        cloudConnector.setCaption(StringUtils.capitalize(moduleName));
+        cloudConnector.setCaption(formatCaption(moduleName));
         cloudConnector.setLocalId(moduleName + "-connector");
         cloudConnector.setExtends(URI_PREFIX + moduleName + '/' + getGlobalRefId(moduleName));
-        cloudConnector.setDescription(StringUtils.capitalize(moduleName) + " Integration");
+        cloudConnector.setDescription(formatDescription(moduleName + " Integration"));
         cloudConnector.setAliasId(ALIAS_ID_PREFIX + moduleName);
 
         return cloudConnector;
@@ -193,18 +198,19 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
         namespace.getNesteds().addAll(getNesteds(executableElement, xStream, moduleName, parsedLocalIds));
 
         Group group = new Group(xStream);
-        group.setCaption(context.getJavaDocUtils().getSummary(executableElement).replaceAll("\\n|<p/>", ""));
+        group.setCaption(formatCaption("General"));
+        group.setDescription(formatDescription(context.getJavaDocUtils().getSummary(executableElement).replaceAll("\\n|<p/>", "")));
         group.setId("general");
         group.getParameters().addAll(simpleTypeParameters);
         group.getParameters().addAll(childElementParameters);
 
         AttributeCategory attributeCategory = new AttributeCategory(xStream);
-        attributeCategory.setDescription("General properties");
+        attributeCategory.setDescription(formatDescription("General properties"));
         attributeCategory.setGroup(group);
 
         CloudConnector cloudConnector = new CloudConnector(xStream, moduleName);
         cloudConnector.setLocalId(context.getNameUtils().uncamel(executableElement.getSimpleName().toString()));
-        cloudConnector.setCaption(context.getNameUtils().uncamel(executableElement.getSimpleName().toString()));
+        cloudConnector.setCaption(formatCaption(context.getNameUtils().uncamel(executableElement.getSimpleName().toString())));
         cloudConnector.setAttributeCategory(attributeCategory);
         cloudConnector.setAbstract("true");
         cloudConnector.setExtends(URI_PREFIX + moduleName + '/' + getGlobalRefId(moduleName));
@@ -222,20 +228,20 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
 
                 Nested nested = new Nested(xStream, moduleName);
                 nested.setLocalId(localId);
-                nested.setCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString()));
-                nested.setDescription(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString()));
+                nested.setCaption(formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+                nested.setDescription(formatDescription(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
 
                 ChildElement childElement = new ChildElement(xStream);
                 childElement.setName(URI_PREFIX + moduleName + '/' + context.getNameUtils().singularize(localId));
-                childElement.setDescription(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString()));
-                childElement.setCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString()));
+                childElement.setDescription(formatDescription(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+                childElement.setCaption(formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
                 childElement.setAllowMultiple("true");
                 nested.setChildElement(childElement);
 
                 Nested nested1 = new Nested(xStream, moduleName);
-                nested1.setCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString()));
+                nested1.setCaption(formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
                 nested1.setLocalId(childElement.getName().substring(childElement.getName().lastIndexOf("/") + 1));
-                nested1.setDescription(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString()));
+                nested1.setDescription(formatDescription(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
 
                 Parameter key;
                 if (((DeclaredType) parameter.asType()).getTypeArguments().isEmpty()) {
@@ -254,20 +260,20 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
 
                 if (context.getTypeMirrorUtils().isMap(parameter.asType())) {
                     key.setName("key");
-                    key.setDescription("Key.");
-                    key.setCaption("Key");
+                    key.setDescription(formatDescription("Key."));
+                    key.setCaption(formatCaption("Key"));
                 } else {
                     key.setName(context.getNameUtils().singularize(localId));
-                    key.setCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString()));
-                    key.setDescription(context.getJavaDocUtils().getParameterSummary(parameter.getSimpleName().toString(), executableElement));
+                    key.setCaption(formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+                    key.setDescription(formatDescription(context.getJavaDocUtils().getParameterSummary(parameter.getSimpleName().toString(), executableElement)));
                 }
                 nested1.getParameters().add(key);
 
                 if (context.getTypeMirrorUtils().isMap(parameter.asType())) {
                     TextParameter textParameter = new TextParameter(xStream);
                     textParameter.setName("value");
-                    textParameter.setDescription("Value.");
-                    textParameter.setCaption("Value");
+                    textParameter.setDescription(formatDescription("Value."));
+                    textParameter.setCaption(formatCaption("Value"));
                     textParameter.setToElement("true");
                     nested1.getParameters().add(textParameter);
                 }
@@ -292,21 +298,25 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
             if (parameter != null) {
                 setParameterInfo(executableElement, parameters, variableElement, parameter, parameterName);
             } else if (variableElement.getAnnotation(Session.class) != null) {
-                ExecutableElement sessionCreateMethod = typeElement.getMethodsAnnotatedWith(SessionCreate.class).get(0);
-                for (VariableElement sessionCreateParameter : sessionCreateMethod.getParameters()) {
-                    parameter = getParameter(xStream, sessionCreateParameter);
-                    parameterName = sessionCreateParameter.getSimpleName().toString();
-                    setParameterInfo(sessionCreateMethod, parameters, sessionCreateParameter, parameter, parameterName);
-                    parameter.setRequired("false");
-                }
+                addSessionParameters(xStream, typeElement, parameters);
             }
         }
         return parameters;
     }
 
+    private void addSessionParameters(XStream xStream, DevKitTypeElement typeElement, List<Parameter> parameters) {
+        ExecutableElement sessionCreateMethod = typeElement.getMethodsAnnotatedWith(SessionCreate.class).get(0);
+        for (VariableElement sessionCreateParameter : sessionCreateMethod.getParameters()) {
+            Parameter parameter = getParameter(xStream, sessionCreateParameter);
+            String parameterName = sessionCreateParameter.getSimpleName().toString();
+            setParameterInfo(sessionCreateMethod, parameters, sessionCreateParameter, parameter, parameterName);
+            parameter.setRequired("false");
+        }
+    }
+
     private void setParameterInfo(ExecutableElement executableElement, List<Parameter> parameters, VariableElement variableElement, Parameter parameter, String parameterName) {
-        parameter.setCaption(context.getNameUtils().friendlyNameFromCamelCase(parameterName));
-        parameter.setDescription(context.getJavaDocUtils().getParameterSummary(parameterName, executableElement));
+        parameter.setCaption(formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameterName)));
+        parameter.setDescription(formatDescription(context.getJavaDocUtils().getParameterSummary(parameterName, executableElement)));
         parameter.setName(parameterName);
         setOptionalOrRequired(variableElement, parameter);
         setDefaultValueIfAvailable(variableElement, parameter);
@@ -319,8 +329,8 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
             if (context.getTypeMirrorUtils().isCollection(variableElement.asType())) {
                 ChildElement childElement = new ChildElement(xStream);
                 childElement.setName(URI_PREFIX + moduleName + "/" + context.getNameUtils().uncamel(variableElement.getSimpleName().toString()));
-                childElement.setDescription(context.getJavaDocUtils().getParameterSummary(variableElement.getSimpleName().toString(), executableElement));
-                childElement.setCaption(context.getNameUtils().friendlyNameFromCamelCase(variableElement.getSimpleName().toString()));
+                childElement.setDescription(formatDescription(context.getJavaDocUtils().getParameterSummary(variableElement.getSimpleName().toString(), executableElement)));
+                childElement.setCaption(formatCaption(context.getNameUtils().friendlyNameFromCamelCase(variableElement.getSimpleName().toString())));
                 if (isNestedCollection(variableElement)) {
                     childElement.setAllowMultiple("true");
                 } else {
@@ -372,5 +382,19 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
 
     private String getGlobalRefId(String moduleName) {
         return "abstract" + StringUtils.capitalize(moduleName) + "ConnectorGeneric";
+    }
+
+    private String formatCaption(String caption) {
+        return WordUtils.capitalizeFully(caption);
+    }
+
+    private String formatDescription(String description) {
+        if(Character.isLowerCase(description.charAt(0))) {
+            description = StringUtils.capitalize(description);
+        }
+        if(!description.endsWith(".")) {
+           description += '.';
+        }
+        return description;
     }
 }
