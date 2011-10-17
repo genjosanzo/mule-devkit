@@ -60,7 +60,9 @@ abstract class AbstractGenerifiable implements Generifiable, Declaration {
         if(typeVariables!=null) {
             f.p('<');
             for (int i = 0; i < typeVariables.size(); i++) {
-                if(i!=0)    f.p(',');
+                if(i!=0) {
+                    f.p(',');
+                }
                 f.d(typeVariables.get(i));
             }
             f.p('>');
@@ -70,8 +72,9 @@ abstract class AbstractGenerifiable implements Generifiable, Declaration {
 
     public TypeVariable generify(String name) {
         TypeVariable v = new TypeVariable(owner(),name);
-        if(typeVariables==null)
+        if(typeVariables==null) {
             typeVariables = new ArrayList<TypeVariable>(3);
+        }
         typeVariables.add(v);
         return v;
     }
@@ -85,10 +88,11 @@ abstract class AbstractGenerifiable implements Generifiable, Declaration {
     }
     
     public TypeVariable[] typeParams() {
-        if(typeVariables==null)
+        if(typeVariables==null) {
             return TypeVariable.EMPTY_ARRAY;
-        else
+        } else {
             return typeVariables.toArray(new TypeVariable[typeVariables.size()]);
+        }
     }
 
 }

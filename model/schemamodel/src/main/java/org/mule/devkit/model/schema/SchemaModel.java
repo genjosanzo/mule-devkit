@@ -46,8 +46,9 @@ public final class SchemaModel {
 
         try {
             for (SchemaLocation schemaLocation : this.schemas) {
-                if( schemaLocation.getSchema() == null )
+                if( schemaLocation.getSchema() == null ) {
                     continue;
+                }
 
                 JAXBContext jaxbContext = JAXBContext.newInstance(Schema.class);
                 Marshaller marshaller = jaxbContext.createMarshaller();

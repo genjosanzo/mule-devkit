@@ -61,7 +61,9 @@ final class DirectClass extends TypeReference {
 
     public String name() {
         int i = fullName.lastIndexOf('.');
-        if(i>=0)    return fullName.substring(i+1);
+        if(i>=0) {
+            return fullName.substring(i + 1);
+        }
         return fullName;
     }
 
@@ -71,8 +73,11 @@ final class DirectClass extends TypeReference {
 
     public Package _package() {
         int i = fullName.lastIndexOf('.');
-        if(i>=0)    return owner()._package(fullName.substring(0,i));
-        else        return owner().rootPackage();
+        if(i>=0) {
+            return owner()._package(fullName.substring(0, i));
+        } else {
+            return owner().rootPackage();
+        }
     }
 
     public TypeReference _extends() {

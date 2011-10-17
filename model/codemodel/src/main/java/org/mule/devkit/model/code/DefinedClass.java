@@ -209,8 +209,9 @@ public class DefinedClass
         super(owner);
 
         if(name!=null) {
-            if (name.trim().length() == 0)
+            if (name.trim().length() == 0) {
                 throw new IllegalArgumentException("TypeReference name empty");
+            }
     
             if (!Character.isJavaIdentifierStart(name.charAt(0))) {
                 String msg =
@@ -234,10 +235,11 @@ public class DefinedClass
         }
 
         this.classType = classTypeVal;
-        if (isInterface())
+        if (isInterface()) {
             this.mods = Modifiers.forInterface(mods);
-        else
+        } else {
             this.mods = Modifiers.forClass(mods);
+        }
 
         this.name = name;
 
@@ -260,12 +262,16 @@ public class DefinedClass
      * @return This class
      */
     public DefinedClass _extends(TypeReference superClass) {
-        if (this.classType==ClassType.INTERFACE)
-        	if(superClass.isInterface()){
-        		return this._implements(superClass);
-        	} else throw new IllegalArgumentException("unable to set the super class for an interface");
-        if (superClass == null)
+        if (this.classType==ClassType.INTERFACE) {
+            if (superClass.isInterface()) {
+                return this._implements(superClass);
+            } else {
+                throw new IllegalArgumentException("unable to set the super class for an interface");
+            }
+        }
+        if (superClass == null) {
             throw new NullPointerException();
+        }
         
         for( TypeReference o=superClass.outer(); o!=null; o=o.outer() ){
             if(this==o){
@@ -286,8 +292,9 @@ public class DefinedClass
      * Returns the class extended by this class.
      */
     public TypeReference _extends() {
-        if(superClass==null)
+        if(superClass==null) {
             superClass = owner().ref(Object.class);
+        }
         return superClass;
     }
 
@@ -352,22 +359,25 @@ public class DefinedClass
      * Gets the fully qualified name of this class.
      */
     public String fullName() {
-        if (outer instanceof DefinedClass)
+        if (outer instanceof DefinedClass) {
             return ((DefinedClass) outer).fullName() + '.' + name();
+        }
 
         Package p = _package();
-        if (p.isUnnamed())
+        if (p.isUnnamed()) {
             return name();
-        else
+        } else {
             return p.name() + '.' + name();
+        }
     }
 
     @Override
     public String binaryName() {
-        if (outer instanceof DefinedClass)
+        if (outer instanceof DefinedClass) {
             return ((DefinedClass) outer).binaryName() + '$' + name();
-        else
+        } else {
             return fullName();
+        }
     }
 
     public boolean isInterface() {
@@ -516,8 +526,9 @@ public class DefinedClass
      *      if the given field is not a field on this class. 
      */
     public void removeField(FieldVariable field) {
-        if(fields.remove(field.name())!=field)
+        if(fields.remove(field.name())!=field) {
             throw new IllegalArgumentException();
+        }
     }
 
     /**
@@ -527,8 +538,9 @@ public class DefinedClass
      * @return JBlock containing initialization statements for this class
      */
     public Block init() {
-        if (init == null)
+        if (init == null) {
             init = new Block();
+        }
         return init;
     }
 
@@ -560,8 +572,9 @@ public class DefinedClass
      */
     public Method getConstructor(Type[] argTypes) {
         for (Method m : constructors) {
-            if (m.hasSignature(argTypes))
+            if (m.hasSignature(argTypes)) {
                 return m;
+            }
         }
         return null;
     }
@@ -611,11 +624,13 @@ public class DefinedClass
      */
     public Method getMethod(String name, Type[] argTypes) {
         for (Method m : methods) {
-            if (!m.name().equals(name))
+            if (!m.name().equals(name)) {
                 continue;
+            }
 
-            if (m.hasSignature(argTypes))
+            if (m.hasSignature(argTypes)) {
                 return m;
+            }
         }
         return null;
     }
@@ -657,14 +672,15 @@ public class DefinedClass
         throws ClassAlreadyExistsException {
 
         String NAME;
-        if (CodeModel.isCaseSensitiveFileSystem)
+        if (CodeModel.isCaseSensitiveFileSystem) {
             NAME = name.toUpperCase();
-        else
+        } else {
             NAME = name;
+        }
 
-        if (getClasses().containsKey(NAME))
+        if (getClasses().containsKey(NAME)) {
             throw new ClassAlreadyExistsException(getClasses().get(NAME));
-        else {
+        } else {
             // XXX problems caught in the NC constructor
             DefinedClass c = new DefinedClass(this, mods, name, classTypeVal);
             getClasses().put(NAME,c);
@@ -715,8 +731,9 @@ public class DefinedClass
      * @return JDocComment containing javadocs for this class
      */
     public DocComment javadoc() {
-        if (jdoc == null)
+        if (jdoc == null) {
             jdoc = new DocComment(owner());
+        }
         return jdoc;
     }
 
@@ -741,15 +758,17 @@ public class DefinedClass
      * class.
      */
     public final Iterator<DefinedClass> classes() {
-        if(classes==null)
+        if(classes==null) {
             return Collections.<DefinedClass>emptyList().iterator();
-        else
+        } else {
             return classes.values().iterator();
+        }
     }
 
     private Map<String,DefinedClass> getClasses() {
-        if(classes==null)
-            classes = new TreeMap<String,DefinedClass>();
+        if(classes==null) {
+            classes = new TreeMap<String, DefinedClass>();
+        }
         return classes;
     }
 
@@ -758,37 +777,43 @@ public class DefinedClass
      * Returns all the nested classes defined in this class.
      */
     public final TypeReference[] listClasses() {
-        if(classes==null)
+        if(classes==null) {
             return new TypeReference[0];
-        else
+        } else {
             return classes.values().toArray(new TypeReference[classes.values().size()]);
+        }
     }
 
     @Override
     public TypeReference outer() {
-        if (outer.isClass())
+        if (outer.isClass()) {
             return (TypeReference) outer;
-        else
+        } else {
             return null;
+        }
     }
 
     public void declare(Formatter f) {
-        if (jdoc != null)
+        if (jdoc != null) {
             f.nl().g(jdoc);
+        }
 
         if (annotations != null){
-            for (AnnotationUse annotation : annotations)
+            for (AnnotationUse annotation : annotations) {
                 f.g(annotation).nl();
+            }
         }
 
         f.g(mods).p(classType.declarationToken).id(name).d(generifiable);
 
-        if (superClass != null && superClass != owner().ref(Object.class))
+        if (superClass != null && superClass != owner().ref(Object.class)) {
             f.nl().i().p("extends").g(superClass).nl().o();
+        }
 
         if (!interfaces.isEmpty()) {
-            if (superClass == null)
+            if (superClass == null) {
                 f.nl();
+            }
             f.i().p(classType==ClassType.INTERFACE ? "extends" : "implements");
             f.g(interfaces);
             f.nl().o();
@@ -805,30 +830,37 @@ public class DefinedClass
 
         if (!enumConstantsByName.isEmpty()) {
             for (EnumConstant c : enumConstantsByName.values()) {
-                if (!first) f.p(',').nl();
+                if (!first) {
+                    f.p(',').nl();
+                }
                 f.d(c);
                 first = false;
             }
         	f.p(';').nl();
         }
 
-        for( FieldVariable field : fields.values() )
+        for( FieldVariable field : fields.values() ) {
             f.d(field);
-        if (init != null)
+        }
+        if (init != null) {
             f.nl().p("static").s(init);
+        }
         for (Method m : constructors) {
             f.nl().d(m);
         }
         for (Method m : methods) {
             f.nl().d(m);
         }
-        if(classes!=null)
-            for (DefinedClass dc : classes.values())
+        if(classes!=null) {
+            for (DefinedClass dc : classes.values()) {
                 f.nl().d(dc);
+            }
+        }
 
         
-        if (directBlock != null)
+        if (directBlock != null) {
             f.p(directBlock);
+        }
         f.nl().o().p('}').nl();
     }
 
@@ -840,16 +872,18 @@ public class DefinedClass
      * This method should be used only as the last resort.
      */
     public void direct(String string) {
-        if (directBlock == null)
+        if (directBlock == null) {
             directBlock = string;
-        else
+        } else {
             directBlock += string;
+        }
     }
 
     public final Package _package() {
         ClassContainer p = outer;
-        while (!(p instanceof Package))
+        while (!(p instanceof Package)) {
             p = p.parentContainer();
+        }
         return (Package) p;
     }
 
@@ -890,8 +924,9 @@ public class DefinedClass
       *          The annotation class to annotate the class with
       */
      public AnnotationUse annotate(TypeReference clazz){
-        if(annotations==null)
-           annotations = new ArrayList<AnnotationUse>();
+        if(annotations==null) {
+            annotations = new ArrayList<AnnotationUse>();
+        }
         AnnotationUse a = new AnnotationUse(clazz);
         annotations.add(a);
         return a;
@@ -905,8 +940,9 @@ public class DefinedClass
      * {@link Annotable#annotations()}
      */
     public Collection<AnnotationUse> annotations() {
-        if (annotations == null)
+        if (annotations == null) {
             annotations = new ArrayList<AnnotationUse>();
+        }
         return Collections.unmodifiableCollection(annotations);
     }
 

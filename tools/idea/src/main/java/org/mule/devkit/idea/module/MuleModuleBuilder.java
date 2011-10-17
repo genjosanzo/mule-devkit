@@ -176,12 +176,18 @@ public abstract class MuleModuleBuilder extends ModuleBuilder implements SourceP
     }
 
     public MavenProject findPotentialParentProject(Project project) {
-        if (!MavenProjectsManager.getInstance(project).isMavenizedProject()) return null;
+        if (!MavenProjectsManager.getInstance(project).isMavenizedProject()) {
+            return null;
+        }
 
         File parentDir = new File(getContentEntryPath()).getParentFile();
-        if (parentDir == null) return null;
+        if (parentDir == null) {
+            return null;
+        }
         VirtualFile parentPom = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(parentDir, "pom.xml"));
-        if (parentPom == null) return null;
+        if (parentPom == null) {
+            return null;
+        }
 
         return MavenProjectsManager.getInstance(project).findProject(parentPom);
     }

@@ -133,8 +133,9 @@ public class CollectionModule
     @Processor
     public void hasFirstName(Map properties)
     {
-        if( !properties.containsKey("FirstName") )
+        if( !properties.containsKey("FirstName") ) {
             throw new RuntimeException("Does not have a first name");
+        }
     }
 
     @Processor
@@ -142,8 +143,9 @@ public class CollectionModule
     {
         for( Map<String, String> object : objects )
         {
-            if( object.keySet().size() != 3 )
+            if( object.keySet().size() != 3 ) {
                 throw new RuntimeException("Invalid object");
+            }
         }
     }
 

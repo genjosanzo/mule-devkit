@@ -69,7 +69,9 @@ public class WhileLoop implements Statement {
     }
 
     public Block body() {
-        if (body == null) body = new Block();
+        if (body == null) {
+            body = new Block();
+        }
         return body;
     }
 
@@ -79,10 +81,11 @@ public class WhileLoop implements Statement {
         } else {
             f.p("while (").g(test).p(')');
         }
-        if (body != null)
+        if (body != null) {
             f.s(body);
-        else
+        } else {
             f.p(';').nl();
+        }
     }
 
 }

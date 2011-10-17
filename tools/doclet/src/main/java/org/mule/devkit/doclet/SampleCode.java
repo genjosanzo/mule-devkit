@@ -118,7 +118,9 @@ public class SampleCode {
       i++;
     }
 
-    if (!offline) relative = "/" + relative;
+    if (!offline) {
+        relative = "/" + relative;
+    }
     ClearPage.write(hdf, "sampleindex.cs", relative + "index" + Doclava.htmlExtension);
   }
 

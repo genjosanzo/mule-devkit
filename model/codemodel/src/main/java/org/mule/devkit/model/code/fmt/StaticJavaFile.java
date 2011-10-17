@@ -95,7 +95,9 @@ public final class StaticJavaFile extends ResourceFile {
     
     public StaticJavaFile(Package _pkg, String _className, URL _source, LineFilter _filter) {
         super(_className+".java");
-        if(_source==null)   throw new NullPointerException();
+        if(_source==null) {
+            throw new NullPointerException();
+        }
         this.pkg = _pkg;
         this.clazz = new JStaticClass();
         this.className = _className;
@@ -126,8 +128,9 @@ public final class StaticJavaFile extends ResourceFile {
             String line;
             while((line=r.readLine())!=null) {
                 line = filter.process(line);
-                if(line!=null)
+                if(line!=null) {
                     w.println(line);
+                }
                 lineNumber++;
             }
         } catch( ParseException e ) {
@@ -148,19 +151,23 @@ public final class StaticJavaFile extends ResourceFile {
         // this filter replaces the package declaration.
         LineFilter f = new LineFilter() {
             public String process(String line) {
-                if(!line.startsWith("package ")) return line;
+                if(!line.startsWith("package ")) {
+                    return line;
+                }
                 
                 // replace package decl
-                if( pkg.isUnnamed() )
+                if( pkg.isUnnamed() ) {
                     return null;
-                else
-                    return "package "+pkg.name()+";";
+                } else {
+                    return "package " + pkg.name() + ";";
+                }
             }
         };
-        if( filter!=null )
-            return new ChainFilter(filter,f);
-        else
+        if( filter!=null ) {
+            return new ChainFilter(filter, f);
+        } else {
             return f;
+        }
     }
     
     /**
@@ -196,7 +203,9 @@ public final class StaticJavaFile extends ResourceFile {
         }
         public String process(String line) throws ParseException {
             line = first.process(line);
-            if(line==null)  return null;
+            if(line==null) {
+                return null;
+            }
             return second.process(line);
         }
     }
@@ -217,10 +226,11 @@ public final class StaticJavaFile extends ResourceFile {
         }
         
         public String fullName() {
-            if(pkg.isUnnamed())
+            if(pkg.isUnnamed()) {
                 return className;
-            else
-                return pkg.name()+'.'+className;
+            } else {
+                return pkg.name() + '.' + className;
+            }
         }
 
         public Package _package() {

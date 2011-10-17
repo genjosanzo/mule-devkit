@@ -36,8 +36,9 @@ public class LifecycleModule
 
     @PostConstruct
     public void init() {
-        if( cycleName == null )
+        if( cycleName == null ) {
             throw new RuntimeException("@PostConstruct before setting variables");
+        }
 
         hasBeenInitialized = true;
     }

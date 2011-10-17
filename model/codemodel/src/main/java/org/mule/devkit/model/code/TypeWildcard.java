@@ -86,10 +86,11 @@ final class TypeWildcard extends TypeReference {
      * If no bound is given, this method returns {@link Object}.
      */
     public TypeReference _extends() {
-        if(bound!=null)
+        if(bound!=null) {
             return bound;
-        else
+        } else {
             return owner().ref(Object.class);
+        }
     }
 
     /**
@@ -109,16 +110,18 @@ final class TypeWildcard extends TypeReference {
 
     protected TypeReference substituteParams(TypeVariable[] variables, List<TypeReference> bindings) {
         TypeReference nb = bound.substituteParams(variables,bindings);
-        if(nb==bound)
+        if(nb==bound) {
             return this;
-        else
+        } else {
             return new TypeWildcard(nb);
+        }
     }
 
     public void generate(Formatter f) {
-        if(bound._extends()==null)
+        if(bound._extends()==null) {
             f.p("?");   // instead of "? extends Object"
-        else
+        } else {
             f.p("? extends").g(bound);
+        }
     }
 }

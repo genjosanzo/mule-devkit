@@ -66,17 +66,20 @@ public final class TypeMirrorUtils {
     }
 
     public boolean isNestedProcessor(TypeMirror type) {
-        if( type.toString().contains(NestedProcessor.class.getName()) )
+        if( type.toString().contains(NestedProcessor.class.getName()) ) {
             return true;
+        }
 
         if (type.toString().contains(java.util.List.class.getName())) {
             DeclaredType variableType = (DeclaredType) type;
             java.util.List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
-            if( variableTypeParameters.size() == 0 )
+            if( variableTypeParameters.size() == 0 ) {
                 return false;
+            }
 
-            if( variableTypeParameters.get(0).toString().contains(NestedProcessor.class.getName()) )
+            if( variableTypeParameters.get(0).toString().contains(NestedProcessor.class.getName()) ) {
                 return true;
+            }
         }
 
         return false;
@@ -138,8 +141,9 @@ public final class TypeMirrorUtils {
     public boolean ignoreParameter(VariableElement variable) {
         String variableType = variable.asType().toString();
         for (Class<?> typeToIgnore : PARAMETER_TYPES_TO_IGNORE) {
-            if (variableType.contains(typeToIgnore.getName()))
+            if (variableType.contains(typeToIgnore.getName())) {
                 return true;
+            }
         }
         for (Class<? extends java.lang.annotation.Annotation> annotationToIgnore : PARAMETERS_ANNOTATIONS_TO_IGNORE) {
             if (variable.getAnnotation(annotationToIgnore) != null) {

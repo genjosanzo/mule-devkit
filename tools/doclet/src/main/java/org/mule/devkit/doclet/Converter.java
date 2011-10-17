@@ -176,7 +176,9 @@ public class Converter {
     }
 
     private static ParameterInfo convertParameter(Parameter p, SourcePosition pos, boolean isVarArg) {
-        if (p == null) return null;
+        if (p == null) {
+            return null;
+        }
         ParameterInfo pi =
                 new ParameterInfo(p.name(), p.typeName(), Converter.obtainType(p.type()), isVarArg,
                         Converter.convertSourcePosition(pos), Converter.convertAnnotationInstances(p.annotations()));
@@ -195,7 +197,9 @@ public class Converter {
     }
 
     private static TypeInfo[] convertTypes(Type[] p) {
-        if (p == null) return null;
+        if (p == null) {
+            return null;
+        }
         int len = p.length;
         TypeInfo[] q = new TypeInfo[len];
         for (int i = 0; i < len; i++) {
@@ -263,7 +267,9 @@ public class Converter {
     };
 
     private static MethodInfo[] getHiddenMethods(MethodDoc[] methods) {
-        if (methods == null) return null;
+        if (methods == null) {
+            return null;
+        }
         ArrayList<MethodInfo> out = new ArrayList<MethodInfo>();
         int N = methods.length;
         for (int i = 0; i < N; i++) {
@@ -288,7 +294,9 @@ public class Converter {
      * because the filtering doesn't seem to be working in the ClassDoc.constructors(boolean) call.
      */
     private static MethodInfo[] convertMethods(MethodDoc[] methods) {
-        if (methods == null) return null;
+        if (methods == null) {
+            return null;
+        }
         ArrayList<MethodInfo> out = new ArrayList<MethodInfo>();
         int N = methods.length;
         for (int i = 0; i < N; i++) {
@@ -309,7 +317,9 @@ public class Converter {
     }
 
     private static MethodInfo[] convertMethods(ConstructorDoc[] methods) {
-        if (methods == null) return null;
+        if (methods == null) {
+            return null;
+        }
         ArrayList<MethodInfo> out = new ArrayList<MethodInfo>();
         int N = methods.length;
         for (int i = 0; i < N; i++) {
@@ -322,7 +332,9 @@ public class Converter {
     }
 
     private static MethodInfo[] convertNonWrittenConstructors(ConstructorDoc[] methods) {
-        if (methods == null) return null;
+        if (methods == null) {
+            return null;
+        }
         ArrayList<MethodInfo> out = new ArrayList<MethodInfo>();
         int N = methods.length;
         for (int i = 0; i < N; i++) {
@@ -396,7 +408,9 @@ public class Converter {
 
 
     private static FieldInfo[] convertFields(FieldDoc[] fields) {
-        if (fields == null) return null;
+        if (fields == null) {
+            return null;
+        }
         ArrayList<FieldInfo> out = new ArrayList<FieldInfo>();
         int N = fields.length;
         for (int i = 0; i < N; i++) {
@@ -604,7 +618,9 @@ public class Converter {
             return null;
         }
         AnnotationValueInfo v = mAnnotationValues.get(o);
-        if (v != null) return v;
+        if (v != null) {
+            return v;
+        }
         v = new AnnotationValueInfo(element);
         mAnnotationValues.put(o, v);
         if (mAnnotationValuesNeedingInit != null) {

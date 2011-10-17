@@ -81,7 +81,9 @@ public final class CaseStatement implements Statement {
     }
 
     public Block body() {
-        if (body == null) body=new Block( false, true );
+        if (body == null) {
+            body = new Block(false, true);
+        }
         return body;
     }
 
@@ -92,8 +94,9 @@ public final class CaseStatement implements Statement {
         } else {
             f.p("default:").nl();
         }
-    	if (body != null)
+    	if (body != null) {
             f.s(body);
+        }
         f.o();
     }
 }

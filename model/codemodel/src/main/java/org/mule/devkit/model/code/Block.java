@@ -119,8 +119,9 @@ public final class Block implements Generable, Statement {
      */
     public int pos(int newPos) {
         int r = pos;
-        if(newPos>content.size() || newPos<0)
+        if(newPos>content.size() || newPos<0) {
             throw new IllegalArgumentException();
+        }
         pos = newPos;
 
         return r;
@@ -429,23 +430,28 @@ public final class Block implements Generable, Statement {
     }
 
     public void generate(Formatter f) {
-        if (bracesRequired)
+        if (bracesRequired) {
             f.p('{').nl();
-        if (indentRequired)
+        }
+        if (indentRequired) {
             f.i();
+        }
         generateBody(f);
-        if (indentRequired)
+        if (indentRequired) {
             f.o();
-        if (bracesRequired)
+        }
+        if (bracesRequired) {
             f.p('}');
+        }
     }
 
     void generateBody(Formatter f) {
         for (Object o : content) {
-            if (o instanceof Declaration)
+            if (o instanceof Declaration) {
                 f.d((Declaration) o);
-            else
+            } else {
                 f.s((Statement) o);
+            }
         }
     }
 
@@ -462,8 +468,9 @@ public final class Block implements Generable, Statement {
     }
     public void state(Formatter f) {
         f.g(this);
-        if (bracesRequired)
+        if (bracesRequired) {
             f.nl();
+        }
     }
 
 }

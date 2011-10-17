@@ -59,10 +59,11 @@ class ContinueStatement implements Statement {
     }
 
     public void state(Formatter f) {
-        if( label==null )
+        if( label==null ) {
             f.p("continue;").nl();
-        else
+        } else {
             f.p("continue").p(label.label).p(';').nl();
+        }
     }
 
 }

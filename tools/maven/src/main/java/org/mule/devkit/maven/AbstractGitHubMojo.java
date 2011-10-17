@@ -68,8 +68,9 @@ public abstract class AbstractGitHubMojo extends AbstractMojo {
      */
     protected void debug(String message) {
         final Log log = getLog();
-        if (log != null)
+        if (log != null) {
             log.debug(message);
+        }
     }
 
     /**
@@ -80,8 +81,9 @@ public abstract class AbstractGitHubMojo extends AbstractMojo {
      */
     protected void debug(String message, Throwable throwable) {
         final Log log = getLog();
-        if (log != null)
+        if (log != null) {
             log.debug(message, throwable);
+        }
     }
 
     /**
@@ -91,8 +93,9 @@ public abstract class AbstractGitHubMojo extends AbstractMojo {
      */
     protected void info(String message) {
         final Log log = getLog();
-        if (log != null)
+        if (log != null) {
             log.info(message);
+        }
     }
 
     /**
@@ -103,8 +106,9 @@ public abstract class AbstractGitHubMojo extends AbstractMojo {
      */
     protected void info(String message, Throwable throwable) {
         final Log log = getLog();
-        if (log != null)
+        if (log != null) {
             log.info(message, throwable);
+        }
     }
 
     /**
@@ -120,21 +124,25 @@ public abstract class AbstractGitHubMojo extends AbstractMojo {
     protected GitHubClient createClient(String host, String userName,
                                         String password, String oauth2Token) throws MojoExecutionException {
         GitHubClient client;
-        if (!StringUtils.isEmpty(host))
+        if (!StringUtils.isEmpty(host)) {
             client = new GitHubClient(host);
-        else
+        } else {
             client = new GitHubClient();
+        }
         if (!StringUtils.isEmpty(userName) && !StringUtils.isEmpty(password)) {
-            if (isDebug())
+            if (isDebug()) {
                 debug("Using basic authentication with username: " + userName);
+            }
             client.setCredentials(userName, password);
         } else if (!StringUtils.isEmpty(oauth2Token)) {
-            if (isDebug())
+            if (isDebug()) {
                 debug("Using OAuth2 access token authentication");
+            }
             client.setOAuth2Token(oauth2Token);
-        } else
+        } else {
             throw new MojoExecutionException(
                     "No authentication credentials configured");
+        }
         return client;
     }
 
@@ -151,12 +159,14 @@ public abstract class AbstractGitHubMojo extends AbstractMojo {
                                          String name) throws MojoExecutionException {
         RepositoryId repository = RepositoryUtils.getRepository(project, owner,
                 name);
-        if (repository == null)
+        if (repository == null) {
             throw new MojoExecutionException(
                     "No GitHub repository (owner and name) configured");
-        if (isDebug())
+        }
+        if (isDebug()) {
             debug(MessageFormat.format("Using GitHub repository {0}",
                     repository.generateId()));
+        }
         return repository;
     }
 }

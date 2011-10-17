@@ -81,10 +81,11 @@ abstract class SingleByteEncoder
 	char testEncode;
 	testEncode = index2.charAt(index1[(c & mask1) >> shift]
 				   + (c & mask2));
-	if (testEncode == '\u0000')
-	    return false;
-	else
-	    return true;
+	if (testEncode == '\u0000') {
+        return false;
+    } else {
+        return true;
+    }
     }
 
     private CoderResult encodeArrayLoop(CharBuffer src, ByteBuffer dst) {
@@ -101,22 +102,26 @@ abstract class SingleByteEncoder
 	    while (sp < sl) {
 		char c = sa[sp];
 		if (Surrogate.is(c)) {
-		    if (sgp.parse(c, sa, sp, sl) < 0)
-			return sgp.error();
+		    if (sgp.parse(c, sa, sp, sl) < 0) {
+                return sgp.error();
+            }
 		    return sgp.unmappableResult();
 		}
-		if (c >= '\uFFFE')
-		    return CoderResult.unmappableForLength(1);
-		if (dl - dp < 1)
-		    return CoderResult.OVERFLOW;
+		if (c >= '\uFFFE') {
+            return CoderResult.unmappableForLength(1);
+        }
+		if (dl - dp < 1) {
+            return CoderResult.OVERFLOW;
+        }
 
 		char e = index2.charAt(index1[(c & mask1) >> shift]
 				       + (c & mask2));
 
 		// If output byte is zero because input char is zero
 		// then character is mappable, o.w. fail
-		if (e == '\u0000' && c != '\u0000')
-		    return CoderResult.unmappableForLength(1);
+		if (e == '\u0000' && c != '\u0000') {
+            return CoderResult.unmappableForLength(1);
+        }
 
 		sp++;
 		da[dp++] = (byte)e;
@@ -134,22 +139,26 @@ abstract class SingleByteEncoder
 	    while (src.hasRemaining()) {
 		char c = src.get();
 		if (Surrogate.is(c)) {
-		    if (sgp.parse(c, src) < 0)
-			return sgp.error();
+		    if (sgp.parse(c, src) < 0) {
+                return sgp.error();
+            }
 		    return sgp.unmappableResult();
 		}
-		if (c >= '\uFFFE')
-		    return CoderResult.unmappableForLength(1);
-		if (!dst.hasRemaining())
-		    return CoderResult.OVERFLOW;
+		if (c >= '\uFFFE') {
+            return CoderResult.unmappableForLength(1);
+        }
+		if (!dst.hasRemaining()) {
+            return CoderResult.OVERFLOW;
+        }
 
 		char e = index2.charAt(index1[(c & mask1) >> shift]
 				       + (c & mask2));
 
 		// If output byte is zero because input char is zero
 		// then character is mappable, o.w. fail
-		if (e == '\u0000' && c != '\u0000')
-		    return CoderResult.unmappableForLength(1);
+		if (e == '\u0000' && c != '\u0000') {
+            return CoderResult.unmappableForLength(1);
+        }
 
 		mark++;
 		dst.put((byte)e);
@@ -161,10 +170,11 @@ abstract class SingleByteEncoder
     }
 
     protected CoderResult encodeLoop(CharBuffer src, ByteBuffer dst) {
-	if (true && src.hasArray() && dst.hasArray())
-	    return encodeArrayLoop(src, dst);
-	else
-	    return encodeBufferLoop(src, dst);
+	if (true && src.hasArray() && dst.hasArray()) {
+        return encodeArrayLoop(src, dst);
+    } else {
+        return encodeBufferLoop(src, dst);
+    }
     }
 
     public byte encode(char inputChar) {

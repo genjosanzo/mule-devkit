@@ -79,8 +79,9 @@ public final class TypeVariable extends TypeReference implements Declaration {
      * @return  this
      */
     public TypeVariable bound( TypeReference c ) {
-        if(bound!=null)
-            throw new IllegalArgumentException("type variable has an existing class bound "+bound);
+        if(bound!=null) {
+            throw new IllegalArgumentException("type variable has an existing class bound " + bound);
+        }
         bound = c;
         return this;
     }
@@ -92,10 +93,11 @@ public final class TypeVariable extends TypeReference implements Declaration {
      * If no bound is given, this method returns {@link Object}.
      */
     public TypeReference _extends() {
-        if(bound!=null)
+        if(bound!=null) {
             return bound;
-        else
+        } else {
             return owner().ref(Object.class);
+        }
     }
 
     /**
@@ -118,15 +120,18 @@ public final class TypeVariable extends TypeReference implements Declaration {
      */
     public void declare(Formatter f) {
         f.id(name);
-        if(bound!=null)
+        if(bound!=null) {
             f.p("extends").g(bound);
+        }
     }
 
 
     protected TypeReference substituteParams(TypeVariable[] variables, List<TypeReference> bindings) {
-        for(int i=0;i<variables.length;i++)
-            if(variables[i]==this)
+        for(int i=0;i<variables.length;i++) {
+            if (variables[i] == this) {
                 return bindings.get(i);
+            }
+        }
         return this;
     }
 

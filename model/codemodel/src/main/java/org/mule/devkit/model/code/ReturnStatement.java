@@ -63,7 +63,9 @@ class ReturnStatement implements Statement {
 
     public void state(Formatter f) {
         f.p("return ");
-        if (expr != null) f.g(expr);
+        if (expr != null) {
+            f.g(expr);
+        }
         f.p(';').nl();
     }
 

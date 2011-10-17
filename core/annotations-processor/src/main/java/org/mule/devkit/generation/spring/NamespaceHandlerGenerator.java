@@ -100,8 +100,9 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
 
         Processor processor = executableElement.getAnnotation(Processor.class);
         String elementName = executableElement.getSimpleName().toString();
-        if (processor.name().length() != 0)
+        if (processor.name().length() != 0) {
             elementName = processor.name();
+        }
 
         init.body().invoke("registerBeanDefinitionParser").arg(ExpressionFactory.lit(context.getNameUtils().uncamel(elementName))).arg(ExpressionFactory._new(beanDefinitionParser));
     }
@@ -111,8 +112,9 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
 
         Source source = executableElement.getAnnotation(Source.class);
         String elementName = executableElement.getSimpleName().toString();
-        if (source.name().length() != 0)
+        if (source.name().length() != 0) {
             elementName = source.name();
+        }
 
         init.body().invoke("registerBeanDefinitionParser").arg(ExpressionFactory.lit(context.getNameUtils().uncamel(elementName))).arg(ExpressionFactory._new(beanDefinitionParser));
     }

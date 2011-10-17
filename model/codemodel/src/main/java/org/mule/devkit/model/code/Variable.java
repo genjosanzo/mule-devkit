@@ -124,8 +124,9 @@ public class Variable extends AbstractExpression implements Declaration, Assignm
      * Changes the name of this variable.
      */
     public void name(String name) {
-        if(!JavaName.isJavaIdentifier(name))
+        if(!JavaName.isJavaIdentifier(name)) {
             throw new IllegalArgumentException();
+        }
         this.name = name;
     }
 
@@ -158,8 +159,9 @@ public class Variable extends AbstractExpression implements Declaration, Assignm
      */
     public Type type(Type newType) {
         Type r = type;
-        if(newType==null)
+        if(newType==null) {
             throw new IllegalArgumentException();
+        }
         type = newType;
         return r;
     }
@@ -171,8 +173,9 @@ public class Variable extends AbstractExpression implements Declaration, Assignm
      *          The annotation class to annotate the field with
      */
     public AnnotationUse annotate(TypeReference clazz){
-        if(annotations==null)
-           annotations = new ArrayList<AnnotationUse>();
+        if(annotations==null) {
+            annotations = new ArrayList<AnnotationUse>();
+        }
         AnnotationUse a = new AnnotationUse(clazz);
         annotations.add(a);
         return a;
@@ -193,8 +196,9 @@ public class Variable extends AbstractExpression implements Declaration, Assignm
     }
 
     public Collection<AnnotationUse> annotations() {
-        if (annotations == null)
+        if (annotations == null) {
             annotations = new ArrayList<AnnotationUse>();
+        }
         return Collections.unmodifiableList(annotations);
     }
 
@@ -204,12 +208,14 @@ public class Variable extends AbstractExpression implements Declaration, Assignm
 
     public void bind(Formatter f) {
         if (annotations != null){
-            for( int i=0; i<annotations.size(); i++ )
+            for( int i=0; i<annotations.size(); i++ ) {
                 f.g(annotations.get(i)).nl();
+            }
         }
         f.g(mods).g(type).id(name);
-        if (init != null)
+        if (init != null) {
             f.p('=').g(init);
+        }
     }
 
     public void declare(Formatter f) {

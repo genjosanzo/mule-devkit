@@ -77,7 +77,9 @@ public class SourcePositionInfo implements Comparable {
   public int compareTo(Object o) {
     SourcePositionInfo that = (SourcePositionInfo) o;
     int r = this.file.compareTo(that.file);
-    if (r != 0) return r;
+    if (r != 0) {
+        return r;
+    }
     return this.line - that.line;
   }
   

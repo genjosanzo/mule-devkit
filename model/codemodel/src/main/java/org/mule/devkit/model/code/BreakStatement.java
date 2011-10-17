@@ -59,9 +59,10 @@ final class BreakStatement implements Statement {
     }
 
     public void state(Formatter f) {
-        if( label==null )
+        if( label==null ) {
             f.p("break;").nl();
-        else
+        } else {
             f.p("break").p(label.label).p(';').nl();
+        }
     }
 }

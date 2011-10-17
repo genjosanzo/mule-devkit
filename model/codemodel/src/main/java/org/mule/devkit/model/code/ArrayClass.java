@@ -112,10 +112,13 @@ final class ArrayClass extends TypeReference {
     //
 
     public boolean equals(Object obj) {
-        if(!(obj instanceof ArrayClass))   return false;
+        if(!(obj instanceof ArrayClass)) {
+            return false;
+        }
         
-        if( componentType.equals( ((ArrayClass)obj).componentType ) )
+        if( componentType.equals( ((ArrayClass)obj).componentType ) ) {
             return true;
+        }
         
         return false;
     }
@@ -125,12 +128,14 @@ final class ArrayClass extends TypeReference {
     }
 
     protected TypeReference substituteParams(TypeVariable[] variables, List<TypeReference> bindings) {
-        if( componentType.isPrimitive() )
+        if( componentType.isPrimitive() ) {
             return this;
+        }
         
         TypeReference c = ((TypeReference)componentType).substituteParams(variables,bindings);
-        if(c==componentType)
+        if(c==componentType) {
             return this;
+        }
         
         return new ArrayClass(owner(),c);
     }

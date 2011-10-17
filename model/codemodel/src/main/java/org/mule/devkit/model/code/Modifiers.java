@@ -150,16 +150,36 @@ public class Modifiers implements Generable {
     }
 
     public void generate(Formatter f) {
-        if ((mods & Modifier.PUBLIC) != 0)        f.p("public");
-        if ((mods & Modifier.PROTECTED) != 0)     f.p("protected");
-        if ((mods & Modifier.PRIVATE) != 0)       f.p("private");
-        if ((mods & Modifier.FINAL) != 0)         f.p("final");
-        if ((mods & Modifier.STATIC) != 0)        f.p("static");
-        if ((mods & Modifier.ABSTRACT) != 0)      f.p("abstract");
-        if ((mods & Modifier.NATIVE) != 0)        f.p("native");
-        if ((mods & Modifier.SYNCHRONIZED) != 0)  f.p("synchronized");
-        if ((mods & Modifier.TRANSIENT) != 0)     f.p("transient");
-        if ((mods & Modifier.VOLATILE) != 0)      f.p("volatile");
+        if ((mods & Modifier.PUBLIC) != 0) {
+            f.p("public");
+        }
+        if ((mods & Modifier.PROTECTED) != 0) {
+            f.p("protected");
+        }
+        if ((mods & Modifier.PRIVATE) != 0) {
+            f.p("private");
+        }
+        if ((mods & Modifier.FINAL) != 0) {
+            f.p("final");
+        }
+        if ((mods & Modifier.STATIC) != 0) {
+            f.p("static");
+        }
+        if ((mods & Modifier.ABSTRACT) != 0) {
+            f.p("abstract");
+        }
+        if ((mods & Modifier.NATIVE) != 0) {
+            f.p("native");
+        }
+        if ((mods & Modifier.SYNCHRONIZED) != 0) {
+            f.p("synchronized");
+        }
+        if ((mods & Modifier.TRANSIENT) != 0) {
+            f.p("transient");
+        }
+        if ((mods & Modifier.VOLATILE) != 0) {
+            f.p("volatile");
+        }
         }
 
     @Override

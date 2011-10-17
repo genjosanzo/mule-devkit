@@ -79,10 +79,11 @@ abstract public class Op {
         }
 
         public void generate(Formatter f) {
-            if (opFirst)
+            if (opFirst) {
                 f.p('(').p(op).g(e).p(')');
-            else
+            } else {
                 f.p('(').g(e).p(op).p(')');
+            }
         }
 
     }
@@ -95,8 +96,12 @@ abstract public class Op {
      * Logical not <tt>'!x'</tt>.
      */
     public static Expression not(Expression e) {
-        if (e == ExpressionFactory.TRUE) return ExpressionFactory.FALSE;
-        if (e == ExpressionFactory.FALSE) return ExpressionFactory.TRUE;
+        if (e == ExpressionFactory.TRUE) {
+            return ExpressionFactory.FALSE;
+        }
+        if (e == ExpressionFactory.FALSE) {
+            return ExpressionFactory.TRUE;
+        }
         return new UnaryOp("!", e);
     }
 
@@ -111,10 +116,11 @@ abstract public class Op {
         }
 
         public void generate(Formatter f) {
-            if (opFirst)
+            if (opFirst) {
                 f.p(op).g(e);
-            else
+            } else {
                 f.g(e).p(op);
+            }
         }
 
     }
@@ -189,18 +195,34 @@ abstract public class Op {
     }
 
     public static Expression cand(Expression left, Expression right) {
-        if (left == ExpressionFactory.TRUE) return right;
-        if (right == ExpressionFactory.TRUE) return left;
-        if (left == ExpressionFactory.FALSE) return left;    // ExpressionFactory.FALSE
-        if (right == ExpressionFactory.FALSE) return right;   // ExpressionFactory.FALSE
+        if (left == ExpressionFactory.TRUE) {
+            return right;
+        }
+        if (right == ExpressionFactory.TRUE) {
+            return left;
+        }
+        if (left == ExpressionFactory.FALSE) {
+            return left;    // ExpressionFactory.FALSE
+        }
+        if (right == ExpressionFactory.FALSE) {
+            return right;   // ExpressionFactory.FALSE
+        }
         return new BinaryOp("&&", left, right);
     }
 
     public static Expression cor(Expression left, Expression right) {
-        if (left == ExpressionFactory.TRUE) return left;    // ExpressionFactory.TRUE
-        if (right == ExpressionFactory.TRUE) return right;   // ExpressionFactory.FALSE
-        if (left == ExpressionFactory.FALSE) return right;
-        if (right == ExpressionFactory.FALSE) return left;
+        if (left == ExpressionFactory.TRUE) {
+            return left;    // ExpressionFactory.TRUE
+        }
+        if (right == ExpressionFactory.TRUE) {
+            return right;   // ExpressionFactory.FALSE
+        }
+        if (left == ExpressionFactory.FALSE) {
+            return right;
+        }
+        if (right == ExpressionFactory.FALSE) {
+            return left;
+        }
         return new BinaryOp("||", left, right);
     }
 

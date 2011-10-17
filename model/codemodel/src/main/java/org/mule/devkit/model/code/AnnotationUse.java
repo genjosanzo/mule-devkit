@@ -80,8 +80,9 @@ public final class AnnotationUse extends AnnotationValue {
     private void addValue(String name, AnnotationValue annotationValue) {
         // Use ordered map to keep the code generation the same on any JVM.
         // Lazily created.
-        if(memberValues==null)
+        if(memberValues==null) {
             memberValues = new LinkedHashMap<String, AnnotationValue>();
+        }
         memberValues.put(name,annotationValue);
     }
 
@@ -421,7 +422,9 @@ public final class AnnotationUse extends AnnotationValue {
                 f.g(memberValues.get("value"));
             } else {
                 for (Map.Entry<String, AnnotationValue> mapEntry : memberValues.entrySet()) {
-                    if (!first) f.p(',');
+                    if (!first) {
+                        f.p(',');
+                    }
                     f.p(mapEntry.getKey()).p('=').g(mapEntry.getValue());
                     first = false;
                 }

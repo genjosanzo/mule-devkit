@@ -109,7 +109,9 @@ public abstract class AbstractAnnotationProcessorMojo extends AbstractMojo {
 
                     java.io.File f = a.getFile();
 
-                    if (f != null) pathElements.add(a.getFile().getAbsolutePath());
+                    if (f != null) {
+                        pathElements.add(a.getFile().getAbsolutePath());
+                    }
                 }
 
             }

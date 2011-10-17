@@ -86,7 +86,9 @@ public class Conditional implements Statement {
      * @return Newly generated else block
      */
     public Block _else() {
-        if (_else == null) _else = new Block();
+        if (_else == null) {
+            _else = new Block();
+        }
         return _else;
     }
 
@@ -113,8 +115,9 @@ public class Conditional implements Statement {
             f.p("if (").g(test).p(')');
         }
         f.g(_then);
-        if (_else != null)
+        if (_else != null) {
             f.p("else").g(_else);
+        }
         f.nl();
     }
 }

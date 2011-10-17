@@ -244,8 +244,9 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
         String result = "";
         String[] parts = camelCaseName.split("(?<!^)(?=[A-Z])");
 
-        for (int i = 0; i < parts.length; i++)
+        for (int i = 0; i < parts.length; i++) {
             result += parts[i].toLowerCase() + (i < parts.length - 1 ? "-" : "");
+        }
 
         return result;
     }

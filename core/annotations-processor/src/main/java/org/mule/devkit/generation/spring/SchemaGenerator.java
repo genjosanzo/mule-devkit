@@ -179,8 +179,9 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
             for (VariableElement variable : method.getParameters()) {
-                if (!context.getTypeMirrorUtils().isEnum(variable.asType()))
+                if (!context.getTypeMirrorUtils().isEnum(variable.asType())) {
                     continue;
+                }
 
                 if (!registeredEnums.contains(variable.asType())) {
                     registerEnum(variable.asType());
@@ -233,8 +234,9 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             String name = method.getSimpleName().toString();
             Processor processor = method.getAnnotation(Processor.class);
-            if (processor.name().length() > 0)
+            if (processor.name().length() > 0) {
                 name = processor.name();
+            }
             String typeName = StringUtils.capitalize(name) + TYPE_SUFFIX;
 
             registerProcessorElement(processor.intercepting(), targetNamespace, name, typeName, method);
@@ -245,8 +247,9 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
             String name = method.getSimpleName().toString();
             Source source = method.getAnnotation(Source.class);
-            if (source.name().length() > 0)
+            if (source.name().length() > 0) {
                 name = source.name();
+            }
             String typeName = StringUtils.capitalize(name) + TYPE_SUFFIX;
 
             registerSourceElement(targetNamespace, name, typeName, method);
@@ -788,8 +791,9 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         Default def = variable.getAnnotation(Default.class);
 
         String name = variable.getSimpleName().toString();
-        if (named != null && named.value().length() > 0)
+        if (named != null && named.value().length() > 0) {
             name = named.value();
+        }
 
         Attribute attribute = new Attribute();
 
@@ -834,8 +838,9 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         Default def = variable.getAnnotation(Default.class);
 
         String name = variable.getSimpleName().toString();
-        if (named != null && named.value().length() > 0)
+        if (named != null && named.value().length() > 0) {
             name = named.value();
+        }
 
         Attribute attribute = new Attribute();
 

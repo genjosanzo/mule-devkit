@@ -95,10 +95,12 @@ public final class SwitchStatement implements Statement {
         } else {
             f.p("switch (").g(test).p(')').p(" {").nl();
         }
-        for( CaseStatement c : cases )
+        for( CaseStatement c : cases ) {
             f.s(c);
-        if( defaultCase != null )
-            f.s( defaultCase );
+        }
+        if( defaultCase != null ) {
+            f.s(defaultCase);
+        }
         f.p('}').nl();
     }
 

@@ -61,13 +61,15 @@ public class UnicodeEscapeWriter extends FilterWriter {
     }
 
     public final void write(int ch) throws IOException {
-        if(!requireEscaping(ch))  out.write(ch);
-        else {
+        if(!requireEscaping(ch)) {
+            out.write(ch);
+        } else {
             // need to escape
             out.write("\\u");
             String s = Integer.toHexString(ch);
-            for( int i=s.length(); i<4; i++ )
+            for( int i=s.length(); i<4; i++ ) {
                 out.write('0');
+            }
             out.write(s);
         }
     }
@@ -77,17 +79,22 @@ public class UnicodeEscapeWriter extends FilterWriter {
      * needs to be escaped. 
      */
     protected boolean requireEscaping(int ch) {
-        if(ch>=128)     return true;
+        if(ch>=128) {
+            return true;
+        }
         
         // control characters
-        if( ch<0x20 && " \t\r\n".indexOf(ch)==-1 )  return true;
+        if( ch<0x20 && " \t\r\n".indexOf(ch)==-1 ) {
+            return true;
+        }
         
         return false;
     }
     
     public final void write(char[] buf, int off, int len) throws IOException {
-        for( int i=0; i<len; i++ )
-            write(buf[off+i]);
+        for( int i=0; i<len; i++ ) {
+            write(buf[off + i]);
+        }
     }
 
     public final void write(char[] buf) throws IOException {

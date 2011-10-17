@@ -998,8 +998,9 @@ public class Doclava {
         ClassInfo[] classes = Converter.rootClasses();
         SortedMap<String, PackageInfo> sorted = new TreeMap<String, PackageInfo>();
         for (ClassInfo cl : classes) {
-            if (!cl.isModule())
+            if (!cl.isModule()) {
                 continue;
+            }
 
             PackageInfo pkg = cl.containingPackage();
             String name;
@@ -1422,7 +1423,9 @@ public class Doclava {
         }
 
         private static Object unwrap(Object proxy) {
-            if (proxy instanceof Proxy) return ((HideHandler) Proxy.getInvocationHandler(proxy)).target;
+            if (proxy instanceof Proxy) {
+                return ((HideHandler) Proxy.getInvocationHandler(proxy)).target;
+            }
             return proxy;
         }
     }
@@ -1575,12 +1578,16 @@ public class Doclava {
             // pass for now
         } finally {
             try {
-                if (bw != null) bw.close();
+                if (bw != null) {
+                    bw.close();
+                }
             } catch (IOException e) {
                 // pass for now
             }
             try {
-                if (fw != null) fw.close();
+                if (fw != null) {
+                    fw.close();
+                }
             } catch (IOException e) {
                 // pass for now
             }
@@ -1617,12 +1624,16 @@ public class Doclava {
             // pass for now
         } finally {
             try {
-                if (bw != null) bw.close();
+                if (bw != null) {
+                    bw.close();
+                }
             } catch (IOException e) {
                 // pass for now
             }
             try {
-                if (fw != null) fw.close();
+                if (fw != null) {
+                    fw.close();
+                }
             } catch (IOException e) {
                 // pass for now
             }

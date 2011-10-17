@@ -95,10 +95,11 @@ class NarrowedClass extends TypeReference {
         buf.append('<');
         boolean first = true;
         for (TypeReference c : args) {
-            if(first)
+            if(first) {
                 first = false;
-            else
+            } else {
                 buf.append(',');
+            }
             buf.append(c.name());
         }
         buf.append('>');
@@ -111,10 +112,11 @@ class NarrowedClass extends TypeReference {
         buf.append('<');
         boolean first = true;
         for (TypeReference c : args) {
-            if(first)
+            if(first) {
                 first = false;
-            else
+            } else {
                 buf.append(',');
+            }
             buf.append(c.fullName());
         }
         buf.append('>');
@@ -128,10 +130,11 @@ class NarrowedClass extends TypeReference {
         buf.append('<');
         boolean first = true;
         for (TypeReference c : args) {
-            if(first)
+            if(first) {
                 first = false;
-            else
+            } else {
                 buf.append(',');
+            }
             buf.append(c.binaryName());
         }
         buf.append('>');
@@ -149,10 +152,11 @@ class NarrowedClass extends TypeReference {
         f.p("{@code <}");
         boolean first = true;
         for( TypeReference c : args ) {
-            if(first)
+            if(first) {
                 first = false;
-            else
+            } else {
                 f.p(',');
+            }
             c.printLink(f);
         }
         f.p("{@code >}");
@@ -164,7 +168,9 @@ class NarrowedClass extends TypeReference {
 
     public TypeReference _extends() {
         TypeReference base = basis._extends();
-        if(base==null)  return base;
+        if(base==null) {
+            return base;
+        }
         return base.substituteParams(basis.typeParams(),args);
     }
 
@@ -208,7 +214,9 @@ class NarrowedClass extends TypeReference {
 
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof NarrowedClass))   return false;
+        if(!(obj instanceof NarrowedClass)) {
+            return false;
+        }
         return fullName().equals(((TypeReference)obj).fullName());
     }
 
@@ -228,10 +236,11 @@ class NarrowedClass extends TypeReference {
             different |= c != args.get(i);
         }
         
-        if(different)
-            return new NarrowedClass(b,clazz);
-        else
+        if(different) {
+            return new NarrowedClass(b, clazz);
+        } else {
             return this;
+        }
     }
 
     @Override

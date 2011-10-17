@@ -93,9 +93,12 @@ public final class EnumConstant extends AbstractExpression implements Declaratio
      *        Argument to add to argument list
      */
     public EnumConstant arg(Expression arg) {
-        if(arg==null)   throw new IllegalArgumentException();
-        if(args==null)
+        if(arg==null) {
+            throw new IllegalArgumentException();
+        }
+        if(args==null) {
             args = new ArrayList<Expression>();
+        }
         args.add(arg);
         return this;
     }
@@ -115,8 +118,9 @@ public final class EnumConstant extends AbstractExpression implements Declaratio
      * @return JDocComment containing javadocs for this constant.
      */
     public DocComment javadoc() {
-        if (jdoc == null)
+        if (jdoc == null) {
             jdoc = new DocComment(type.owner());
+        }
         return jdoc;
     }
 
@@ -126,8 +130,9 @@ public final class EnumConstant extends AbstractExpression implements Declaratio
      *          The annotation class to annotate the field with
      */
     public AnnotationUse annotate(TypeReference clazz){
-        if(annotations==null)
-           annotations = new ArrayList<AnnotationUse>();
+        if(annotations==null) {
+            annotations = new ArrayList<AnnotationUse>();
+        }
         AnnotationUse a = new AnnotationUse(clazz);
         annotations.add(a);
         return a;
@@ -151,17 +156,20 @@ public final class EnumConstant extends AbstractExpression implements Declaratio
      * {@link Annotable#annotations()}
      */
     public Collection<AnnotationUse> annotations() {
-        if (annotations == null)
+        if (annotations == null) {
             annotations = new ArrayList<AnnotationUse>();
+        }
         return Collections.unmodifiableList(annotations);
     }
 
     public void declare(Formatter f) {
-        if( jdoc != null )
-            f.nl().g( jdoc );
+        if( jdoc != null ) {
+            f.nl().g(jdoc);
+        }
         if (annotations != null) {
-            for( int i=0; i<annotations.size(); i++ )
+            for( int i=0; i<annotations.size(); i++ ) {
                 f.g(annotations.get(i)).nl();
+            }
         }
         f.id(name);
         if(args!=null) {

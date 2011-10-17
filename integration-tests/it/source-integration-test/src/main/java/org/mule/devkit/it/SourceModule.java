@@ -35,8 +35,9 @@ public class SourceModule
 		int count = startAt;
         while(true)
         {
-            if(Thread.interrupted() || count == endAt)
+            if(Thread.interrupted() || count == endAt) {
                 throw new InterruptedException();
+            }
 
             callback.process(count);
 
@@ -52,8 +53,9 @@ public class SourceModule
 		int count = startAt;
         while(true)
         {
-            if(Thread.interrupted() || count == endAt)
+            if(Thread.interrupted() || count == endAt) {
                 throw new InterruptedException();
+            }
 
             callback.process(count, properties);
 

@@ -60,8 +60,9 @@ public class ProgressCodeWriter extends FilterCodeWriter {
     public ProgressCodeWriter( CodeWriter output, PrintStream progress ) {
         super(output);
         this.progress = progress;
-        if(progress==null)
+        if(progress==null) {
             throw new IllegalArgumentException();
+        }
     }
 
     private final PrintStream progress;
@@ -77,11 +78,13 @@ public class ProgressCodeWriter extends FilterCodeWriter {
     }
     
     private void report(Package pkg, String fileName) {
-        if(pkg.isUnnamed()) progress.println(fileName);
-        else
+        if(pkg.isUnnamed()) {
+            progress.println(fileName);
+        } else {
             progress.println(
-                pkg.name().replace('.',File.separatorChar)
-                    +File.separatorChar+fileName);
+                    pkg.name().replace('.', File.separatorChar)
+                            + File.separatorChar + fileName);
+        }
     }
 
 }

@@ -13,4 +13,6 @@
     <rule ref="rulesets/unusedcode.xml/UnusedLocalVariable"/>
     <rule ref="rulesets/unusedcode.xml/UnusedFormalParameter"/>
 
+    <rule ref="rulesets/braces.xml"/>
+
 </ruleset>

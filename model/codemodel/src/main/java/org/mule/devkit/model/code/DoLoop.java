@@ -65,16 +65,19 @@ public class DoLoop implements Statement {
     }
 
     public Block body() {
-        if (body == null) body = new Block();
+        if (body == null) {
+            body = new Block();
+        }
         return body;
     }
 
     public void state(Formatter f) {
         f.p("do");
-        if (body != null)
+        if (body != null) {
             f.g(body);
-        else
+        } else {
             f.p("{ }");
+        }
 
         if (Op.hasTopOp(test)) {
             f.p("while ").g(test);

@@ -104,7 +104,9 @@ public class MuleModuleWizardStep extends ModuleWizardStep {
 
         SelectMavenProjectDialog d = new SelectMavenProjectDialog(myProjectOrNull, current);
         d.show();
-        if (!d.isOK()) return current;
+        if (!d.isOK()) {
+            return current;
+        }
         return d.getResult();
     }
 
@@ -211,7 +213,9 @@ public class MuleModuleWizardStep extends ModuleWizardStep {
     }
 
     private String formatProjectString(MavenProject project) {
-        if (project == null) return "<none>";
+        if (project == null) {
+            return "<none>";
+        }
         return project.getMavenId().getDisplayString();
     }
 

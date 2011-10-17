@@ -100,7 +100,9 @@ public class MuleModuleBuilderHelper {
             }
         }.execute().getResultObject();
 
-        if (pom == null) return;
+        if (pom == null) {
+            return;
+        }
 
         if (myAggregatorProject == null) {
             MavenProjectsManager manager = MavenProjectsManager.getInstance(project);
@@ -119,31 +121,43 @@ public class MuleModuleBuilderHelper {
         // execute when current dialog is closed (e.g. Project Structure)
         MavenUtil.invokeLater(project, ModalityState.NON_MODAL, new Runnable() {
             public void run() {
-                if (!pom.isValid()) return;
+                if (!pom.isValid()) {
+                    return;
+                }
 
                 EditorHelper.openInEditor(getPsiFile(project, pom));
-                if (myArchetype != null) generateFromArchetype(project, pom);
+                if (myArchetype != null) {
+                    generateFromArchetype(project, pom);
+                }
             }
         });
     }
 
     private void updateProjectPom(final Project project, final VirtualFile pom) {
-        if (myParentProject == null) return;
+        if (myParentProject == null) {
+            return;
+        }
 
         new WriteCommandAction.Simple(project, myCommandName) {
             protected void run() throws Throwable {
                 MavenDomProjectModel model = MavenDomUtil.getMavenDomProjectModel(project, pom);
-                if (model == null) return;
+                if (model == null) {
+                    return;
+                }
 
                 MavenDomUtil.updateMavenParent(model, myParentProject);
 
                 if (myInheritGroupId) {
                     XmlElement el = model.getGroupId().getXmlElement();
-                    if (el != null) el.delete();
+                    if (el != null) {
+                        el.delete();
+                    }
                 }
                 if (myInheritVersion) {
                     XmlElement el = model.getVersion().getXmlElement();
-                    if (el != null) el.delete();
+                    if (el != null) {
+                        el.delete();
+                    }
                 }
 
                 CodeStyleManager.getInstance(project).reformat(getPsiFile(project, pom));
@@ -185,7 +199,9 @@ public class MuleModuleBuilderHelper {
         props.put("archetypeGroupId", myArchetype.groupId);
         props.put("archetypeArtifactId", myArchetype.artifactId);
         props.put("archetypeVersion", myArchetype.version);
-        if (myArchetype.repository != null) props.put("archetypeRepository", myArchetype.repository);
+        if (myArchetype.repository != null) {
+            props.put("archetypeRepository", myArchetype.repository);
+        }
 
         props.put("groupId", myProjectId.getGroupId());
         props.put("artifactId", myProjectId.getArtifactId());

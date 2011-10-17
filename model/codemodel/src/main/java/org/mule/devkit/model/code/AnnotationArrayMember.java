@@ -303,8 +303,9 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
 
         boolean first = true;
         for (AnnotationValue aValue : values) {
-            if (!first)
+            if (!first) {
                 f.p(',').nl();
+            }
             f.g(aValue);
             first = false;
         }

@@ -74,8 +74,9 @@ public class FileCodeWriter extends CodeWriter {
     public FileCodeWriter( File target, boolean readOnly ) throws IOException {
         this.target = target;
         this.readOnly = readOnly;
-        if(!target.exists() || !target.isDirectory())
+        if(!target.exists() || !target.isDirectory()) {
             throw new IOException(target + ": non-existent directory");
+        }
     }
     
     
@@ -85,29 +86,36 @@ public class FileCodeWriter extends CodeWriter {
     
     protected File getFile(Package pkg, String fileName ) throws IOException {
         File dir;
-        if(pkg.isUnnamed())
+        if(pkg.isUnnamed()) {
             dir = target;
-        else
+        } else {
             dir = new File(target, toDirName(pkg));
+        }
         
-        if(!dir.exists())   dir.mkdirs();
+        if(!dir.exists()) {
+            dir.mkdirs();
+        }
         
         File fn = new File(dir,fileName);
         
         if (fn.exists()) {
-            if (!fn.delete())
+            if (!fn.delete()) {
                 throw new IOException(fn + ": Can't delete previous version");
+            }
         }
         
         
-        if(readOnly)        readonlyFiles.add(fn);
+        if(readOnly) {
+            readonlyFiles.add(fn);
+        }
         return fn;
     }
 
     public void close() throws IOException {
         // mark files as read-onnly if necessary
-        for (File f : readonlyFiles)
+        for (File f : readonlyFiles) {
             f.setReadOnly();
+        }
     }
     
     /** Converts a package name to the directory name. */

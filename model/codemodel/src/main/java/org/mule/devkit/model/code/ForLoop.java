@@ -78,7 +78,9 @@ public class ForLoop implements Statement {
     }
     
     public Block body() {
-        if (body == null) body = new Block();
+        if (body == null) {
+            body = new Block();
+        }
         return body;
     }
     
@@ -86,18 +88,22 @@ public class ForLoop implements Statement {
         f.p("for (");
         boolean first = true;
         for (Object o : inits) {
-            if (!first) f.p(',');
-            if (o instanceof Variable)
+            if (!first) {
+                f.p(',');
+            }
+            if (o instanceof Variable) {
                 f.b((Variable) o);
-            else
+            } else {
                 f.g((Expression) o);
+            }
             first = false;
         }
         f.p(';').g(test).p(';').g(updates).p(')');
-        if (body != null)
+        if (body != null) {
             f.g(body).nl();
-        else
+        } else {
             f.p(';').nl();
+        }
     }
     
 }

@@ -178,14 +178,17 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     protected Map<String, FieldVariableElement> generateProcessorFieldForEachParameter(DefinedClass messageProcessorClass, ExecutableElement processorMethod, Class annotatedWith) {
         Map<String, AbstractMessageGenerator.FieldVariableElement> fields = new HashMap<String, FieldVariableElement>();
         for (VariableElement variable : processorMethod.getParameters()) {
-            if (variable.asType().toString().contains(SourceCallback.class.getName()))
+            if (variable.asType().toString().contains(SourceCallback.class.getName())) {
                 continue;
+            }
 
-            if (variable.getAnnotation(Session.class) != null)
+            if (variable.getAnnotation(Session.class) != null) {
                 continue;
+            }
 
-            if (annotatedWith != null && variable.getAnnotation(annotatedWith) == null)
+            if (annotatedWith != null && variable.getAnnotation(annotatedWith) == null) {
                 continue;
+            }
 
             String fieldName = variable.getSimpleName().toString();
 
@@ -237,8 +240,9 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     protected Map<String, FieldVariableElement> generateStandardFieldForEachParameter(DefinedClass messageProcessorClass, ExecutableElement processorMethod, Class annotatedWith) {
         Map<String, AbstractMessageGenerator.FieldVariableElement> fields = new HashMap<String, FieldVariableElement>();
         for (VariableElement variable : processorMethod.getParameters()) {
-            if (annotatedWith != null && variable.getAnnotation(annotatedWith) == null)
+            if (annotatedWith != null && variable.getAnnotation(annotatedWith) == null) {
                 continue;
+            }
 
             String fieldName = variable.getSimpleName().toString();
 
@@ -489,28 +493,37 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
+            if (this == obj) {
                 return true;
-            if (obj == null)
+            }
+            if (obj == null) {
                 return false;
-            if (getClass() != obj.getClass())
+            }
+            if (getClass() != obj.getClass()) {
                 return false;
+            }
             FieldVariableElement other = (FieldVariableElement) obj;
             if (field == null) {
-                if (other.field != null)
+                if (other.field != null) {
                     return false;
-            } else if (!field.equals(other.field))
+                }
+            } else if (!field.equals(other.field)) {
                 return false;
+            }
             if (fieldType == null) {
-                if (other.fieldType != null)
+                if (other.fieldType != null) {
                     return false;
-            } else if (!fieldType.equals(other.fieldType))
+                }
+            } else if (!fieldType.equals(other.fieldType)) {
                 return false;
+            }
             if (variableElement == null) {
-                if (other.variableElement != null)
+                if (other.variableElement != null) {
                     return false;
-            } else if (!variableElement.equals(other.variableElement))
+                }
+            } else if (!variableElement.equals(other.variableElement)) {
                 return false;
+            }
             return true;
         }
 

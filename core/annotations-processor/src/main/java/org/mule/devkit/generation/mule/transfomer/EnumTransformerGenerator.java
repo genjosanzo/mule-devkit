@@ -83,8 +83,9 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
 
         for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Source.class)) {
             for (VariableElement variable : method.getParameters()) {
-                if (!context.getTypeMirrorUtils().isEnum(variable.asType()))
+                if (!context.getTypeMirrorUtils().isEnum(variable.asType())) {
                     continue;
+                }
 
                 if (!registeredEnums.contains(variable.asType())) {
                     registerEnumTransformer(variable);

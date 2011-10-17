@@ -76,8 +76,9 @@ public class FieldVariable extends Variable implements DocCommentable {
     @Override
     public void name(String name) {
         // make sure that the new name is available
-        if(owner.fields.containsKey(name))
-            throw new IllegalArgumentException("name "+name+" is already in use");
+        if(owner.fields.containsKey(name)) {
+            throw new IllegalArgumentException("name " + name + " is already in use");
+        }
         String oldName = name();
         super.name(name);
         owner.fields.remove(oldName);
@@ -91,14 +92,16 @@ public class FieldVariable extends Variable implements DocCommentable {
      * @return JDocComment containing javadocs for this class
      */
     public DocComment javadoc() {
-        if( jdoc == null ) 
+        if( jdoc == null ) {
             jdoc = new DocComment(owner.owner());
+        }
         return jdoc;
     }
 
     public void declare(Formatter f) {
-        if( jdoc != null )
-            f.g( jdoc );
+        if( jdoc != null ) {
+            f.g(jdoc);
+        }
         super.declare( f );
     }
 

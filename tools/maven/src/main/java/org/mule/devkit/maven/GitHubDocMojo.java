@@ -175,18 +175,20 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
             stream = new FileInputStream(file);
             final byte[] buffer = new byte[8192];
             int read;
-            while ((read = stream.read(buffer)) != -1)
+            while ((read = stream.read(buffer)) != -1) {
                 output.write(buffer, 0, read);
+            }
         } catch (IOException e) {
             throw new MojoExecutionException("Error reading file: "
                     + getExceptionMessage(e), e);
         } finally {
-            if (stream != null)
+            if (stream != null) {
                 try {
                     stream.close();
                 } catch (IOException e) {
                     debug("Exception closing stream", e);
                 }
+            }
         }
 
         Blob blob = new Blob().setEncoding(Blob.ENCODING_BASE64);
@@ -200,14 +202,16 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
         }
 
         try {
-            if (isDebug())
+            if (isDebug()) {
                 debug(MessageFormat.format("Creating blob from {0}",
                         file.getAbsolutePath()));
+            }
 
-            if (!dryRun)
+            if (!dryRun) {
                 return service.createBlob(repository, blob);
-            else
+            } else {
                 return null;
+            }
         } catch (IOException e) {
             throw new MojoExecutionException("Error creating blob: "
                     + getExceptionMessage(e), e);
@@ -221,12 +225,15 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
      * @return non-null but possibly empty array of non-null/non-empty strings
      */
     public static String[] removeEmpties(final String... values) {
-        if (values == null || values.length == 0)
+        if (values == null || values.length == 0) {
             return new String[0];
+        }
         List<String> validValues = new ArrayList<String>();
-        for (String value : values)
-            if (value != null && value.length() > 0)
+        for (String value : values) {
+            if (value != null && value.length() > 0) {
                 validValues.add(value);
+            }
+        }
         return validValues.toArray(new String[validValues.size()]);
     }
 
@@ -243,10 +250,12 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
                                             final String[] excludes, final String baseDir) {
         final DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(baseDir);
-        if (includes != null && includes.length > 0)
+        if (includes != null && includes.length > 0) {
             scanner.setIncludes(includes);
-        if (excludes != null && excludes.length > 0)
+        }
+        if (excludes != null && excludes.length > 0) {
             scanner.setExcludes(excludes);
+        }
         scanner.scan();
         return scanner.getIncludedFiles();
     }
@@ -255,27 +264,31 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
         RepositoryId repository = getRepository(project, repositoryOwner,
                 repositoryName);
 
-        if (dryRun)
+        if (dryRun) {
             info("Dry run mode, repository will not be modified");
+        }
 
         // Find files to include
         String baseDir = outputDirectory.getAbsolutePath();
         String[] includePaths = removeEmpties(includes);
         String[] excludePaths = removeEmpties(excludes);
-        if (isDebug())
+        if (isDebug()) {
             debug(MessageFormat.format(
                     "Scanning {0} and including {1} and exluding {2}", baseDir,
                     Arrays.toString(includePaths),
                     Arrays.toString(excludePaths)));
+        }
         String[] paths = getMatchingPaths(includePaths, excludePaths,
                 baseDir);
-        if (paths.length != 1)
+        if (paths.length != 1) {
             info(MessageFormat.format("Creating {0} blobs", paths.length));
-        else
+        } else {
             info("Creating 1 blob");
-        if (isDebug())
+        }
+        if (isDebug()) {
             debug(MessageFormat.format("Scanned files to include: {0}",
                     Arrays.toString(paths)));
+        }
 
         DataService service = new DataService(createClient(host, userName,
                 password, oauth2Token));
@@ -283,15 +296,19 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
         // Write blobs and build tree entries
         List<TreeEntry> entries = new ArrayList<TreeEntry>(paths.length);
         String prefix = path;
-        if (prefix == null)
+        if (prefix == null) {
             prefix = "";
-        if (prefix.length() > 0 && !prefix.endsWith("/"))
+        }
+        if (prefix.length() > 0 && !prefix.endsWith("/")) {
             prefix += "/";
+        }
 
         // Convert separator to forward slash '/'
-        if ('\\' == File.separatorChar)
-            for (int i = 0; i < paths.length; i++)
+        if ('\\' == File.separatorChar) {
+            for (int i = 0; i < paths.length; i++) {
                 paths[i] = paths[i].replace('\\', '/');
+            }
+        }
 
         for (String path : paths) {
             TreeEntry entry = new TreeEntry();
@@ -306,42 +323,47 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
         try {
             ref = service.getReference(repository, branch);
         } catch (RequestException e) {
-            if (404 != e.getStatus())
+            if (404 != e.getStatus()) {
                 throw new MojoExecutionException("Error getting reference: "
                         + getExceptionMessage(e), e);
+            }
         } catch (IOException e) {
             throw new MojoExecutionException("Error getting reference: "
                     + getExceptionMessage(e), e);
         }
 
-        if (ref != null && !org.eclipse.egit.github.core.TypedResource.TYPE_COMMIT.equals(ref.getObject().getType()))
+        if (ref != null && !org.eclipse.egit.github.core.TypedResource.TYPE_COMMIT.equals(ref.getObject().getType())) {
             throw new MojoExecutionException(
                     MessageFormat
                             .format("Existing ref {0} points to a {1} ({2}) instead of a commmit",
                                     ref.getRef(), ref.getObject().getType(),
                                     ref.getObject().getSha()));
+        }
 
         // Write tree
         Tree tree;
         try {
             int size = entries.size();
-            if (size != 1)
+            if (size != 1) {
                 info(MessageFormat.format(
                         "Creating tree with {0} blob entries", size));
-            else
+            } else {
                 info("Creating tree with 1 blob entry");
+            }
             String baseTree = null;
             if (merge && ref != null) {
                 Tree currentTree = service.getCommit(repository,
                         ref.getObject().getSha()).getTree();
-                if (currentTree != null)
+                if (currentTree != null) {
                     baseTree = currentTree.getSha();
+                }
                 info(MessageFormat.format("Merging with tree {0}", baseTree));
             }
-            if (!dryRun)
+            if (!dryRun) {
                 tree = service.createTree(repository, entries, baseTree);
-            else
+            } else {
                 tree = new Tree();
+            }
         } catch (IOException e) {
             throw new MojoExecutionException("Error creating tree: "
                     + getExceptionMessage(e), e);
@@ -353,16 +375,18 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
         commit.setTree(tree);
 
         // Set parent commit SHA-1 if reference exists
-        if (ref != null)
+        if (ref != null) {
             commit.setParents(Collections.singletonList(new Commit().setSha(ref
                     .getObject().getSha())));
+        }
 
         Commit created;
         try {
-            if (!dryRun)
+            if (!dryRun) {
                 created = service.createCommit(repository, commit);
-            else
+            } else {
                 created = new Commit();
+            }
             info(MessageFormat.format("Creating commit with SHA-1: {0}",
                     created.getSha()));
         } catch (IOException e) {
@@ -379,8 +403,9 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
                 info(MessageFormat.format(
                         "Updating reference {0} from {1} to {2}", branch,
                         commit.getParents().get(0).getSha(), created.getSha()));
-                if (!dryRun)
+                if (!dryRun) {
                     service.editReference(repository, ref, force);
+                }
             } catch (IOException e) {
                 throw new MojoExecutionException("Error editing reference: "
                         + getExceptionMessage(e), e);
@@ -392,8 +417,9 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
                 info(MessageFormat.format(
                         "Creating reference {0} starting at commit {1}",
                         branch, created.getSha()));
-                if (!dryRun)
+                if (!dryRun) {
                     service.createReference(repository, ref);
+                }
             } catch (IOException e) {
                 throw new MojoExecutionException("Error creating reference: "
                         + getExceptionMessage(e), e);

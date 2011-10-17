@@ -151,8 +151,9 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
 	}
     
     private Set<TypeReference> getThrows() {
-        if(_throws==null)
+        if(_throws==null) {
             _throws = new TreeSet<TypeReference>(ClassNameComparator.theInstance);
+        }
         return _throws;
     }
 
@@ -261,8 +262,9 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
      *          The annotation class to annotate the field with
      */
     public AnnotationUse annotate(TypeReference clazz){
-        if(annotations==null)
-           annotations = new ArrayList<AnnotationUse>();
+        if(annotations==null) {
+            annotations = new ArrayList<AnnotationUse>();
+        }
         AnnotationUse a = new AnnotationUse(clazz);
         annotations.add(a);
         return a;
@@ -283,8 +285,9 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
     }
 
     public Collection<AnnotationUse> annotations() {
-        if (annotations == null)
+        if (annotations == null) {
             annotations = new ArrayList<AnnotationUse>();
+        }
         return Collections.unmodifiableList(annotations);
     }
 
@@ -328,8 +331,9 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
 	 */
 	public Type[] listParamTypes() {
 		Type[] r = new Type[params.size()];
-		for (int i = 0; i < r.length; i++)
-			r[i] = params.get(i).type();
+		for (int i = 0; i < r.length; i++) {
+            r[i] = params.get(i).type();
+        }
 		return r;
 	}
 
@@ -339,10 +343,11 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
 	 * If there's no vararg parameter type, null will be returned.
 	 */
 	public Type listVarParamType() {
-		if (varParam != null)
-			return varParam.type();
-		else
-			return null;
+		if (varParam != null) {
+            return varParam.type();
+        } else {
+            return null;
+        }
 	}
 
 	/**
@@ -368,12 +373,15 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
 	 */
 	public boolean hasSignature(Type[] argTypes) {
 		Variable[] p = listParams();
-		if (p.length != argTypes.length)
-			return false;
+		if (p.length != argTypes.length) {
+            return false;
+        }
 
-		for (int i = 0; i < p.length; i++)
-			if (!p[i].type().equals(argTypes[i]))
-				return false;
+		for (int i = 0; i < p.length; i++) {
+            if (!p[i].type().equals(argTypes[i])) {
+                return false;
+            }
+        }
 
 		return true;
 	}
@@ -384,8 +392,9 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
 	 * @return Body of method
 	 */
 	public Block body() {
-		if (body == null)
-			body = new Block();
+		if (body == null) {
+            body = new Block();
+        }
 		return body;
 	}
     
@@ -406,18 +415,21 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
 	 * @return JDocComment containing javadocs for this class
 	 */
 	public DocComment javadoc() {
-		if (jdoc == null)
-			jdoc = new DocComment(owner());
+		if (jdoc == null) {
+            jdoc = new DocComment(owner());
+        }
 		return jdoc;
 	}
 
 	public void declare(Formatter f) {
-		if (jdoc != null)
-			f.g(jdoc);
+		if (jdoc != null) {
+            f.g(jdoc);
+        }
 
         if (annotations != null){
-            for (AnnotationUse a : annotations)
+            for (AnnotationUse a : annotations) {
                 f.g(a).nl();
+            }
         }
 
         f.g(mods);
@@ -425,23 +437,27 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
         // declare the generics parameters
 		super.declare(f);
 
-		if (!isConstructor())
-			f.g(type);
+		if (!isConstructor()) {
+            f.g(type);
+        }
 		f.id(name).p('(').i();
         // when parameters are printed in new lines, we want them to be indented.
         // there's a good chance no newlines happen, too, but just in case it does.
 		boolean first = true;
         for (Variable var : params) {
-            if (!first)
+            if (!first) {
                 f.p(',');
-            if(var.isAnnotated())
+            }
+            if(var.isAnnotated()) {
                 f.nl();
+            }
             f.b(var);
             first = false;
         }
 		if (hasVarArgs()) {
-			if (!first)
-				f.p(',');
+			if (!first) {
+                f.p(',');
+            }
 			f.g(varParam.type().elementType());
 			f.p("... ");
 			f.id(varParam.name());

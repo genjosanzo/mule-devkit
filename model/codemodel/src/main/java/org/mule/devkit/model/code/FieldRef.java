@@ -99,8 +99,9 @@ public class FieldRef extends AbstractExpression implements AssignmentTarget {
     FieldRef(Generable object, String name, boolean explicitThis) {
         this.explicitThis = explicitThis;
         this.object = object;
-        if (name.indexOf('.') >= 0)
+        if (name.indexOf('.') >= 0) {
             throw new IllegalArgumentException("Field name contains '.': " + name);
+        }
         this.name = name;
     }
 
@@ -112,7 +113,9 @@ public class FieldRef extends AbstractExpression implements AssignmentTarget {
 
     public void generate(Formatter f) {
         String name = this.name;
-        if(name==null)  name=var.name();
+        if(name==null) {
+            name = var.name();
+        }
 
         if (object != null) {
             f.g(object).p('.').p(name);

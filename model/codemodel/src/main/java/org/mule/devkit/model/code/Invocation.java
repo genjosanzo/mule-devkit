@@ -109,8 +109,9 @@ public final class Invocation extends AbstractExpression implements Statement {
 
     private Invocation(Generable object, String name) {
         this.object = object;
-        if (name.indexOf('.') >= 0)
+        if (name.indexOf('.') >= 0) {
             throw new IllegalArgumentException("method name contains '.': " + name);
+        }
         this.name = name;
     }
 
@@ -141,7 +142,9 @@ public final class Invocation extends AbstractExpression implements Statement {
      *        Argument to add to argument list
      */
     public Invocation arg(Expression arg) {
-        if(arg==null)   throw new IllegalArgumentException();
+        if(arg==null) {
+            throw new IllegalArgumentException();
+        }
         args.add(arg);
         return this;
     }
@@ -169,25 +172,29 @@ public final class Invocation extends AbstractExpression implements Statement {
             // [RESULT] new T[]{arg1,arg2,arg3,...};
             f.p("new").g(type).p('{');
         } else {
-            if (isConstructor)
+            if (isConstructor) {
                 f.p("new").g(type).p('(');
-            else {
+            } else {
                 String name = this.name;
-                if(name==null)  name=this.method.name();
+                if(name==null) {
+                    name = this.method.name();
+                }
 
-                if (object != null)
+                if (object != null) {
                     f.g(object).p('.').p(name).p('(');
-                else
+                } else {
                     f.id(name).p('(');
+                }
             }
         }
                 
         f.g(args);
 
-        if (isConstructor && type.isArray())
+        if (isConstructor && type.isArray()) {
             f.p('}');
-        else 
+        } else {
             f.p(')');
+        }
             
         if( type instanceof DefinedClass && ((DefinedClass)type).isAnonymous() ) {
             ((AnonymousClass)type).declareBody(f);

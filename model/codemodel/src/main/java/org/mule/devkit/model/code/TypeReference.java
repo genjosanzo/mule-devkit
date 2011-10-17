@@ -172,23 +172,32 @@ public abstract class TypeReference extends Type
         // to avoid the confusion, always use "this" explicitly in this method.
         
         // null can be assigned to any type.
-        if( derived instanceof NullType)  return true;
+        if( derived instanceof NullType) {
+            return true;
+        }
         
-        if( this==derived )     return true;
+        if( this==derived ) {
+            return true;
+        }
         
         // the only class that is assignable from an interface is
         // java.lang.Object
-        if( this==_package().owner().ref(Object.class) )  return true;
+        if( this==_package().owner().ref(Object.class) ) {
+            return true;
+        }
         
         TypeReference b = derived._extends();
-        if( b!=null && this.isAssignableFrom(b) )
+        if( b!=null && this.isAssignableFrom(b) ) {
             return true;
+        }
         
         if( this.isInterface() ) {
             Iterator<TypeReference> itfs = derived._implements();
-            while( itfs.hasNext() )
-                if( this.isAssignableFrom(itfs.next()) )
+            while( itfs.hasNext() ) {
+                if (this.isAssignableFrom(itfs.next())) {
                     return true;
+                }
+            }
         }
         
         return false;
@@ -219,21 +228,24 @@ public abstract class TypeReference extends Type
      */
     public final TypeReference getBaseClass( TypeReference baseType ) {
 
-        if( this.erasure().equals(baseType) )
+        if( this.erasure().equals(baseType) ) {
             return this;
+        }
 
         TypeReference b = _extends();
         if( b!=null ) {
             TypeReference bc = b.getBaseClass(baseType);
-            if(bc!=null)
+            if(bc!=null) {
                 return bc;
+            }
         }
 
         Iterator<TypeReference> itfs = _implements();
         while( itfs.hasNext() ) {
             TypeReference bc = itfs.next().getBaseClass(baseType);
-            if(bc!=null)
+            if(bc!=null) {
                 return bc;
+            }
         }
 
         return null;
@@ -246,8 +258,9 @@ public abstract class TypeReference extends Type
 
     private TypeReference arrayClass;
     public TypeReference array() {
-        if(arrayClass==null)
-            arrayClass = new ArrayClass(owner(),this);
+        if(arrayClass==null) {
+            arrayClass = new ArrayClass(owner(), this);
+        }
         return arrayClass;
     }
 
@@ -264,8 +277,9 @@ public abstract class TypeReference extends Type
 
     public TypeReference narrow( Class<?>... clazz ) {
         TypeReference[] r = new TypeReference[clazz.length];
-        for( int i=0; i<clazz.length; i++ )
+        for( int i=0; i<clazz.length; i++ ) {
             r[i] = owner().ref(clazz[i]);
+        }
         return narrow(r);
     }
 

@@ -52,8 +52,9 @@ public class SessionManagerAdapterGenerator extends AbstractMessageGenerator {
         ExecutableElement sessionCreate = createSessionForClass(typeElement);
         ExecutableElement sessionDestroy = destroySessionForClass(typeElement);
 
-        if (sessionCreate == null || sessionDestroy == null)
+        if (sessionCreate == null || sessionDestroy == null) {
             return false;
+        }
 
         return true;
     }
@@ -123,8 +124,9 @@ public class SessionManagerAdapterGenerator extends AbstractMessageGenerator {
         Variable hash = hashCode.body().decl(context.getCodeModel().INT, "hash", ExpressionFactory.lit(1));
 
         for (VariableElement variable : sessionCreate.getParameters()) {
-            if (variable.getAnnotation(SessionKey.class) == null)
+            if (variable.getAnnotation(SessionKey.class) == null) {
                 continue;
+            }
 
             String fieldName = variable.getSimpleName().toString();
 
@@ -147,8 +149,9 @@ public class SessionManagerAdapterGenerator extends AbstractMessageGenerator {
         Expression areEqual = Op._instanceof(obj, sessionAdapterKey);
 
         for (VariableElement variable : sessionCreate.getParameters()) {
-            if (variable.getAnnotation(SessionKey.class) == null)
+            if (variable.getAnnotation(SessionKey.class) == null) {
                 continue;
+            }
 
             String fieldName = variable.getSimpleName().toString();
             areEqual = Op.cand(areEqual, Op.eq(

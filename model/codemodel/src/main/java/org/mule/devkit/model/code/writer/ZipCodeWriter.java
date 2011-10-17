@@ -74,7 +74,9 @@ public class ZipCodeWriter extends CodeWriter {
         
     public OutputStream openBinary(Package pkg, String fileName) throws IOException {
         String name = fileName;
-        if(!pkg.isUnnamed())    name = toDirName(pkg)+name;
+        if(!pkg.isUnnamed()) {
+            name = toDirName(pkg) + name;
+        }
         
         zip.putNextEntry(new ZipEntry(name));
         return filter;

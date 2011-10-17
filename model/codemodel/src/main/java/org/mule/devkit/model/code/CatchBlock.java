@@ -56,7 +56,9 @@ public class CatchBlock implements Generable {
     }
 
     public Variable param(String name) {
-        if (var != null) throw new IllegalStateException();
+        if (var != null) {
+            throw new IllegalStateException();
+        }
         var = new Variable(Modifiers.forVar(Modifier.NONE), exception, name, null);
         return var;
     }
@@ -66,9 +68,10 @@ public class CatchBlock implements Generable {
     }
 
     public void generate(Formatter f) {
-        if (var == null)
+        if (var == null) {
             var = new Variable(Modifiers.forVar(Modifier.NONE),
                     exception, "_x", null);
+        }
         f.p("catch (").b(var).p(')').g(body);
     }
 

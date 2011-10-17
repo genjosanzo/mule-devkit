@@ -54,14 +54,22 @@ public class JavaName {
      * Checks if a given string is usable as a Java identifier.
      */
     public static boolean isJavaIdentifier(String s) {
-        if(s.length()==0)   return false;
-        if( reservedKeywords.contains(s) )  return false;
+        if(s.length()==0) {
+            return false;
+        }
+        if( reservedKeywords.contains(s) ) {
+            return false;
+        }
 
-        if(!Character.isJavaIdentifierStart(s.charAt(0)))   return false;
+        if(!Character.isJavaIdentifierStart(s.charAt(0))) {
+            return false;
+        }
 
-        for (int i = 1; i < s.length(); i++)
-            if (!Character.isJavaIdentifierPart(s.charAt(i)))
+        for (int i = 1; i < s.length(); i++) {
+            if (!Character.isJavaIdentifierPart(s.charAt(i))) {
                 return false;
+            }
+        }
 
         return true;
     }
@@ -79,12 +87,17 @@ public class JavaName {
     public static boolean isJavaPackageName(String s) {
         while(s.length()!=0) {
             int idx = s.indexOf('.');
-            if(idx==-1) idx=s.length();
-            if( !isJavaIdentifier(s.substring(0,idx)) )
+            if(idx==-1) {
+                idx = s.length();
+            }
+            if( !isJavaIdentifier(s.substring(0,idx)) ) {
                 return false;
+            }
 
             s = s.substring(idx);
-            if(s.length()!=0)    s = s.substring(1);    // remove '.'
+            if(s.length()!=0) {
+                s = s.substring(1);    // remove '.'
+            }
         }
         return true;
     }
@@ -117,8 +130,9 @@ public class JavaName {
         // if we see non-ASCII characters, abort
         for(int i=0; i<word.length(); i++ ) {
             char ch = word.charAt(i);
-            if(ch >=0x80)
+            if(ch >=0x80) {
                 return word;
+            }
 
             // note that this isn't the same as allUpper &= Character.isUpperCase(ch);
             allUpper &= !Character.isLowerCase(ch);
@@ -127,7 +141,9 @@ public class JavaName {
         for (Entry e : TABLE) {
             String r = e.apply(word);
             if(r!=null) {
-                if(allUpper)    r=r.toUpperCase();
+                if(allUpper) {
+                    r = r.toUpperCase();
+                }
                 return r;
             }
         }
@@ -203,8 +219,9 @@ public class JavaName {
             // and 5.0 keywords
             "enum"
             };
-        for (String w : words)
+        for (String w : words) {
             reservedKeywords.add(w);
+        }
     }
 
 

@@ -57,8 +57,9 @@ public final class JArray extends AbstractExpression {
      * Add an element to the array initializer
      */
     public JArray add(Expression e) {
-        if (exprs == null)
+        if (exprs == null) {
             exprs = new ArrayList<Expression>();
+        }
         exprs.add(e);
         return this;
     }
@@ -81,22 +82,26 @@ public final class JArray extends AbstractExpression {
         }
         
         f.p("new").g(t).p('[');
-        if (size != null)
+        if (size != null) {
             f.g(size);
+        }
         f.p(']');
         
-        for( int i=0; i<arrayCount; i++ )
+        for( int i=0; i<arrayCount; i++ ) {
             f.p("[]");
+        }
         
-        if ((size == null) || (exprs != null))
+        if ((size == null) || (exprs != null)) {
             f.p('{');
+        }
         if (exprs != null) {
             f.g(exprs);
         } else {
             f.p(' ');
         }
-        if ((size == null) || (exprs != null))
+        if ((size == null) || (exprs != null)) {
             f.p('}');
+        }
     }
 
 }

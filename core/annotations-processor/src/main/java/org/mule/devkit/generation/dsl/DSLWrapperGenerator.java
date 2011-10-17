@@ -69,8 +69,9 @@ public class DSLWrapperGenerator extends AbstractModuleGenerator {
         for (final ExecutableElement executableElement : ElementFilter.methodsIn(typeElement.getEnclosedElements())) {
             final Processor mp = executableElement.getAnnotation(Processor.class);
 
-            if (mp == null)
+            if (mp == null) {
                 continue;
+            }
 
             final List<Parameter> mandatoryParams = new LinkedList<Parameter>();
             final List<FieldVariable> fields = new LinkedList<FieldVariable>();
@@ -203,8 +204,9 @@ public class DSLWrapperGenerator extends AbstractModuleGenerator {
         for (final VariableElement variableElement : variableElements) {
             final Configurable configInfo = variableElement.getAnnotation(Configurable.class);
 
-            if (configInfo == null)
+            if (configInfo == null) {
                 continue;
+            }
 
             final String fieldName = variableElement.getSimpleName().toString();
 
@@ -212,8 +214,9 @@ public class DSLWrapperGenerator extends AbstractModuleGenerator {
 
             final Default defaultInfo = variableElement.getAnnotation(Default.class);
 
-            if (defaultInfo == null)
+            if (defaultInfo == null) {
                 continue;
+            }
 
             final Invocation methdoCall = ExpressionFactory.invoke(object, "set" + StringUtils.capitalize(fieldName));
             methdoCall.arg(defaultValue(variableElement.asType(), defaultInfo.value()));

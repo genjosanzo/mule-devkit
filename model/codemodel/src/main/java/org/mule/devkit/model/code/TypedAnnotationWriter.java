@@ -104,8 +104,9 @@ class TypedAnnotationWriter<A extends Annotation,W extends AnnotationWriter<A>>
 
         String name = method.getName();
         Object arg=null;
-        if(args!=null && args.length>0)
+        if(args!=null && args.length>0) {
             arg = args[0];
+        }
 
         // check how it's defined on the annotation
         Method m = annotation.getDeclaredMethod(name);
@@ -130,8 +131,9 @@ class TypedAnnotationWriter<A extends Annotation,W extends AnnotationWriter<A>>
             checkType(Class.class,rt);
             if(m.getDefaultValue()!=null) {
                 // check the default
-                if(targ.equals(targ.owner().ref((Class)m.getDefaultValue())))
+                if(targ.equals(targ.owner().ref((Class)m.getDefaultValue()))) {
                     return proxy;   // defaulted
+                }
             }
             use.param(name,targ);
             return proxy;
@@ -141,7 +143,9 @@ class TypedAnnotationWriter<A extends Annotation,W extends AnnotationWriter<A>>
         checkType(arg.getClass(),rt);
         if(m.getDefaultValue()!=null && m.getDefaultValue().equals(arg))
             // defaulted. no need to write out.
+        {
             return proxy;
+        }
 
         if(arg instanceof String) {
             use.param(name,(String)arg);
@@ -169,8 +173,9 @@ class TypedAnnotationWriter<A extends Annotation,W extends AnnotationWriter<A>>
 
     @SuppressWarnings("unchecked")
 	private Object addArrayValue(Object proxy,String name, Class itemType, Class expectedReturnType, Object arg) {
-        if(arrays==null)
-            arrays = new HashMap<String,AnnotationArrayMember>();
+        if(arrays==null) {
+            arrays = new HashMap<String, AnnotationArrayMember>();
+        }
         AnnotationArrayMember m = arrays.get(name);
         if(m==null) {
             m = use.paramArray(name);
@@ -180,8 +185,9 @@ class TypedAnnotationWriter<A extends Annotation,W extends AnnotationWriter<A>>
         // sub annotation
         if(Annotation.class.isAssignableFrom(itemType)) {
             Class<? extends Annotation> r = (Class<? extends Annotation>)itemType;
-            if(!AnnotationWriter.class.isAssignableFrom(expectedReturnType))
-                throw new IllegalArgumentException("Unexpected return type "+expectedReturnType);
+            if(!AnnotationWriter.class.isAssignableFrom(expectedReturnType)) {
+                throw new IllegalArgumentException("Unexpected return type " + expectedReturnType);
+            }
             return new TypedAnnotationWriter(r,expectedReturnType,m.annotate(r)).createProxy();
         }
 
@@ -219,11 +225,13 @@ class TypedAnnotationWriter<A extends Annotation,W extends AnnotationWriter<A>>
      * If not, report an error.
      */
     private void checkType(Class<?> actual, Class<?> expected) {
-        if(expected==actual || expected.isAssignableFrom(actual))
+        if(expected==actual || expected.isAssignableFrom(actual)) {
             return; // no problem
+        }
 
-        if( expected== CodeModel.boxToPrimitive.get(actual) )
+        if( expected== CodeModel.boxToPrimitive.get(actual) ) {
             return; // no problem
+        }
 
         throw new IllegalArgumentException("Expected "+expected+" but found "+actual);
     }
@@ -250,13 +258,16 @@ class TypedAnnotationWriter<A extends Annotation,W extends AnnotationWriter<A>>
         for( java.lang.reflect.Type t : clazz.getGenericInterfaces()) {
             if(t instanceof ParameterizedType) {
                 ParameterizedType p = (ParameterizedType) t;
-                if(p.getRawType()==AnnotationWriter.class)
-                    return (Class<? extends Annotation>)p.getActualTypeArguments()[0];
+                if(p.getRawType()==AnnotationWriter.class) {
+                    return (Class<? extends Annotation>) p.getActualTypeArguments()[0];
+                }
             }
             if(t instanceof Class<?>) {
                 // recursive search
                 Class<? extends Annotation> r = findAnnotationType((Class<?>)t);
-                if(r!=null)     return r;
+                if(r!=null) {
+                    return r;
+                }
             }
         }
         return null;

@@ -71,18 +71,20 @@ public class JavadocEscapeWriter extends FilterWriter {
     }
 
     public void write(int ch) throws IOException {
-        if(ch=='<')
+        if(ch=='<') {
             out.write("&lt;");
-        else
-        if(ch=='&')
+        } else
+        if(ch=='&') {
             out.write("&amp;");
-        else
+        } else {
             out.write(ch);
+        }
     }
     
     public void write(char[] buf, int off, int len) throws IOException {
-        for( int i=0; i<len; i++ )
-            write(buf[off+i]);
+        for( int i=0; i<len; i++ ) {
+            write(buf[off + i]);
+        }
     }
 
     public void write(char[] buf) throws IOException {

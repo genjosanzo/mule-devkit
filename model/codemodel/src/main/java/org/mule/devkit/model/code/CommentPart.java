@@ -79,16 +79,21 @@ public class CommentPart extends ArrayList<Object> {
     }
 
     private void flattenAppend(Object value) {
-        if(value==null) return;
+        if(value==null) {
+            return;
+        }
         if(value instanceof Object[]) {
-            for( Object o : (Object[])value)
+            for( Object o : (Object[])value) {
                 flattenAppend(o);
+            }
         } else
         if(value instanceof Collection<?>) {
-            for( Object o : (Collection<?>)value)
+            for( Object o : (Collection<?>)value) {
                 flattenAppend(o);
-        } else
+            }
+        } else {
             super.add(value);
+        }
     }
 
     /**
@@ -98,14 +103,17 @@ public class CommentPart extends ArrayList<Object> {
         if(!f.isPrinting()) {
             // quickly pass the types to Formatter, as that's all we care.
             // we don't need to worry about the exact formatting of text.
-            for( Object o : this )
-                if(o instanceof TypeReference)
-                    f.g((TypeReference)o);
+            for( Object o : this ) {
+                if (o instanceof TypeReference) {
+                    f.g((TypeReference) o);
+                }
+            }
             return;
         }
 
-        if(!isEmpty())
+        if(!isEmpty()) {
             f.p(indent);
+        }
 
         Iterator<Object> itr = iterator();
         while(itr.hasNext()) {
@@ -116,13 +124,15 @@ public class CommentPart extends ArrayList<Object> {
                 String s = (String)o;
                 while( (idx=s.indexOf('\n'))!=-1 ) {
                     String line = s.substring(0,idx);
-                    if(line.length()>0)
+                    if(line.length()>0) {
                         f.p(escape(line));
+                    }
                     s = s.substring(idx+1);
                     f.nl().p(indent);
                 }
-                if(s.length()!=0)
+                if(s.length()!=0) {
                     f.p(escape(s));
+                }
             } else
             if(o instanceof TypeReference) {
                 // TODO: this doesn't print the parameterized type properly
@@ -130,12 +140,14 @@ public class CommentPart extends ArrayList<Object> {
             } else
             if(o instanceof Type) {
                 f.g((Type)o);
-            } else
+            } else {
                 throw new IllegalStateException();
+            }
         }
 
-        if(!isEmpty())
+        if(!isEmpty()) {
             f.nl();
+        }
     }
 
     /**
@@ -144,7 +156,9 @@ public class CommentPart extends ArrayList<Object> {
     private String escape(String s) {
         while(true) {
             int idx = s.indexOf("*/");
-            if(idx <0)   return s;
+            if(idx <0) {
+                return s;
+            }
 
             s = s.substring(0,idx+1)+"<!---->"+s.substring(idx+1);
         }

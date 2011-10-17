@@ -72,8 +72,9 @@ public final class ForEach implements Statement {
 	}
 
 	public Block body() {
-		if (body == null)
-			body = new Block();
+		if (body == null) {
+            body = new Block();
+        }
 		return body;
 	}
 
@@ -81,10 +82,11 @@ public final class ForEach implements Statement {
 		f.p("for (");
 		f.g(type).id(var).p(": ").g(collection);
 		f.p(')');
-		if (body != null)
-			f.g(body).nl();
-		else
-			f.p(';').nl();
+		if (body != null) {
+            f.g(body).nl();
+        } else {
+            f.p(';').nl();
+        }
 	}
 
 }

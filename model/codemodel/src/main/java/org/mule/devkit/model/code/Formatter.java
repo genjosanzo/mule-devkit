@@ -164,20 +164,33 @@ public final class Formatter {
     }
 
     private boolean needSpace(char c1, char c2) {
-        if ((c1 == ']') && (c2 == '{')) return true;
-        if (c1 == ';') return true;
+        if ((c1 == ']') && (c2 == '{')) {
+            return true;
+        }
+        if (c1 == ';') {
+            return true;
+        }
         if (c1 == CLOSE_TYPE_ARGS) {
             // e.g., "public Foo<Bar> test;"
             if(c2=='(') // but not "new Foo<Bar>()"
+            {
                 return false;
+            }
             return true;
         }
-        if ((c1 == ')') && (c2 == '{')) return true;
-        if ((c1 == ',') || (c1 == '=')) return true;
-        if (c2 == '=') return true;
+        if ((c1 == ')') && (c2 == '{')) {
+            return true;
+        }
+        if ((c1 == ',') || (c1 == '=')) {
+            return true;
+        }
+        if (c2 == '=') {
+            return true;
+        }
         if (Character.isDigit(c1)) {
-            if ((c2 == '(') || (c2 == ')') || (c2 == ';') || (c2 == ','))
+            if ((c2 == '(') || (c2 == ')') || (c2 == ';') || (c2 == ',')) {
                 return false;
+            }
             return true;
         }
         if (Character.isJavaIdentifierPart(c1)) {
@@ -204,7 +217,9 @@ public final class Formatter {
             }
         }
         if (Character.isDigit(c2)) {
-            if (c1 == '(') return false;
+            if (c1 == '(') {
+                return false;
+            }
             return true;
         }
         return false;
@@ -215,11 +230,13 @@ public final class Formatter {
 
     private void spaceIfNeeded(char c) {
         if (atBeginningOfLine) {
-            for (int i = 0; i < indentLevel; i++)
+            for (int i = 0; i < indentLevel; i++) {
                 pw.print(indentSpace);
+            }
             atBeginningOfLine = false;
-        } else if ((lastChar != 0) && needSpace(lastChar, c))
+        } else if ((lastChar != 0) && needSpace(lastChar, c)) {
             pw.print(' ');
+        }
     }
 
     /**
@@ -277,10 +294,11 @@ public final class Formatter {
             if(importedClasses.contains(type)) {
                 p(type.name()); // FQCN imported or not necessary, so generate short name
             } else {
-                if(type.outer()!=null)
+                if(type.outer()!=null) {
                     t(type.outer()).p('.').p(type.name());
-                else
+                } else {
                     p(type.fullName()); // collision was detected, so generate FQCN
+                }
             }
             break;
         case COLLECTING:
@@ -358,8 +376,9 @@ public final class Formatter {
         boolean first = true;
         if(!list.isEmpty()) {
             for (Generable item : list) {
-                if (!first)
+                if (!first) {
                     p(',');
+                }
                 g(item);
                 first = false;
             }
@@ -465,12 +484,14 @@ public final class Formatter {
             clazz = clazz._extends();
         }
          
-        if(clazz._package().isUnnamed())
+        if(clazz._package().isUnnamed()) {
             return true;
+        }
 
         final String packageName = clazz._package().name();
-        if(packageName.equals("java.lang"))
+        if(packageName.equals("java.lang")) {
             return true;    // no need to explicitly import java.lang classes
+        }
     
         if (clazz._package() == c._package()){ 
             // inner classes require an import stmt.
@@ -516,12 +537,14 @@ public final class Formatter {
             // special case where a generated type collides with a type in package java
 
             // more than one type with the same name
-            if(classes.size() > 1)
+            if(classes.size() > 1) {
                 return true;
+            }
 
             // an id and (at least one) type with the same name
-            if(id && classes.size() != 0)
+            if(id && classes.size() != 0) {
                 return true;
+            }
 
             for(TypeReference c : classes) {
                 if (c instanceof AnonymousClass) {
@@ -535,20 +558,23 @@ public final class Formatter {
                         // if the class called "String" is in the same package,
                         // we still need to import it.
                         DefinedClass n = itr.next();
-                        if(n.name().equals(c.name()))
+                        if(n.name().equals(c.name())) {
                             return true;    //collision
+                        }
                     }
                 }
-                if(c.outer()!=null)
+                if(c.outer()!=null) {
                     return true; // avoid importing inner class to work around 6431987. Also see jaxb issue 166
+                }
             }
 
             return false;
         }
 
         public void add(TypeReference clazz) {
-            if(!classes.contains(clazz))
+            if(!classes.contains(clazz)) {
                 classes.add(clazz);
+            }
         }
 
         public List<TypeReference> getClasses() {

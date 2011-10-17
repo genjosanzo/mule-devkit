@@ -71,7 +71,9 @@ public class SingleStreamCodeWriter extends CodeWriter {
 
     public OutputStream openBinary(org.mule.devkit.model.code.Package pkg, String fileName) throws IOException {
         String pkgName = pkg.name();
-        if(pkgName.length()!=0)     pkgName += '.';
+        if(pkgName.length()!=0) {
+            pkgName += '.';
+        }
         
         out.println(
             "-----------------------------------" + pkgName+fileName +

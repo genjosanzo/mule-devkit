@@ -68,16 +68,20 @@ public class TryStatement implements Statement {
     }
 
     public Block _finally() {
-        if (_finally == null) _finally = new Block();
+        if (_finally == null) {
+            _finally = new Block();
+        }
         return _finally;
     }
 
     public void state(Formatter f) {
         f.p("try").g(body);
-        for (CatchBlock cb : catches)
+        for (CatchBlock cb : catches) {
             f.g(cb);
-        if (_finally != null)
+        }
+        if (_finally != null) {
             f.p("finally").g(_finally);
+        }
         f.nl();
     }
 

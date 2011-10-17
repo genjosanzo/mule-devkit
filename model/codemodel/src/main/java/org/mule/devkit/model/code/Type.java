@@ -53,26 +53,27 @@ public abstract class Type implements Generable, Comparable<Type> {
      * Obtains a reference to the primitive type object from a type name.
      */
     public static PrimitiveType parse(CodeModel codeModel, String typeName) {
-        if (typeName.equals("void"))
+        if (typeName.equals("void")) {
             return codeModel.VOID;
-        else if (typeName.equals("boolean"))
+        } else if (typeName.equals("boolean")) {
             return codeModel.BOOLEAN;
-        else if (typeName.equals("byte"))
+        } else if (typeName.equals("byte")) {
             return codeModel.BYTE;
-        else if (typeName.equals("short"))
+        } else if (typeName.equals("short")) {
             return codeModel.SHORT;
-        else if (typeName.equals("char"))
+        } else if (typeName.equals("char")) {
             return codeModel.CHAR;
-        else if (typeName.equals("int"))
+        } else if (typeName.equals("int")) {
             return codeModel.INT;
-        else if (typeName.equals("float"))
+        } else if (typeName.equals("float")) {
             return codeModel.FLOAT;
-        else if (typeName.equals("long"))
+        } else if (typeName.equals("long")) {
             return codeModel.LONG;
-        else if (typeName.equals("double"))
+        } else if (typeName.equals("double")) {
             return codeModel.DOUBLE;
-        else
+        } else {
             throw new IllegalArgumentException("Not a primitive type: " + typeName);
+        }
     }
 
     /** Gets the owner code model object. */

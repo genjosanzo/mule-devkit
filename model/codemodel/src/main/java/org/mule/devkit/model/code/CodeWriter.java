@@ -101,9 +101,13 @@ public abstract class CodeWriter {
                 @Override
                 protected boolean requireEscaping(int ch) {
                     // control characters
-                    if( ch<0x20 && " \t\r\n".indexOf(ch)==-1 )  return true;
+                    if( ch<0x20 && " \t\r\n".indexOf(ch)==-1 ) {
+                        return true;
+                    }
                     // check ASCII chars, for better performance
-                    if( ch<0x80 )       return false;
+                    if( ch<0x80 ) {
+                        return false;
+                    }
 
                     return !encoder.canEncode((char)ch);
                 }

@@ -91,8 +91,9 @@ public class DocComment extends CommentPart implements Generable {
      */
     public CommentPart addParam( String param ) {
         CommentPart p = atParams.get(param);
-        if(p==null)
-            atParams.put(param,p=new CommentPart());
+        if(p==null) {
+            atParams.put(param, p = new CommentPart());
+        }
         return p;
     }
 
@@ -116,8 +117,9 @@ public class DocComment extends CommentPart implements Generable {
      */
     public CommentPart addThrows( TypeReference exception ) {
         CommentPart p = atThrows.get(exception);
-        if(p==null)
-            atThrows.put(exception,p=new CommentPart());
+        if(p==null) {
+            atThrows.put(exception, p = new CommentPart());
+        }
         return p;
     }
     
@@ -125,8 +127,9 @@ public class DocComment extends CommentPart implements Generable {
      * Appends a text to @return tag.
      */
     public CommentPart addReturn( String ret) {
-        if(atReturn==null)
+        if(atReturn==null) {
             atReturn = new CommentPart();
+        }
         return atReturn;
     }
 
@@ -134,8 +137,9 @@ public class DocComment extends CommentPart implements Generable {
      * add an @deprecated tag to the javadoc, with the associated message.
      */
     public CommentPart addDeprecated() {
-        if(atDeprecated==null)
+        if(atDeprecated==null) {
             atDeprecated = new CommentPart();
+        }
         return atDeprecated;
     }
 
@@ -144,8 +148,9 @@ public class DocComment extends CommentPart implements Generable {
      */
     public Map<String,String> addXdoclet(String name) {
         Map<String,String> p = atXdoclets.get(name);
-        if(p==null)
-            atXdoclets.put(name,p=new HashMap<String,String>());
+        if(p==null) {
+            atXdoclets.put(name, p = new HashMap<String, String>());
+        }
         return p;
     }
 
@@ -154,8 +159,9 @@ public class DocComment extends CommentPart implements Generable {
      */
     public Map<String,String> addXdoclet(String name, Map<String,String> attributes) {
         Map<String,String> p = atXdoclets.get(name);
-        if(p==null)
-            atXdoclets.put(name,p=new HashMap<String,String>());
+        if(p==null) {
+            atXdoclets.put(name, p = new HashMap<String, String>());
+        }
         p.putAll(attributes);
         return p;
     }
@@ -165,8 +171,9 @@ public class DocComment extends CommentPart implements Generable {
      */
     public Map<String,String> addXdoclet(String name, String attribute, String value) {
         Map<String,String> p = atXdoclets.get(name);
-        if(p==null)
-            atXdoclets.put(name,p=new HashMap<String,String>());
+        if(p==null) {
+            atXdoclets.put(name, p = new HashMap<String, String>());
+        }
         p.put(attribute, value);
         return p;
     }

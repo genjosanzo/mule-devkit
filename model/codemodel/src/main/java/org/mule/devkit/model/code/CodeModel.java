@@ -132,8 +132,9 @@ public final class CodeModel {
         try {
             // let the system property override, in case the user really
             // wants to override.
-            if (System.getProperty("com.sun.codemodel.FileSystemCaseSensitive") != null)
+            if (System.getProperty("com.sun.codemodel.FileSystemCaseSensitive") != null) {
                 return true;
+            }
         } catch (Exception e) {
         }
 
@@ -200,10 +201,12 @@ public final class CodeModel {
      */
     public DefinedClass _class(int mods, String fullyqualifiedName, ClassType t) throws ClassAlreadyExistsException {
         int idx = fullyqualifiedName.lastIndexOf('.');
-        if (idx < 0) return rootPackage()._class(fullyqualifiedName);
-        else
+        if (idx < 0) {
+            return rootPackage()._class(fullyqualifiedName);
+        } else {
             return _package(fullyqualifiedName.substring(0, idx))
                     ._class(mods, fullyqualifiedName.substring(idx + 1), t);
+        }
     }
 
     /**
@@ -224,10 +227,12 @@ public final class CodeModel {
      */
     public DefinedClass _getClass(String fullyQualifiedName) {
         int idx = fullyQualifiedName.lastIndexOf('.');
-        if (idx < 0) return rootPackage()._getClass(fullyQualifiedName);
-        else
+        if (idx < 0) {
+            return rootPackage()._getClass(fullyQualifiedName);
+        } else {
             return _package(fullyQualifiedName.substring(0, idx))
                     ._getClass(fullyQualifiedName.substring(idx + 1));
+        }
     }
 
     /**
@@ -311,8 +316,9 @@ public final class CodeModel {
     private void build(CodeWriter source, CodeWriter resource) throws IOException {
         Package[] pkgs = packages.values().toArray(new Package[packages.size()]);
         // avoid concurrent modification exception
-        for (Package pkg : pkgs)
+        for (Package pkg : pkgs) {
             pkg.build(source, resource);
+        }
         source.close();
         resource.close();
     }
@@ -325,8 +331,9 @@ public final class CodeModel {
         int r = 0;
         Package[] pkgs = packages.values().toArray(new Package[packages.size()]);
         // avoid concurrent modification exception
-        for (Package pkg : pkgs)
+        for (Package pkg : pkgs) {
             r += pkg.countArtifacts();
+        }
         return r;
     }
 
@@ -345,8 +352,9 @@ public final class CodeModel {
     public TypeReference ref(Class<?> clazz) {
         ReferencedClass jrc = (ReferencedClass) refClasses.get(clazz);
         if (jrc == null) {
-            if (clazz.isPrimitive())
+            if (clazz.isPrimitive()) {
                 throw new IllegalArgumentException(clazz + " is a primitive");
+            }
             if (clazz.isArray()) {
                 return new ArrayClass(this, _ref(clazz.getComponentType()));
             } else {
@@ -358,10 +366,11 @@ public final class CodeModel {
     }
 
     public Type _ref(Class<?> c) {
-        if (c.isPrimitive())
+        if (c.isPrimitive()) {
             return Type.parse(this, c.getName());
-        else
+        } else {
             return ref(c);
+        }
     }
 
     /**
@@ -410,8 +419,9 @@ public final class CodeModel {
      * which is equivalent to "? extends Object".
      */
     public TypeReference wildcard() {
-        if (wildcard == null)
+        if (wildcard == null) {
             wildcard = ref(Object.class).wildcard();
+        }
         return wildcard;
     }
 
@@ -425,8 +435,9 @@ public final class CodeModel {
      */
     public Type parseType(String name) throws ClassNotFoundException {
         // array
-        if (name.endsWith("[]"))
+        if (name.endsWith("[]")) {
             return parseType(name.substring(0, name.length() - 2)).array();
+        }
 
         // try primitive type
         try {
@@ -478,10 +489,11 @@ public final class CodeModel {
                 char ch = s.charAt(idx);
                 if (Character.isJavaIdentifierStart(ch)
                         || Character.isJavaIdentifierPart(ch)
-                        || ch == '.')
+                        || ch == '.') {
                     idx++;
-                else
+                } else {
                     break;
+                }
             }
 
             TypeReference clazz = refClass(s.substring(start, idx));
@@ -494,13 +506,15 @@ public final class CodeModel {
          * and array specifiers.
          */
         private TypeReference parseSuffix(TypeReference clazz) throws ClassNotFoundException {
-            if (idx == s.length())
+            if (idx == s.length()) {
                 return clazz; // hit EOL
+            }
 
             char ch = s.charAt(idx);
 
-            if (ch == '<')
+            if (ch == '<') {
                 return parseSuffix(parseArguments(clazz));
+            }
 
             if (ch == '[') {
                 if (s.charAt(idx + 1) == ']') {
@@ -517,8 +531,9 @@ public final class CodeModel {
          * Skips whitespaces
          */
         private void ws() {
-            while (Character.isWhitespace(s.charAt(idx)) && idx < s.length())
+            while (Character.isWhitespace(s.charAt(idx)) && idx < s.length()) {
                 idx++;
+            }
         }
 
         /**
@@ -527,22 +542,26 @@ public final class CodeModel {
          * @return the index of the character next to '>'
          */
         private TypeReference parseArguments(TypeReference rawType) throws ClassNotFoundException {
-            if (s.charAt(idx) != '<')
+            if (s.charAt(idx) != '<') {
                 throw new IllegalArgumentException();
+            }
             idx++;
 
             List<TypeReference> args = new ArrayList<TypeReference>();
 
             while (true) {
                 args.add(parseTypeName());
-                if (idx == s.length())
+                if (idx == s.length()) {
                     throw new IllegalArgumentException("Missing '>' in " + s);
+                }
                 char ch = s.charAt(idx);
-                if (ch == '>')
+                if (ch == '>') {
                     return rawType.narrow(args.toArray(new TypeReference[args.size()]));
+                }
 
-                if (ch != ',')
+                if (ch != ',') {
                     throw new IllegalArgumentException(s);
+                }
                 idx++;
             }
 
@@ -584,7 +603,9 @@ public final class CodeModel {
 
         public TypeReference outer() {
             Class<?> p = _class.getDeclaringClass();
-            if (p == null) return null;
+            if (p == null) {
+                return null;
+            }
             return ref(p);
         }
 
@@ -592,25 +613,29 @@ public final class CodeModel {
             String name = fullName();
 
             // this type is array
-            if (name.indexOf('[') != -1)
+            if (name.indexOf('[') != -1) {
                 return CodeModel.this._package("");
+            }
 
             // other normal case
             int idx = name.lastIndexOf('.');
-            if (idx < 0)
+            if (idx < 0) {
                 return CodeModel.this._package("");
-            else
+            } else {
                 return CodeModel.this._package(name.substring(0, idx));
+            }
         }
 
         public TypeReference _extends() {
             Class<?> sp = _class.getSuperclass();
             if (sp == null) {
-                if (isInterface())
+                if (isInterface()) {
                     return owner().ref(Object.class);
+                }
                 return null;
-            } else
+            } else {
                 return ref(sp);
+            }
         }
 
         public Iterator<TypeReference> _implements() {
@@ -642,10 +667,11 @@ public final class CodeModel {
 
         public PrimitiveType getPrimitiveType() {
             Class<?> v = boxToPrimitive.get(_class);
-            if (v != null)
+            if (v != null) {
                 return parse(CodeModel.this, v.getName());
-            else
+            } else {
                 return null;
+            }
         }
 
         public boolean isArray() {
@@ -699,8 +725,9 @@ public final class CodeModel {
         m1.put(Short.class, Short.TYPE);
         m1.put(Void.class, Void.TYPE);
 
-        for (Map.Entry<Class<?>, Class<?>> e : m1.entrySet())
+        for (Map.Entry<Class<?>, Class<?>> e : m1.entrySet()) {
             m2.put(e.getValue(), e.getKey());
+        }
 
         boxToPrimitive = Collections.unmodifiableMap(m1);
         primitiveToBox = Collections.unmodifiableMap(m2);

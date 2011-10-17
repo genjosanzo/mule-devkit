@@ -115,10 +115,11 @@ public final class Package implements Declaration, Generable, ClassContainer, An
             throw new IllegalArgumentException(msg);
         }
 
-        if (CodeModel.isCaseSensitiveFileSystem)
+        if (CodeModel.isCaseSensitiveFileSystem) {
             upperCaseClassMap = null;
-        else
+        } else {
             upperCaseClassMap = new HashMap<String, DefinedClass>();
+        }
 
         this.name = name;
     }
@@ -132,7 +133,9 @@ public final class Package implements Declaration, Generable, ClassContainer, An
      * Gets the parent package, or null if this class is the root package.
      */
     public Package parent() {
-        if (name.length() == 0) return null;
+        if (name.length() == 0) {
+            return null;
+        }
 
         int idx = name.lastIndexOf('.');
         return owner._package(name.substring(0, idx));
@@ -172,16 +175,17 @@ public final class Package implements Declaration, Generable, ClassContainer, An
     }
 
     public DefinedClass _class(int mods, String name, ClassType classTypeVal) throws ClassAlreadyExistsException {
-        if (classes.containsKey(name))
+        if (classes.containsKey(name)) {
             throw new ClassAlreadyExistsException(classes.get(name));
-        else {
+        } else {
             // XXX problems caught in the NC constructor
             DefinedClass c = new DefinedClass(this, mods, name, classTypeVal);
 
             if (upperCaseClassMap != null) {
                 DefinedClass dc = upperCaseClassMap.get(name.toUpperCase());
-                if (dc != null)
+                if (dc != null) {
                     throw new ClassAlreadyExistsException(dc);
+                }
                 upperCaseClassMap.put(name.toUpperCase(), c);
             }
             classes.put(name, c);
@@ -271,10 +275,11 @@ public final class Package implements Declaration, Generable, ClassContainer, An
      *         If the class is not yet created.
      */
     public DefinedClass _getClass(String name) {
-        if (classes.containsKey(name))
+        if (classes.containsKey(name)) {
             return classes.get(name);
-        else
+        } else {
             return null;
+        }
     }
 
     /**
@@ -336,9 +341,11 @@ public final class Package implements Declaration, Generable, ClassContainer, An
      * Checks if a resource of the given name exists.
      */
     public boolean hasResourceFile(String name) {
-        for (ResourceFile r : resources)
-            if (r.name().equals(name))
+        for (ResourceFile r : resources) {
+            if (r.name().equals(name)) {
                 return true;
+            }
+        }
         return false;
     }
 
@@ -356,8 +363,9 @@ public final class Package implements Declaration, Generable, ClassContainer, An
      * @return JDocComment containing javadocs for this class
      */
     public DocComment javadoc() {
-        if (jdoc == null)
+        if (jdoc == null) {
             jdoc = new DocComment(owner());
+        }
         return jdoc;
     }
 
@@ -365,27 +373,31 @@ public final class Package implements Declaration, Generable, ClassContainer, An
      * Removes a class from this package.
      */
     public void remove(TypeReference c) {
-        if (c._package() != this)
+        if (c._package() != this) {
             throw new IllegalArgumentException(
                     "the specified class is not a member of this package," + " or it is a referenced class");
+        }
 
         // note that c may not be a member of classes.
         // this happens when someone is trying to remove a non generated class
         classes.remove(c.name());
-        if (upperCaseClassMap != null)
+        if (upperCaseClassMap != null) {
             upperCaseClassMap.remove(c.name().toUpperCase());
+        }
     }
 
     /**
      * Reference a class within this package.
      */
     public TypeReference ref(String name) throws ClassNotFoundException {
-        if (name.indexOf('.') >= 0)
+        if (name.indexOf('.') >= 0) {
             throw new IllegalArgumentException("TypeReference name contains '.': " + name);
+        }
 
         String n = "";
-        if (!isUnnamed())
+        if (!isUnnamed()) {
             n = this.name + '.';
+        }
         n += name;
 
         return owner.ref(Class.forName(n));
@@ -395,8 +407,11 @@ public final class Package implements Declaration, Generable, ClassContainer, An
      * Gets a reference to a sub package of this package.
      */
     public Package subPackage(String pkg) {
-        if (isUnnamed()) return owner()._package(pkg);
-        else return owner()._package(name + '.' + pkg);
+        if (isUnnamed()) {
+            return owner()._package(pkg);
+        } else {
+            return owner()._package(name + '.' + pkg);
+        }
     }
 
     /**
@@ -413,8 +428,9 @@ public final class Package implements Declaration, Generable, ClassContainer, An
     public boolean isDefined(String classLocalName) {
         Iterator<DefinedClass> itr = classes();
         while (itr.hasNext()) {
-            if ((itr.next()).name().equals(classLocalName))
+            if ((itr.next()).name().equals(classLocalName)) {
                 return true;
+            }
         }
 
         return false;
@@ -447,10 +463,12 @@ public final class Package implements Declaration, Generable, ClassContainer, An
 
 
     public AnnotationUse annotate(TypeReference clazz) {
-        if (isUnnamed())
+        if (isUnnamed()) {
             throw new IllegalArgumentException("the root package cannot be annotated");
-        if (annotations == null)
+        }
+        if (annotations == null) {
             annotations = new ArrayList<AnnotationUse>();
+        }
         AnnotationUse a = new AnnotationUse(clazz);
         annotations.add(a);
         return a;
@@ -465,8 +483,9 @@ public final class Package implements Declaration, Generable, ClassContainer, An
     }
 
     public Collection<AnnotationUse> annotations() {
-        if (annotations == null)
+        if (annotations == null) {
             annotations = new ArrayList<AnnotationUse>();
+        }
         return Collections.unmodifiableList(annotations);
     }
 
@@ -474,13 +493,16 @@ public final class Package implements Declaration, Generable, ClassContainer, An
      * Convert the package name to directory path equivalent
      */
     File toPath(File dir) {
-        if (name == null) return dir;
+        if (name == null) {
+            return dir;
+        }
         return new File(dir, name.replace('.', File.separatorChar));
     }
 
     public void declare(Formatter f) {
-        if (name.length() != 0)
+        if (name.length() != 0) {
             f.p("package").p(name).p(';').nl();
+        }
     }
 
     public void generate(Formatter f) {
@@ -492,8 +514,9 @@ public final class Package implements Declaration, Generable, ClassContainer, An
 
         // write classes
         for (DefinedClass c : classes.values()) {
-            if (c.isHidden())
+            if (c.isHidden()) {
                 continue;   // don't generate this file
+            }
 
             Formatter f = createJavaSourceFileWriter(src, c.name());
             f.write(c);
@@ -504,13 +527,15 @@ public final class Package implements Declaration, Generable, ClassContainer, An
         if (annotations != null || jdoc != null) {
             Formatter f = createJavaSourceFileWriter(src, "package-info");
 
-            if (jdoc != null)
+            if (jdoc != null) {
                 f.g(jdoc);
+            }
 
             // TODO: think about importing
             if (annotations != null) {
-                for (AnnotationUse a : annotations)
+                for (AnnotationUse a : annotations) {
                     f.g(a).nl();
+                }
             }
             f.d(this);
 
@@ -529,8 +554,9 @@ public final class Package implements Declaration, Generable, ClassContainer, An
     /*package*/ int countArtifacts() {
         int r = 0;
         for (DefinedClass c : classes.values()) {
-            if (c.isHidden())
+            if (c.isHidden()) {
                 continue;   // don't generate this file
+            }
             r++;
         }
 

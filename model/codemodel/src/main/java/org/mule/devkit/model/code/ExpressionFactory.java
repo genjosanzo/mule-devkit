@@ -103,10 +103,11 @@ public abstract class ExpressionFactory {
         return new AbstractExpression() {
                 public void generate(Formatter f) {
                     TypeReference c;
-                    if(cl instanceof NarrowedClass)
-                        c = ((NarrowedClass)cl).basis;
-                    else
+                    if(cl instanceof NarrowedClass) {
+                        c = ((NarrowedClass) cl).basis;
+                    } else {
                         c = cl;
+                    }
                     f.g(c).p(".class");
                 }
             };
@@ -262,8 +263,9 @@ public abstract class ExpressionFactory {
                     // not printable. use Unicode escape
                     sb.append("\\u");
                     String hex = Integer.toHexString(((int)c)&0xFFFF);
-                    for( int k=hex.length(); k<4; k++ )
+                    for( int k=hex.length(); k<4; k++ ) {
                         sb.append('0');
+                    }
                     sb.append(hex);
                 } else {
                     sb.append(c);

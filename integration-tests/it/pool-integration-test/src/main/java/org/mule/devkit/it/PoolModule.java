@@ -46,8 +46,9 @@ public class PoolModule {
     public void count(int startAt, int endAt, int step, SourceCallback callback) throws Exception {
         int count = startAt;
         while (true) {
-            if (Thread.interrupted() || count == endAt)
+            if (Thread.interrupted() || count == endAt) {
                 throw new InterruptedException();
+            }
 
             callback.process(count);
 

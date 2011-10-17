@@ -361,9 +361,13 @@ public class Stubs {
     HashSet<String> classDeclTypeVars = new HashSet<String>();
     String leafName = cl.asTypeInfo().fullName(classDeclTypeVars);
     int bracket = leafName.indexOf('<');
-    if (bracket < 0) bracket = leafName.length() - 1;
+    if (bracket < 0) {
+        bracket = leafName.length() - 1;
+    }
     int period = leafName.lastIndexOf('.', bracket);
-    if (period < 0) period = -1;
+    if (period < 0) {
+        period = -1;
+    }
     leafName = leafName.substring(period + 1);
 
     String kind = cl.kind();

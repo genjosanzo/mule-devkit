@@ -79,8 +79,9 @@ public final class PrimitiveType extends Type {
 
     private TypeReference arrayClass;
     public TypeReference array() {
-        if(arrayClass==null)
-            arrayClass = new ArrayClass(owner,this);
+        if(arrayClass==null) {
+            arrayClass = new ArrayClass(owner, this);
+        }
         return arrayClass;
     }
     
