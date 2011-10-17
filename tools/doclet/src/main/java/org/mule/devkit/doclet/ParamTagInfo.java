@@ -31,10 +31,9 @@ public class ParamTagInfo extends ParsedTagInfo {
     private String mAttributeName;
     private String mDefaultValue;
     private boolean mIsNestedProcessor;
-    private boolean mIsSession;
 
     ParamTagInfo(String name, String kind, String text, String attributeName, boolean isOptional, String defaultValue,
-                 boolean isNestedProcessor, boolean isSession, ContainerInfo base, SourcePositionInfo sp) {
+                 boolean isNestedProcessor, ContainerInfo base, SourcePositionInfo sp) {
         super(name, kind, text, base, sp);
 
         Matcher m = PATTERN.matcher(text);
@@ -53,7 +52,6 @@ public class ParamTagInfo extends ParsedTagInfo {
         mAttributeName = attributeName;
         mDefaultValue = defaultValue;
         mIsNestedProcessor = isNestedProcessor;
-        mIsSession = isSession;
         setCommentText(mParameterComment);
     }
 
@@ -111,10 +109,6 @@ public class ParamTagInfo extends ParsedTagInfo {
         return mIsNestedProcessor;
     }
 
-    public boolean isSession() {
-        return mIsSession;
-    }
-
     @Override
     public void makeHDF(Data data, String base) {
         data.setValue(base + ".name", parameterName());
@@ -123,7 +117,6 @@ public class ParamTagInfo extends ParsedTagInfo {
         data.setValue(base + ".defaultValue", defaultValue());
         data.setValue(base + ".isTypeParameter", isTypeParameter() ? "1" : "0");
         data.setValue(base + ".isNestedProcessor", isNestedProcessor() ? "1" : "0");
-        data.setValue(base + ".isSession", isSession() ? "1" : "0");
         TagInfo.makeHDF(data, base + ".comment", commentTags());
     }
 

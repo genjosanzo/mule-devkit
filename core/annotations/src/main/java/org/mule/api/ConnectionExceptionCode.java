@@ -14,31 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.mule.api;
 
-package org.mule.devkit.it;
-
-import java.io.File;
-
-public class SessionIT extends AbstractMavenIT
-{
-
-    protected String getArtifactVersion()
-    {
-        return "1.0";
-    }
-
-    protected String getArtifactId()
-    {
-        return "session-integration-test";
-    }
-
-    protected String getGroupId()
-    {
-        return "org.mule.devkit.it";
-    }
-
-    protected File getRoot()
-    {
-        return new File("target/integration-tests/" + getArtifactId());
-    }
+/**
+ * List of possible outcomes to a connection failure
+ */
+public enum ConnectionExceptionCode {
+    /**
+     * The host cannot be resolved to an IP address
+     */
+    UNKNOWN_HOST,
+    /**
+     * The destination cannot be reached. Either the host is wrong
+     * or the port might be.
+     */
+    CANNOT_REACH,
+    /**
+     * The supplied credentials are not correct.
+     */
+    INCORRECT_CREDENTIALS,
+    /**
+     * The credentials used to authenticate has expired.
+     */
+    CREDENTIALS_EXPIRED,
+    /**
+     * Something else went wrong.
+     */
+    UNKNOWN;
 }

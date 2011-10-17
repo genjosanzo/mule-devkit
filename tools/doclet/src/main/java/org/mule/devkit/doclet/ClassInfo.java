@@ -919,8 +919,8 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
         data.setValue("class.moduleSessionAware", Boolean.toString(this.moduleSessionAware()));
 
         if( moduleSessionAware() ) {
-            //ParameterInfo.makeHDF(data, "class.moduleSessionVariables", mModuleSessionVariables, false, mModuleSessionVariablesTypes);
-            ParamTagInfo.makeHDF(data, "class.moduleSessionVariables", mModuleSessionVariables);
+            //ParameterInfo.makeHDF(data, "class.moduleSessionVariables", mModuleConnectVariables, false, mModuleConnectVariablesTypes);
+            ParamTagInfo.makeHDF(data, "class.moduleConnectVariables", mModuleConnectVariables);
         }
 
         // class info
@@ -1513,9 +1513,9 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
     private String mModuleMinMuleVersion;
     private String mModuleNamespace;
     private String mModuleSchemaLocation;
-    private boolean mModuleSessionAware;
-    private ParamTagInfo[] mModuleSessionVariables;
-    private Set<String> mModuleSessionVariablesTypes;
+    private boolean mModuleHasConnectionManager;
+    private ParamTagInfo[] mModuleConnectVariables;
+    private Set<String> mModuleConnectVariablesTypes;
     private String mName;
     private String mQualifiedName;
     private String mQualifiedTypeName;
@@ -1847,7 +1847,7 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
     }
 
     public boolean moduleSessionAware() {
-        return mModuleSessionAware;
+        return mModuleHasConnectionManager;
     }
 
 
@@ -1917,35 +1917,35 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
                 }
             }
             mIsModule = annotationPresent;
-            boolean hasSessionCreate = false;
-            boolean hasSessionDestroy = false;
+            boolean hasConnect = false;
+            boolean hasDisconnect = false;
             if( mIsModule ) {
                 for (MethodInfo m : methods()) {
                     for( AnnotationInstanceInfo annotation : m.annotations() ) {
-                        if (annotation.type().qualifiedName().equals("org.mule.api.annotations.session.SessionCreate")) {
-                            mModuleSessionVariables = m.paramTags();
-                            mModuleSessionVariablesTypes = m.typeVariables();
-                            hasSessionCreate = true;
+                        if (annotation.type().qualifiedName().equals("org.mule.api.annotations.Connect")) {
+                            mModuleConnectVariables = m.paramTags();
+                            mModuleConnectVariablesTypes = m.typeVariables();
+                            hasConnect = true;
                         }
-                        if (annotation.type().qualifiedName().equals("org.mule.api.annotations.session.SessionDestroy")) {
-                            hasSessionDestroy = true;
+                        if (annotation.type().qualifiedName().equals("org.mule.api.annotations.Disconnect")) {
+                            hasDisconnect = true;
                         }
                     }
                 }
             }
-            if( hasSessionCreate && hasSessionDestroy ) {
-                mModuleSessionAware = true;
+            if( hasConnect && hasDisconnect ) {
+                mModuleHasConnectionManager = true;
             }
             mModuleKnown = true;
         }
         return mIsModule;
     }
 
-    public ParamTagInfo[] sessionTags() {
-        return mModuleSessionVariables;
+    public ParamTagInfo[] connectionTags() {
+        return mModuleConnectVariables;
     }
 
-    public boolean isSessionAware() {
-        return mModuleSessionAware;
+    public boolean hasConnectionManager() {
+        return mModuleHasConnectionManager;
     }
 }

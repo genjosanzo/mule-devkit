@@ -24,11 +24,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a parameter inside {@link org.mule.api.annotations.session.SessionCreate} as
- * the key for the session lookup.
+ * Marks a parameter inside {@link org.mule.api.annotations.Connect} as
+ * the key for the connector lookup.
  */
 @Target(value = {ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface SessionKey {
+public @interface ConnectionKey {
 }

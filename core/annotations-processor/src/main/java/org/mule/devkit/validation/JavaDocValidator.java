@@ -19,13 +19,13 @@ package org.mule.devkit.validation;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.annotations.Configurable;
+import org.mule.api.annotations.Connect;
 import org.mule.api.annotations.Connector;
+import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
-import org.mule.api.annotations.session.SessionCreate;
-import org.mule.api.annotations.session.SessionDestroy;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.util.IOUtils;
@@ -75,11 +75,11 @@ public class JavaDocValidator implements Validator {
             validateMethod(typeElement, context, method);
         }
 
-        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(SessionCreate.class)) {
+        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Connect.class)) {
             validateAllParameters(context, method);
         }
 
-        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(SessionDestroy.class)) {
+        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Disconnect.class)) {
             validateAllParameters(context, method);
         }
     }

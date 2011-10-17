@@ -17,6 +17,28 @@
 
 package org.mule.devkit.it;
 
-public class InvalidSession extends Exception
+import java.io.File;
+
+public class ConnectorIT extends AbstractMavenIT
 {
+
+    protected String getArtifactVersion()
+    {
+        return "1.0";
+    }
+
+    protected String getArtifactId()
+    {
+        return "connector-integration-test";
+    }
+
+    protected String getGroupId()
+    {
+        return "org.mule.devkit.it";
+    }
+
+    protected File getRoot()
+    {
+        return new File("target/integration-tests/" + getArtifactId());
+    }
 }

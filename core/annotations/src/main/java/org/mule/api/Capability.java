@@ -29,9 +29,9 @@ public enum Capability {
     LIFECYCLE_CAPABLE(0),
 
     /**
-     * This capability indicates that the module implements {@link org.mule.api.adapter.SessionManagerAdapter}
+     * This capability indicates that the module implements {@link ConnectionManager}
      */
-    SESSION_MANAGEMENT_CAPABLE(1),
+    CONNECTION_MANAGEMENT_CAPABLE(1),
 
     /**
      * This capability indicates that the module implements {@link org.mule.api.adapter.OAuth1Adapter}

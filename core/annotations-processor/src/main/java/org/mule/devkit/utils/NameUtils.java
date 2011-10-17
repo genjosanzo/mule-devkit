@@ -250,12 +250,28 @@ public class NameUtils {
         return pkg + "." + className + "ModuleObject";
     }
 
-    public String generateSessionKeyRoleKey(TypeElement typeElement) {
+    public String generateConnectorObjectRoleKey(TypeElement typeElement) {
         String typeFullName = getBinaryName(typeElement);
         String pkg = getPackageName(typeFullName);
         String className = getClassName(typeFullName);
 
-        return pkg + "." + className + "SessionKey";
+        return pkg + "." + className + "Connector";
+    }
+
+    public String generateConnectionKeyRoleKey(TypeElement typeElement) {
+        String typeFullName = getBinaryName(typeElement);
+        String pkg = getPackageName(typeFullName);
+        String className = getClassName(typeFullName);
+
+        return pkg + "." + className + "ConnectionKey";
+    }
+
+    public String generateConnectionManagerRoleKey(TypeElement typeElement) {
+        String typeFullName = getBinaryName(typeElement);
+        String pkg = getPackageName(typeFullName);
+        String className = getClassName(typeFullName);
+
+        return pkg + "." + className + "ConnectionManager";
     }
 
     public String getBinaryName(TypeElement typeElement) {

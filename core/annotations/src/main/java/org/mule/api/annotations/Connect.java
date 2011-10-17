@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mule.api.annotations.session;
+package org.mule.api.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -23,18 +23,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation can be attached to any method also annotated with {@link org.mule.api.annotations.Processor} or
- * {@link org.mule.api.annotations.Source}. It receives a single argument which is the class of the exception to
- * be catch.
- *
- * If the exception is thrown by the Processor/Source it will automatically invalidate the session.
+ * This annotation marks a method inside a {@link org.mule.api.annotations.Connector} as the responsible for creating
+ * a connection. It will be called by the connector's connection manager.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface InvalidateSessionOn {
-    /**
-     * The class of the exception that signals the invalidation of the session
-     */
-    Class exception();
+public @interface Connect {
+
 }
