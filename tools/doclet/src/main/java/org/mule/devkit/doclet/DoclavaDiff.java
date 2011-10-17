@@ -46,11 +46,11 @@ public final class DoclavaDiff {
   private final List<FederatedSite> sites = new ArrayList<FederatedSite>();
   
   public static void main(String[] args) {
-    new DoclavaDiff(args).generateSite();
+      // TODO: options parsing
+    new DoclavaDiff().generateSite();
   }
   
-  public DoclavaDiff(String[] args) {
-    // TODO: options parsing
+  public DoclavaDiff() {
     try {
       sites.add(new FederatedSite("Android", new URL("http://manatee/doclava/android")));
       sites.add(new FederatedSite("GWT", new URL("http://manatee/doclava/gwt")));

@@ -342,8 +342,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                 }
                 if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
                     if (requiredChildElements == 1) {
-                        Optional optional = variable.getAnnotation(Optional.class);
-                        GroupRef groupRef = generateNestedProcessorGroup(optional);
+                        GroupRef groupRef = generateNestedProcessorGroup();
                         complexContentExtension.setGroup(groupRef);
                         complexContentExtension.setAll(null);
 
@@ -401,7 +400,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         collectionElement.setMaxOccurs("1");
 
         LocalComplexType collectionComplexType = new LocalComplexType();
-        GroupRef group = generateNestedProcessorGroup(optional);
+        GroupRef group = generateNestedProcessorGroup();
 
         collectionComplexType.setGroup(group);
         collectionElement.setComplexType(collectionComplexType);
@@ -423,14 +422,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     }
 
-    private GroupRef generateNestedProcessorGroup(Optional optional) {
+    private GroupRef generateNestedProcessorGroup() {
         GroupRef group = new GroupRef();
         group.generateNestedProcessorGroup(SchemaConstants.MULE_MESSAGE_PROCESSOR_OR_OUTBOUND_ENDPOINT_TYPE);
-        //if (optional != null) {
         group.setMinOccurs(BigInteger.valueOf(0L));
-        //} else {
-        //    group.setMinOccurs(BigInteger.valueOf(1L));
-        //}
         group.setMaxOccurs("unbounded");
         return group;
     }

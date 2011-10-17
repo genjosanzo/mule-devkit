@@ -198,10 +198,10 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey(typeElement));
 
             // add process method
-            generateProcessMethod(executableElement, messageProcessorClass, fields, sessionFields, messageProcessorListener, muleContext, object, expressionManager, patternInfo, poolObjectClass);
+            generateProcessMethod(executableElement, messageProcessorClass, fields, sessionFields, messageProcessorListener, muleContext, object, poolObjectClass);
         } else {
             // add process method
-            generateProcessMethod(executableElement, messageProcessorClass, fields, sessionFields, messageProcessorListener, muleContext, object, expressionManager, patternInfo);
+            generateProcessMethod(executableElement, messageProcessorClass, fields, sessionFields, messageProcessorListener, muleContext, object, null);
         }
     }
 
@@ -575,11 +575,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         return defaultMuleEvent;
     }
 
-    private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> sessionFields, FieldVariable messageProcessorListener, FieldVariable muleContext, FieldVariable object, FieldVariable expressionManager, FieldVariable patternInfo) {
-        generateProcessMethod(executableElement, messageProcessorClass, fields, sessionFields, messageProcessorListener, muleContext, object, expressionManager, patternInfo, null);
-    }
-
-    private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> sessionFields, FieldVariable messageProcessorListener, FieldVariable muleContext, FieldVariable object, FieldVariable expressionManager, FieldVariable patternInfo, DefinedClass poolObjectClass) {
+    private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> sessionFields, FieldVariable messageProcessorListener, FieldVariable muleContext, FieldVariable object, DefinedClass poolObjectClass) {
         String methodName = executableElement.getSimpleName().toString();
         Type muleEvent = ref(MuleEvent.class);
 
