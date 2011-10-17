@@ -61,27 +61,29 @@ public class ConnectorValidator implements Validator {
             throw new ValidationException(typeElement, "You need have exactly one method annotated with @Connect and one with @Disconnect");
         }
 
-        ExecutableElement connectMethod = connectMethods.get(0);
-        ExecutableElement disconnectMethod = disconnectMethods.get(0);
+        if (typeElement.usesConnectionManager()) {
+            ExecutableElement connectMethod = connectMethods.get(0);
+            ExecutableElement disconnectMethod = disconnectMethods.get(0);
 
-        if( connectMethod.getThrownTypes().size() != 1 ) {
-            throw new ValidationException(typeElement, "A @Connect method can only throw a single type of exception. That exception must be ConnectionException.");
-        }
+            if (connectMethod.getThrownTypes().size() != 1) {
+                throw new ValidationException(typeElement, "A @Connect method can only throw a single type of exception. That exception must be ConnectionException.");
+            }
 
-        if( !connectMethod.getThrownTypes().get(0).toString().equals("org.mule.api.ConnectionException") ) {
-            throw new ValidationException(typeElement, "A @Connect method can only throw a single type of exception. That exception must be ConnectionException.");
-        }
+            if (!connectMethod.getThrownTypes().get(0).toString().equals("org.mule.api.ConnectionException")) {
+                throw new ValidationException(typeElement, "A @Connect method can only throw a single type of exception. That exception must be ConnectionException.");
+            }
 
-        if( !connectMethod.getReturnType().toString().equals("void") ) {
-            throw new ValidationException(typeElement, "A @Connect method cannot return anything.");
-        }
+            if (!connectMethod.getReturnType().toString().equals("void")) {
+                throw new ValidationException(typeElement, "A @Connect method cannot return anything.");
+            }
 
-        if (disconnectMethod.getParameters().size() != 0) {
-            throw new ValidationException(typeElement, "The @Disconnect method cannot receive any arguments");
-        }
+            if (disconnectMethod.getParameters().size() != 0) {
+                throw new ValidationException(typeElement, "The @Disconnect method cannot receive any arguments");
+            }
 
-        if( !disconnectMethod.getReturnType().toString().equals("void") ) {
-            throw new ValidationException(typeElement, "A @Disconnect method cannot return anything.");
+            if (!disconnectMethod.getReturnType().toString().equals("void")) {
+                throw new ValidationException(typeElement, "A @Disconnect method cannot return anything.");
+            }
         }
     }
 }

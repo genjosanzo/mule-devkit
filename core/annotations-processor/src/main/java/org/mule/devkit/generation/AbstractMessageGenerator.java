@@ -181,7 +181,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                 continue;
             }
 
-            if (annotatedWith != null && variable.getAnnotation(annotatedWith) == null)
+            if (annotatedWith != null && variable.getAnnotation(annotatedWith) == null) {
                 continue;
             }
 

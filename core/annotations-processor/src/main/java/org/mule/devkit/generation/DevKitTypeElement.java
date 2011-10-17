@@ -63,5 +63,5 @@ public interface DevKitTypeElement extends TypeElement {
 
     String schemaVersion();
 
-    boolean usesSessionManagement();
+    boolean usesConnectionManager();
 }

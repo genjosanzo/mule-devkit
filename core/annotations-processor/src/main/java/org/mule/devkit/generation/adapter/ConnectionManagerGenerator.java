@@ -58,8 +58,9 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         ExecutableElement connectMethod = connectForClass(typeElement);
         ExecutableElement disconnectMethod = disconnectForClass(typeElement);
 
-        if (connectMethod == null || disconnectMethod == null)
+        if (connectMethod == null || disconnectMethod == null) {
             return false;
+        }
 
         return true;
     }
@@ -150,8 +151,9 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         Variable hash = hashCode.body().decl(context.getCodeModel().INT, "hash", ExpressionFactory.lit(1));
 
         for (VariableElement variable : connect.getParameters()) {
-            if (variable.getAnnotation(ConnectionKey.class) == null)
+            if (variable.getAnnotation(ConnectionKey.class) == null) {
                 continue;
+            }
 
             String fieldName = variable.getSimpleName().toString();
 
@@ -174,8 +176,9 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         Expression areEqual = Op._instanceof(obj, connectionKey);
 
         for (VariableElement variable : connect.getParameters()) {
-            if (variable.getAnnotation(ConnectionKey.class) == null)
+            if (variable.getAnnotation(ConnectionKey.class) == null) {
                 continue;
+            }
 
             String fieldName = variable.getSimpleName().toString();
             areEqual = Op.cand(areEqual, Op.eq(
@@ -253,21 +256,15 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
     private void generateActivateObjectMethod(DefinedClass connectionFactoryClass) {
         Method activateObject = connectionFactoryClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "activateObject");
         activateObject._throws(ref(Exception.class));
-        Variable key = activateObject.param(Object.class, "key");
-        Variable obj = activateObject.param(Object.class, "obj");
     }
 
     private void generatePassivateObjectMethod(DefinedClass connectionFactoryClass) {
         Method passivateObject = connectionFactoryClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "passivateObject");
         passivateObject._throws(ref(Exception.class));
-        Variable key = passivateObject.param(Object.class, "key");
-        Variable obj = passivateObject.param(Object.class, "obj");
     }
 
     private void generateValidateObjectMethod(DefinedClass connectionFactoryClass) {
         Method validateObject = connectionFactoryClass.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "validateObject");
-        Variable key = validateObject.param(Object.class, "key");
-        Variable obj = validateObject.param(Object.class, "obj");
 
         validateObject.body()._return(ExpressionFactory.TRUE);
     }

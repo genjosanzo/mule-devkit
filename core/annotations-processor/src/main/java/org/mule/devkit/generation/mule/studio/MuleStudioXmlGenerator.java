@@ -19,11 +19,10 @@ package org.mule.devkit.generation.mule.studio;
 
 import org.apache.commons.lang.WordUtils;
 import org.mule.api.annotations.Configurable;
+import org.mule.api.annotations.Connect;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
-import org.mule.api.annotations.param.Session;
-import org.mule.api.annotations.session.SessionCreate;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.AbstractElementType;
@@ -138,8 +137,8 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
             }
         }
 
-        if (typeElement.usesSessionManagement()) {
-            addSessionAttributeTypes(typeElement, fields);
+        if (typeElement.usesConnectionManager()) {
+            addConnectionAttributeTypes(typeElement, fields);
         }
 
         AttributeType nameAttributeType = new AttributeType();
@@ -355,19 +354,18 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
             String parameterName = variableElement.getSimpleName().toString();
             if (parameter != null) {
                 setAttributeTypeInfo(executableElement, parameters, variableElement, parameter, parameterName);
-            } else if (variableElement.getAnnotation(Session.class) != null) {
-                addSessionAttributeTypes(typeElement, parameters);
             }
         }
+        addConnectionAttributeTypes(typeElement, parameters);
         return parameters;
     }
 
-    private void addSessionAttributeTypes(DevKitTypeElement typeElement, List<AttributeType> parameters) {
-        ExecutableElement sessionCreateMethod = typeElement.getMethodsAnnotatedWith(SessionCreate.class).get(0);
-        for (VariableElement sessionCreateAttributeType : sessionCreateMethod.getParameters()) {
-            AttributeType parameter = createAttributeType(sessionCreateAttributeType);
-            String parameterName = sessionCreateAttributeType.getSimpleName().toString();
-            setAttributeTypeInfo(sessionCreateMethod, parameters, sessionCreateAttributeType, parameter, parameterName);
+    private void addConnectionAttributeTypes(DevKitTypeElement typeElement, List<AttributeType> parameters) {
+        ExecutableElement connectMethod = typeElement.getMethodsAnnotatedWith(Connect.class).get(0);
+        for (VariableElement connectAttributeType : connectMethod.getParameters()) {
+            AttributeType parameter = createAttributeType(connectAttributeType);
+            String parameterName = connectAttributeType.getSimpleName().toString();
+            setAttributeTypeInfo(connectMethod, parameters, connectAttributeType, parameter, parameterName);
             parameter.setRequired(false);
         }
     }

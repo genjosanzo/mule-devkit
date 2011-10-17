@@ -203,7 +203,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
                 Conditional ifNotNull = callSource.body()._if(Op.ne(connectFields.get(fieldName).getField(),
                         ExpressionFactory._null()));
 
-                Type type = ref(sessionFields.get(fieldName).getVariableElement().asType()).boxify();
+                Type type = ref(connectFields.get(fieldName).getVariableElement().asType()).boxify();
 
                 Variable transformed = (Variable) connectionParameters.get(fieldName);
 
