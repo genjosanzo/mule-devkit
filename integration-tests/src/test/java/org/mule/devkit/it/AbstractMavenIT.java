@@ -26,6 +26,8 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 public abstract class AbstractMavenIT {
@@ -50,6 +52,7 @@ public abstract class AbstractMavenIT {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void buildExecutable() throws VerificationException {
         InputStream systemPropertiesStream = null;
         try {
@@ -63,7 +66,7 @@ public abstract class AbstractMavenIT {
             systemProperties.load(systemPropertiesStream);
 
             verifier.setSystemProperties(systemProperties);
-
+            verifier.getCliOptions().addAll(getCliOptions());
             verifier.executeGoal("clean");
             verifier.executeGoal("package");
 
@@ -73,5 +76,9 @@ public abstract class AbstractMavenIT {
         } finally {
             IOUtil.close(systemPropertiesStream);
         }
+    }
+
+    protected List<String> getCliOptions() {
+        return Collections.emptyList();
     }
 }

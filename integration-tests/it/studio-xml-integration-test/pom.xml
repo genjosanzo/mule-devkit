@@ -58,6 +58,14 @@
                 <directory>src/test/resources</directory>
             </resource>
         </resources>
+        <testResources>
+            <testResource>
+                <directory>target/META-INF</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+            </testResource>
+        </testResources>
     </build>
 
     <dependencies>

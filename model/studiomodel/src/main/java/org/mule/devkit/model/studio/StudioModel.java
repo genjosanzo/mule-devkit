@@ -16,52 +16,58 @@
  */
 package org.mule.devkit.model.studio;
 
-import com.thoughtworks.xstream.XStream;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 import org.mule.devkit.model.code.CodeWriter;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 
 public class StudioModel {
 
     private static final String XML_FILE_NAME = "META-INF/%s-studio.xml";
     private CodeWriter codeWriter;
-    private XStream xStream;
-    private Namespace namespace;
     private String moduleName;
+    private Module module;
 
-    public StudioModel(CodeWriter codeWriter, XStream xStream) {
+    public StudioModel(CodeWriter codeWriter) {
         this.codeWriter = codeWriter;
-        this.xStream = xStream;
     }
 
     public void build() throws IOException {
-        if(namespace == null) {
-            return;
-        }
         try {
-            String studioXml = xStream.toXML(namespace).replaceAll("__abstract", "abstract").replaceAll("__extends", "extends"); // TODO;
-            OutputStream springSchemasStream = codeWriter.openBinary(null, String.format(XML_FILE_NAME, moduleName));
-            OutputStreamWriter springSchemasOut = new OutputStreamWriter(springSchemasStream, "UTF-8");
-            springSchemasOut.write(studioXml);
-            springSchemasOut.flush();
-            springSchemasOut.close();
+            if (module != null) {
+                serializeXml();
+            }
+        } catch (JAXBException e) {
+            throw new IOException(e);
         } catch (UnsupportedEncodingException e) {
             throw new IOException(e);
         }
     }
 
-    public XStream getXStream() {
-        return xStream;
-    }
-
-    public void setNamespace(Namespace namespace) {
-        this.namespace = namespace;
+    private void serializeXml() throws JAXBException, IOException {
+        JAXBContext jaxbContext = JAXBContext.newInstance(Module.class);
+        Marshaller marshaller = jaxbContext.createMarshaller();
+        NamespaceFilter outFilter = new NamespaceFilter("mule", "http://www.mulesoft.org/schema/mule/core", true);
+        OutputFormat format = new OutputFormat();
+        format.setIndent(true);
+        format.setNewlines(true);
+        OutputStream schemaStream = codeWriter.openBinary(null, String.format(XML_FILE_NAME, moduleName));
+        XMLWriter writer = new XMLWriter(schemaStream, format);
+        outFilter.setContentHandler(writer);
+        marshaller.marshal(module, outFilter);
     }
 
     public void setModuleName(String moduleName) {
         this.moduleName = moduleName;
+    }
+
+    public void setModule(Module module) {
+        this.module = module;
     }
 }

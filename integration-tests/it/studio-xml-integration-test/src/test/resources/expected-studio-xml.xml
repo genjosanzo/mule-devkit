@@ -1,194 +1,198 @@
-<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" prefix="mymodule"
-           url="http://www.mulesoft.org/schema/mule/mymodule">
-    <global-cloud-connector image="icons/large/mymodule-connector-48x32.png"
-                            icon="icons/small/mymodule-connector-24x16.png" localId="config"
-                            extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
-                            caption="Mymodule" description="Global Mymodule configuration information.">
-        <attribute-category caption="Mymodule" description="Mymodule configuration properties.">
-            <group caption="Generic" id="mymoduleGenericProperties">
-                <string required="true" name="configurableString" caption="Configurable String"
-                        description="Configurable String."/>
-                <string required="false" name="optionalConfigurableString" caption="Optional Configurable String"
-                        description="Configurable optional String."/>
-                <string required="false" defaultValue="a default" name="optionalWithDefaultConfigurableString"
-                        caption="Optional With Default Configurable String"
-                        description="Configurable optional String with default value."/>
-                <string required="false" name="user" caption="User" description="The user name to use."/>
-                <string required="false" name="password" caption="Password" description="The password to use."/>
-                <name required="false" name="name" caption="Name"
-                      description="Give a name to this configuration so it can be later referenced by config-ref."/>
-            </group>
-        </attribute-category>
-    </global-cloud-connector>
-    <cloud-connector localId="mymodule-connector" icon="icons/small/mymodule-connector-24x16.png"
-                     image="icons/large/mymodule-connector-48x32.png"
-                     aliasId="org.mule.tooling.ui.modules.core.pattern.mymodule"
-                     extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
-                     caption="Mymodule" description="Mymodule Integration.">
-        <attribute-category caption="General" description="General properties">
-            <group caption="Generic" id="mymoduleConnectorGeneric">
-                <modeSwitch name="Mymodule operations to execute" caption="Operation" description="Operation.">
-                    <mode modeId="http://www.mulesoft.org/schema/mule/mymodule/operation1" modeLabel="Operation1"/>
-                    <mode modeId="http://www.mulesoft.org/schema/mule/mymodule/operation2" modeLabel="Operation2"/>
-                    <mode modeId="http://www.mulesoft.org/schema/mule/mymodule/operation3" modeLabel="Operation3"/>
-                    <mode modeId="http://www.mulesoft.org/schema/mule/mymodule/operation4" modeLabel="Operation4"/>
-                    <mode modeId="http://www.mulesoft.org/schema/mule/mymodule/operation5" modeLabel="Operation5"/>
-                    <mode modeId="http://www.mulesoft.org/schema/mule/mymodule/operation6" modeLabel="Operation6"/>
-                </modeSwitch>
-            </group>
-        </attribute-category>
-    </cloud-connector>
-    <cloud-connector localId="abstractMymoduleConnectorGeneric" icon="icons/small/mymodule-connector-24x16.png"
-                     image="icons/large/mymodule-connector-48x32.png" abstract="true"
-                     caption="Abstractmymoduleconnectorgeneric" description="Interact with Mymodule.">
-        <attribute-category caption="General" description="General properties">
-            <group caption="Generic" id="abstractMymoduleConnectorGeneric">
-                <globalRef requiredType="http://www.mulesoft.org/schema/mule/mymodule/config" name="config-ref"
-                           caption="Config reference"
-                           description="Specify which configuration to use for this invocation."/>
-            </group>
-        </attribute-category>
-    </cloud-connector>
-    <cloud-connector localId="operation1" icon="icons/small/mymodule-connector-24x16.png"
-                     image="icons/large/mymodule-connector-48x32.png" abstract="true"
-                     extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
-                     caption="Operation1">
-        <attribute-category caption="General" description="General properties.">
-            <group caption="General" id="general" description="Operation1 method description.">
-                <string required="true" name="stringParameter" caption="String Parameter"
-                        description="StringParameter description."/>
-                <integer required="true" name="intParameter" caption="Int Parameter"
-                         description="IntParameter description."/>
-                <boolean required="true" name="booleanParameter" caption="Boolean Parameter"
-                         description="BooleanParameter description."/>
-            </group>
-        </attribute-category>
-    </cloud-connector>
-    <cloud-connector localId="operation2" icon="icons/small/mymodule-connector-24x16.png"
-                     image="icons/large/mymodule-connector-48x32.png" abstract="true"
-                     extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
-                     caption="Operation2">
-        <attribute-category caption="General" description="General properties.">
-            <group caption="General" id="general" description="Operation2 method description.">
-                <string required="false" name="stringParameter" caption="String Parameter"
-                        description="StringParameter description."/>
-                <integer required="false" name="intParameter" caption="Int Parameter"
-                         description="IntParameter description."/>
-                <boolean required="false" name="booleanParameter" caption="Boolean Parameter"
-                         description="BooleanParameter description."/>
-            </group>
-        </attribute-category>
-    </cloud-connector>
-    <cloud-connector localId="operation3" icon="icons/small/mymodule-connector-24x16.png"
-                     image="icons/large/mymodule-connector-48x32.png" abstract="true"
-                     extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
-                     caption="Operation3">
-        <attribute-category caption="General" description="General properties.">
-            <group caption="General" id="general" description="Operation3 method description.">
-                <string required="false" defaultValue="fede" name="stringParameter" caption="String Parameter"
-                        description="StringParameter description."/>
-                <integer required="false" defaultValue="10" name="intParameter" caption="Int Parameter"
-                         description="IntParameter description."/>
-                <boolean required="false" defaultValue="true" name="booleanParameter" caption="Boolean Parameter"
-                         description="BooleanParameter description."/>
-            </group>
-        </attribute-category>
-    </cloud-connector>
-    <cloud-connector localId="operation4" icon="icons/small/mymodule-connector-24x16.png"
-                     image="icons/large/mymodule-connector-48x32.png" abstract="true"
-                     extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
-                     caption="Operation4">
-        <attribute-category caption="General" description="General properties.">
-            <group caption="General" id="general" description="Operation4 method description.">
-                <string required="false" name="user" caption="User" description="The user name to use."/>
-                <string required="false" name="password" caption="Password" description="The password to use."/>
-                <string required="true" name="stringParameter" caption="String Parameter"
-                        description="StringParameter description."/>
-            </group>
-        </attribute-category>
-    </cloud-connector>
-    <cloud-connector localId="operation5" icon="icons/small/mymodule-connector-24x16.png"
-                     image="icons/large/mymodule-connector-48x32.png" abstract="true"
-                     extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
-                     caption="Operation5">
-        <attribute-category caption="General" description="General properties.">
-            <group caption="General" id="general" description="Operation5 method description.">
-                <childElement allowMultiple="false" inplace="true"
-                              name="http://www.mulesoft.org/schema/mule/mymodule/integers" caption="Integers"
-                              description="Represents the integers."/>
-                <childElement allowMultiple="false" inplace="true"
-                              name="http://www.mulesoft.org/schema/mule/mymodule/strings" caption="Strings"
-                              description="Represents the strings."/>
-                <childElement allowMultiple="false" inplace="true"
-                              name="http://www.mulesoft.org/schema/mule/mymodule/booleans" caption="Booleans"
-                              description="Represents the booleans."/>
-            </group>
-        </attribute-category>
-    </cloud-connector>
-    <cloud-connector localId="operation6" icon="icons/small/mymodule-connector-24x16.png"
-                     image="icons/large/mymodule-connector-48x32.png" abstract="true"
-                     extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
-                     caption="Operation6">
-        <attribute-category caption="General" description="General properties.">
-            <group caption="General" id="general" description="Operation6 method description.">
-                <childElement allowMultiple="false" inplace="true"
-                              name="http://www.mulesoft.org/schema/mule/mymodule/string-string-map"
-                              caption="String String Map" description="Represents the stringStringMap."/>
-                <childElement allowMultiple="false" inplace="true"
-                              name="http://www.mulesoft.org/schema/mule/mymodule/string-object-map"
-                              caption="String Object Map" description="Represents the stringObjectMap."/>
-            </group>
-        </attribute-category>
-    </cloud-connector>
-    <nested localId="integers" icon="icons/small/mymodule-connector-24x16.png"
-            image="icons/large/mymodule-connector-48x32.png" caption="Integers" description="Integers.">
-        <childElement allowMultiple="true" name="http://www.mulesoft.org/schema/mule/mymodule/integer"
-                      caption="Integers" description="Integers."/>
-    </nested>
-    <nested localId="integer" icon="icons/small/mymodule-connector-24x16.png"
-            image="icons/large/mymodule-connector-48x32.png" caption="Integers" description="Integers.">
-        <integer name="integer" caption="Integers" description="Represents the integers."/>
-    </nested>
-    <nested localId="strings" icon="icons/small/mymodule-connector-24x16.png"
-            image="icons/large/mymodule-connector-48x32.png" caption="Strings" description="Strings.">
-        <childElement allowMultiple="true" name="http://www.mulesoft.org/schema/mule/mymodule/string" caption="Strings"
-                      description="Strings."/>
-    </nested>
-    <nested localId="string" icon="icons/small/mymodule-connector-24x16.png"
-            image="icons/large/mymodule-connector-48x32.png" caption="Strings" description="Strings.">
-        <string name="string" caption="Strings" description="Represents the strings."/>
-    </nested>
-    <nested localId="booleans" icon="icons/small/mymodule-connector-24x16.png"
-            image="icons/large/mymodule-connector-48x32.png" caption="Booleans" description="Booleans.">
-        <childElement allowMultiple="true" name="http://www.mulesoft.org/schema/mule/mymodule/boolean"
-                      caption="Booleans" description="Booleans."/>
-    </nested>
-    <nested localId="boolean" icon="icons/small/mymodule-connector-24x16.png"
-            image="icons/large/mymodule-connector-48x32.png" caption="Booleans" description="Booleans.">
-        <string name="boolean" caption="Booleans" description="Represents the booleans."/>
-    </nested>
-    <nested localId="string-string-map" icon="icons/small/mymodule-connector-24x16.png"
-            image="icons/large/mymodule-connector-48x32.png" caption="String String Map"
-            description="String string map.">
-        <childElement allowMultiple="true" name="http://www.mulesoft.org/schema/mule/mymodule/string-string-map"
-                      caption="String String Map" description="String string map."/>
-    </nested>
-    <nested localId="string-string-map" icon="icons/small/mymodule-connector-24x16.png"
-            image="icons/large/mymodule-connector-48x32.png" caption="String String Map"
-            description="String string map.">
-        <string name="key" caption="Key" description="Key."/>
-        <text isToElement="true" name="value" caption="Value" description="Value."/>
-    </nested>
-    <nested localId="string-object-map" icon="icons/small/mymodule-connector-24x16.png"
-            image="icons/large/mymodule-connector-48x32.png" caption="String Object Map"
-            description="String object map.">
-        <childElement allowMultiple="true" name="http://www.mulesoft.org/schema/mule/mymodule/string-object-map"
-                      caption="String Object Map" description="String object map."/>
-    </nested>
-    <nested localId="string-object-map" icon="icons/small/mymodule-connector-24x16.png"
-            image="icons/large/mymodule-connector-48x32.png" caption="String Object Map"
-            description="String object map.">
-        <string name="key" caption="Key" description="Key."/>
-        <text isToElement="true" name="value" caption="Value" description="Value."/>
-    </nested>
-</namespace>
+<module xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core">
+    <namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" prefix="mymodule"
+               url="http://www.mulesoft.org/schema/mule/mymodule">
+        <global-cloud-connector image="icons/large/mymodule-connector-48x32.png"
+                                icon="icons/small/mymodule-connector-24x16.png" localId="config"
+                                extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
+                                caption="Mymodule" description="Global Mymodule configuration information.">
+            <attribute-category caption="Mymodule" description="Mymodule configuration properties.">
+                <group caption="Generic" id="mymoduleGenericProperties">
+                    <name required="false" name="name" caption="Name"
+                          description="Give a name to this configuration so it can be later referenced by config-ref."/>
+                    <string required="true" name="configurableString" caption="Configurable String"
+                            description="Configurable String."/>
+                    <string required="false" name="optionalConfigurableString" caption="Optional Configurable String"
+                            description="Configurable optional String."/>
+                    <string required="false" defaultValue="a default" name="optionalWithDefaultConfigurableString"
+                            caption="Optional With Default Configurable String"
+                            description="Configurable optional String with default value."/>
+                    <string required="false" name="user" caption="User" description="The user name to use."/>
+                    <string required="false" name="password" caption="Password" description="The password to use."/>
+                </group>
+            </attribute-category>
+        </global-cloud-connector>
+        <cloud-connector localId="mymodule-connector" icon="icons/small/mymodule-connector-24x16.png"
+                         image="icons/large/mymodule-connector-48x32.png"
+                         aliasId="org.mule.tooling.ui.modules.core.pattern.mymodule"
+                         extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
+                         caption="Mymodule" description="Mymodule Integration.">
+            <attribute-category caption="General" description="General properties.">
+                <group caption="Generic" id="mymoduleConnectorGeneric">
+                    <modeSwitch name="Mymodule operations to execute" caption="Operation" description="Operation.">
+                        <mode modeId="http://www.mulesoft.org/schema/mule/mymodule/operation1" modeLabel="Operation1"/>
+                        <mode modeId="http://www.mulesoft.org/schema/mule/mymodule/operation2" modeLabel="Operation2"/>
+                        <mode modeId="http://www.mulesoft.org/schema/mule/mymodule/operation3" modeLabel="Operation3"/>
+                        <mode modeId="http://www.mulesoft.org/schema/mule/mymodule/operation4" modeLabel="Operation4"/>
+                        <mode modeId="http://www.mulesoft.org/schema/mule/mymodule/operation5" modeLabel="Operation5"/>
+                        <mode modeId="http://www.mulesoft.org/schema/mule/mymodule/operation6" modeLabel="Operation6"/>
+                    </modeSwitch>
+                </group>
+            </attribute-category>
+        </cloud-connector>
+        <cloud-connector localId="abstractMymoduleConnectorGeneric" icon="icons/small/mymodule-connector-24x16.png"
+                         image="icons/large/mymodule-connector-48x32.png" abstract="true"
+                         caption="Abstractmymoduleconnectorgeneric" description="Interact with Mymodule.">
+            <attribute-category caption="General" description="General properties.">
+                <group caption="Generic" id="abstractMymoduleConnectorGeneric">
+                    <globalRef requiredType="http://www.mulesoft.org/schema/mule/mymodule/config" name="config-ref"
+                               caption="Config Reference"
+                               description="Specify which configuration to use for this invocation."/>
+                </group>
+            </attribute-category>
+        </cloud-connector>
+        <cloud-connector localId="operation1" icon="icons/small/mymodule-connector-24x16.png"
+                         image="icons/large/mymodule-connector-48x32.png" abstract="true"
+                         extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
+                         caption="Operation1">
+            <attribute-category caption="General" description="General properties.">
+                <group caption="General" id="general" description="Operation1 method description.">
+                    <string required="true" name="stringParameter" caption="String Parameter"
+                            description="StringParameter description."/>
+                    <integer required="true" name="intParameter" caption="Int Parameter"
+                             description="IntParameter description." min="0" step="1"/>
+                    <boolean required="true" name="booleanParameter" caption="Boolean Parameter"
+                             description="BooleanParameter description."/>
+                </group>
+            </attribute-category>
+        </cloud-connector>
+        <cloud-connector localId="operation2" icon="icons/small/mymodule-connector-24x16.png"
+                         image="icons/large/mymodule-connector-48x32.png" abstract="true"
+                         extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
+                         caption="Operation2">
+            <attribute-category caption="General" description="General properties.">
+                <group caption="General" id="general" description="Operation2 method description.">
+                    <string required="false" name="stringParameter" caption="String Parameter"
+                            description="StringParameter description."/>
+                    <integer required="false" name="intParameter" caption="Int Parameter"
+                             description="IntParameter description." min="0" step="1"/>
+                    <boolean required="false" name="booleanParameter" caption="Boolean Parameter"
+                             description="BooleanParameter description."/>
+                </group>
+            </attribute-category>
+        </cloud-connector>
+        <cloud-connector localId="operation3" icon="icons/small/mymodule-connector-24x16.png"
+                         image="icons/large/mymodule-connector-48x32.png" abstract="true"
+                         extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
+                         caption="Operation3">
+            <attribute-category caption="General" description="General properties.">
+                <group caption="General" id="general" description="Operation3 method description.">
+                    <string required="false" defaultValue="fede" name="stringParameter" caption="String Parameter"
+                            description="StringParameter description."/>
+                    <integer required="false" defaultValue="10" name="intParameter" caption="Int Parameter"
+                             description="IntParameter description." min="0" step="1"/>
+                    <boolean required="false" defaultValue="true" name="booleanParameter" caption="Boolean Parameter"
+                             description="BooleanParameter description."/>
+                </group>
+            </attribute-category>
+        </cloud-connector>
+        <cloud-connector localId="operation4" icon="icons/small/mymodule-connector-24x16.png"
+                         image="icons/large/mymodule-connector-48x32.png" abstract="true"
+                         extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
+                         caption="Operation4">
+            <attribute-category caption="General" description="General properties.">
+                <group caption="General" id="general" description="Operation4 method description.">
+                    <string required="false" name="user" caption="User" description="The user name to use."/>
+                    <string required="false" name="password" caption="Password" description="The password to use."/>
+                    <string required="true" name="stringParameter" caption="String Parameter"
+                            description="StringParameter description."/>
+                </group>
+            </attribute-category>
+        </cloud-connector>
+        <nested localId="integers" icon="icons/small/mymodule-connector-24x16.png"
+                image="icons/large/mymodule-connector-48x32.png" caption="Integers" description="Integers.">
+            <childElement allowMultiple="true" name="http://www.mulesoft.org/schema/mule/mymodule/integer"
+                          caption="Integers" description="Integers."/>
+        </nested>
+        <nested localId="integer" icon="icons/small/mymodule-connector-24x16.png"
+                image="icons/large/mymodule-connector-48x32.png" caption="Integers" description="Integers.">
+            <integer name="integer" caption="Integers" description="Represents the integers." min="0" step="1"/>
+        </nested>
+        <nested localId="strings" icon="icons/small/mymodule-connector-24x16.png"
+                image="icons/large/mymodule-connector-48x32.png" caption="Strings" description="Strings.">
+            <childElement allowMultiple="true" name="http://www.mulesoft.org/schema/mule/mymodule/string"
+                          caption="Strings"
+                          description="Strings."/>
+        </nested>
+        <nested localId="string" icon="icons/small/mymodule-connector-24x16.png"
+                image="icons/large/mymodule-connector-48x32.png" caption="Strings" description="Strings.">
+            <string name="string" caption="Strings" description="Represents the strings."/>
+        </nested>
+        <nested localId="booleans" icon="icons/small/mymodule-connector-24x16.png"
+                image="icons/large/mymodule-connector-48x32.png" caption="Booleans" description="Booleans.">
+            <childElement allowMultiple="true" name="http://www.mulesoft.org/schema/mule/mymodule/boolean"
+                          caption="Booleans" description="Booleans."/>
+        </nested>
+        <nested localId="boolean" icon="icons/small/mymodule-connector-24x16.png"
+                image="icons/large/mymodule-connector-48x32.png" caption="Booleans" description="Booleans.">
+            <boolean name="boolean" caption="Booleans" description="Represents the booleans."/>
+        </nested>
+        <cloud-connector localId="operation5" icon="icons/small/mymodule-connector-24x16.png"
+                         image="icons/large/mymodule-connector-48x32.png" abstract="true"
+                         extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
+                         caption="Operation5">
+            <attribute-category caption="General" description="General properties.">
+                <group caption="General" id="general" description="Operation5 method description.">
+                    <childElement allowMultiple="false" inplace="true"
+                                  name="http://www.mulesoft.org/schema/mule/mymodule/integers" caption="Integers"
+                                  description="Represents the integers."/>
+                    <childElement allowMultiple="false" inplace="true"
+                                  name="http://www.mulesoft.org/schema/mule/mymodule/strings" caption="Strings"
+                                  description="Represents the strings."/>
+                    <childElement allowMultiple="false" inplace="true"
+                                  name="http://www.mulesoft.org/schema/mule/mymodule/booleans" caption="Booleans"
+                                  description="Represents the booleans."/>
+                </group>
+            </attribute-category>
+        </cloud-connector>
+        <nested localId="string-string-map" icon="icons/small/mymodule-connector-24x16.png"
+                image="icons/large/mymodule-connector-48x32.png" caption="String String Map"
+                description="String string map.">
+            <childElement allowMultiple="true" name="http://www.mulesoft.org/schema/mule/mymodule/string-string-map"
+                          caption="String String Map" description="String string map."/>
+        </nested>
+        <nested localId="string-string-map" icon="icons/small/mymodule-connector-24x16.png"
+                image="icons/large/mymodule-connector-48x32.png" caption="String String Map"
+                description="String string map.">
+            <string name="key" caption="Key" description="Key."/>
+            <text isToElement="true" name="value" caption="Value" description="Value."/>
+        </nested>
+        <nested localId="string-object-map" icon="icons/small/mymodule-connector-24x16.png"
+                image="icons/large/mymodule-connector-48x32.png" caption="String Object Map"
+                description="String object map.">
+            <childElement allowMultiple="true" name="http://www.mulesoft.org/schema/mule/mymodule/string-object-map"
+                          caption="String Object Map" description="String object map."/>
+        </nested>
+        <nested localId="string-object-map" icon="icons/small/mymodule-connector-24x16.png"
+                image="icons/large/mymodule-connector-48x32.png" caption="String Object Map"
+                description="String object map.">
+            <string name="key" caption="Key" description="Key."/>
+            <text isToElement="true" name="value" caption="Value" description="Value."/>
+        </nested>
+        <cloud-connector localId="operation6" icon="icons/small/mymodule-connector-24x16.png"
+                         image="icons/large/mymodule-connector-48x32.png" abstract="true"
+                         extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
+                         caption="Operation6">
+            <attribute-category caption="General" description="General properties.">
+                <group caption="General" id="general" description="Operation6 method description.">
+                    <childElement allowMultiple="false" inplace="true"
+                                  name="http://www.mulesoft.org/schema/mule/mymodule/string-string-map"
+                                  caption="String String Map" description="Represents the stringStringMap."/>
+                    <childElement allowMultiple="false" inplace="true"
+                                  name="http://www.mulesoft.org/schema/mule/mymodule/string-object-map"
+                                  caption="String Object Map" description="Represents the stringObjectMap."/>
+                </group>
+            </attribute-category>
+        </cloud-connector>
+    </namespace>
+</module>

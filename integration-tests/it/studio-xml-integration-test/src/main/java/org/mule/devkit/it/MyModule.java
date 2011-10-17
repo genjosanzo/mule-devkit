@@ -100,7 +100,6 @@ public class MyModule {
      */
     @Processor
     public void operation4(@Session MySession sesion, String stringParameter) {
-
     }
 
     /**
@@ -112,7 +111,6 @@ public class MyModule {
      */
     @Processor
     public void operation5(List<Integer> integers, List<String> strings, List<Boolean> booleans) {
-
     }
 
     /**
@@ -123,7 +121,6 @@ public class MyModule {
      */
     @Processor
     public void operation6(Map<String, String> stringStringMap, Map<String, Object> stringObjectMap) {
-
     }
 
     /**
@@ -136,7 +133,6 @@ public class MyModule {
     @SessionCreate
     public MySession createSession(@SessionKey String user, String password) {
         return new MySession(user, password);
-
     }
 
     /**
@@ -144,7 +140,6 @@ public class MyModule {
      */
     @SessionDestroy
     public void destroySession(MySession session) {
-        // nothing to do here
     }
 
     public void setConfigurableString(String configurableString) {

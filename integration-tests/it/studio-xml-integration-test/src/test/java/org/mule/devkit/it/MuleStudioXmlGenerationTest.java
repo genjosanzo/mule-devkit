@@ -17,20 +17,27 @@
 
 package org.mule.devkit.it;
 
+import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLTestCase;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.mule.util.IOUtils;
 
-public class MyModuleTest extends XMLTestCase {
+public class MuleStudioXmlGenerationTest extends XMLTestCase {
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setIgnoreAttributeOrder(true);
+    }
 
     public void testGeneratedXmlIsAsExpected() throws Exception {
-        XMLUnit.setIgnoreWhitespace(true);
-        String expectedXml = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("META-INF/mymodule-studio.xml"));
-        String actualXml = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("expected-studio-xml.xml"));
+        String expectedXml = IOUtils.toString(MuleStudioXmlGenerationTest.class.getClassLoader().getResourceAsStream("expected-studio-xml.xml"));
+        String actualXml = IOUtils.toString(MuleStudioXmlGenerationTest.class.getClassLoader().getResourceAsStream("META-INF/mymodule-studio.xml"));
         Diff myDiff = new Diff(expectedXml, actualXml);
         myDiff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
-        assertTrue(myDiff.identical());
+        assertTrue(new DetailedDiff(myDiff).toString(), myDiff.similar());
     }
 }

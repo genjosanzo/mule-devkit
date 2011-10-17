@@ -17,7 +17,6 @@
 
 package org.mule.devkit;
 
-import com.thoughtworks.xstream.XStream;
 import org.mule.devkit.model.code.CodeModel;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.writer.FilerCodeWriter;
@@ -58,7 +57,7 @@ public class GeneratorContext {
         this.typeMirrorUtils = new TypeMirrorUtils(this.types);
         this.nameUtils = new NameUtils(this.elements);
         this.javaDocUtils = new JavaDocUtils(this.elements);
-        this.studioModel = new StudioModel(new FilerCodeWriter(filer), new XStream());
+        this.studioModel = new StudioModel(new FilerCodeWriter(filer));
         this.options = options;
     }
 

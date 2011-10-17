@@ -15,27 +15,36 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.model.studio;
+package org.mule.devkit.it;
 
-import com.thoughtworks.xstream.XStream;
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
-public class ChildElement extends Parameter {
+public class MuleStudioXmlGenerationIT extends AbstractMavenIT {
 
-    private String allowMultiple;
-    private String inplace;
-
-    public ChildElement(XStream xStream) {
-        super(xStream);
-        xStream.alias("childElement", ChildElement.class);
-        xStream.useAttributeFor(ChildElement.class, "allowMultiple");
-        xStream.useAttributeFor(ChildElement.class, "inplace");
+    @Override
+    protected String getArtifactVersion() {
+        return "1.0";
     }
 
-    public void setAllowMultiple(String allowMultiple) {
-        this.allowMultiple = allowMultiple;
+    @Override
+    protected String getArtifactId() {
+        return "studio-xml-integration-test";
     }
 
-    public void setInplace(String inplace) {
-        this.inplace = inplace;
+    @Override
+    protected String getGroupId() {
+        return "org.mule.devkit.it";
+    }
+
+    @Override
+    protected File getRoot() {
+        return new File("target/integration-tests/" + getArtifactId());
+    }
+
+    @Override
+    protected List<String> getCliOptions() {
+        return Arrays.asList("-Ddevkit.generate.studio.xml=true");
     }
 }
