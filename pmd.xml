@@ -10,4 +10,6 @@
 
     <rule ref="rulesets/imports.xml" />
 
+    <rule ref="rulesets/unusedcode.xml/UnusedLocalVariable"/>
+
 </ruleset>

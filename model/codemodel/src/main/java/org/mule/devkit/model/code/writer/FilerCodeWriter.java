@@ -21,7 +21,6 @@ import org.mule.devkit.model.code.CodeWriter;
 import org.mule.devkit.model.code.Package;
 
 import javax.annotation.processing.Filer;
-import javax.tools.JavaFileManager;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
@@ -36,28 +35,30 @@ public final class FilerCodeWriter extends CodeWriter {
         this.filer = filer;
     }
 
+    @Override
     public OutputStream openBinary(Package pkg, String fileName) throws IOException {
-        JavaFileManager.Location loc;
-
-        if (pkg != null)
+        if (pkg != null) {
             return filer.createResource(SOURCE_OUTPUT, pkg.name(), fileName).openOutputStream();
-        else
+        } else {
             return filer.createResource(SOURCE_OUTPUT, "", fileName).openOutputStream();
+        }
     }
 
+    @Override
     public Writer openSource(org.mule.devkit.model.code.Package pkg, String fileName) throws IOException {
         String name;
-        if (pkg.isUnnamed())
+        if (pkg.isUnnamed()) {
             name = fileName;
-        else
+        } else {
             name = pkg.name() + '.' + fileName;
+        }
 
         name = name.substring(0, name.length() - 5);   // strip ".java"
 
         return filer.createSourceFile(name).openWriter();
     }
 
+    @Override
     public void close() {
-        ; // noop
     }
 }

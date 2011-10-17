@@ -250,21 +250,21 @@ public class SessionManagerAdapterGenerator extends AbstractMessageGenerator {
     private void generateActivateObjectMethod(DefinedClass sessionAdapterObjectFactory) {
         Method activateObject = sessionAdapterObjectFactory.method(Modifier.PUBLIC, context.getCodeModel().VOID, "activateObject");
         activateObject._throws(ref(Exception.class));
-        Variable key = activateObject.param(Object.class, "key");
-        Variable obj = activateObject.param(Object.class, "obj");
+        activateObject.param(Object.class, "key");
+        activateObject.param(Object.class, "obj");
     }
 
     private void generatePassivateObjectMethod(DefinedClass sessionAdapterObjectFactory) {
         Method passivateObject = sessionAdapterObjectFactory.method(Modifier.PUBLIC, context.getCodeModel().VOID, "passivateObject");
         passivateObject._throws(ref(Exception.class));
-        Variable key = passivateObject.param(Object.class, "key");
-        Variable obj = passivateObject.param(Object.class, "obj");
+        passivateObject.param(Object.class, "key");
+        passivateObject.param(Object.class, "obj");
     }
 
     private void generateValidateObjectMethod(DefinedClass sessionAdapterObjectFactory) {
         Method validateObject = sessionAdapterObjectFactory.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "validateObject");
-        Variable key = validateObject.param(Object.class, "key");
-        Variable obj = validateObject.param(Object.class, "obj");
+        validateObject.param(Object.class, "key");
+        validateObject.param(Object.class, "obj");
 
         validateObject.body()._return(ExpressionFactory.TRUE);
     }

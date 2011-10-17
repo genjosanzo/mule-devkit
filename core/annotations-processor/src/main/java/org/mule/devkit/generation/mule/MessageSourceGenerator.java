@@ -201,7 +201,6 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
                         ExpressionFactory._null()));
 
                 Type type = ref(sessionFields.get(fieldName).getVariableElement().asType()).boxify();
-                String name = "transformed" + StringUtils.capitalize(fieldName);
 
                 Variable transformed = (Variable) sessionParameters.get(fieldName);
 
@@ -358,7 +357,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         );
         ifResponse._then()._return(responseEvent.invoke("getMessage").invoke("getPayload"));
 
-        CatchBlock muleExceptionBlock = tryBlock._catch(ref(MuleException.class));
+        tryBlock._catch(ref(MuleException.class));
         process.body()._return(ExpressionFactory._null());
     }
 
@@ -402,7 +401,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         );
         ifResponse._then()._return(responseEvent.invoke("getMessage").invoke("getPayload"));
 
-        CatchBlock muleExceptionBlock = tryBlock._catch(ref(MuleException.class));
+        tryBlock._catch(ref(MuleException.class));
         process.body()._return(ExpressionFactory._null());
     }
 

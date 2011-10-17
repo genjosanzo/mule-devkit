@@ -95,7 +95,7 @@ public class Comment {
           String str = m.group(1);
           String tagname = m.group(2);
           String tagvalue = m.group(3);
-          tag(null, m.group(1), true, pos);
+          tag(null, str, true, pos);
           tag(tagname, tagvalue, true, pos);
           start = m.end();
         }

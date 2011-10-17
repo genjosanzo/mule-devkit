@@ -58,15 +58,12 @@ public class DocFile {
 
     public static String getProperty(String docfile, String property) {
         String filedata = readFile(docfile);
-        int start = -1;
-        int lineno = 1;
         Matcher lines = LINE.matcher(filedata);
         String line = null;
         while (lines.find()) {
             line = lines.group(1);
             if (line.length() > 0) {
                 if (line.equals("@jd:body")) {
-                    start = lines.end();
                     break;
                 }
                 Matcher prop = PROP.matcher(line);
@@ -80,7 +77,6 @@ public class DocFile {
                     break;
                 }
             }
-            lineno++;
         }
 
         return null;

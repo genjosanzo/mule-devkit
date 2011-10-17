@@ -135,7 +135,7 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
         Method doTransform = jaxbTransformerClass.method(Modifier.PROTECTED, ref(Object.class), "doTransform");
         doTransform._throws(TransformerException.class);
         Variable src = doTransform.param(ref(Object.class), "src");
-        Variable encoding = doTransform.param(ref(String.class), "encoding");
+        doTransform.param(ref(String.class), "encoding");
 
         Variable result = doTransform.body().decl(ref(variableElement.asType()).boxify(), "result", ExpressionFactory._null());
 

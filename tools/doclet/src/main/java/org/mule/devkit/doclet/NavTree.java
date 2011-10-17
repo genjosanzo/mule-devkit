@@ -98,7 +98,7 @@ public class NavTree {
             buf.append(c);
           } else {
             buf.append("\\u");
-            for (int j = 0; i < 4; i++) {
+            for (; i < 4; i++) {
               char x = (char) (c & 0x000f);
               if (x > 10) {
                 x = (char) (x - 10 + 'a');

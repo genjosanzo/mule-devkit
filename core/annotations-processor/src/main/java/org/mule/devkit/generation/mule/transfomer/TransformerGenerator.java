@@ -124,7 +124,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         Method doTransform = transformerClass.method(Modifier.PROTECTED, ref(Object.class), "doTransform");
         doTransform._throws(TransformerException.class);
         Variable src = doTransform.param(ref(Object.class), "src");
-        Variable encoding = doTransform.param(ref(String.class), "encoding");
+        doTransform.param(ref(String.class), "encoding");
 
         Variable poolObject = null;
         if (poolObjectClass != null) {

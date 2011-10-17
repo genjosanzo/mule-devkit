@@ -59,7 +59,7 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
         FieldVariable remotePort = remotePortFieldWithGetterAndSetter(httpCallbackAdapter);
         FieldVariable domain = domainFieldWithGetterAndSetter(httpCallbackAdapter);
         FieldVariable logger = FieldBuilder.newLoggerField(httpCallbackAdapter);
-        FieldVariable async = asyncFieldWithGetterAndSetter(httpCallbackAdapter);
+        asyncFieldWithGetterAndSetter(httpCallbackAdapter);
         generateInitialiseMethod(httpCallbackAdapter, localPort, remotePort, domain, logger);
     }
 

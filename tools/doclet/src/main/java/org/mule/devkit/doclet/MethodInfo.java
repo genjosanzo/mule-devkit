@@ -218,7 +218,6 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
     }
 
     public boolean isDeprecated() {
-        boolean deprecated = false;
         if (!mDeprecatedKnown) {
             boolean commentDeprecated = comment().isDeprecated();
             boolean annotationDeprecated = false;
@@ -633,8 +632,6 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
                 String qualifiedName = myType.qualifiedTypeName();
                 String realType = myType.isPrimitive() ? "" : myType.asClassInfo().qualifiedName();
                 String s = params[i];
-                int slen = s.length();
-                int qnlen = qualifiedName.length();
 
                 // Check for a matching generic name or best known type
                 if (!matchesType(qualifiedName, s) && !matchesType(realType, s)) {

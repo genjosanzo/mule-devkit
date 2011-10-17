@@ -103,7 +103,7 @@ public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
     }
 
     private void generateDisposeMethod(DefinedClass lifecycleAdapterFactory) {
-        Method dispose = lifecycleAdapterFactory.method(Modifier.PUBLIC, context.getCodeModel().VOID, "dispose");
+        lifecycleAdapterFactory.method(Modifier.PUBLIC, context.getCodeModel().VOID, "dispose");
     }
 
     private void generateInitialiseMethod(DefinedClass lifecycleAdapterFactory) {

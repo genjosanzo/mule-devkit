@@ -162,7 +162,6 @@ public class LinkReference {
         final int TYPE = 1;
         final int NAME = 2;
         int dimension = 0;
-        int arraypair = 0;
         int state = START;
         int typestart = 0;
         int typeend = -1;
@@ -188,9 +187,7 @@ public class LinkReference {
                   typeend = i;
                 }
                 dimension++;
-                arraypair++;
               } else if (c == ']') {
-                arraypair--;
               } else if (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
                 if (typeend < 0) {
                   typeend = i;

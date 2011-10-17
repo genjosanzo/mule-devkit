@@ -119,7 +119,6 @@ public class Doclava {
 
     public static boolean checkLevel(boolean pub, boolean prot, boolean pkgp, boolean priv,
                                      boolean hidden) {
-        int level = 0;
         if (hidden && !checkLevel(SHOW_HIDDEN)) {
             return false;
         }
@@ -148,7 +147,6 @@ public class Doclava {
         String todoFile = null;
         String stubsDir = null;
         // Create the dependency graph for the stubs directory
-        boolean offlineMode = false;
         String apiFile = null;
         HashSet<String> stubPackages = null;
         ArrayList<String> knownTagsFiles = new ArrayList<String>();
@@ -219,8 +217,6 @@ public class Doclava {
                 parseComments = true;
             } else if (a[0].equals("-since")) {
                 sinceTagger.addVersion(a[1], a[2]);
-            } else if (a[0].equals("-offlinemode")) {
-                offlineMode = true;
             } else if (a[0].equals("-federate")) {
                 try {
                     String name = a[1];

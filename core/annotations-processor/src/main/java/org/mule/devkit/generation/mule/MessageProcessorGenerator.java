@@ -635,7 +635,6 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                         ExpressionFactory._null()));
 
                 Type type = ref(sessionFields.get(fieldName).getVariableElement().asType()).boxify();
-                String name = "transformed" + StringUtils.capitalize(fieldName);
 
                 Variable transformed = (Variable) sessionParameters.get(fieldName);
 

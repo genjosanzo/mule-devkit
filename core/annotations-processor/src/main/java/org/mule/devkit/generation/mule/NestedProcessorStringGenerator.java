@@ -66,26 +66,22 @@ public class NestedProcessorStringGenerator extends AbstractModuleGenerator {
     private void generateCallbackProcessWithPayload(DefinedClass callbackClass, FieldVariable output) {
         Method process = callbackClass.method(Modifier.PUBLIC, ref(Object.class), "process");
         process._throws(ref(Exception.class));
-        Variable payload = process.param(ref(Object.class), "payload");
-
+        process.param(ref(Object.class), "payload");
         process.body()._return(output);
     }
 
     private void generateCallbackProcessWithPayloadAndProperties(DefinedClass callbackClass, FieldVariable output) {
         Method process = callbackClass.method(Modifier.PUBLIC, ref(Object.class), "process");
         process._throws(ref(Exception.class));
-        Variable payload = process.param(ref(Object.class), "payload");
-        Variable properties = process.param(ref(Map.class).narrow(ref(String.class)).narrow(ref(Object.class)), "properties");
-
-
+        process.param(ref(Object.class), "payload");
+        process.param(ref(Map.class).narrow(ref(String.class)).narrow(ref(Object.class)), "properties");
         process.body()._return(output);
     }
 
     private void generateCallbackProcessWithProperties(DefinedClass callbackClass, FieldVariable output) {
         Method process = callbackClass.method(Modifier.PUBLIC, ref(Object.class), "processWithExtraProperties");
         process._throws(ref(Exception.class));
-        Variable properties = process.param(ref(Map.class).narrow(ref(String.class)).narrow(ref(Object.class)), "properties");
-
+        process.param(ref(Map.class).narrow(ref(String.class)).narrow(ref(Object.class)), "properties");
         process.body()._return(output);
     }
 
