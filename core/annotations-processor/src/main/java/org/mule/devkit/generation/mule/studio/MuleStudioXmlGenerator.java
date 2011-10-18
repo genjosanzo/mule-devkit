@@ -356,7 +356,9 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
                 setAttributeTypeInfo(executableElement, parameters, variableElement, parameter, parameterName);
             }
         }
-        addConnectionAttributeTypes(typeElement, parameters);
+        if(typeElement.usesConnectionManager()) {
+            addConnectionAttributeTypes(typeElement, parameters);
+        }
         return parameters;
     }
 
