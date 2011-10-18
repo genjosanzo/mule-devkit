@@ -76,6 +76,10 @@ public class BasicValidator implements Validator {
             if (variable.asType().getKind().isPrimitive() && optional != null && (def == null || def.value().length() == 0)) {
                 throw new ValidationException(variable, "@Optional @Configurable fields can only be applied to non-primitive types with a @Default value");
             }
+
+            if( def != null && optional == null) {
+                throw new ValidationException(variable, "@Default @Configurable fields must also include @Optional, otherwise the @Default will never take place.");
+            }
         }
     }
 }

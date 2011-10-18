@@ -23,17 +23,17 @@ import org.mule.api.Capability;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SessionModuleTest extends AbstractModuleTest {
+public class ConnectorModuleTest extends AbstractModuleTest {
 
     @Override
     protected String getConfigResources() {
-        return "session.xml";
+        return "connector.xml";
     }
 
     public void testEnsureCapability() throws Exception {
         Capabilities capabilities = (Capabilities)muleContext.getRegistry().lookupObject("configA");
 
-        assertTrue(capabilities.isCapableOf(Capability.SESSION_MANAGEMENT_CAPABLE));
+        assertTrue(capabilities.isCapableOf(Capability.CONNECTION_MANAGEMENT_CAPABLE));
     }
 
     public void testVerifySessionWithPassword() throws Exception {

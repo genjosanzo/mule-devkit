@@ -21,7 +21,6 @@ import org.apache.commons.lang.StringUtils;
 import org.mule.api.Capabilities;
 import org.mule.api.MuleException;
 import org.mule.api.annotations.Configurable;
-import org.mule.api.annotations.Module;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Startable;
@@ -49,8 +48,7 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        Module module = typeElement.getAnnotation(Module.class);
-        return module.poolable();
+        return typeElement.isPoolable();
     }
 
     @Override

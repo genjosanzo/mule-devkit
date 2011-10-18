@@ -20,7 +20,6 @@ package org.mule.devkit.generation;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleContext;
 import org.mule.api.NestedProcessor;
-import org.mule.api.annotations.param.Session;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
 import org.mule.api.construct.FlowConstruct;
@@ -179,10 +178,6 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         Map<String, AbstractMessageGenerator.FieldVariableElement> fields = new HashMap<String, FieldVariableElement>();
         for (VariableElement variable : processorMethod.getParameters()) {
             if (variable.asType().toString().contains(SourceCallback.class.getName())) {
-                continue;
-            }
-
-            if (variable.getAnnotation(Session.class) != null) {
                 continue;
             }
 

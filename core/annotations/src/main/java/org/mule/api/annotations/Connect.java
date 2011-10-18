@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mule.api.annotations.session;
+package org.mule.api.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -23,12 +23,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation marks a method inside a {@link org.mule.api.annotations.Module} as the responsible for creating
- * a session. It will be called by the module's session manager.
+ * This annotation marks a method inside a {@link org.mule.api.annotations.Connector} as the responsible for creating
+ * a connection. It will be called by the connector's connection manager.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface SessionCreate {
+public @interface Connect {
 
 }

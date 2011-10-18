@@ -282,7 +282,7 @@ def:op_description(obj) ?><?cs
           <?cs set:count = #2 ?>
           <?cs each:attribute=obj.paramTags ?>
             <?cs if:attribute.isSession=="1" ?>
-                <?cs each:attribute=obj.sessionTags ?>
+                <?cs each:attribute=obj.connectionTags ?>
                     <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
                         <td class="jd-linkcol"><nobr><?cs var:attribute.attributeName ?></nobr></td>
                         <td class="jd-descrcol"><?cs var:attribute.defaultValue ?></td>

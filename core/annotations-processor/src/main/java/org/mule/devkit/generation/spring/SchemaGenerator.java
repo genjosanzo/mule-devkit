@@ -25,7 +25,6 @@ import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
-import org.mule.api.annotations.param.Session;
 import org.mule.api.callback.HttpCallback;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
@@ -357,17 +356,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                     } else {
                         generateNestedProcessorElement(all, variable);
                     }
-                } else if (variable.getAnnotation(Session.class) != null) {
-                    // get the executable element for create session
-                    ExecutableElement sessionCreate = createSessionForMethod(element);
-                    // add a configurable argument for each session variable
-                    for (VariableElement sessionVariable : sessionCreate.getParameters()) {
-                        if (context.getTypeMirrorUtils().isCollection(sessionVariable.asType())) {
-                            generateCollectionElement(schema, targetNamespace, all, sessionVariable, true);
-                        } else {
-                            complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(schema, sessionVariable, true));
-                        }
-                    }
                 } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
                     all.getParticle().add(objectFactory.createElement(generateXmlElement(variable.getSimpleName().toString(), targetNamespace)));
                 } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
@@ -376,11 +364,21 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                     complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(schema, variable));
                 }
             }
+
+            ExecutableElement connectExecutableElement = connectForMethod(element);
+            if( connectExecutableElement != null ) {
+                for (VariableElement connectVariable : connectExecutableElement.getParameters()) {
+                    if (context.getTypeMirrorUtils().isCollection(connectVariable.asType())) {
+                        generateCollectionElement(schema, targetNamespace, all, connectVariable, true);
+                    } else {
+                        complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(schema, connectVariable, true));
+                    }
+                }
+            }
         }
 
         if (all.getParticle().size() == 0) {
             complexContentExtension.setSequence(null);
-            //complexContent.setMixed(false);
         }
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
@@ -672,27 +670,27 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             }
         }
 
-        // get the executable typeElement for create session
-        ExecutableElement sessionCreate = createSessionForClass(typeElement);
+        // get the executable typeElement for create connectivity
+        ExecutableElement connectMethod = connectForClass(typeElement);
 
-        if (sessionCreate != null) {
-            // add a configurable argument for each session variable
-            for (VariableElement sessionVariable : sessionCreate.getParameters()) {
-                if (context.getTypeMirrorUtils().isCollection(sessionVariable.asType())) {
-                    generateCollectionElement(schema, targetNamespace, all, sessionVariable, true);
+        if (connectMethod != null) {
+            // add a configurable argument for each connectivity variable
+            for (VariableElement connectVariable : connectMethod.getParameters()) {
+                if (context.getTypeMirrorUtils().isCollection(connectVariable.asType())) {
+                    generateCollectionElement(schema, targetNamespace, all, connectVariable, true);
                 } else {
-                    config.getAttributeOrAttributeGroup().add(createParameterAttribute(schema, sessionVariable, true));
+                    config.getAttributeOrAttributeGroup().add(createParameterAttribute(schema, connectVariable, true));
                 }
             }
 
             TopLevelElement poolingProfile = new TopLevelElement();
-            poolingProfile.setName("session-pooling-profile");
+            poolingProfile.setName("connection-pooling-profile");
             poolingProfile.setType(SchemaConstants.MULE_POOLING_PROFILE_TYPE);
             poolingProfile.setMinOccurs(BigInteger.valueOf(0L));
 
             Annotation annotation = new Annotation();
             Documentation doc = new Documentation();
-            doc.getContent().add("Characteristics of the session pool.");
+            doc.getContent().add("Characteristics of the connection pool.");
             annotation.getAppinfoOrDocumentation().add(doc);
 
             poolingProfile.setAnnotation(annotation);

@@ -174,9 +174,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
-        ExecutableElement sessionCreate = createSessionForClass(typeElement);
-        if (sessionCreate != null) {
-            for (VariableElement variable : sessionCreate.getParameters()) {
+        ExecutableElement connect = connectForClass(typeElement);
+        if (connect != null) {
+            for (VariableElement variable : connect.getParameters()) {
                 String fieldName = variable.getSimpleName().toString();
 
                 if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
@@ -221,8 +221,8 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.ASYNC_FIELD_NAME);
         }
 
-        if (sessionCreate != null) {
-            generateParsePoolingProfile("session-pooling-profile", "sessionPoolingProfile", parse, element, builder);
+        if (connect != null) {
+            generateParsePoolingProfile("connection-pooling-profile", "connectionPoolingProfile", parse, element, builder);
         }
 
         if (typeElement.isPoolable()) {
@@ -426,9 +426,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
-        ExecutableElement sessionCreate = createSessionForMethod(executableElement);
-        if (sessionCreate != null) {
-            for (VariableElement variable : sessionCreate.getParameters()) {
+        ExecutableElement connectMethod = connectForMethod(executableElement);
+        if (connectMethod != null) {
+            for (VariableElement variable : connectMethod.getParameters()) {
                 String fieldName = variable.getSimpleName().toString();
 
                 if (SchemaTypeConversion.isSupported(variable.asType().toString())) {

@@ -23,7 +23,6 @@ import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
-import org.mule.api.annotations.param.Session;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
@@ -93,10 +92,6 @@ public class DSLWrapperGenerator extends AbstractModuleGenerator {
 
     private void handleParameters(final List<? extends VariableElement> parameters, final DefinedClass _interface, final DefinedClass _builder, final List<Parameter> mandatoryParams, final List<FieldVariable> fields) {
         for (final VariableElement param : parameters) {
-
-            if (param.getAnnotation(Session.class) != null) {
-                continue;
-            }
 
             final String paramName = param.getSimpleName().toString();
             final FieldVariable field = _builder.field(Modifier.PRIVATE, Object.class, paramName);

@@ -14,21 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.mule.api.annotations.param;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package org.mule.api;
 
 /**
- * Marks a parameter inside {@link org.mule.api.annotations.session.SessionCreate} as
- * the key for the session lookup.
+ * List of possible outcomes to a connection failure
  */
-@Target(value = {ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface SessionKey {
+public enum ConnectionExceptionCode {
+    /**
+     * The host cannot be resolved to an IP address
+     */
+    UNKNOWN_HOST,
+    /**
+     * The destination cannot be reached. Either the host is wrong
+     * or the port might be.
+     */
+    CANNOT_REACH,
+    /**
+     * The supplied credentials are not correct.
+     */
+    INCORRECT_CREDENTIALS,
+    /**
+     * The credentials used to authenticate has expired.
+     */
+    CREDENTIALS_EXPIRED,
+    /**
+     * Something else went wrong.
+     */
+    UNKNOWN;
 }

@@ -21,13 +21,14 @@ import org.apache.commons.lang.StringUtils;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.annotations.Source;
-import org.mule.api.annotations.param.Session;
 import org.mule.api.callback.SourceCallback;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.spring.SchemaTypeConversion;
@@ -45,6 +46,7 @@ import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Type;
+import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.session.DefaultMuleSession;
 
@@ -95,11 +97,11 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         // add a field for each argument of the method
         Map<String, FieldVariableElement> fields = generateProcessorFieldForEachParameter(messageSourceClass, executableElement);
 
-        // add fields for session if required
-        ExecutableElement sessionCreate = createSessionForClass(typeElement);
-        Map<String, AbstractMessageGenerator.FieldVariableElement> sessionFields = null;
-        if (sessionCreate != null) {
-            sessionFields = generateProcessorFieldForEachParameter(messageSourceClass, sessionCreate);
+        // add fields for connectivity if required
+        ExecutableElement connectMethod = connectForClass(typeElement);
+        Map<String, AbstractMessageGenerator.FieldVariableElement> connectFields = null;
+        if (connectMethod != null) {
+            connectFields = generateProcessorFieldForEachParameter(messageSourceClass, connectMethod);
         }
 
         // add standard fields
@@ -130,10 +132,10 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
             generateSetter(messageSourceClass, fields.get(fieldName).getField());
         }
 
-        // generate setters for session fields
-        if (sessionFields != null) {
-            for (String fieldName : sessionFields.keySet()) {
-                generateSetter(messageSourceClass, sessionFields.get(fieldName).getField());
+        // generate setters for connectivity fields
+        if (connectFields != null) {
+            for (String fieldName : connectFields.keySet()) {
+                generateSetter(messageSourceClass, connectFields.get(fieldName).getField());
             }
         }
 
@@ -152,19 +154,19 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
             DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey(typeElement));
 
             // add run method
-            generateRunMethod(messageSourceClass, executableElement, fields, sessionFields, object, muleContext, poolObjectClass, logger);
+            generateRunMethod(messageSourceClass, executableElement, fields, connectFields, object, muleContext, poolObjectClass, logger);
         } else {
             // add run method
-            generateRunMethod(messageSourceClass, executableElement, fields, sessionFields, object, muleContext, logger);
+            generateRunMethod(messageSourceClass, executableElement, fields, connectFields, object, muleContext, logger);
         }
     }
 
-    private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> sessionFields, FieldVariable object, FieldVariable muleContext, FieldVariable logger) {
-        generateRunMethod(messageSourceClass, executableElement, fields, sessionFields, object, muleContext, null, logger);
+    private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectFields, FieldVariable object, FieldVariable muleContext, FieldVariable logger) {
+        generateRunMethod(messageSourceClass, executableElement, fields, connectFields, object, muleContext, null, logger);
     }
 
 
-    private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> sessionFields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass, FieldVariable logger) {
+    private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectFields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass, FieldVariable logger) {
         Method run = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "run");
         run.javadoc().add("Implementation {@link Runnable#run()} that will invoke the method on the pojo that this message source wraps.");
 
@@ -173,38 +175,39 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
             poolObject = run.body().decl(poolObjectClass, "poolObject", ExpressionFactory._null());
         }
 
-        // add session field declarations
-        Map<String, Expression> sessionParameters = new HashMap<String, Expression>();
-        ExecutableElement createSession = createSessionForMethod(executableElement);
-        Variable session = null;
-        if (createSession != null) {
-            session = run.body().decl(ref(createSession.getReturnType()), "session", ExpressionFactory._null());
+        // add connection field declarations
+        Map<String, Expression> connectionParameters = new HashMap<String, Expression>();
+        ExecutableElement connectMethod = connectForMethod(executableElement);
+        Variable connection = null;
+        if (connectMethod != null) {
+            DefinedClass connectionClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey((TypeElement) connectMethod.getEnclosingElement()));
+            connection = run.body().decl(connectionClass, "connection", ExpressionFactory._null());
 
-            for (VariableElement variable : createSession.getParameters()) {
+            for (VariableElement variable : connectMethod.getParameters()) {
                 String fieldName = variable.getSimpleName().toString();
 
-                Type type = ref(sessionFields.get(fieldName).getVariableElement().asType()).boxify();
+                Type type = ref(connectFields.get(fieldName).getVariableElement().asType()).boxify();
                 String name = "transformed" + StringUtils.capitalize(fieldName);
 
                 Variable transformed = run.body().decl(type, name, ExpressionFactory._null());
-                sessionParameters.put(fieldName, transformed);
+                connectionParameters.put(fieldName, transformed);
             }
         }
 
         TryStatement callSource = run.body()._try();
 
-        if (createSession != null) {
-            for (VariableElement variable : createSession.getParameters()) {
+        if (connectMethod != null) {
+            for (VariableElement variable : connectMethod.getParameters()) {
                 String fieldName = variable.getSimpleName().toString();
 
-                Conditional ifNotNull = callSource.body()._if(Op.ne(sessionFields.get(fieldName).getField(),
+                Conditional ifNotNull = callSource.body()._if(Op.ne(connectFields.get(fieldName).getField(),
                         ExpressionFactory._null()));
 
-                Type type = ref(sessionFields.get(fieldName).getVariableElement().asType()).boxify();
+                Type type = ref(connectFields.get(fieldName).getVariableElement().asType()).boxify();
 
-                Variable transformed = (Variable) sessionParameters.get(fieldName);
+                Variable transformed = (Variable) connectionParameters.get(fieldName);
 
-                Cast cast = ExpressionFactory.cast(type, sessionFields.get(fieldName).getField());
+                Cast cast = ExpressionFactory.cast(type, connectFields.get(fieldName).getField());
 
                 ifNotNull._then().assign(transformed, cast);
 
@@ -221,22 +224,6 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         for (VariableElement variable : executableElement.getParameters()) {
             if (variable.asType().toString().contains(SourceCallback.class.getName())) {
                 parameters.add(ExpressionFactory._this());
-            } else if (variable.getAnnotation(Session.class) != null) {
-                if (createSession != null) {
-                    DefinedClass sessionKey = context.getClassForRole(context.getNameUtils().generateSessionKeyRoleKey((TypeElement) executableElement.getEnclosingElement()));
-                    Invocation newKey = ExpressionFactory._new(sessionKey);
-                    for (String field : sessionParameters.keySet()) {
-                        newKey.arg(sessionParameters.get(field));
-                    }
-
-                    Invocation createSessionInvoke = object.invoke("borrowSession");
-                    createSessionInvoke.arg(newKey);
-                    callSource.body().assign(session, createSessionInvoke);
-
-                    parameters.add(session);
-                } else {
-                    parameters.add(ExpressionFactory._null());
-                }
             } else {
                 String fieldName = variable.getSimpleName().toString();
                 if (SchemaTypeConversion.isSupported(fields.get(fieldName).getVariableElement().asType().toString()) ||
@@ -253,10 +240,35 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
             }
         }
 
+
         Invocation methodCall;
         if (poolObject != null) {
             callSource.body().assign(poolObject, ExpressionFactory.cast(poolObject.type(), object.invoke("getLifecyleEnabledObjectPool").invoke("borrowObject")));
             methodCall = poolObject.invoke(methodName);
+        } else if (connectMethod != null) {
+            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionKeyRoleKey((TypeElement) executableElement.getEnclosingElement()));
+
+            Invocation newKey = ExpressionFactory._new(connectionKey);
+            Invocation createConnection = object.invoke("acquireConnection");
+            for (String field : connectionParameters.keySet()) {
+                newKey.arg(connectionParameters.get(field));
+            }
+            createConnection.arg(newKey);
+            callSource.body().assign(connection, createConnection);
+
+            Conditional ifConnectionIsNull = callSource.body()._if(Op.eq(connection, ExpressionFactory._null()));
+            TypeReference coreMessages = ref(CoreMessages.class);
+            Invocation failedToInvoke = coreMessages.staticInvoke("failedToCreate");
+            if (methodName != null) {
+                failedToInvoke.arg(ExpressionFactory.lit(methodName));
+            }
+            Invocation messageException = ExpressionFactory._new(ref(MessagingException.class));
+            messageException.arg(failedToInvoke);
+            messageException.arg(ExpressionFactory.cast(ref(MuleEvent.class), ExpressionFactory._null()));
+            messageException.arg(ExpressionFactory._new(ref(RuntimeException.class)).arg("Cannot create connection"));
+            ifConnectionIsNull._then()._throw(messageException);
+
+            methodCall = connection.invoke(methodName);
         } else {
             methodCall = object.invoke(methodName);
         }
@@ -277,23 +289,23 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
             poolObjectNotNull.add(object.invoke("getLifecyleEnabledObjectPool").invoke("returnObject").arg(poolObject));
         }
 
-        if (createSession != null) {
+        if (connectMethod != null) {
             Block fin = callSource._finally();
-            Block sessionNotNull = fin._if(Op.ne(session, ExpressionFactory._null()))._then();
+            Block connectionNotNull = fin._if(Op.ne(connection, ExpressionFactory._null()))._then();
 
-            TryStatement tryToReleaseSession = sessionNotNull._try();
+            TryStatement tryToReleaseSession = connectionNotNull._try();
 
-            DefinedClass sessionKey = context.getClassForRole(context.getNameUtils().generateSessionKeyRoleKey((TypeElement) executableElement.getEnclosingElement()));
-            Invocation newKey = ExpressionFactory._new(sessionKey);
-            for (String field : sessionParameters.keySet()) {
-                newKey.arg(sessionParameters.get(field));
+            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionKeyRoleKey((TypeElement) executableElement.getEnclosingElement()));
+            Invocation newKey = ExpressionFactory._new(connectionKey);
+            for (String field : connectionParameters.keySet()) {
+                newKey.arg(connectionParameters.get(field));
             }
 
-            Invocation releaseSession = object.invoke("returnSession");
-            releaseSession.arg(newKey);
-            releaseSession.arg(session);
+            Invocation returnConnection = object.invoke("releaseConnection");
+            returnConnection.arg(newKey);
+            returnConnection.arg(connection);
 
-            tryToReleaseSession.body().add(releaseSession);
+            tryToReleaseSession.body().add(returnConnection);
 
             tryToReleaseSession._catch(ref(Exception.class));
         }
