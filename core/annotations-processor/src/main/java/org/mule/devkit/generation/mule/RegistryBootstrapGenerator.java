@@ -21,6 +21,7 @@ import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.util.IOUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -28,26 +29,29 @@ import java.io.OutputStreamWriter;
 
 public class RegistryBootstrapGenerator extends AbstractModuleGenerator {
 
+    private boolean executed;
+
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return true;
+        return !executed;
     }
 
     @Override
     protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
+        OutputStreamWriter registryBootstrapStreamOut = null;
         try {
             OutputStream registryBootstrapStream = context.getCodeModel().getCodeWriter().openBinary(null, "META-INF/services/org/mule/config/registry-bootstrap.properties");
-            OutputStreamWriter registryBootstrapStreamOut = new OutputStreamWriter(registryBootstrapStream, "UTF-8");
-
+            registryBootstrapStreamOut = new OutputStreamWriter(registryBootstrapStream, "UTF-8");
             for (DefinedClass clazz : context.getRegisterAtBoot()) {
                 registryBootstrapStreamOut.write(clazz.name() + "=" + clazz.fullName() + "\n");
 
             }
-
             registryBootstrapStreamOut.flush();
-            registryBootstrapStreamOut.close();
+            executed = true;
         } catch (IOException ioe) {
             throw new GenerationException(ioe);
+        } finally {
+            IOUtils.closeQuietly(registryBootstrapStreamOut);
         }
     }
 }

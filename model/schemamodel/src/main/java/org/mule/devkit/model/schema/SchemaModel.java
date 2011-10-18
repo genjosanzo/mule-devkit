@@ -20,47 +20,42 @@ package org.mule.devkit.model.schema;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.mule.devkit.model.code.CodeWriter;
+import org.mule.util.IOUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.List;
 
 public final class SchemaModel {
+
     private CodeWriter codeWriter;
-    private java.util.List<SchemaLocation> schemas;
+    private List<SchemaLocation> schemaLocations;
 
     public SchemaModel(CodeWriter codeWriter) {
         this.codeWriter = codeWriter;
-        this.schemas = new ArrayList<SchemaLocation>();
+        this.schemaLocations = new ArrayList<SchemaLocation>();
     }
 
     public void addSchemaLocation(SchemaLocation schemaLocation) {
-        this.schemas.add(schemaLocation);
+        schemaLocations.add(schemaLocation);
     }
 
     public void build() throws IOException {
-
         try {
-            for (SchemaLocation schemaLocation : this.schemas) {
-                if( schemaLocation.getSchema() == null ) {
-                    continue;
+            if (!schemaLocations.isEmpty()) {
+                for (SchemaLocation schemaLocation : schemaLocations) {
+                    if (schemaLocation.getSchema() != null) {
+                        buildSchema(schemaLocation);
+                    }
                 }
-
-                JAXBContext jaxbContext = JAXBContext.newInstance(Schema.class);
-                Marshaller marshaller = jaxbContext.createMarshaller();
-                NamespaceFilter outFilter = new NamespaceFilter("mule", "http://www.mulesoft.org/schema/mule/core", true);
-                OutputFormat format = new OutputFormat();
-                format.setIndent(true);
-                format.setNewlines(true);
-                OutputStream schemaStream = this.codeWriter.openBinary(null, schemaLocation.getFileName());
-
-                XMLWriter writer = new XMLWriter(schemaStream, format);
-                outFilter.setContentHandler(writer);
-                marshaller.marshal(schemaLocation.getSchema(), outFilter);
+                buildSpringHandlersFile();
+                buildSpringSchemasFile();
             }
         } catch (JAXBException e) {
             throw new IOException(e);
@@ -69,7 +64,64 @@ public final class SchemaModel {
         }
     }
 
-    public java.util.List<SchemaLocation> getSchemaLocations() {
-        return this.schemas;
+    private void buildSchema(SchemaLocation schemaLocation) throws JAXBException, IOException {
+        OutputStream schemaStream = null;
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(Schema.class);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            NamespaceFilter outFilter = new NamespaceFilter("mule", "http://www.mulesoft.org/schema/mule/core", true);
+            OutputFormat format = new OutputFormat();
+            format.setIndent(true);
+            format.setNewlines(true);
+            schemaStream = codeWriter.openBinary(null, schemaLocation.getFileName());
+
+            XMLWriter writer = new XMLWriter(schemaStream, format);
+            outFilter.setContentHandler(writer);
+            marshaller.marshal(schemaLocation.getSchema(), outFilter);
+        } finally {
+            IOUtils.closeQuietly(schemaStream);
+        }
+    }
+
+    private void buildSpringHandlersFile() throws IOException {
+        OutputStreamWriter outputStreamWriter = null;
+        try {
+
+            OutputStream outputStream = codeWriter.openBinary(null, "META-INF/spring.handlers");
+            outputStreamWriter = new OutputStreamWriter(outputStream, "UTF-8");
+
+            for (SchemaLocation schemaLocation : schemaLocations) {
+                if (schemaLocation.getNamespaceHandler() != null) {
+                    String targetNamespace = schemaLocation.getSchema().getTargetNamespace().replace("://", "\\://");
+                    outputStreamWriter.write(targetNamespace + "=" + schemaLocation.getNamespaceHandler() + "\n");
+                }
+            }
+
+            outputStreamWriter.flush();
+        } finally {
+            IOUtils.closeQuietly(outputStreamWriter);
+        }
+    }
+
+    private void buildSpringSchemasFile() throws IOException {
+        OutputStreamWriter outputStreamWriter = null;
+        try {
+            OutputStream outputStream = codeWriter.openBinary(null, "META-INF/spring.schemas");
+            outputStreamWriter = new OutputStreamWriter(outputStream, "UTF-8");
+
+            for (SchemaLocation schemaLocation : schemaLocations) {
+                if (schemaLocation.getFileName() != null && schemaLocation.getLocation() != null) {
+                    outputStreamWriter.write(schemaLocation.getLocation().replace("://", "\\://") + "=" + schemaLocation.getFileName() + "\n");
+                }
+            }
+
+            outputStreamWriter.flush();
+        } finally {
+            IOUtils.closeQuietly(outputStreamWriter);
+        }
+    }
+
+    public List<SchemaLocation> getSchemaLocations() {
+        return schemaLocations;
     }
 }

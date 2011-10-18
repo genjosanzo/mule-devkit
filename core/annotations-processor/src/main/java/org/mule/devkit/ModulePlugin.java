@@ -41,8 +41,6 @@ import org.mule.devkit.generation.mule.transfomer.TransformerGenerator;
 import org.mule.devkit.generation.spring.BeanDefinitionParserGenerator;
 import org.mule.devkit.generation.spring.NamespaceHandlerGenerator;
 import org.mule.devkit.generation.spring.SchemaGenerator;
-import org.mule.devkit.generation.spring.SpringNamespaceHandlerGenerator;
-import org.mule.devkit.generation.spring.SpringSchemaGenerator;
 import org.mule.devkit.validation.BasicValidator;
 import org.mule.devkit.validation.JavaDocValidator;
 import org.mule.devkit.validation.OAuthValidator;
@@ -84,8 +82,6 @@ public class ModulePlugin implements Plugin {
         generators.add(new MessageSourceGenerator());
         generators.add(new MessageProcessorGenerator());
         generators.add(new NamespaceHandlerGenerator());
-        generators.add(new SpringNamespaceHandlerGenerator());
-        generators.add(new SpringSchemaGenerator());
         generators.add(new RegistryBootstrapGenerator());
         generators.add(new MuleStudioXmlGenerator());
         //generators.add(new DSLWrapperGenerator());

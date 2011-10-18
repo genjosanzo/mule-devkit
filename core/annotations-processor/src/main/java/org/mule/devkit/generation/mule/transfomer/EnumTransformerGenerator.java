@@ -40,8 +40,6 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-import java.util.HashSet;
-import java.util.Set;
 
 public class EnumTransformerGenerator extends AbstractMessageGenerator {
 
@@ -52,29 +50,28 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
 
     @Override
     protected void doGenerate(DevKitTypeElement typeElement) {
-        Set<TypeMirror> registeredEnums = new HashSet<TypeMirror>();
 
         for (VariableElement field : typeElement.getFields()) {
             if (context.getTypeMirrorUtils().isEnum(field.asType())) {
-                if (!registeredEnums.contains(field.asType())) {
+                if (!context.isEnumRegistered(field.asType())) {
                     registerEnumTransformer(field);
-                    registeredEnums.add(field.asType());
+                    context.registerEnum(field.asType());
                 }
             }
         }
 
         for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             for (VariableElement variable : method.getParameters()) {
-                if (context.getTypeMirrorUtils().isEnum(variable.asType()) && !registeredEnums.contains(variable.asType())) {
+                if (context.getTypeMirrorUtils().isEnum(variable.asType()) && !context.isEnumRegistered(variable.asType())) {
                     registerEnumTransformer(variable);
-                    registeredEnums.add(variable.asType());
+                    context.registerEnum(variable.asType());
                 } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
                     DeclaredType variableType = (DeclaredType) variable.asType();
                     for (TypeMirror variableTypeParameter : variableType.getTypeArguments()) {
-                        if (context.getTypeMirrorUtils().isEnum(variableTypeParameter) && !registeredEnums.contains(variableTypeParameter)) {
+                        if (context.getTypeMirrorUtils().isEnum(variableTypeParameter) && !context.isEnumRegistered(variableTypeParameter)) {
                             Element enumElement = context.getTypeUtils().asElement(variableTypeParameter);
                             registerEnumTransformer(enumElement);
-                            registeredEnums.add(variableTypeParameter);
+                            context.registerEnum(variableTypeParameter);
                         }
                     }
                 }
@@ -87,9 +84,9 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
                     continue;
                 }
 
-                if (!registeredEnums.contains(variable.asType())) {
+                if (!context.isEnumRegistered(variable.asType())) {
                     registerEnumTransformer(variable);
-                    registeredEnums.add(variable.asType());
+                    context.registerEnum(variable.asType());
                 }
             }
         }

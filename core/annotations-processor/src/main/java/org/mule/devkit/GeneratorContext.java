@@ -27,14 +27,18 @@ import org.mule.devkit.utils.NameUtils;
 import org.mule.devkit.utils.TypeMirrorUtils;
 
 import javax.annotation.processing.Filer;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class GeneratorContext {
+
     private CodeModel codeModel;
     private SchemaModel schemaModel;
     private StudioModel studioModel;
@@ -46,6 +50,7 @@ public class GeneratorContext {
     private NameUtils nameUtils;
     private JavaDocUtils javaDocUtils;
     private Map<String, String> options;
+    private Set<TypeMirror> registeredEnums;
 
     public GeneratorContext(Filer filer, Types types, Elements elements, Map<String, String> options) {
         this.registerAtBoot = new ArrayList<DefinedClass>();
@@ -59,6 +64,7 @@ public class GeneratorContext {
         this.javaDocUtils = new JavaDocUtils(this.elements);
         this.studioModel = new StudioModel(new FilerCodeWriter(filer));
         this.options = options;
+        registeredEnums = new HashSet<TypeMirror>();
     }
 
     public CodeModel getCodeModel() {
@@ -111,5 +117,13 @@ public class GeneratorContext {
 
     public boolean hasOption(String option) {
         return options.containsKey(option);
+    }
+
+    public void registerEnum(TypeMirror enumToRegister) {
+        registeredEnums.add(enumToRegister);
+    }
+
+    public boolean isEnumRegistered(TypeMirror enumToCheck) {
+        return registeredEnums.contains(enumToCheck);
     }
 }
