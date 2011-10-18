@@ -17,15 +17,15 @@
 
 package org.mule.devkit.it;
 
+import org.mule.api.ConnectionException;
 import org.mule.api.annotations.Configurable;
-import org.mule.api.annotations.Module;
+import org.mule.api.annotations.Connect;
+import org.mule.api.annotations.Connector;
+import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
-import org.mule.api.annotations.param.Session;
-import org.mule.api.annotations.param.SessionKey;
-import org.mule.api.annotations.session.SessionCreate;
-import org.mule.api.annotations.session.SessionDestroy;
 
 import java.util.List;
 import java.util.Map;
@@ -33,9 +33,9 @@ import java.util.Map;
 /**
  * Simple Module for testing
  *
- * @author Mulesoft, inc.
+ * @author MuleSoft, inc.
  */
-@Module(name = "mymodule")
+@Connector(name = "mymodule")
 public class MyModule {
 
     /**
@@ -95,11 +95,10 @@ public class MyModule {
     /**
      * operation4 method description
      *
-     * @param sesion          represents the session
      * @param stringParameter stringParameter description
      */
     @Processor
-    public void operation4(@Session MySession sesion, String stringParameter) {
+    public void operation4(String stringParameter) {
     }
 
     /**
@@ -124,22 +123,22 @@ public class MyModule {
     }
 
     /**
-     * Creates the session
+     * Create a connection
      *
      * @param user     the user name to use
      * @param password the password to use
      * @return the new session
      */
-    @SessionCreate
-    public MySession createSession(@SessionKey String user, String password) {
-        return new MySession(user, password);
+    @Connect
+    public void connect(@ConnectionKey String user, String password)
+        throws ConnectionException {
     }
 
     /**
-     * Destroys the session
+     * Disconnect
      */
-    @SessionDestroy
-    public void destroySession(MySession session) {
+    @Disconnect
+    public void disconnect() {
     }
 
     public void setConfigurableString(String configurableString) {

@@ -256,15 +256,21 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
     private void generateActivateObjectMethod(DefinedClass connectionFactoryClass) {
         Method activateObject = connectionFactoryClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "activateObject");
         activateObject._throws(ref(Exception.class));
+        activateObject.param(Object.class, "key");
+        activateObject.param(Object.class, "obj");
     }
 
     private void generatePassivateObjectMethod(DefinedClass connectionFactoryClass) {
         Method passivateObject = connectionFactoryClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "passivateObject");
         passivateObject._throws(ref(Exception.class));
+        passivateObject.param(Object.class, "key");
+        passivateObject.param(Object.class, "obj");
     }
 
     private void generateValidateObjectMethod(DefinedClass connectionFactoryClass) {
         Method validateObject = connectionFactoryClass.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "validateObject");
+        validateObject.param(Object.class, "key");
+        validateObject.param(Object.class, "obj");
 
         validateObject.body()._return(ExpressionFactory.TRUE);
     }
