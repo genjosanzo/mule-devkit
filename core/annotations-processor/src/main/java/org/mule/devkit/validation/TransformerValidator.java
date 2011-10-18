@@ -19,9 +19,12 @@ package org.mule.devkit.validation;
 
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Module;
+import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import java.util.Map;
 
 public class TransformerValidator implements Validator {
@@ -38,9 +41,27 @@ public class TransformerValidator implements Validator {
             return;
         }
 
-        // TODO implement
+        for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
 
-        // verify that every @Transformer is public and non-static and non-generic
-        // verify that every @Transformer signature is Object x(Object);
+            if (!method.getModifiers().contains(Modifier.STATIC)) {
+                throw new ValidationException(method, "@Transformer must be a static method");
+            }
+
+            if (!method.getModifiers().contains(Modifier.PUBLIC)) {
+                throw new ValidationException(method, "@Transformer cannot be applied to a non-public method");
+            }
+
+            if( method.getReturnType().toString().equals("void") ) {
+                throw new ValidationException(method, "@Transformer cannot be void");
+            }
+
+            if( method.getReturnType().toString().equals("java.lang.Object") ) {
+                throw new ValidationException(method, "@Transformer cannot return java.lang.Object");
+            }
+
+            if( method.getParameters().size() != 1 ) {
+                throw new ValidationException(method, "@Transformer must receive exactly one argument.");
+            }
+        }
     }
 }

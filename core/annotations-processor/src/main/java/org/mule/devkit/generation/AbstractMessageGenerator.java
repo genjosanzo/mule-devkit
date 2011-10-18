@@ -269,23 +269,25 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             initialise.body().assign(patternInfo, ref(TemplateParser.class).staticInvoke("createMuleStyleParser").invoke("getStyle"));
         }
 
-        Conditional ifNoObject = initialise.body()._if(Op.eq(object, ExpressionFactory._null()));
-        TryStatement tryLookUp = ifNoObject._then()._try();
-        tryLookUp.body().assign(object, muleContext.invoke("getRegistry").invoke("lookupObject").arg(ExpressionFactory.dotclass(pojoClass)));
-        tryLookUp.body()._if(Op.eq(object, ExpressionFactory._null()))._then().
-                _throw(ExpressionFactory._new(ref(InitialisationException.class)).
-                        arg(ref(MessageFactory.class).staticInvoke("createStaticMessage").
-                                arg("Cannot find object")).arg(ExpressionFactory._this()));
-        CatchBlock catchBlock = tryLookUp._catch(ref(RegistrationException.class));
-        Variable exception = catchBlock.param("e");
-        TypeReference coreMessages = ref(CoreMessages.class);
-        Invocation failedToInvoke = coreMessages.staticInvoke("initialisationFailure");
-        failedToInvoke.arg(pojoClass.fullName());
-        Invocation messageException = ExpressionFactory._new(ref(InitialisationException.class));
-        messageException.arg(failedToInvoke);
-        messageException.arg(exception);
-        messageException.arg(ExpressionFactory._this());
-        catchBlock.body()._throw(messageException);
+        if( object != null ) {
+            Conditional ifNoObject = initialise.body()._if(Op.eq(object, ExpressionFactory._null()));
+            TryStatement tryLookUp = ifNoObject._then()._try();
+            tryLookUp.body().assign(object, muleContext.invoke("getRegistry").invoke("lookupObject").arg(ExpressionFactory.dotclass(pojoClass)));
+            tryLookUp.body()._if(Op.eq(object, ExpressionFactory._null()))._then().
+                    _throw(ExpressionFactory._new(ref(InitialisationException.class)).
+                            arg(ref(MessageFactory.class).staticInvoke("createStaticMessage").
+                                    arg("Cannot find object")).arg(ExpressionFactory._this()));
+            CatchBlock catchBlock = tryLookUp._catch(ref(RegistrationException.class));
+            Variable exception = catchBlock.param("e");
+            TypeReference coreMessages = ref(CoreMessages.class);
+            Invocation failedToInvoke = coreMessages.staticInvoke("initialisationFailure");
+            failedToInvoke.arg(pojoClass.fullName());
+            Invocation messageException = ExpressionFactory._new(ref(InitialisationException.class));
+            messageException.arg(failedToInvoke);
+            messageException.arg(exception);
+            messageException.arg(ExpressionFactory._this());
+            catchBlock.body()._throw(messageException);
+        }
 
         if (fields != null) {
             for (String fieldName : fields.keySet()) {

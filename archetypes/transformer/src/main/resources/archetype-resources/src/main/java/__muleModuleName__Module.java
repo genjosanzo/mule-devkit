@@ -36,20 +36,6 @@ import org.mule.api.annotations.Transformer;
 public class ${muleModuleName}Module
 {
     /**
-     * Configurable
-     */
-    @Configurable
-    private String myProperty;
-
-    /**
-     * Set property
-     */
-    public void setMyProperty(String myProperty)
-    {
-        this.myProperty = myProperty;
-    }
-
-    /**
      * Transformer
      *
      * {@sample.xml doc/${moduleNameLower}-connector.xml.sample ${moduleNameLower}:my-transform}
@@ -57,7 +43,7 @@ public class ${muleModuleName}Module
      * @return Transformed object
      */
     @Transformer(sourceTypes={String.class})
-    public String myTransform(Object source)
+    public static String myTransform(Object source)
     {
         if( source != null )
         {

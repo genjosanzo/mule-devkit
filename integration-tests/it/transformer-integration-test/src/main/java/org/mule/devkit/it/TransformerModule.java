@@ -25,7 +25,7 @@ public class TransformerModule
 {
 
     @Transformer(sourceTypes={String.class})
-    public Character transformStringToChar(Object payload)
+    public static Character transformStringToChar(Object payload)
     {
         if( payload != null )
         {

@@ -30,8 +30,6 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/${moduleNameLower} http://www.mulesoft.org/schema/mule/${moduleNameLower}/${version}/mule-${moduleNameLower}.xsd">
 
-    <${moduleNameLower}:config myProperty="Some string"/>
-
     <flow name="testFlow">
         <${moduleNameLower}:my-transform/>
     </flow>

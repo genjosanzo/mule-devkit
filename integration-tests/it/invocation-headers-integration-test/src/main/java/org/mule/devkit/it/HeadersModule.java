@@ -118,7 +118,7 @@ public class HeadersModule {
     }
 
     @Transformer
-    public URL transformStringToUrl(String url) {
+    public static URL transformStringToUrl(String url) {
         try {
             return new URL(url);
         } catch (MalformedURLException e) {
