@@ -68,7 +68,7 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return context.hasOption("generateStudioXml");
+        return !context.hasOption("skipStudioXmlGeneration");
     }
 
     @Override

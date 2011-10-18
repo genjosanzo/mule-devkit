@@ -19,15 +19,13 @@ package org.mule.devkit.it;
 
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.IOUtil;
 import org.junit.Before;
 import org.junit.Test;
+import org.mule.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
 
 public abstract class AbstractMavenIT {
@@ -54,31 +52,31 @@ public abstract class AbstractMavenIT {
     @Test
     @SuppressWarnings("unchecked")
     public void buildExecutable() throws VerificationException {
-        InputStream systemPropertiesStream = null;
         try {
             Verifier verifier = new Verifier(getRoot().getAbsolutePath(), null, true);
             verifier.setAutoclean(false);
             verifier.setMavenDebug(true);
             verifier.setDebug(true);
 
-            systemPropertiesStream = getClass().getClassLoader().getResourceAsStream("maven.properties");
-            Properties systemProperties = new Properties();
-            systemProperties.load(systemPropertiesStream);
-
-            verifier.setSystemProperties(systemProperties);
-            verifier.getCliOptions().addAll(getCliOptions());
+            setSystemProperties(verifier);
             verifier.executeGoal("clean");
             verifier.executeGoal("package");
 
             verifier.verifyErrorFreeLog();
         } catch (IOException ioe) {
             throw new VerificationException(ioe);
-        } finally {
-            IOUtil.close(systemPropertiesStream);
         }
     }
 
-    protected List<String> getCliOptions() {
-        return Collections.emptyList();
+    protected void setSystemProperties(Verifier verifier) throws IOException {
+        InputStream systemPropertiesStream = null;
+        try {
+            systemPropertiesStream = getClass().getClassLoader().getResourceAsStream("maven.properties");
+            Properties systemProperties = new Properties();
+            systemProperties.load(systemPropertiesStream);
+            verifier.setSystemProperties(systemProperties);
+        } finally {
+            IOUtils.closeQuietly(systemPropertiesStream);
+        }
     }
 }

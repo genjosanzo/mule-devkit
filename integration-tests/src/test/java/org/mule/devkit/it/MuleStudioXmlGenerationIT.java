@@ -17,9 +17,10 @@
 
 package org.mule.devkit.it;
 
+import org.apache.maven.it.Verifier;
+
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
+import java.io.IOException;
 
 public class MuleStudioXmlGenerationIT extends AbstractMavenIT {
 
@@ -44,7 +45,8 @@ public class MuleStudioXmlGenerationIT extends AbstractMavenIT {
     }
 
     @Override
-    protected List<String> getCliOptions() {
-        return Arrays.asList("-Ddevkit.generate.studio.xml=true");
+    protected void setSystemProperties(Verifier verifier) throws IOException {
+        super.setSystemProperties(verifier);
+        verifier.getSystemProperties().remove("devkit.studio.xml.skip");
     }
 }
