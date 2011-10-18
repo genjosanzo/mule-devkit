@@ -57,7 +57,7 @@ public class PoolModule {
     }
 
     @Transformer(sourceTypes = {String.class})
-    public Character transformStringToChar(Object payload) {
+    public static Character transformStringToChar(Object payload) {
         if (payload != null) {
             return ((String) payload).charAt(0);
         }
