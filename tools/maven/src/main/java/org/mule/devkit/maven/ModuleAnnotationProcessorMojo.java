@@ -56,7 +56,7 @@ public class ModuleAnnotationProcessorMojo extends AbstractAnnotationProcessorMo
     @MojoParameter(required = false, expression = "${devkit.javadoc.check.skip}", description = "Skip JavaDoc validation", defaultValue = "false")
     private boolean skipJavaDocValidation;
 
-    @MojoParameter(required = false, expression = "${devkit.studio.xml.skip}", description = "Skip Mule Studio XML generation", defaultValue = "false")
+    @MojoParameter(required = false, expression = "${devkit.studio.xml.skip}", description = "Skip Mule Studio XML generation", defaultValue = "true")
     private boolean skipStudioXmlGeneration;
 
     @Override
