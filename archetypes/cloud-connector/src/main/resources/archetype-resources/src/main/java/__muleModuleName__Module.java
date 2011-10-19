@@ -23,16 +23,16 @@
 #set($moduleGroupIdPath = $groupId.replace(".", "/"))
 package ${package};
 
-import org.mule.api.annotations.Module;
+import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Processor;
 
 /**
- * Module
+ * Cloud Connector
  *
  * @author MuleSoft, Inc.
  */
-@Module(name="${moduleNameLower}", schemaVersion="${version}")
+@Connector(name="${moduleNameLower}", schemaVersion="${version}")
 public class ${muleModuleName}Module
 {
     /**
