@@ -24,6 +24,10 @@
 package ${package};
 
 import org.mule.api.annotations.Connector;
+import org.mule.api.annotations.Connect;
+import org.mule.api.annotations.Disconnect;
+import org.mule.api.annotations.param.ConnectionKey;
+import org.mule.api.ConnectionException;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Processor;
 
@@ -49,6 +53,21 @@ public class ${muleModuleName}Module
     public void setMyProperty(String myProperty)
     {
         this.myProperty = myProperty;
+    }
+
+    @Connect
+    public void connect(@ConnectionKey String username, String password)
+        throws ConnectionException {
+        /*
+         * CODE FOR ESTABLISHING A CONNECTION GOES IN HERE
+         */
+    }
+
+    @Disconnect
+    public void disconnect() {
+        /*
+         * CODE FOR CLOSING A CONNECTION GOES IN HERE
+         */
     }
 
     /**
