@@ -132,17 +132,24 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         String fileName = "META-INF/mule-" + typeElement.name() + XSD_EXTENSION;
 
-        String location = typeElement.schemaLocation();
-        if (location == null || location.length() == 0) {
-            location = schema.getTargetNamespace() + "/" + typeElement.schemaVersion() + "/mule-" + typeElement.name() + XSD_EXTENSION;
+        String versionedLocation = typeElement.schemaLocation();
+        String currentLocation = null;
+        if (versionedLocation == null || versionedLocation.length() == 0) {
+            versionedLocation = schema.getTargetNamespace() + "/" + typeElement.schemaVersion() + "/mule-" + typeElement.name() + XSD_EXTENSION;
+            currentLocation = schema.getTargetNamespace() + "/current/mule-" + typeElement.name() + XSD_EXTENSION;
         }
 
         // TODO: replace with a class role
         String namespaceHandlerName = context.getNameUtils().generateClassName(typeElement, ".config.spring", NAMESPACE_HANDLER_SUFFIX);
 
-        SchemaLocation schemaLocation = new SchemaLocation(schema, fileName, location, namespaceHandlerName);
+        SchemaLocation versionedSchemaLocation = new SchemaLocation(schema, schema.getTargetNamespace(), fileName, versionedLocation, namespaceHandlerName);
 
-        context.getSchemaModel().addSchemaLocation(schemaLocation);
+        context.getSchemaModel().addSchemaLocation(versionedSchemaLocation);
+
+        if( currentLocation != null ) {
+            SchemaLocation currentSchemaLocation = new SchemaLocation(null, schema.getTargetNamespace(), fileName, currentLocation, namespaceHandlerName);
+            context.getSchemaModel().addSchemaLocation(currentSchemaLocation);
+        }
     }
 
     private void registerEnums(Schema schema, DevKitTypeElement typeElement) {

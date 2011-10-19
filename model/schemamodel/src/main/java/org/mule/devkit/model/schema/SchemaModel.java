@@ -92,7 +92,7 @@ public final class SchemaModel {
 
             for (SchemaLocation schemaLocation : schemaLocations) {
                 if (schemaLocation.getNamespaceHandler() != null) {
-                    String targetNamespace = schemaLocation.getSchema().getTargetNamespace().replace("://", "\\://");
+                    String targetNamespace = schemaLocation.getTargetNamespace().replace("://", "\\://");
                     outputStreamWriter.write(targetNamespace + "=" + schemaLocation.getNamespaceHandler() + "\n");
                 }
             }

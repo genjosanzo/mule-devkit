@@ -22,7 +22,7 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:callback="http://www.mulesoft.org/schema/mule/callback"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
-        http://www.mulesoft.org/schema/mule/callback http://www.mulesoft.org/schema/mule/callback/1.0/mule-callback.xsd">
+        http://www.mulesoft.org/schema/mule/callback http://www.mulesoft.org/schema/mule/callback/current/mule-callback.xsd">
 
     <callback:config/>
 

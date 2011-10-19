@@ -25,7 +25,7 @@
       xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
-        http://www.mulesoft.org/schema/mule/connector http://www.mulesoft.org/schema/mule/connector/1.0/mule-connector.xsd">
+        http://www.mulesoft.org/schema/mule/connector http://www.mulesoft.org/schema/mule/connector/current/mule-connector.xsd">
 
     <connector:config name="configA" username="mulesoft" password="muleion">
         <connector:connection-pooling-profile maxActive="10" maxIdle="10"
