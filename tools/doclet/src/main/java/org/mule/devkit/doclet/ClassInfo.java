@@ -1883,39 +1883,17 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
             boolean annotationPresent = false;
             for (AnnotationInstanceInfo annotation : annotations()) {
                 if (annotation.type().qualifiedName().equals("org.mule.api.annotations.Module")) {
-                    for (AnnotationValueInfo value : annotation.elementValues()) {
-                        if ("name".equals(value.element().name())) {
-                            mModuleName = value.valueString().replace("\"", "");
-                        }
-                    }
-                    mModuleVersion = "1.0";
-                    for (AnnotationValueInfo value : annotation.elementValues()) {
-                        if ("version".equals(value.element().name())) {
-                            mModuleVersion = value.valueString().replace("\"", "");
-                        }
-                    }
-                    mModuleMinMuleVersion = "3.2";
-                    for (AnnotationValueInfo value : annotation.elementValues()) {
-                        if ("minMuleVersion".equals(value.element().name())) {
-                            mModuleMinMuleVersion = value.valueString().replace("\"", "");
-                        }
-                    }
-                    mModuleNamespace = "http://www.mulesoft.org/schema/mule/" + mModuleName;
-                    for (AnnotationValueInfo value : annotation.elementValues()) {
-                        if ("namespace".equals(value.element().name())) {
-                            mModuleNamespace = value.valueString().replace("\"", "");
-                        }
-                    }
-                    mModuleSchemaLocation = mModuleNamespace + "/" + mModuleVersion + "/mule-" + mModuleName + ".xsd";
-                    for (AnnotationValueInfo value : annotation.elementValues()) {
-                        if ("schemaLocation".equals(value.element().name())) {
-                            mModuleSchemaLocation = value.valueString().replace("\"", "");
-                        }
-                    }
+                    extractConnectorOrModuleAnnotation(annotation);
+                    annotationPresent = true;
+                    break;
+                }
+                else if (annotation.type().qualifiedName().equals("org.mule.api.annotations.Connector")) {
+                    extractConnectorOrModuleAnnotation(annotation);
                     annotationPresent = true;
                     break;
                 }
             }
+
             mIsModule = annotationPresent;
             boolean hasConnect = false;
             boolean hasDisconnect = false;
@@ -1939,6 +1917,38 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
             mModuleKnown = true;
         }
         return mIsModule;
+    }
+
+    private void extractConnectorOrModuleAnnotation(AnnotationInstanceInfo annotation) {
+        for (AnnotationValueInfo value : annotation.elementValues()) {
+            if ("name".equals(value.element().name())) {
+                mModuleName = value.valueString().replace("\"", "");
+            }
+        }
+        mModuleVersion = "1.0";
+        for (AnnotationValueInfo value : annotation.elementValues()) {
+            if ("version".equals(value.element().name())) {
+                mModuleVersion = value.valueString().replace("\"", "");
+            }
+        }
+        mModuleMinMuleVersion = "3.2";
+        for (AnnotationValueInfo value : annotation.elementValues()) {
+            if ("minMuleVersion".equals(value.element().name())) {
+                mModuleMinMuleVersion = value.valueString().replace("\"", "");
+            }
+        }
+        mModuleNamespace = "http://www.mulesoft.org/schema/mule/" + mModuleName;
+        for (AnnotationValueInfo value : annotation.elementValues()) {
+            if ("namespace".equals(value.element().name())) {
+                mModuleNamespace = value.valueString().replace("\"", "");
+            }
+        }
+        mModuleSchemaLocation = mModuleNamespace + "/" + mModuleVersion + "/mule-" + mModuleName + ".xsd";
+        for (AnnotationValueInfo value : annotation.elementValues()) {
+            if ("schemaLocation".equals(value.element().name())) {
+                mModuleSchemaLocation = value.valueString().replace("\"", "");
+            }
+        }
     }
 
     public ParamTagInfo[] connectionTags() {
