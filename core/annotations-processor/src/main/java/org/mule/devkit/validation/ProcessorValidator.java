@@ -27,11 +27,11 @@ import org.mule.api.annotations.param.Payload;
 import org.mule.api.callback.InterceptCallback;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
-import org.mule.devkit.utils.ValidatorUtils;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeKind;
 import java.util.List;
 import java.util.Map;
 
@@ -62,10 +62,6 @@ public class ProcessorValidator implements Validator {
                 throw new ValidationException(method, "@Processor cannot be applied to a non-public method");
             }
 
-            if(ValidatorUtils.isTypeForbidden(method.getReturnType())) {
-                throw new ValidationException(method, "@Processor return type unsupported type");
-            }
-
             validateIntercepting(method);
 
             for (VariableElement parameter : method.getParameters()) {
@@ -87,8 +83,8 @@ public class ProcessorValidator implements Validator {
                     throw new ValidationException(parameter, "You cannot have more than one of InboundHeader, InvocationHeaders or Payload annotation");
                 }
 
-                if (ValidatorUtils.isTypeForbidden(parameter)) {
-                    throw new ValidationException(parameter, "@Processor parameter of unsupported type");
+                if (parameter.getAnnotation(Payload.class) == null && parameter.asType().getKind() == TypeKind.ARRAY) {
+                    throw new ValidationException(parameter, "@Processor parameted cannot be arrays, use List instead");
                 }
             }
         }
