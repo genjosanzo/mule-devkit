@@ -173,7 +173,7 @@
 #index-links {
   padding:7px 0 4px 18px;
   font-size: 10px;
-  height: 31px;
+  height: 37px;
   background-color: #3572A6;
   color: #ddd;
 }
@@ -247,6 +247,14 @@
 
 #all-content {
   overflow:auto;
+}
+
+#jd-header-nopad {
+  font-family: Monaco, monospace;
+  font-size: 12px;
+  background-color: #3572A6;
+  /* padding: 7px 15px; */
+  color: #fff;
 }
 
 #jd-header {
