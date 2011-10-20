@@ -24,9 +24,10 @@ import org.mule.devkit.model.schema.SchemaModel;
 import org.mule.devkit.model.studio.StudioModel;
 import org.mule.devkit.utils.JavaDocUtils;
 import org.mule.devkit.utils.NameUtils;
+import org.mule.devkit.utils.SourceUtils;
 import org.mule.devkit.utils.TypeMirrorUtils;
 
-import javax.annotation.processing.Filer;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -51,19 +52,21 @@ public class GeneratorContext {
     private JavaDocUtils javaDocUtils;
     private Map<String, String> options;
     private Set<TypeMirror> registeredEnums;
+    private SourceUtils sourceUtils;
 
-    public GeneratorContext(Filer filer, Types types, Elements elements, Map<String, String> options) {
+    public GeneratorContext(ProcessingEnvironment env) {
         this.registerAtBoot = new ArrayList<DefinedClass>();
-        this.codeModel = new CodeModel(new FilerCodeWriter(filer));
-        this.schemaModel = new SchemaModel(new FilerCodeWriter(filer));
+        this.codeModel = new CodeModel(new FilerCodeWriter(env.getFiler()));
+        this.schemaModel = new SchemaModel(new FilerCodeWriter(env.getFiler()));
         this.roles = new HashMap<String, DefinedClass>();
-        this.elements = elements;
-        this.types = types;
+        this.elements = env.getElementUtils();
+        this.types = env.getTypeUtils();
         this.typeMirrorUtils = new TypeMirrorUtils(this.types);
         this.nameUtils = new NameUtils(this.elements);
         this.javaDocUtils = new JavaDocUtils(this.elements);
-        this.studioModel = new StudioModel(new FilerCodeWriter(filer));
-        this.options = options;
+        this.studioModel = new StudioModel(new FilerCodeWriter(env.getFiler()));
+        this.options = env.getOptions();
+        this.sourceUtils = new SourceUtils(env);
         registeredEnums = new HashSet<TypeMirror>();
     }
 
@@ -125,5 +128,9 @@ public class GeneratorContext {
 
     public boolean isEnumRegistered(TypeMirror enumToCheck) {
         return registeredEnums.contains(enumToCheck);
+    }
+
+    public SourceUtils getSourceUtils() {
+        return sourceUtils;
     }
 }

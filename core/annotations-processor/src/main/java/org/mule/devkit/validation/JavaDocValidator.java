@@ -32,7 +32,10 @@ import org.mule.util.IOUtils;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
 
@@ -126,25 +129,35 @@ public class JavaDocValidator implements Validator {
     }
 
     private boolean exampleDoesNotExist(GeneratorContext context, ExecutableElement method) throws ValidationException {
+        boolean found = false;
         String sample = context.getJavaDocUtils().getTagContent("sample.xml", method);
         String[] split = sample.split(" ");
 
-        if(split.length != 2) {
+        if (split.length != 2) {
             throw new ValidationException(method, "Check @sample.xml javadoc tag because is not well formed for method: " + method.getSimpleName());
         }
 
         String pathToExamplesFile = split[0];
         String exampleName = split[1];
 
-        if (pathToExamplesFile.contains("../")) {
-            pathToExamplesFile = pathToExamplesFile.substring(pathToExamplesFile.lastIndexOf("../") + 3);
+        TypeElement typeElement = (TypeElement) method.getEnclosingElement();
+        String sourcePath = context.getSourceUtils().getPath(typeElement);
+        int packageCount = StringUtils.countMatches(typeElement.getQualifiedName().toString(), ".") + 1;
+        while (packageCount > 0) {
+            sourcePath = sourcePath.substring(0, sourcePath.lastIndexOf("/"));
+            packageCount--;
         }
 
         try {
-            String examplesFileContent = IOUtils.getResourceAsString(pathToExamplesFile, getClass());
-            return !examplesFileContent.contains("BEGIN_INCLUDE(" + exampleName + ")");
+            File docFile = new File(sourcePath, pathToExamplesFile);
+            String examplesFileContent = IOUtils.toString(new FileInputStream(docFile));
+            if (examplesFileContent.contains("BEGIN_INCLUDE(" + exampleName + ")")) {
+                found = true;
+            }
         } catch (IOException e) {
-            throw new ValidationException(method, "Error loading examples file from path: " + pathToExamplesFile, e);
+            // do nothing
         }
+
+        return !found;
     }
 }

@@ -163,7 +163,7 @@ public class ModuleAnnotationProcessor extends AbstractProcessor {
     }
 
     private void createContext() {
-        context = new GeneratorContext(processingEnv.getFiler(), processingEnv.getTypeUtils(), processingEnv.getElementUtils(), processingEnv.getOptions());
+        context = new GeneratorContext(processingEnv);
     }
 
     protected GeneratorContext getContext() {
