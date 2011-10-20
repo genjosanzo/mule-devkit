@@ -46,6 +46,21 @@ public class ConnectionException extends Exception {
     }
 
     /**
+     * Create a new connection exception
+     *
+     * @param code Code describing what went wrong. Use {@link ConnectionExceptionCode.UNKNOWN} for unexpected problems.
+     * @param thirdPartyCode Code as provided by the third party API
+     * @param throwable Inner exception
+     * @param message Message describing what went wrong
+     */
+    public ConnectionException(ConnectionExceptionCode code, String thirdPartyCode, String message, Throwable throwable) {
+        super(message, throwable);
+
+        this.code = code;
+        this.thirdPartyCode = thirdPartyCode;
+    }
+
+    /**
      * Get a code for what went wrong
      *
      * @return A {@link ConnectionExceptionCode}
