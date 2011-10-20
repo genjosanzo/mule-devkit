@@ -17,6 +17,7 @@
 package org.mule.devkit.doclet;
 
 import com.google.clearsilver.jsilver.data.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.mule.devkit.doclet.apicheck.AbstractMethodInfo;
 
 import java.util.ArrayList;
@@ -546,7 +547,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
             for (ParamTagInfo tag : comment().paramTags()) {
                 int index = indexOfParam(tag.parameterName(), names);
                 if (index >= 0) {
-                    comments[index] = tag.parameterComment();
+                    comments[index] = StringUtils.capitalize(tag.parameterComment());
                     positions[index] = tag.position();
                 } else {
                     Errors.error(Errors.UNKNOWN_PARAM_TAG_NAME, tag.position(),

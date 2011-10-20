@@ -167,6 +167,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
 
     private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectFields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass, FieldVariable logger) {
+        String methodName = executableElement.getSimpleName().toString();
         Method run = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "run");
         run.javadoc().add("Implementation {@link Runnable#run()} that will invoke the method on the pojo that this message source wraps.");
 
@@ -213,12 +214,22 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
                 Cast castLocal = ExpressionFactory.cast(type, object.invoke("get" + StringUtils.capitalize(fieldName)));
 
+                Conditional ifConfigAlsoNull = ifNotNull._else()._if(Op.eq(object.invoke("get" + StringUtils.capitalize(fieldName)), ExpressionFactory._null()));
+                TypeReference coreMessages = ref(CoreMessages.class);
+                Invocation failedToInvoke = coreMessages.staticInvoke("failedToCreate");
+                if (methodName != null) {
+                    failedToInvoke.arg(ExpressionFactory.lit(methodName));
+                }
+                Invocation messageException = ExpressionFactory._new(ref(MessagingException.class));
+                messageException.arg(failedToInvoke);
+                messageException.arg(ExpressionFactory.cast(ref(MuleEvent.class), ExpressionFactory._null()));
+                messageException.arg(ExpressionFactory._new(ref(RuntimeException.class)).arg("You must provide a " + fieldName + " at the config or the message processor level."));
+                ifConfigAlsoNull._then()._throw(messageException);
+
                 ifNotNull._else().assign(transformed, castLocal);
 
             }
         }
-
-        String methodName = executableElement.getSimpleName().toString();
 
         List<Expression> parameters = new ArrayList<Expression>();
         for (VariableElement variable : executableElement.getParameters()) {

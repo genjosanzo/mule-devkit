@@ -8,7 +8,7 @@
 
 <div class="g-unit" id="all-content">
 
-<div id="jd-header">
+<div id="jd-header-nopad">
 <h1><?cs var:page.title ?></h1>
 </div>
 

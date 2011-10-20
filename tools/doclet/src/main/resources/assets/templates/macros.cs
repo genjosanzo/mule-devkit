@@ -281,16 +281,6 @@ def:op_description(obj) ?><?cs
       <td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i>Specify which configuration to use.</td></tr>
           <?cs set:count = #2 ?>
           <?cs each:attribute=obj.paramTags ?>
-            <?cs if:attribute.isSession=="1" ?>
-                <?cs each:attribute=obj.connectionTags ?>
-                    <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
-                        <td class="jd-linkcol"><nobr><?cs var:attribute.attributeName ?></nobr></td>
-                        <td class="jd-descrcol"><?cs var:attribute.defaultValue ?></td>
-                        <td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i><?cs call:op_tag_list(attribute.comment) ?></td>
-                    </tr>
-                    <?cs set:count = count + #1 ?>
-                <?cs /each ?>
-            <?cs else ?>
                 <?cs if:attribute.isNestedProcessor=="0" ?>
                 <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
                     <td class="jd-linkcol"><nobr><?cs var:attribute.attributeName ?></nobr></td>
@@ -299,8 +289,15 @@ def:op_description(obj) ?><?cs
                 </tr>
                 <?cs set:count = count + #1 ?>
                 <?cs /if ?>
-            <?cs /if ?>
           <?cs /each ?>
+        <?cs each:attribute=obj.connectionTags ?>
+            <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
+                <td class="jd-linkcol"><nobr><?cs var:attribute.attributeName ?></nobr></td>
+                <td class="jd-descrcol"><?cs var:attribute.defaultValue ?></td>
+                <td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i><?cs call:op_tag_list(attribute.comment) ?></td>
+            </tr>
+        <?cs set:count = count + #1 ?>
+        <?cs /each ?>
       </table>
   </div>
   <div class="jd-tagdata">

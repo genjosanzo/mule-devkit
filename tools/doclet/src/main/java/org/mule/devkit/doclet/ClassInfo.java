@@ -1927,7 +1927,7 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
         }
         mModuleVersion = "1.0";
         for (AnnotationValueInfo value : annotation.elementValues()) {
-            if ("version".equals(value.element().name())) {
+            if ("schemaVersion".equals(value.element().name())) {
                 mModuleVersion = value.valueString().replace("\"", "");
             }
         }

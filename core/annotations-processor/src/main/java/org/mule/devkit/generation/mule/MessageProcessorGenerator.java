@@ -655,6 +655,20 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
                 Cast castLocal = ExpressionFactory.cast(type, evaluateAndTransformLocal);
 
+                Conditional ifConfigAlsoNull = ifNotNull._else()._if(Op.eq(object.invoke("get" + StringUtils.capitalize(fieldName)), ExpressionFactory._null()));
+                TypeReference coreMessages = ref(CoreMessages.class);
+                Invocation failedToInvoke = coreMessages.staticInvoke("failedToCreate");
+                if (methodName != null) {
+                    failedToInvoke.arg(ExpressionFactory.lit(methodName));
+                }
+                Invocation messageException = ExpressionFactory._new(ref(MessagingException.class));
+                messageException.arg(failedToInvoke);
+                if (event != null) {
+                    messageException.arg(event);
+                }
+                messageException.arg(ExpressionFactory._new(ref(RuntimeException.class)).arg("You must provide a " + fieldName + " at the config or the message processor level."));
+                ifConfigAlsoNull._then()._throw(messageException);
+
                 ifNotNull._else().assign(transformed, castLocal);
 
             }

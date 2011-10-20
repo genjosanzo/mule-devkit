@@ -1,6 +1,6 @@
 <html>
 <head>
-<meta http-equiv="refresh" content="0;url=guide/install.html">
+<meta http-equiv="refresh" content="0;url=mule/modules.html">
 </head>
 <body>
 <?cs include:"analytics.cs" ?>
