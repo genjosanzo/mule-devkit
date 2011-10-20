@@ -16,6 +16,8 @@
  */
 package org.mule.devkit.utils;
 
+import org.mule.api.annotations.param.Payload;
+
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -23,10 +25,10 @@ import javax.lang.model.type.TypeMirror;
 public class ValidatorUtils {
 
     public static boolean isTypeForbidden(VariableElement variableElement) {
-        return variableElement.asType().getKind() == TypeKind.ARRAY && !variableElement.asType().toString().equals("byte[]");
+        return variableElement.getAnnotation(Payload.class) == null && variableElement.asType().getKind() == TypeKind.ARRAY;
     }
 
     public static boolean isTypeForbidden(TypeMirror typeMirror) {
-        return typeMirror.getKind() == TypeKind.ARRAY && !typeMirror.toString().equals("byte[]");
+        return typeMirror.getKind() == TypeKind.ARRAY;
     }
 }
