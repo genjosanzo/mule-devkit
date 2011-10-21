@@ -20,11 +20,9 @@ package org.mule.devkit.validation;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 
-import java.util.Map;
-
 public interface Validator {
 
-    boolean shouldValidate(Map<String, String> options);
+    boolean shouldValidate(DevKitTypeElement typeElement, GeneratorContext context);
 
     void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException;
 }

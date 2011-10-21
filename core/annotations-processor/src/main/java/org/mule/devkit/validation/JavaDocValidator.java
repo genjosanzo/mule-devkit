@@ -20,9 +20,7 @@ package org.mule.devkit.validation;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connect;
-import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Disconnect;
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
@@ -37,20 +35,16 @@ import javax.lang.model.element.VariableElement;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Map;
 
 public class JavaDocValidator implements Validator {
 
     @Override
-    public boolean shouldValidate(Map<String, String> options) {
-        return !options.containsKey("skipJavaDocValidation");
+    public boolean shouldValidate(DevKitTypeElement typeElement, GeneratorContext context) {
+        return typeElement.isModuleOrConnector() && !context.isEnvOptionSet("skipJavaDocValidation");
     }
 
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
-        if (!typeElement.hasAnnotation(Module.class) && !typeElement.hasAnnotation(Connector.class)) {
-            return;
-        }
 
         if (!hasComment(typeElement.getInnerTypeElement(), context)) {
             throw new ValidationException(typeElement, "Class " + typeElement.getQualifiedName().toString() + " is not properly documented. A summary is missing.");

@@ -134,12 +134,7 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
 
     @Override
     public boolean isModuleOrConnector() {
-        if (hasAnnotation(Module.class) ||
-                hasAnnotation(Connector.class)) {
-            return true;
-        }
-
-        return false;
+        return hasAnnotation(Module.class) || hasAnnotation(Connector.class);
     }
 
     @Override

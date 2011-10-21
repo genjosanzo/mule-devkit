@@ -17,8 +17,6 @@
 
 package org.mule.devkit.validation;
 
-import org.mule.api.annotations.Connector;
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
@@ -33,20 +31,16 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import java.util.List;
-import java.util.Map;
 
 public class ProcessorValidator implements Validator {
 
     @Override
-    public boolean shouldValidate(Map<String, String> options) {
-        return true;
+    public boolean shouldValidate(DevKitTypeElement typeElement, GeneratorContext context) {
+        return typeElement.isModuleOrConnector();
     }
 
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
-        if (!typeElement.hasAnnotation(Module.class) && !typeElement.hasAnnotation(Connector.class)) {
-            return;
-        }
 
         for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
 

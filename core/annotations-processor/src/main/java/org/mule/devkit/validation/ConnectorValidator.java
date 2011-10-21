@@ -25,21 +25,16 @@ import org.mule.devkit.generation.DevKitTypeElement;
 
 import javax.lang.model.element.ExecutableElement;
 import java.util.List;
-import java.util.Map;
 
 public class ConnectorValidator implements Validator {
 
     @Override
-    public boolean shouldValidate(Map<String, String> options) {
-        return true;
+    public boolean shouldValidate(DevKitTypeElement typeElement, GeneratorContext context) {
+        return typeElement.hasAnnotation(Connector.class);
     }
 
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
-
-        if (!typeElement.hasAnnotation(Connector.class)) {
-            return;
-        }
 
         List<ExecutableElement> connectMethods = typeElement.getMethodsAnnotatedWith(Connect.class);
         if (connectMethods.size() > 1) {

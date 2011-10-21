@@ -18,8 +18,6 @@
 package org.mule.devkit.validation;
 
 import org.mule.api.annotations.Configurable;
-import org.mule.api.annotations.Connector;
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.devkit.GeneratorContext;
@@ -28,22 +26,16 @@ import org.mule.devkit.generation.DevKitTypeElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
-import java.util.Map;
 
 public class BasicValidator implements Validator {
 
     @Override
-    public boolean shouldValidate(Map<String, String> options) {
-        return true;
+    public boolean shouldValidate(DevKitTypeElement typeElement, GeneratorContext context) {
+        return typeElement.isModuleOrConnector();
     }
 
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
-
-        if (!typeElement.hasAnnotation(Module.class) &&
-                !typeElement.hasAnnotation(Connector.class)) {
-            return;
-        }
 
         if (typeElement.isInterface()) {
             throw new ValidationException(typeElement, "@Module/@Connector cannot be applied to an interface");
