@@ -55,6 +55,13 @@ public class ${muleModuleName}Module
         this.myProperty = myProperty;
     }
 
+    /**
+     * Connect
+     *
+     * @param username A username
+     * @param password A password
+     * @throws ConnectionException
+     */
     @Connect
     public void connect(@ConnectionKey String username, String password)
         throws ConnectionException {
@@ -63,6 +70,9 @@ public class ${muleModuleName}Module
          */
     }
 
+    /**
+     * Disconnect
+     */
     @Disconnect
     public void disconnect() {
         /*
@@ -73,7 +83,7 @@ public class ${muleModuleName}Module
     /**
      * Custom processor
      *
-     * {@sample.xml doc/${moduleNameLower}-connector.xml.sample ${moduleNameLower}:my-processor}
+     * {@sample.xml ../../../doc/${muleModuleName}-connector.xml.sample ${moduleNameLower}:my-processor}
      *
      * @param content Content to be processed
      * @return Some string
