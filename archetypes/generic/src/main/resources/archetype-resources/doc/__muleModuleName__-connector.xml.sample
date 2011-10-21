@@ -1,0 +1,3 @@
+<!-- BEGIN_INCLUDE(${muleModuleName.toLowerCase()}:my-processor) -->
+    <${muleModuleName.toLowerCase()}:my-processor content="#[map-payload:content]" />
+<!-- END_INCLUDE(${muleModuleName.toLowerCase()}:my-processor) -->

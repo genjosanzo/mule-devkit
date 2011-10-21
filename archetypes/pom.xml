@@ -17,6 +17,7 @@
     <packaging>pom</packaging>
 
 	<modules>
+        <module>generic</module>
         <module>cloud-connector</module>
         <module>transformer</module>
 	</modules>
