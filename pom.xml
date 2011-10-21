@@ -137,6 +137,42 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>windows_profile</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <toolsjar>${java.home}/../lib/tools.jar</toolsjar>
+            </properties>
+        </profile>
+        <profile>
+            <id>linux_profile</id>
+            <activation>
+                <os>
+                    <name>linux</name>
+                </os>
+            </activation>
+            <properties>
+                <toolsjar>${java.home}/../lib/tools.jar</toolsjar>
+            </properties>
+        </profile>
+        <profile>
+            <id>osx_profile</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <properties>
+                <toolsjar>${java.home}/../Classes/classes.jar</toolsjar>
+            </properties>
+        </profile>
+    </profiles>
+
     <repositories>
         <repository>
             <id>jboss</id>
@@ -148,10 +184,10 @@
             <name>MuleSoft Releases</name>
             <url>http://repository.mulesoft.org/releases/</url>
         </repository>
-		<repository>
-			<id>oss-sonatype-snapshots</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-		</repository>
+        <repository>
+            <id>oss-sonatype-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
     </repositories>
 
     <distributionManagement>
