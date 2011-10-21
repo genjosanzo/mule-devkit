@@ -24,10 +24,10 @@ import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
-import org.mule.devkit.utils.ValidatorUtils;
 
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeKind;
 import java.util.Map;
 
 public class BasicValidator implements Validator {
@@ -67,8 +67,8 @@ public class BasicValidator implements Validator {
                 throw new ValidationException(variable, "@Configurable cannot be applied to field with static modifier");
             }
 
-            if(ValidatorUtils.isTypeForbidden(variable)) {
-                throw new ValidationException(variable, "@Configurable of unsupported type");
+            if(variable.asType().getKind() == TypeKind.ARRAY) {
+                throw new ValidationException(variable, "@Configurable cannot be applied to arrays");
             }
 
             Optional optional = variable.getAnnotation(Optional.class);
