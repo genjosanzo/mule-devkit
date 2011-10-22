@@ -120,7 +120,7 @@ public class ModuleAnnotationProcessor extends AbstractProcessor {
                 try {
                     for (Plugin plugin : getPlugins()) {
                         for (Validator validator : plugin.getValidators()) {
-                            if (validator.shouldValidate(processingEnv.getOptions())) {
+                            if (validator.shouldValidate(devKitTypeElement, context)) {
                                 validator.validate(devKitTypeElement, context);
                             }
                         }

@@ -32,6 +32,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -53,21 +54,23 @@ public class GeneratorContext {
     private Map<String, String> options;
     private Set<TypeMirror> registeredEnums;
     private SourceUtils sourceUtils;
+    private Map<String, String> envOptions;
 
     public GeneratorContext(ProcessingEnvironment env) {
-        this.registerAtBoot = new ArrayList<DefinedClass>();
-        this.codeModel = new CodeModel(new FilerCodeWriter(env.getFiler()));
-        this.schemaModel = new SchemaModel(new FilerCodeWriter(env.getFiler()));
-        this.roles = new HashMap<String, DefinedClass>();
-        this.elements = env.getElementUtils();
-        this.types = env.getTypeUtils();
-        this.typeMirrorUtils = new TypeMirrorUtils(this.types);
-        this.nameUtils = new NameUtils(this.elements);
-        this.javaDocUtils = new JavaDocUtils(this.elements);
-        this.studioModel = new StudioModel(new FilerCodeWriter(env.getFiler()));
-        this.options = env.getOptions();
-        this.sourceUtils = new SourceUtils(env);
+        registerAtBoot = new ArrayList<DefinedClass>();
+        codeModel = new CodeModel(new FilerCodeWriter(env.getFiler()));
+        schemaModel = new SchemaModel(new FilerCodeWriter(env.getFiler()));
+        roles = new HashMap<String, DefinedClass>();
+        elements = env.getElementUtils();
+        types = env.getTypeUtils();
+        typeMirrorUtils = new TypeMirrorUtils(this.types);
+        nameUtils = new NameUtils(this.elements);
+        javaDocUtils = new JavaDocUtils(this.elements);
+        studioModel = new StudioModel(new FilerCodeWriter(env.getFiler()));
+        options = env.getOptions();
+        sourceUtils = new SourceUtils(env);
         registeredEnums = new HashSet<TypeMirror>();
+        envOptions = Collections.unmodifiableMap(env.getOptions());
     }
 
     public CodeModel getCodeModel() {
@@ -79,7 +82,7 @@ public class GeneratorContext {
     }
 
     public void registerAtBoot(DefinedClass clazz) {
-        this.registerAtBoot.add(clazz);
+        registerAtBoot.add(clazz);
     }
 
     public SchemaModel getSchemaModel() {
@@ -87,19 +90,19 @@ public class GeneratorContext {
     }
 
     public Types getTypeUtils() {
-        return this.types;
+        return types;
     }
 
     public Elements getElementsUtils() {
-        return this.elements;
+        return elements;
     }
 
     public void setClassRole(String role, DefinedClass clazz) {
-        this.roles.put(role, clazz);
+        roles.put(role, clazz);
     }
 
     public DefinedClass getClassForRole(String role) {
-        return this.roles.get(role);
+        return roles.get(role);
     }
 
     public TypeMirrorUtils getTypeMirrorUtils() {
@@ -132,5 +135,9 @@ public class GeneratorContext {
 
     public SourceUtils getSourceUtils() {
         return sourceUtils;
+    }
+
+    public boolean isEnvOptionSet(String envOption) {
+        return envOptions.containsKey(envOption);
     }
 }
