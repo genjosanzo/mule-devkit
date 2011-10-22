@@ -19,17 +19,17 @@
 
 <component-set>
     <components>
-	    <component>
-	      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
-	      <role-hint>mule-module</role-hint>
-	      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
-	      <configuration>
-	        <type>mule-module</type>
-	        <extension>jar</extension>
-	        <language>java</language>
-	        <addedToClasspath>true</addedToClasspath>
-	      </configuration>
-	    </component>
+        <component>
+            <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+            <role-hint>mule-module</role-hint>
+            <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+            <configuration>
+                <type>mule-module</type>
+                <extension>jar</extension>
+                <language>java</language>
+                <addedToClasspath>true</addedToClasspath>
+            </configuration>
+        </component>
         <component>
             <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
             <role-hint>mule-module</role-hint>
@@ -54,7 +54,8 @@
                     </process-classes>
                     <generate-test-sources></generate-test-sources>
                     <process-test-sources></process-test-sources>
-                    <generate-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</generate-test-resources>
+                    <generate-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources
+                    </generate-test-resources>
                     <process-test-resources>
                     </process-test-resources>
                     <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile
@@ -64,7 +65,8 @@
                     <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
                     <package>org.mule.tools.devkit:mule-devkit-maven-plugin:attach-schema,
                         org.apache.maven.plugins:maven-jar-plugin:jar,
-                        org.mule.tools.devkit:mule-devkit-maven-plugin:package</package>
+                        org.mule.tools.devkit:mule-devkit-maven-plugin:package
+                    </package>
                     <pre-integration-test></pre-integration-test>
                     <integration-test>
                     </integration-test>

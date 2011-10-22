@@ -49,17 +49,17 @@ package org.mule.devkit.model.code;
  */
 public final class ForEach implements Statement {
 
-	private final Type type;
-	private final String var;
-	private Block body = null; // lazily created
-	private final Expression collection;
+    private final Type type;
+    private final String var;
+    private Block body = null; // lazily created
+    private final Expression collection;
     private final Variable loopVar;
 
-	public ForEach(Type vartype, String variable, Expression collection) {
+    public ForEach(Type vartype, String variable, Expression collection) {
 
-		this.type = vartype;
-		this.var = variable;
-		this.collection = collection;
+        this.type = vartype;
+        this.var = variable;
+        this.collection = collection;
         loopVar = new Variable(Modifiers.forVar(Modifier.NONE), type, var, collection);
     }
 
@@ -67,26 +67,26 @@ public final class ForEach implements Statement {
     /**
      * Returns a reference to the loop variable.
      */
-	public Variable var() {
-		return loopVar;
-	}
+    public Variable var() {
+        return loopVar;
+    }
 
-	public Block body() {
-		if (body == null) {
+    public Block body() {
+        if (body == null) {
             body = new Block();
         }
-		return body;
-	}
+        return body;
+    }
 
-	public void state(Formatter f) {
-		f.p("for (");
-		f.g(type).id(var).p(": ").g(collection);
-		f.p(')');
-		if (body != null) {
+    public void state(Formatter f) {
+        f.p("for (");
+        f.g(type).id(var).p(": ").g(collection);
+        f.p(')');
+        if (body != null) {
             f.g(body).nl();
         } else {
             f.p(';').nl();
         }
-	}
+    }
 
 }

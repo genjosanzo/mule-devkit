@@ -124,7 +124,7 @@ public class ParamTagInfo extends ParsedTagInfo {
         for (int i = 0; i < tags.length; i++) {
             // don't output if the comment is ""
             //if (!"".equals(tags[i].parameterComment())) {
-                tags[i].makeHDF(data, base + "." + i);
+            tags[i].makeHDF(data, base + "." + i);
             //}
         }
     }

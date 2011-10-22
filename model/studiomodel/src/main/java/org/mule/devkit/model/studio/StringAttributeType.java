@@ -30,9 +30,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for StringAttributeType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="StringAttributeType">
  *   &lt;complexContent>
@@ -42,25 +42,20 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "StringAttributeType")
 public class StringAttributeType
-    extends AttributeType
-{
+        extends AttributeType {
 
     @XmlAttribute(name = "defaultValue")
     protected String defaultValue;
 
     /**
      * Gets the value of the defaultValue property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getDefaultValue() {
         return defaultValue;
@@ -68,11 +63,9 @@ public class StringAttributeType
 
     /**
      * Sets the value of the defaultValue property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDefaultValue(String value) {
         this.defaultValue = value;

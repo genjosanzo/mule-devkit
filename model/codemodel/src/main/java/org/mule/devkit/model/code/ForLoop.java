@@ -49,41 +49,41 @@ import java.util.List;
  */
 
 public class ForLoop implements Statement {
-    
+
     private List<Object> inits = new ArrayList<Object>();
     private Expression test = null;
     private List<Expression> updates = new ArrayList<Expression>();
     private Block body = null;
-    
+
     public Variable init(int mods, Type type, String var, Expression e) {
         Variable v = new Variable(Modifiers.forVar(mods), type, var, e);
         inits.add(v);
         return v;
     }
-    
+
     public Variable init(Type type, String var, Expression e) {
         return init(Modifier.NONE, type, var, e);
     }
-    
+
     public void init(Variable v, Expression e) {
         inits.add(ExpressionFactory.assign(v, e));
     }
-    
+
     public void test(Expression e) {
         this.test = e;
     }
-    
+
     public void update(Expression e) {
         updates.add(e);
     }
-    
+
     public Block body() {
         if (body == null) {
             body = new Block();
         }
         return body;
     }
-    
+
     public void state(Formatter f) {
         f.p("for (");
         boolean first = true;
@@ -105,5 +105,5 @@ public class ForLoop implements Statement {
             f.p(';').nl();
         }
     }
-    
+
 }

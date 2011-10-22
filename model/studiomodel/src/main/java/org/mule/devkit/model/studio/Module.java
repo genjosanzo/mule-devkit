@@ -32,9 +32,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -46,12 +46,10 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "namespace"
+        "namespace"
 })
 @XmlRootElement(name = "module")
 public class Module {
@@ -61,11 +59,9 @@ public class Module {
 
     /**
      * Gets the value of the namespace property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link NamespaceType }
-     *     
+     *
+     * @return possible object is
+     *         {@link NamespaceType }
      */
     public NamespaceType getNamespace() {
         return namespace;
@@ -73,11 +69,9 @@ public class Module {
 
     /**
      * Sets the value of the namespace property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link NamespaceType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link NamespaceType }
      */
     public void setNamespace(NamespaceType value) {
         this.namespace = value;

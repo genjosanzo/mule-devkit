@@ -17,22 +17,18 @@
 
 package org.mule.devkit.it;
 
-public class SourceModuleTest extends AbstractModuleTest
-{
+public class SourceModuleTest extends AbstractModuleTest {
 
     @Override
-    protected String getConfigResources()
-    {
+    protected String getConfigResources() {
         return "source.xml";
     }
 
-    public void testSource() throws Exception
-    {
+    public void testSource() throws Exception {
         runFlow("source");
     }
 
-    public void testSourceWithProperties() throws Exception
-    {
+    public void testSourceWithProperties() throws Exception {
         runFlow("sourceWithProperties");
     }
 

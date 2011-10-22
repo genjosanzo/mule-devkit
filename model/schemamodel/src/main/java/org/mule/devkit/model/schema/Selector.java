@@ -36,9 +36,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -55,15 +55,12 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "selector")
 public class Selector
-    extends Annotated
-{
+        extends Annotated {
 
     @XmlAttribute(name = "xpath", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
@@ -71,11 +68,9 @@ public class Selector
 
     /**
      * Gets the value of the xpath property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getXpath() {
         return xpath;
@@ -83,11 +78,9 @@ public class Selector
 
     /**
      * Sets the value of the xpath property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setXpath(String value) {
         this.xpath = value;

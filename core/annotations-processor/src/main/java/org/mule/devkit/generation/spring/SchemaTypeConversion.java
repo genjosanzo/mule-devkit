@@ -27,7 +27,7 @@ public final class SchemaTypeConversion {
     public static QName convertType(String typeName, String targetNamespace) {
         if (typeName.equals("java.lang.String")) {
             return new QName(SchemaConstants.XSD_NAMESPACE, "string", "xs");
-        //} else if( typeName.equals("java.lang.Object")) {
+            //} else if( typeName.equals("java.lang.Object")) {
             //return new QName(SchemaConstants.XSD_NAMESPACE, "string", "xs");
             //return new QName(SchemaConstants.MULE_NAMESPACE, "propertyPlaceholderType", "mule");
         } else if (typeName.equals("int")) {

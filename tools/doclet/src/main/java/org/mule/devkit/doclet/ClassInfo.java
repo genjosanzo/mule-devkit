@@ -464,10 +464,11 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
     public void gatherFields(ClassInfo owner, ClassInfo cl, HashMap<String, FieldInfo> fields) {
         gatherFields(owner, cl, fields, false);
     }
+
     public void gatherFields(ClassInfo owner, ClassInfo cl, HashMap<String, FieldInfo> fields, boolean ignoreVisibility) {
         FieldInfo[] flds = cl.selfFields();
         for (FieldInfo f : flds) {
-            if( ignoreVisibility ) {
+            if (ignoreVisibility) {
                 fields.put(f.name(), f.cloneForClass(owner));
             } else {
                 if (f.checkLevel()) {
@@ -918,7 +919,7 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
         data.setValue("class.moduleMinMuleVersion", this.moduleMinMuleVersion());
         data.setValue("class.moduleSessionAware", Boolean.toString(this.moduleSessionAware()));
 
-        if( moduleSessionAware() ) {
+        if (moduleSessionAware()) {
             //ParameterInfo.makeHDF(data, "class.moduleSessionVariables", mModuleConnectVariables, false, mModuleConnectVariablesTypes);
             ParamTagInfo.makeHDF(data, "class.moduleConnectVariables", mModuleConnectVariables);
         }
@@ -1886,8 +1887,7 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
                     extractConnectorOrModuleAnnotation(annotation);
                     annotationPresent = true;
                     break;
-                }
-                else if (annotation.type().qualifiedName().equals("org.mule.api.annotations.Connector")) {
+                } else if (annotation.type().qualifiedName().equals("org.mule.api.annotations.Connector")) {
                     extractConnectorOrModuleAnnotation(annotation);
                     annotationPresent = true;
                     break;
@@ -1897,9 +1897,9 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
             mIsModule = annotationPresent;
             boolean hasConnect = false;
             boolean hasDisconnect = false;
-            if( mIsModule ) {
+            if (mIsModule) {
                 for (MethodInfo m : methods()) {
-                    for( AnnotationInstanceInfo annotation : m.annotations() ) {
+                    for (AnnotationInstanceInfo annotation : m.annotations()) {
                         if (annotation.type().qualifiedName().equals("org.mule.api.annotations.Connect")) {
                             mModuleConnectVariables = m.paramTags();
                             mModuleConnectVariablesTypes = m.typeVariables();
@@ -1911,7 +1911,7 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
                     }
                 }
             }
-            if( hasConnect && hasDisconnect ) {
+            if (hasConnect && hasDisconnect) {
                 mModuleHasConnectionManager = true;
             }
             mModuleKnown = true;

@@ -49,7 +49,8 @@ public abstract class ExpressionFactory {
     /**
      * This class is not instanciable.
      */
-    private ExpressionFactory() { }
+    private ExpressionFactory() {
+    }
 
     public static Expression assign(AssignmentTarget lhs, Expression rhs) {
         return new Assignment(lhs, rhs);
@@ -66,13 +67,13 @@ public abstract class ExpressionFactory {
     public static Invocation _new(Type t) {
         return new Invocation(t);
     }
-    
+
     public static Invocation invoke(String method) {
-        return new Invocation((Expression)null, method);
+        return new Invocation((Expression) null, method);
     }
-    
+
     public static Invocation invoke(Method method) {
-        return new Invocation((Expression)null,method);
+        return new Invocation((Expression) null, method);
     }
 
     public static Invocation invoke(Expression lhs, Method method) {
@@ -84,11 +85,11 @@ public abstract class ExpressionFactory {
     }
 
     public static FieldRef ref(String field) {
-        return new FieldRef((Expression)null, field);
+        return new FieldRef((Expression) null, field);
     }
 
     public static FieldRef ref(Expression lhs, Variable field) {
-        return new FieldRef(lhs,field);
+        return new FieldRef(lhs, field);
     }
 
     public static FieldRef ref(Expression lhs, String field) {
@@ -96,21 +97,21 @@ public abstract class ExpressionFactory {
     }
 
     public static FieldRef refthis(String field) {
-         return new FieldRef(null, field, true);
+        return new FieldRef(null, field, true);
     }
 
     public static Expression dotclass(final TypeReference cl) {
         return new AbstractExpression() {
-                public void generate(Formatter f) {
-                    TypeReference c;
-                    if(cl instanceof NarrowedClass) {
-                        c = ((NarrowedClass) cl).basis;
-                    } else {
-                        c = cl;
-                    }
-                    f.g(c).p(".class");
+            public void generate(Formatter f) {
+                TypeReference c;
+                if (cl instanceof NarrowedClass) {
+                    c = ((NarrowedClass) cl).basis;
+                } else {
+                    c = cl;
                 }
-            };
+                f.g(c).p(".class");
+            }
+        };
     }
 
     public static ArrayCompRef component(Expression lhs, Expression index) {
@@ -122,14 +123,13 @@ public abstract class ExpressionFactory {
     }
 
     public static JArray newArray(Type type) {
-        return newArray(type,null);
+        return newArray(type, null);
     }
 
     /**
      * Generates {@code new T[size]}.
      *
-     * @param type
-     *      The type of the array component. 'T' or {@code new T[size]}.
+     * @param type The type of the array component. 'T' or {@code new T[size]}.
      */
     public static JArray newArray(Type type, Expression size) {
         // you cannot create an array whose component type is a generic
@@ -139,50 +139,56 @@ public abstract class ExpressionFactory {
     /**
      * Generates {@code new T[size]}.
      *
-     * @param type
-     *      The type of the array component. 'T' or {@code new T[size]}.
+     * @param type The type of the array component. 'T' or {@code new T[size]}.
      */
     public static JArray newArray(Type type, int size) {
-        return newArray(type,lit(size));
+        return newArray(type, lit(size));
     }
-    
-    
+
+
     private static final Expression __this = new Atom("this");
+
     /**
      * Returns a reference to "this", an implicit reference
      * to the current object.
      */
-    public static Expression _this() { return __this; }
+    public static Expression _this() {
+        return __this;
+    }
 
     private static final Expression __super = new Atom("super");
+
     /**
      * Returns a reference to "super", an implicit reference
      * to the super class.
      */
-    public static Expression _super() { return __super; }
-    
-    
+    public static Expression _super() {
+        return __super;
+    }
+
+
     /* -- Literals -- */
 
     private static final Expression __null = new Atom("null");
+
     public static Expression _null() {
         return __null;
     }
-    
+
     /**
      * Boolean constant that represents <code>true</code>
      */
     public static final Expression TRUE = new Atom("true");
-    
+
     /**
      * Boolean constant that represents <code>false</code>
      */
     public static final Expression FALSE = new Atom("false");
 
     public static Expression lit(boolean b) {
-        return b?TRUE:FALSE;
+        return b ? TRUE : FALSE;
     }
-    
+
     public static Expression lit(int n) {
         return new Atom(Integer.toString(n));
     }
@@ -192,49 +198,35 @@ public abstract class ExpressionFactory {
     }
 
     public static Expression lit(float f) {
-    	if (f == Float.NEGATIVE_INFINITY)
-    	{
-    		return new Atom("java.lang.Float.NEGATIVE_INFINITY");
-    	}
-    	else if (f == Float.POSITIVE_INFINITY)
-    	{
-    		return new Atom("java.lang.Float.POSITIVE_INFINITY");
-    	}
-    	else if (Float.isNaN(f))
-    	{
-    		return new Atom("java.lang.Float.NaN");
-    	}
-    	else
-    	{
-    		return new Atom(Float.toString(f) + "F");
-    	}
+        if (f == Float.NEGATIVE_INFINITY) {
+            return new Atom("java.lang.Float.NEGATIVE_INFINITY");
+        } else if (f == Float.POSITIVE_INFINITY) {
+            return new Atom("java.lang.Float.POSITIVE_INFINITY");
+        } else if (Float.isNaN(f)) {
+            return new Atom("java.lang.Float.NaN");
+        } else {
+            return new Atom(Float.toString(f) + "F");
+        }
     }
 
     public static Expression lit(double d) {
-    	if (d == Double.NEGATIVE_INFINITY)
-    	{
-    		return new Atom("java.lang.Double.NEGATIVE_INFINITY");
-    	}
-    	else if (d == Double.POSITIVE_INFINITY)
-    	{
-    		return new Atom("java.lang.Double.POSITIVE_INFINITY");
-    	}
-    	else if (Double.isNaN(d))
-    	{
-    		return new Atom("java.lang.Double.NaN");
-    	}
-    	else
-    	{
-    		return new Atom(Double.toString(d) + "D");
-    	}
+        if (d == Double.NEGATIVE_INFINITY) {
+            return new Atom("java.lang.Double.NEGATIVE_INFINITY");
+        } else if (d == Double.POSITIVE_INFINITY) {
+            return new Atom("java.lang.Double.POSITIVE_INFINITY");
+        } else if (Double.isNaN(d)) {
+            return new Atom("java.lang.Double.NaN");
+        } else {
+            return new Atom(Double.toString(d) + "D");
+        }
     }
 
     static final String charEscape = "\b\t\n\f\r\"\'\\";
-    static final String charMacro  = "btnfr\"'\\";
-    
+    static final String charMacro = "btnfr\"'\\";
+
     /**
      * Escapes the given string, then surrounds it by the specified
-     * quotation mark. 
+     * quotation mark.
      */
     public static String quotify(char quote, String s) {
         int n = s.length();
@@ -243,8 +235,8 @@ public abstract class ExpressionFactory {
         for (int i = 0; i < n; i++) {
             char c = s.charAt(i);
             int j = charEscape.indexOf(c);
-            if(j>=0) {
-                if((quote=='"' && c=='\'') || (quote=='\'' && c=='"')) {
+            if (j >= 0) {
+                if ((quote == '"' && c == '\'') || (quote == '\'' && c == '"')) {
                     sb.append(c);
                 } else {
                     sb.append('\\');
@@ -259,11 +251,11 @@ public abstract class ExpressionFactory {
                 // the escaping here (regardless of the actual file encoding)
                 //
                 // see bug 
-                if( c<0x20 || 0x7E<c ) {
+                if (c < 0x20 || 0x7E < c) {
                     // not printable. use Unicode escape
                     sb.append("\\u");
-                    String hex = Integer.toHexString(((int)c)&0xFFFF);
-                    for( int k=hex.length(); k<4; k++ ) {
+                    String hex = Integer.toHexString(((int) c) & 0xFFFF);
+                    for (int k = hex.length(); k < 4; k++) {
                         sb.append('0');
                     }
                     sb.append(hex);
@@ -283,23 +275,23 @@ public abstract class ExpressionFactory {
     public static Expression lit(String s) {
         return new StringLiteral(s);
     }
-    
+
     /**
      * Creates an expression directly from a source code fragment.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This method can be used as a short-cut to create a Expression.
      * For example, instead of <code>_a.gt(_b)</code>, you can write
      * it as: <code>ExpressionFactory.direct("a>b")</code>.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * Be warned that there is a danger in using this method,
      * as it obfuscates the object model.
      */
-    public static Expression direct( final String source ) {
-        return new AbstractExpression(){
-            public void generate( Formatter f ) {
-                    f.p('(').p(source).p(')');
+    public static Expression direct(final String source) {
+        return new AbstractExpression() {
+            public void generate(Formatter f) {
+                f.p('(').p(source).p(')');
             }
         };
     }

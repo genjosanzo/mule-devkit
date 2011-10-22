@@ -42,8 +42,8 @@ public class EnumModule {
 
     @Processor
     public boolean checkPropertiesSet(Map<Property, String> allProperties, List<Property> propertiesToCheck) {
-        for(Property property : propertiesToCheck) {
-            if(!allProperties.containsKey(property)) {
+        for (Property property : propertiesToCheck) {
+            if (!allProperties.containsKey(property)) {
                 return false;
             }
         }

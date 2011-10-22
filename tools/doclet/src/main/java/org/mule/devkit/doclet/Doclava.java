@@ -759,10 +759,10 @@ public class Doclava {
 
     private static void makeTocHDF(Map<String, List<TocInfo>> toc, Data data) {
         int i = 0;
-        for( String topic : toc.keySet() ) {
+        for (String topic : toc.keySet()) {
             data.setValue("topics." + i + ".title", topic == null ? "Root" : topic);
             int j = 0;
-            for( TocInfo page : toc.get(topic) ) {
+            for (TocInfo page : toc.get(topic)) {
                 data.setValue("topics." + i + ".topics." + j + ".title", page.getTitle());
                 data.setValue("topics." + i + ".topics." + j + ".link", "../" + page.getFilename());
                 j++;
@@ -829,7 +829,7 @@ public class Doclava {
             sorted.put(name, pkg);
             for (MethodInfo method : cl.methods()) {
                 if (method.isProcessor() || method.isSource() ||
-                    method.isTransformer()) {
+                        method.isTransformer()) {
                     sorted.put(method.elementName(), method);
                 }
             }

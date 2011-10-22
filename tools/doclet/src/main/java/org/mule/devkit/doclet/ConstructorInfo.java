@@ -23,130 +23,130 @@ import java.util.List;
 
 public class ConstructorInfo implements AbstractMethodInfo {
 
-  private boolean mIsVarargs;
-  private String mName;
-  private String mType;
-  private boolean mIsStatic;
-  private boolean mIsFinal;
-  private boolean mIsDeprecated;
-  private String mScope;
-  private List<String> mExceptions;
-  private List<ParameterInfo> mParameters;
-  private SourcePositionInfo mSourcePosition;
-  private ClassInfo mClass;
+    private boolean mIsVarargs;
+    private String mName;
+    private String mType;
+    private boolean mIsStatic;
+    private boolean mIsFinal;
+    private boolean mIsDeprecated;
+    private String mScope;
+    private List<String> mExceptions;
+    private List<ParameterInfo> mParameters;
+    private SourcePositionInfo mSourcePosition;
+    private ClassInfo mClass;
 
-  public ConstructorInfo(String name, String type, boolean isStatic, boolean isFinal,
-      String deprecated, String scope, SourcePositionInfo pos, ClassInfo clazz) {
-    mName = name;
-    mType = type;
-    mIsStatic = isStatic;
-    mIsFinal = isFinal;
-    mIsDeprecated = "deprecated".equals(deprecated);
-    mScope = scope;
-    mExceptions = new ArrayList<String>();
-    mParameters = new ArrayList<ParameterInfo>();
-    mSourcePosition = pos;
-    mClass = clazz;
-  }
-  
-  public void setDeprecated(boolean deprecated) {
-    mIsDeprecated = deprecated;
-  }
-
-  public void addParameter(ParameterInfo pInfo) {
-    mParameters.add(pInfo);
-  }
-
-  public void addException(String exec) {
-    mExceptions.add(exec);
-  }
-
-  public String getHashableName() {
-    StringBuilder result = new StringBuilder();
-    result.append(name());
-    for (ParameterInfo pInfo : mParameters) {
-      result.append(":").append(pInfo.typeName());
-    }
-    return result.toString();
-  }
-
-  public SourcePositionInfo position() {
-    return mSourcePosition;
-  }
-
-  public String name() {
-    return mName;
-  }
-
-  public String qualifiedName() {
-    String baseName = (mClass != null) ? (mClass.qualifiedName() + ".") : "";
-    return baseName + name();
-  }
-
-  public String prettySignature() {
-    String params = "";
-    for (ParameterInfo pInfo : mParameters) {
-      if (params.length() > 0) {
-        params += ", ";
-      }
-      params += pInfo.typeName();
-    }
-    return qualifiedName() + '(' + params + ')';
-  }
-
-  public boolean isConsistent(ConstructorInfo mInfo) {
-    boolean consistent = true;
-
-    if (mIsFinal != mInfo.mIsFinal) {
-      consistent = false;
-      Errors.error(Errors.CHANGED_FINAL, mInfo.position(), "Constructor " + mInfo.qualifiedName()
-          + " has changed 'final' qualifier");
+    public ConstructorInfo(String name, String type, boolean isStatic, boolean isFinal,
+                           String deprecated, String scope, SourcePositionInfo pos, ClassInfo clazz) {
+        mName = name;
+        mType = type;
+        mIsStatic = isStatic;
+        mIsFinal = isFinal;
+        mIsDeprecated = "deprecated".equals(deprecated);
+        mScope = scope;
+        mExceptions = new ArrayList<String>();
+        mParameters = new ArrayList<ParameterInfo>();
+        mSourcePosition = pos;
+        mClass = clazz;
     }
 
-    if (mIsStatic != mInfo.mIsStatic) {
-      consistent = false;
-      Errors.error(Errors.CHANGED_FINAL, mInfo.position(), "Constructor " + mInfo.qualifiedName()
-          + " has changed 'static' qualifier");
+    public void setDeprecated(boolean deprecated) {
+        mIsDeprecated = deprecated;
     }
 
-    if (!mScope.equals(mInfo.mScope)) {
-      consistent = false;
-      Errors.error(Errors.CHANGED_SCOPE, mInfo.position(), "Constructor " + mInfo.qualifiedName()
-          + " changed scope from " + mScope + " to " + mInfo.mScope);
+    public void addParameter(ParameterInfo pInfo) {
+        mParameters.add(pInfo);
     }
 
-    if (!mIsDeprecated == mInfo.mIsDeprecated) {
-      consistent = false;
-      Errors.error(Errors.CHANGED_DEPRECATED, mInfo.position(), "Constructor "
-          + mInfo.qualifiedName() + " has changed deprecation state");
+    public void addException(String exec) {
+        mExceptions.add(exec);
     }
 
-    for (String exec : mExceptions) {
-      if (!mInfo.mExceptions.contains(exec)) {
-        Errors.error(Errors.CHANGED_THROWS, mInfo.position(), "Constructor "
-            + mInfo.qualifiedName() + " no longer throws exception " + exec);
-        consistent = false;
-      }
+    public String getHashableName() {
+        StringBuilder result = new StringBuilder();
+        result.append(name());
+        for (ParameterInfo pInfo : mParameters) {
+            result.append(":").append(pInfo.typeName());
+        }
+        return result.toString();
     }
 
-    for (String exec : mInfo.mExceptions) {
-      if (!mExceptions.contains(exec)) {
-        Errors.error(Errors.CHANGED_THROWS, mInfo.position(), "Constructor "
-            + mInfo.qualifiedName() + " added thrown exception " + exec);
-        consistent = false;
-      }
+    public SourcePositionInfo position() {
+        return mSourcePosition;
     }
 
-    return consistent;
-  }
+    public String name() {
+        return mName;
+    }
 
-  @Override
-  public void setVarargs(boolean varargs) {
-    mIsVarargs = varargs;
-  }
+    public String qualifiedName() {
+        String baseName = (mClass != null) ? (mClass.qualifiedName() + ".") : "";
+        return baseName + name();
+    }
 
-  public boolean isVarArgs() {
-    return mIsVarargs;
-  }
+    public String prettySignature() {
+        String params = "";
+        for (ParameterInfo pInfo : mParameters) {
+            if (params.length() > 0) {
+                params += ", ";
+            }
+            params += pInfo.typeName();
+        }
+        return qualifiedName() + '(' + params + ')';
+    }
+
+    public boolean isConsistent(ConstructorInfo mInfo) {
+        boolean consistent = true;
+
+        if (mIsFinal != mInfo.mIsFinal) {
+            consistent = false;
+            Errors.error(Errors.CHANGED_FINAL, mInfo.position(), "Constructor " + mInfo.qualifiedName()
+                    + " has changed 'final' qualifier");
+        }
+
+        if (mIsStatic != mInfo.mIsStatic) {
+            consistent = false;
+            Errors.error(Errors.CHANGED_FINAL, mInfo.position(), "Constructor " + mInfo.qualifiedName()
+                    + " has changed 'static' qualifier");
+        }
+
+        if (!mScope.equals(mInfo.mScope)) {
+            consistent = false;
+            Errors.error(Errors.CHANGED_SCOPE, mInfo.position(), "Constructor " + mInfo.qualifiedName()
+                    + " changed scope from " + mScope + " to " + mInfo.mScope);
+        }
+
+        if (!mIsDeprecated == mInfo.mIsDeprecated) {
+            consistent = false;
+            Errors.error(Errors.CHANGED_DEPRECATED, mInfo.position(), "Constructor "
+                    + mInfo.qualifiedName() + " has changed deprecation state");
+        }
+
+        for (String exec : mExceptions) {
+            if (!mInfo.mExceptions.contains(exec)) {
+                Errors.error(Errors.CHANGED_THROWS, mInfo.position(), "Constructor "
+                        + mInfo.qualifiedName() + " no longer throws exception " + exec);
+                consistent = false;
+            }
+        }
+
+        for (String exec : mInfo.mExceptions) {
+            if (!mExceptions.contains(exec)) {
+                Errors.error(Errors.CHANGED_THROWS, mInfo.position(), "Constructor "
+                        + mInfo.qualifiedName() + " added thrown exception " + exec);
+                consistent = false;
+            }
+        }
+
+        return consistent;
+    }
+
+    @Override
+    public void setVarargs(boolean varargs) {
+        mIsVarargs = varargs;
+    }
+
+    public boolean isVarArgs() {
+        return mIsVarargs;
+    }
 
 }

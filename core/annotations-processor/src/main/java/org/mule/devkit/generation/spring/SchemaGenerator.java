@@ -146,7 +146,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         context.getSchemaModel().addSchemaLocation(versionedSchemaLocation);
 
-        if( currentLocation != null ) {
+        if (currentLocation != null) {
             SchemaLocation currentSchemaLocation = new SchemaLocation(null, schema.getTargetNamespace(), fileName, currentLocation, namespaceHandlerName);
             context.getSchemaModel().addSchemaLocation(currentSchemaLocation);
         }
@@ -373,7 +373,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             }
 
             ExecutableElement connectExecutableElement = connectForMethod(element);
-            if( connectExecutableElement != null ) {
+            if (connectExecutableElement != null) {
                 for (VariableElement connectVariable : connectExecutableElement.getParameters()) {
                     if (context.getTypeMirrorUtils().isCollection(connectVariable.asType())) {
                         generateCollectionElement(schema, targetNamespace, all, connectVariable, true);
@@ -459,7 +459,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
         collectionElement.setMaxOccurs("1");
 
-       // add doc
+        // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
         doc.getContent().add(context.getJavaDocUtils().getParameterSummary(variable.getSimpleName().toString(), variable.getEnclosingElement()));

@@ -222,7 +222,7 @@ public class NameUtils {
     public String generateClassNameInPackage(Element element, String className) {
         Element enclosingElement = element.getEnclosingElement();
         String packageName;
-        if(enclosingElement.getKind() == ElementKind.CLASS) {
+        if (enclosingElement.getKind() == ElementKind.CLASS) {
             packageName = getPackageName(getBinaryName((TypeElement) enclosingElement));
         } else if (enclosingElement.getEnclosingElement() != null) {
             TypeElement parentClass = ElementFilter.typesIn(Arrays.asList(enclosingElement.getEnclosingElement())).get(0);
@@ -275,7 +275,7 @@ public class NameUtils {
     }
 
     public String getBinaryName(TypeElement typeElement) {
-        if(typeElement instanceof TypeElementImpl) {
+        if (typeElement instanceof TypeElementImpl) {
             typeElement = ((DefaultDevKitTypeElement) typeElement).unWrap();
         }
         return elements.getBinaryName(typeElement).toString();

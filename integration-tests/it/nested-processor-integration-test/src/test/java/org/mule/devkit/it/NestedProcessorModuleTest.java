@@ -17,48 +17,39 @@
 
 package org.mule.devkit.it;
 
-public class NestedProcessorModuleTest extends AbstractModuleTest
-{
+public class NestedProcessorModuleTest extends AbstractModuleTest {
 
     @Override
-    protected String getConfigResources()
-    {
+    protected String getConfigResources() {
         return "callback.xml";
     }
 
-    public void testCallback() throws Exception
-    {
+    public void testCallback() throws Exception {
         runFlow("callback", "mulesoft");
     }
 
-    public void testCallbackWithString() throws Exception
-    {
+    public void testCallbackWithString() throws Exception {
         runFlow("callbackWithString", "mulesoft");
     }
 
-    public void testCallbackWithStringAndChildElements() throws Exception
-    {
+    public void testCallbackWithStringAndChildElements() throws Exception {
         runFlow("callbackWithStringAndChildElements", "MuleSoft, Inc.");
     }
 
-    public void testCallbackListWithString() throws Exception
-    {
+    public void testCallbackListWithString() throws Exception {
         runFlow("callbackListWithString", "mulesoft");
     }
 
-    public void testProcessItems() throws Exception
-    {
+    public void testProcessItems() throws Exception {
         runFlowWithPayload("processItems", "payload", "payload");
     }
 
-    public void testProcessOneByOne() throws Exception
-    {
+    public void testProcessOneByOne() throws Exception {
         runFlowWithPayload("processItemsOneByOne", 3, "payload");
     }
 
 
-    public void testCallbackWithPayload() throws Exception
-    {
+    public void testCallbackWithPayload() throws Exception {
         runFlowWithPayload("callbackWithPayload", "payload", "payload");
     }
 }

@@ -17,7 +17,7 @@
 package org.mule.devkit.doclet;
 
 public interface InheritedTags {
-  TagInfo[] tags();
+    TagInfo[] tags();
 
-  InheritedTags inherited();
+    InheritedTags inherited();
 }

@@ -46,7 +46,7 @@ package org.mule.devkit.model.code;
 public final class CaseStatement implements Statement {
 
     /**
-     * label part of the case statement 
+     * label part of the case statement
      */
     private Expression label;
 
@@ -59,7 +59,7 @@ public final class CaseStatement implements Statement {
      * is this a regular case statement or a default case statement?
      */
     private boolean isDefaultCase = false;
-    
+
     /**
      * Construct a case statement
      */
@@ -75,7 +75,7 @@ public final class CaseStatement implements Statement {
         this.label = label;
         this.isDefaultCase = isDefaultCase;
     }
-    
+
     public Expression label() {
         return label;
     }
@@ -89,12 +89,12 @@ public final class CaseStatement implements Statement {
 
     public void state(Formatter f) {
         f.i();
-        if( !isDefaultCase ) {
+        if (!isDefaultCase) {
             f.p("case ").g(label).p(':').nl();
         } else {
             f.p("default:").nl();
         }
-    	if (body != null) {
+        if (body != null) {
             f.s(body);
         }
         f.o();

@@ -31,7 +31,7 @@ public class ConnectorModuleTest extends AbstractModuleTest {
     }
 
     public void testEnsureCapability() throws Exception {
-        Capabilities capabilities = (Capabilities)muleContext.getRegistry().lookupObject("configA");
+        Capabilities capabilities = (Capabilities) muleContext.getRegistry().lookupObject("configA");
 
         assertTrue(capabilities.isCapableOf(Capability.CONNECTION_MANAGEMENT_CAPABLE));
     }

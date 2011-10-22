@@ -31,12 +31,12 @@
 
     <flow name="source">
         <source:count startAt="1" endAt="100" step="1"/>
-		<logger level="INFO"/>
+        <logger level="INFO"/>
     </flow>
 
     <flow name="sourceWithProperties">
         <source:count-with-property startAt="1" endAt="100" step="1" key="MULESOFT_PROPERTY" value="APPLE"/>
-		<source:throw-exception-if-no-property key="MULESOFT_PROPERTY"/>
+        <source:throw-exception-if-no-property key="MULESOFT_PROPERTY"/>
     </flow>
 
 </mule>

@@ -52,33 +52,32 @@ import java.io.Writer;
 /**
  * Filter CodeWriter that writes a progress message to the specified
  * PrintStream.
- * 
- * @author
- * 	Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
+ *
+ * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
 public class ProgressCodeWriter extends FilterCodeWriter {
-    public ProgressCodeWriter( CodeWriter output, PrintStream progress ) {
+    public ProgressCodeWriter(CodeWriter output, PrintStream progress) {
         super(output);
         this.progress = progress;
-        if(progress==null) {
+        if (progress == null) {
             throw new IllegalArgumentException();
         }
     }
 
     private final PrintStream progress;
-    
+
     public OutputStream openBinary(Package pkg, String fileName) throws IOException {
         report(pkg, fileName);
-        return super.openBinary(pkg,fileName);
+        return super.openBinary(pkg, fileName);
     }
 
     public Writer openSource(Package pkg, String fileName) throws IOException {
         report(pkg, fileName);
-        return super.openSource(pkg,fileName);
+        return super.openSource(pkg, fileName);
     }
-    
+
     private void report(Package pkg, String fileName) {
-        if(pkg.isUnnamed()) {
+        if (pkg.isUnnamed()) {
             progress.println(fileName);
         } else {
             progress.println(

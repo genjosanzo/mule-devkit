@@ -37,9 +37,9 @@ import java.util.List;
 
 /**
  * <p>Java class for NestedElementType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="NestedElementType">
  *   &lt;complexContent>
@@ -69,57 +69,54 @@ import java.util.List;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "NestedElementType", propOrder = {
-    "regexpOrEncodingOrString"
+        "regexpOrEncodingOrString"
 })
 public class NestedElementType
-    extends AbstractElementType
-{
+        extends AbstractElementType {
 
     @XmlElementRefs({
-        @XmlElementRef(name = "name", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "expression", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "url", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "encoding", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "childElement", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "password", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "text", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "long", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "boolean", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "file", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "list", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "integer", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "transientBoolean", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "regexp", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "globalRef", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "string", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "path", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "classname", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "enum", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class)
+            @XmlElementRef(name = "name", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "expression", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "url", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "encoding", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "childElement", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "password", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "text", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "long", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "boolean", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "file", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "list", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "integer", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "transientBoolean", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "regexp", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "globalRef", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "string", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "path", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "classname", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "enum", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class)
     })
     protected List<JAXBElement<? extends AttributeType>> regexpOrEncodingOrString;
 
     /**
      * Gets the value of the regexpOrEncodingOrString property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the regexpOrEncodingOrString property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getRegexpOrEncodingOrString().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link JAXBElement }{@code <}{@link ExpressionAttributeType }{@code >}
      * {@link JAXBElement }{@code <}{@link AttributeType }{@code >}
@@ -140,8 +137,6 @@ public class NestedElementType
      * {@link JAXBElement }{@code <}{@link AttributeType }{@code >}
      * {@link JAXBElement }{@code <}{@link AttributeType }{@code >}
      * {@link JAXBElement }{@code <}{@link EnumType }{@code >}
-     * 
-     * 
      */
     public List<JAXBElement<? extends AttributeType>> getRegexpOrEncodingOrString() {
         if (regexpOrEncodingOrString == null) {

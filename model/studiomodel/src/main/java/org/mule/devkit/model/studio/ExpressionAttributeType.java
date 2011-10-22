@@ -33,9 +33,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for ExpressionAttributeType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="ExpressionAttributeType">
  *   &lt;complexContent>
@@ -45,25 +45,20 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ExpressionAttributeType")
 public class ExpressionAttributeType
-    extends AttributeType
-{
+        extends AttributeType {
 
     @XmlAttribute(name = "evaluatorControl")
     protected String evaluatorControl;
 
     /**
      * Gets the value of the evaluatorControl property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getEvaluatorControl() {
         return evaluatorControl;
@@ -71,11 +66,9 @@ public class ExpressionAttributeType
 
     /**
      * Sets the value of the evaluatorControl property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setEvaluatorControl(String value) {
         this.evaluatorControl = value;

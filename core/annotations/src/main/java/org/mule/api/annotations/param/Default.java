@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
  * Specifies a default value to a {@link org.mule.api.annotations.Configurable} field or a
  * {@link org.mule.api.annotations.Processor}/{@link org.mule.api.annotations.Source} parameter.
  */
-@Target(value={ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD})
+@Target(value = {ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Default {

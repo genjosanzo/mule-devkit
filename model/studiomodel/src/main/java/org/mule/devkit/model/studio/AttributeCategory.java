@@ -34,9 +34,9 @@ import java.util.List;
 
 /**
  * <p>Java class for AttributeCategory complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="AttributeCategory">
  *   &lt;complexContent>
@@ -52,12 +52,10 @@ import java.util.List;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AttributeCategory", propOrder = {
-    "group"
+        "group"
 })
 public class AttributeCategory {
 
@@ -73,25 +71,23 @@ public class AttributeCategory {
 
     /**
      * Gets the value of the group property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the group property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getGroup().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link Group }
-     * 
-     * 
      */
     public List<Group> getGroup() {
         if (group == null) {
@@ -102,11 +98,9 @@ public class AttributeCategory {
 
     /**
      * Gets the value of the caption property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getCaption() {
         return caption;
@@ -114,11 +108,9 @@ public class AttributeCategory {
 
     /**
      * Sets the value of the caption property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setCaption(String value) {
         this.caption = value;
@@ -126,11 +118,9 @@ public class AttributeCategory {
 
     /**
      * Gets the value of the description property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getDescription() {
         return description;
@@ -138,11 +128,9 @@ public class AttributeCategory {
 
     /**
      * Sets the value of the description property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDescription(String value) {
         this.description = value;
@@ -150,11 +138,9 @@ public class AttributeCategory {
 
     /**
      * Gets the value of the versions property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getVersions() {
         return versions;
@@ -162,11 +148,9 @@ public class AttributeCategory {
 
     /**
      * Sets the value of the versions property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setVersions(String value) {
         this.versions = value;
@@ -174,11 +158,9 @@ public class AttributeCategory {
 
     /**
      * Gets the value of the mode property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link NewSimpleType }
-     *     
+     *
+     * @return possible object is
+     *         {@link NewSimpleType }
      */
     public NewSimpleType getMode() {
         return mode;
@@ -186,11 +168,9 @@ public class AttributeCategory {
 
     /**
      * Sets the value of the mode property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link NewSimpleType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link NewSimpleType }
      */
     public void setMode(NewSimpleType value) {
         this.mode = value;

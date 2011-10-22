@@ -35,11 +35,11 @@ import java.math.BigInteger;
 
 /**
  * Specifies a web service that supports the rssCloud interface which can be implemented in HTTP-POST, XML-RPC or SOAP 1.1. Its purpose is to allow processes to register with a cloud to be notified of updates to the channel, implementing a lightweight publish-subscribe protocol for RSS feeds.
- * 
+ * <p/>
  * <p>Java class for Cloud complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="Cloud">
  *   &lt;complexContent>
@@ -53,8 +53,6 @@ import java.math.BigInteger;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Cloud")
@@ -74,11 +72,9 @@ public class Cloud {
 
     /**
      * Gets the value of the domain property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getDomain() {
         return domain;
@@ -86,11 +82,9 @@ public class Cloud {
 
     /**
      * Sets the value of the domain property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDomain(String value) {
         this.domain = value;
@@ -98,11 +92,9 @@ public class Cloud {
 
     /**
      * Gets the value of the port property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
+     *
+     * @return possible object is
+     *         {@link BigInteger }
      */
     public BigInteger getPort() {
         return port;
@@ -110,11 +102,9 @@ public class Cloud {
 
     /**
      * Sets the value of the port property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link BigInteger }
      */
     public void setPort(BigInteger value) {
         this.port = value;
@@ -122,11 +112,9 @@ public class Cloud {
 
     /**
      * Gets the value of the path property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getPath() {
         return path;
@@ -134,11 +122,9 @@ public class Cloud {
 
     /**
      * Sets the value of the path property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setPath(String value) {
         this.path = value;
@@ -146,11 +132,9 @@ public class Cloud {
 
     /**
      * Gets the value of the registerProcedure property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getRegisterProcedure() {
         return registerProcedure;
@@ -158,11 +142,9 @@ public class Cloud {
 
     /**
      * Sets the value of the registerProcedure property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setRegisterProcedure(String value) {
         this.registerProcedure = value;
@@ -170,11 +152,9 @@ public class Cloud {
 
     /**
      * Gets the value of the protocol property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link CloudProtocol }
-     *     
+     *
+     * @return possible object is
+     *         {@link CloudProtocol }
      */
     public CloudProtocol getProtocol() {
         return protocol;
@@ -182,11 +162,9 @@ public class Cloud {
 
     /**
      * Sets the value of the protocol property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link CloudProtocol }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link CloudProtocol }
      */
     public void setProtocol(CloudProtocol value) {
         this.protocol = value;

@@ -37,9 +37,9 @@ import java.util.List;
 
 /**
  * <p>Java class for AbstractElementType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="AbstractElementType">
  *   &lt;complexContent>
@@ -71,28 +71,26 @@ import java.util.List;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AbstractElementType", propOrder = {
-    "attributeCategoryOrRequiredSetAlternativesOrFixedAttribute"
+        "attributeCategoryOrRequiredSetAlternativesOrFixedAttribute"
 })
 @XmlSeeAlso({
-    ScopeType.class,
-    NestedElementType.class,
-    PatternType.class,
-    GlobalType.class,
-    EndpointType.class
+        ScopeType.class,
+        NestedElementType.class,
+        PatternType.class,
+        GlobalType.class,
+        EndpointType.class
 })
 public class AbstractElementType {
 
     @XmlElements({
-        @XmlElement(name = "wrap-in-attrs", type = Attributes.class),
-        @XmlElement(name = "fixedAttribute", type = FixedAttributeType.class),
-        @XmlElement(name = "alwaysAdd", type = AlwaysAdd.class),
-        @XmlElement(name = "required-set-alternatives", type = AlternativesType.class),
-        @XmlElement(name = "attribute-category", type = AttributeCategory.class)
+            @XmlElement(name = "wrap-in-attrs", type = Attributes.class),
+            @XmlElement(name = "fixedAttribute", type = FixedAttributeType.class),
+            @XmlElement(name = "alwaysAdd", type = AlwaysAdd.class),
+            @XmlElement(name = "required-set-alternatives", type = AlternativesType.class),
+            @XmlElement(name = "attribute-category", type = AttributeCategory.class)
     })
     protected List<Object> attributeCategoryOrRequiredSetAlternativesOrFixedAttribute;
     @XmlAttribute(name = "wrapIn")
@@ -127,29 +125,27 @@ public class AbstractElementType {
 
     /**
      * Gets the value of the attributeCategoryOrRequiredSetAlternativesOrFixedAttribute property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the attributeCategoryOrRequiredSetAlternativesOrFixedAttribute property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link Attributes }
      * {@link FixedAttributeType }
      * {@link AlwaysAdd }
      * {@link AlternativesType }
      * {@link AttributeCategory }
-     * 
-     * 
      */
     public List<Object> getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute() {
         if (attributeCategoryOrRequiredSetAlternativesOrFixedAttribute == null) {
@@ -160,11 +156,9 @@ public class AbstractElementType {
 
     /**
      * Gets the value of the wrapIn property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getWrapIn() {
         return wrapIn;
@@ -172,11 +166,9 @@ public class AbstractElementType {
 
     /**
      * Sets the value of the wrapIn property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setWrapIn(String value) {
         this.wrapIn = value;
@@ -184,11 +176,9 @@ public class AbstractElementType {
 
     /**
      * Gets the value of the allowAny property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isAllowAny() {
         return allowAny;
@@ -196,11 +186,9 @@ public class AbstractElementType {
 
     /**
      * Sets the value of the allowAny property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setAllowAny(Boolean value) {
         this.allowAny = value;
@@ -208,11 +196,9 @@ public class AbstractElementType {
 
     /**
      * Gets the value of the versions property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getVersions() {
         return versions;
@@ -220,11 +206,9 @@ public class AbstractElementType {
 
     /**
      * Sets the value of the versions property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setVersions(String value) {
         this.versions = value;
@@ -232,11 +216,9 @@ public class AbstractElementType {
 
     /**
      * Gets the value of the aliasId property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getAliasId() {
         return aliasId;
@@ -244,11 +226,9 @@ public class AbstractElementType {
 
     /**
      * Sets the value of the aliasId property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setAliasId(String value) {
         this.aliasId = value;
@@ -256,11 +236,9 @@ public class AbstractElementType {
 
     /**
      * Gets the value of the caption property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getCaption() {
         return caption;
@@ -268,11 +246,9 @@ public class AbstractElementType {
 
     /**
      * Sets the value of the caption property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setCaption(String value) {
         this.caption = value;
@@ -280,11 +256,9 @@ public class AbstractElementType {
 
     /**
      * Gets the value of the description property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getDescription() {
         return description;
@@ -292,11 +266,9 @@ public class AbstractElementType {
 
     /**
      * Sets the value of the description property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDescription(String value) {
         this.description = value;
@@ -304,11 +276,9 @@ public class AbstractElementType {
 
     /**
      * Gets the value of the icon property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getIcon() {
         return icon;
@@ -316,11 +286,9 @@ public class AbstractElementType {
 
     /**
      * Sets the value of the icon property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setIcon(String value) {
         this.icon = value;
@@ -328,11 +296,9 @@ public class AbstractElementType {
 
     /**
      * Gets the value of the localId property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getLocalId() {
         return localId;
@@ -340,11 +306,9 @@ public class AbstractElementType {
 
     /**
      * Sets the value of the localId property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setLocalId(String value) {
         this.localId = value;
@@ -352,11 +316,9 @@ public class AbstractElementType {
 
     /**
      * Gets the value of the doNotInherit property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getDoNotInherit() {
         return doNotInherit;
@@ -364,11 +326,9 @@ public class AbstractElementType {
 
     /**
      * Sets the value of the doNotInherit property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDoNotInherit(String value) {
         this.doNotInherit = value;
@@ -376,11 +336,9 @@ public class AbstractElementType {
 
     /**
      * Gets the value of the embedIn property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getEmbedIn() {
         return embedIn;
@@ -388,11 +346,9 @@ public class AbstractElementType {
 
     /**
      * Sets the value of the embedIn property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setEmbedIn(String value) {
         this.embedIn = value;
@@ -400,11 +356,9 @@ public class AbstractElementType {
 
     /**
      * Gets the value of the image property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getImage() {
         return image;
@@ -412,11 +366,9 @@ public class AbstractElementType {
 
     /**
      * Sets the value of the image property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setImage(String value) {
         this.image = value;
@@ -424,11 +376,9 @@ public class AbstractElementType {
 
     /**
      * Gets the value of the category property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getCategory() {
         return category;
@@ -436,11 +386,9 @@ public class AbstractElementType {
 
     /**
      * Sets the value of the category property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setCategory(String value) {
         this.category = value;
@@ -448,11 +396,9 @@ public class AbstractElementType {
 
     /**
      * Gets the value of the abstract property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isAbstract() {
         return _abstract;
@@ -460,11 +406,9 @@ public class AbstractElementType {
 
     /**
      * Sets the value of the abstract property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setAbstract(Boolean value) {
         this._abstract = value;
@@ -472,11 +416,9 @@ public class AbstractElementType {
 
     /**
      * Gets the value of the extends property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getExtends() {
         return _extends;
@@ -484,11 +426,9 @@ public class AbstractElementType {
 
     /**
      * Sets the value of the extends property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setExtends(String value) {
         this._extends = value;

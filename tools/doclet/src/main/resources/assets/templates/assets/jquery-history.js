@@ -52,9 +52,9 @@
         },
         getCurrent: function() {
             if (currentHash) {
-              return currentHash.replace(hashTrim, '');
-            } else { 
-              return ""; 
+                return currentHash.replace(hashTrim, '');
+            } else {
+                return "";
             }
         }
     };

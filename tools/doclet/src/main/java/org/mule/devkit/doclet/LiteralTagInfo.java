@@ -17,14 +17,14 @@
 package org.mule.devkit.doclet;
 
 public class LiteralTagInfo extends TagInfo {
-  static String encode(String t) {
-    t = t.replace("&", "&amp;");
-    t = t.replace("<", "&lt;");
-    t = t.replace(">", "&gt;");
-    return t;
-  }
+    static String encode(String t) {
+        t = t.replace("&", "&amp;");
+        t = t.replace("<", "&lt;");
+        t = t.replace(">", "&gt;");
+        return t;
+    }
 
-  public LiteralTagInfo(String text, SourcePositionInfo sp) {
-    super("Text", "Text", encode(text), sp);
-  }
+    public LiteralTagInfo(String text, SourcePositionInfo sp) {
+        super("Text", "Text", encode(text), sp);
+    }
 }

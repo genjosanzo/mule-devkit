@@ -26,17 +26,14 @@ import org.mule.tck.FunctionalTestCase;
 
 import java.util.Map;
 
-public abstract class AbstractModuleTest extends FunctionalTestCase
-{
+public abstract class AbstractModuleTest extends FunctionalTestCase {
     private static final String EMPTY_PAYLOAD = "";
 
-    protected Flow lookupFlowConstruct(String name)
-    {
+    protected Flow lookupFlowConstruct(String name) {
         return (Flow) AbstractMuleTestCase.muleContext.getRegistry().lookupFlowConstruct(name);
     }
 
-    protected <T> void runFlow(String flowName, T expect) throws Exception
-    {
+    protected <T> void runFlow(String flowName, T expect) throws Exception {
         String payload = EMPTY_PAYLOAD;
         Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = AbstractMuleTestCase.getTestEvent(payload);
@@ -45,8 +42,7 @@ public abstract class AbstractModuleTest extends FunctionalTestCase
         assertEquals(expect, responseEvent.getMessage().getPayload());
     }
 
-    protected <T, U> void runFlowWithPayload(String flowName, T expect, U payload) throws Exception
-    {
+    protected <T, U> void runFlowWithPayload(String flowName, T expect, U payload) throws Exception {
         Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = AbstractMuleTestCase.getTestEvent(payload);
         MuleEvent responseEvent = flow.process(event);
@@ -54,11 +50,10 @@ public abstract class AbstractModuleTest extends FunctionalTestCase
         assertEquals(expect, responseEvent.getMessage().getPayload());
     }
 
-    protected <T, U> void runFlowWithPayloadAndHeaders(String flowName, Map<String, Object> headers, T expect, U payload) throws Exception
-    {
+    protected <T, U> void runFlowWithPayloadAndHeaders(String flowName, Map<String, Object> headers, T expect, U payload) throws Exception {
         Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = AbstractMuleTestCase.getTestEvent(payload);
-        for( String key : headers.keySet()) {
+        for (String key : headers.keySet()) {
             event.getMessage().setProperty(key, headers.get(key), PropertyScope.INVOCATION);
         }
         MuleEvent responseEvent = flow.process(event);
@@ -66,11 +61,10 @@ public abstract class AbstractModuleTest extends FunctionalTestCase
         assertEquals(expect, responseEvent.getMessage().getPayload());
     }
 
-    protected <U> MuleMessage runFlowWithPayloadAndHeaders(String flowName, Map<String, Object> headers, U payload) throws Exception
-    {
+    protected <U> MuleMessage runFlowWithPayloadAndHeaders(String flowName, Map<String, Object> headers, U payload) throws Exception {
         Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = AbstractMuleTestCase.getTestEvent(payload);
-        for( String key : headers.keySet()) {
+        for (String key : headers.keySet()) {
             event.getMessage().setProperty(key, headers.get(key), PropertyScope.INVOCATION);
         }
         MuleEvent responseEvent = flow.process(event);

@@ -41,7 +41,6 @@
 package org.mule.devkit.model.code;
 
 
-
 /**
  * A cast operation.
  */
@@ -59,12 +58,9 @@ public final class Cast extends AbstractExpression {
     /**
      * Cast constructor
      *
-     * @param type
-     *        Type to which the expression is cast
-     *
-     * @param object
-     *        Expression for the object upon which
-     *        the cast is applied
+     * @param type   Type to which the expression is cast
+     * @param object Expression for the object upon which
+     *               the cast is applied
      */
     Cast(Type type, Expression object) {
         this.type = type;

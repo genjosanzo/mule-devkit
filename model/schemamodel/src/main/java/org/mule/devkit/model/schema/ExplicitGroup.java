@@ -32,13 +32,12 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * 
- *    group type for the three kinds of group
- * 
+ * group type for the three kinds of group
+ * <p/>
  * <p>Java class for explicitGroup complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="explicitGroup">
  *   &lt;complexContent>
@@ -52,18 +51,15 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "explicitGroup")
 @XmlSeeAlso({
-    All.class,
-    SimpleExplicitGroup.class
+        All.class,
+        SimpleExplicitGroup.class
 })
 public class ExplicitGroup
-    extends Group
-{
+        extends Group {
 
 
 }

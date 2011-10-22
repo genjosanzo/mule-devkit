@@ -39,12 +39,12 @@
  */
 
 package org.mule.devkit.model.code;
+
 /**
  * This helps enable whether the DefinedClass is a Class or Interface or
  * AnnotationTypeDeclaration or Enum
  *
- * @author
- *     Bhakti Mehta (bhakti.mehta@sun.com)
+ * @author Bhakti Mehta (bhakti.mehta@sun.com)
  */
 public final class ClassType {
 

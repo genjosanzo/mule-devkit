@@ -20,7 +20,7 @@ package org.mule.api.callback;
 /**
  * Callback interface used by {@link org.mule.api.annotations.Processor} annotated methods which also are
  * declared as intercepting.
- *
+ * <p/>
  * This callback is there to facilitate the decision made by the processor to continue the chain or to stop
  * it.
  */

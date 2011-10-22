@@ -47,13 +47,13 @@ import java.util.Comparator;
 /**
  * Comparator object that sorts {@link org.mule.devkit.model.code.TypeReference}es in the order
  * of their names.
- * 
- * @author
- * 	Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
+ *
+ * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
 public class ClassNameComparator implements Comparator<TypeReference> {
-    private ClassNameComparator() {}
-    
+    private ClassNameComparator() {
+    }
+
     public int compare(TypeReference l, TypeReference r) {
         return l.fullName().compareTo(r.fullName());
     }

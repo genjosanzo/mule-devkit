@@ -23,12 +23,14 @@ public interface OAuth1Adapter {
 
     /**
      * Retrieve OAuth verifier
+     *
      * @return A String representing the OAuth verifier
      */
     String getOauthVerifier();
 
     /**
      * Set OAuth verifier
+     *
      * @param value OAuth verifier to set
      */
     void setOauthVerifier(String value);
@@ -45,6 +47,7 @@ public interface OAuth1Adapter {
 
     /**
      * Set access token
+     *
      * @param value
      */
     void setAccessToken(String value);
@@ -56,6 +59,7 @@ public interface OAuth1Adapter {
 
     /**
      * Set access token secret
+     *
      * @param value Access token secret
      */
     void setAccessTokenSecret(String value);

@@ -49,7 +49,7 @@ public class ConnectorModule {
 
     @Source
     public void stream(SourceCallback callback) {
-        for( int i = 0; i < 10; i++ ) {
+        for (int i = 0; i < 10; i++) {
             try {
                 callback.process(Integer.valueOf(i));
             } catch (Exception e) {
@@ -86,7 +86,7 @@ public class ConnectorModule {
 
     @Connect
     public void connect(@ConnectionKey String username, String password) throws ConnectionException {
-        if( !this.url.equals("http://www.mulesoft.org") ) {
+        if (!this.url.equals("http://www.mulesoft.org")) {
             throw new ConnectionException(ConnectionExceptionCode.CANNOT_REACH, "", "");
         }
 

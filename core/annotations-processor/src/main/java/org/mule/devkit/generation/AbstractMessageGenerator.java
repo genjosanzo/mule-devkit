@@ -269,7 +269,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             initialise.body().assign(patternInfo, ref(TemplateParser.class).staticInvoke("createMuleStyleParser").invoke("getStyle"));
         }
 
-        if( object != null ) {
+        if (object != null) {
             Conditional ifNoObject = initialise.body()._if(Op.eq(object, ExpressionFactory._null()));
             TryStatement tryLookUp = ifNoObject._then()._try();
             tryLookUp.body().assign(object, muleContext.invoke("getRegistry").invoke("lookupObject").arg(ExpressionFactory.dotclass(pojoClass)));

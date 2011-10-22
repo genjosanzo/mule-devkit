@@ -80,7 +80,7 @@ public class MuleModuleWizardStep extends ModuleWizardStep {
         myInheritGroupIdCheckBox.addActionListener(updatingListener);
         myInheritVersionCheckBox.addActionListener(updatingListener);
 
-        myModuleName.addKeyListener( new KeyListener() {
+        myModuleName.addKeyListener(new KeyListener() {
             public void keyTyped(KeyEvent keyEvent) {
             }
 

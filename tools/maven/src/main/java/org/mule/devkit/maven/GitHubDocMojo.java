@@ -117,7 +117,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
      * Paths and patterns to exclude
      */
     @MojoParameter
-    private String[] excludes = new String[] { "**/current.xml" };
+    private String[] excludes = new String[]{"**/current.xml"};
 
     /**
      * Base directory to commit files from

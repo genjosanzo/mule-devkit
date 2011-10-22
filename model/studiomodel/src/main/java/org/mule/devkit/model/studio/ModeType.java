@@ -34,9 +34,9 @@ import java.util.List;
 
 /**
  * <p>Java class for ModeType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="ModeType">
  *   &lt;complexContent>
@@ -49,16 +49,13 @@ import java.util.List;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ModeType", propOrder = {
-    "mode"
+        "mode"
 })
 public class ModeType
-    extends AttributeType
-{
+        extends AttributeType {
 
     @XmlElement(required = true)
     protected List<ModeElementType> mode;
@@ -67,25 +64,23 @@ public class ModeType
 
     /**
      * Gets the value of the mode property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the mode property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getMode().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link ModeElementType }
-     * 
-     * 
      */
     public List<ModeElementType> getMode() {
         if (mode == null) {
@@ -96,11 +91,9 @@ public class ModeType
 
     /**
      * Gets the value of the changesVisibility property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isChangesVisibility() {
         return changesVisibility;
@@ -108,11 +101,9 @@ public class ModeType
 
     /**
      * Sets the value of the changesVisibility property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setChangesVisibility(Boolean value) {
         this.changesVisibility = value;

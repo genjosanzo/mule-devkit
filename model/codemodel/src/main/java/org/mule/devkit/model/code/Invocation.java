@@ -80,31 +80,28 @@ public final class Invocation extends AbstractExpression implements Statement {
     /**
      * Invokes a method on an object.
      *
-     * @param object
-     *        Expression for the object upon which
-     *        the named method will be invoked,
-     *        or null if none
-     *
-     * @param name
-     *        Name of method to invoke
+     * @param object Expression for the object upon which
+     *               the named method will be invoked,
+     *               or null if none
+     * @param name   Name of method to invoke
      */
     Invocation(Expression object, String name) {
-        this( (Generable)object, name );
+        this((Generable) object, name);
     }
 
     Invocation(Expression object, Method method) {
-        this( (Generable)object, method );
+        this((Generable) object, method);
     }
-    
+
     /**
      * Invokes a static method on a class.
      */
     Invocation(TypeReference type, String name) {
-        this( (Generable)type, name );
+        this((Generable) type, name);
     }
 
     Invocation(TypeReference type, Method method) {
-        this( (Generable)type, method );
+        this((Generable) type, method);
     }
 
     private Invocation(Generable object, String name) {
@@ -117,18 +114,17 @@ public final class Invocation extends AbstractExpression implements Statement {
 
     private Invocation(Generable object, Method method) {
         this.object = object;
-        this.method =method;
+        this.method = method;
     }
 
     /**
      * Invokes a constructor of an object (i.e., creates
      * a new object.)
-     * 
-     * @param c
-     *      Type of the object to be created. If this type is
-     *      an array type, added arguments are treated as array
-     *      initializer. Thus you can create an expression like
-     *      <code>new int[]{1,2,3,4,5}</code>.
+     *
+     * @param c Type of the object to be created. If this type is
+     *          an array type, added arguments are treated as array
+     *          initializer. Thus you can create an expression like
+     *          <code>new int[]{1,2,3,4,5}</code>.
      */
     Invocation(Type c) {
         this.isConstructor = true;
@@ -136,13 +132,12 @@ public final class Invocation extends AbstractExpression implements Statement {
     }
 
     /**
-     *  Add an expression to this invocation's argument list
+     * Add an expression to this invocation's argument list
      *
-     * @param arg
-     *        Argument to add to argument list
+     * @param arg Argument to add to argument list
      */
     public Invocation arg(Expression arg) {
-        if(arg==null) {
+        if (arg == null) {
             throw new IllegalArgumentException();
         }
         args.add(arg);
@@ -151,21 +146,21 @@ public final class Invocation extends AbstractExpression implements Statement {
 
     /**
      * Adds a literal argument.
-     *
+     * <p/>
      * Short for {@code arg(JExpr.lit(v))}
      */
     public Invocation arg(String v) {
         return arg(ExpressionFactory.lit(v));
     }
-    
-	/**
-	 * Returns all arguments of the invocation.
-	 * @return
-	 *      If there's no arguments, an empty array will be returned.
-	 */
-	public Expression[] listArgs() {
-		return args.toArray(new Expression[args.size()]);
-	}
+
+    /**
+     * Returns all arguments of the invocation.
+     *
+     * @return If there's no arguments, an empty array will be returned.
+     */
+    public Expression[] listArgs() {
+        return args.toArray(new Expression[args.size()]);
+    }
 
     public void generate(Formatter f) {
         if (isConstructor && type.isArray()) {
@@ -176,7 +171,7 @@ public final class Invocation extends AbstractExpression implements Statement {
                 f.p("new").g(type).p('(');
             } else {
                 String name = this.name;
-                if(name==null) {
+                if (name == null) {
                     name = this.method.name();
                 }
 
@@ -187,7 +182,7 @@ public final class Invocation extends AbstractExpression implements Statement {
                 }
             }
         }
-                
+
         f.g(args);
 
         if (isConstructor && type.isArray()) {
@@ -195,9 +190,9 @@ public final class Invocation extends AbstractExpression implements Statement {
         } else {
             f.p(')');
         }
-            
-        if( type instanceof DefinedClass && ((DefinedClass)type).isAnonymous() ) {
-            ((AnonymousClass)type).declareBody(f);
+
+        if (type instanceof DefinedClass && ((DefinedClass) type).isAnonymous()) {
+            ((AnonymousClass) type).declareBody(f);
         }
     }
 

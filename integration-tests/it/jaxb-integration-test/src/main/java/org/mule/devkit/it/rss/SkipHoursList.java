@@ -35,9 +35,9 @@ import java.util.List;
 
 /**
  * <p>Java class for SkipHoursList complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="SkipHoursList">
  *   &lt;complexContent>
@@ -49,12 +49,10 @@ import java.util.List;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "SkipHoursList", propOrder = {
-    "hour"
+        "hour"
 })
 public class SkipHoursList {
 
@@ -63,25 +61,23 @@ public class SkipHoursList {
 
     /**
      * Gets the value of the hour property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the hour property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getHour().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link Integer }
-     * 
-     * 
      */
     public List<Integer> getHour() {
         if (hour == null) {

@@ -21,5 +21,4 @@
 // Generated on: 2011.10.14 at 10:40:36 AM CDT 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package org.mule.devkit.model.studio;
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED) package org.mule.devkit.model.studio;

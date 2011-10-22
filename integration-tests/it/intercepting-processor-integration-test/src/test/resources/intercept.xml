@@ -30,13 +30,13 @@
     <intercept:config/>
 
     <flow name="shouldContinue">
-		<intercept:should-continue cont="true"/>
-		<intercept:set-payload payload="itDidContinue"/>
+        <intercept:should-continue cont="true"/>
+        <intercept:set-payload payload="itDidContinue"/>
     </flow>
 
     <flow name="shouldNotContinue">
-		<intercept:should-continue cont="false"/>
-		<intercept:set-payload payload="itDidContinue"/>
+        <intercept:should-continue cont="false"/>
+        <intercept:set-payload payload="itDidContinue"/>
     </flow>
 
 </mule>

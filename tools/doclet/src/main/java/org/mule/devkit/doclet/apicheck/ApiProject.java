@@ -23,14 +23,14 @@ import java.util.Map;
 
 public final class ApiProject {
 
-  private final Map<String, TypeInfo> cache = new HashMap<String, TypeInfo>();
+    private final Map<String, TypeInfo> cache = new HashMap<String, TypeInfo>();
 
-  public TypeInfo obtainTypeFromString(String name) {
-    TypeInfo result = cache.get(name);
-    if (result == null) {
-      result = new TypeInfo(name);
-      cache.put(name, result);
+    public TypeInfo obtainTypeFromString(String name) {
+        TypeInfo result = cache.get(name);
+        if (result == null) {
+            result = new TypeInfo(name);
+            cache.put(name, result);
+        }
+        return result;
     }
-    return result;
-  }
 }

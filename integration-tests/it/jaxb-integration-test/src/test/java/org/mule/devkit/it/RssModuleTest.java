@@ -17,17 +17,14 @@
 
 package org.mule.devkit.it;
 
-public class RssModuleTest extends AbstractModuleTest
-{
+public class RssModuleTest extends AbstractModuleTest {
 
     @Override
-    protected String getConfigResources()
-    {
+    protected String getConfigResources() {
         return "rss.xml";
     }
 
-    public void testJAXB() throws Exception
-    {
+    public void testJAXB() throws Exception {
         runFlow("feedCountFlow", 1);
     }
 }

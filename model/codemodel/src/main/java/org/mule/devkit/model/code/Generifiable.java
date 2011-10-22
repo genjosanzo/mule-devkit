@@ -42,28 +42,27 @@ package org.mule.devkit.model.code;
 
 /**
  * Declarations that can have type variables.
- * 
+ * <p/>
  * Something that can be made into a generic.
- * 
- * @author
- *     Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
+ *
+ * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
 public interface Generifiable {
     /**
      * Adds a new type variable to this declaration.
      */
     TypeVariable generify(String name);
-    
+
     /**
      * Adds a new type variable to this declaration with a bound.
      */
     TypeVariable generify(String name, Class<?> bound);
-    
+
     /**
      * Adds a new type variable to this declaration with a bound.
      */
     TypeVariable generify(String name, TypeReference bound);
-    
+
     /**
      * Iterates all the type parameters of this class/interface.
      */

@@ -31,9 +31,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for Booleantype complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="Booleantype">
  *   &lt;complexContent>
@@ -43,25 +43,20 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Booleantype")
 public class Booleantype
-    extends AttributeType
-{
+        extends AttributeType {
 
     @XmlAttribute(name = "defaultValue")
     protected Boolean defaultValue;
 
     /**
      * Gets the value of the defaultValue property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isDefaultValue() {
         return defaultValue;
@@ -69,11 +64,9 @@ public class Booleantype
 
     /**
      * Sets the value of the defaultValue property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setDefaultValue(Boolean value) {
         this.defaultValue = value;

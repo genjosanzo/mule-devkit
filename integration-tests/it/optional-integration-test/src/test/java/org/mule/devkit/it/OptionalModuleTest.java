@@ -17,22 +17,18 @@
 
 package org.mule.devkit.it;
 
-public class OptionalModuleTest extends AbstractModuleTest
-{
+public class OptionalModuleTest extends AbstractModuleTest {
 
     @Override
-    protected String getConfigResources()
-    {
+    protected String getConfigResources() {
         return "optional.xml";
     }
 
-    public void testOptionalParameter() throws Exception
-    {
+    public void testOptionalParameter() throws Exception {
         runFlow("optionalParameter", 10);
     }
 
-    public void testOptionalConfiguration() throws Exception
-    {
+    public void testOptionalConfiguration() throws Exception {
         runFlow("optionalConfig", 50);
     }
 

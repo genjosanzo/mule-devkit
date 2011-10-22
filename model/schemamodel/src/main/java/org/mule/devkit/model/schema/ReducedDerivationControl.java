@@ -32,9 +32,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for reducedDerivationControl.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ * <p/>
  * <pre>
  * &lt;simpleType name="reducedDerivationControl">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}derivationControl">
@@ -43,7 +43,6 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
- * 
  */
 @XmlType(name = "reducedDerivationControl")
 @XmlEnum(DerivationControl.class)
@@ -64,7 +63,7 @@ public enum ReducedDerivationControl {
     }
 
     public static ReducedDerivationControl fromValue(DerivationControl v) {
-        for (ReducedDerivationControl c: ReducedDerivationControl.values()) {
+        for (ReducedDerivationControl c : ReducedDerivationControl.values()) {
             if (c.value.equals(v)) {
                 return c;
             }

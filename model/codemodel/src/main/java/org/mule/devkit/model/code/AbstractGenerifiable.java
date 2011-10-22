@@ -45,22 +45,23 @@ import java.util.List;
 
 /**
  * Implementation of {@link Generifiable}.
- * 
- * @author
- *     Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
+ *
+ * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
 abstract class AbstractGenerifiable implements Generifiable, Declaration {
-    
-    /** Lazily created list of {@link TypeVariable}s. */
+
+    /**
+     * Lazily created list of {@link TypeVariable}s.
+     */
     private List<TypeVariable> typeVariables = null;
-    
+
     protected abstract CodeModel owner();
-    
-    public void declare( Formatter f ) {
-        if(typeVariables!=null) {
+
+    public void declare(Formatter f) {
+        if (typeVariables != null) {
             f.p('<');
             for (int i = 0; i < typeVariables.size(); i++) {
-                if(i!=0) {
+                if (i != 0) {
                     f.p(',');
                 }
                 f.d(typeVariables.get(i));
@@ -71,8 +72,8 @@ abstract class AbstractGenerifiable implements Generifiable, Declaration {
 
 
     public TypeVariable generify(String name) {
-        TypeVariable v = new TypeVariable(owner(),name);
-        if(typeVariables==null) {
+        TypeVariable v = new TypeVariable(owner(), name);
+        if (typeVariables == null) {
             typeVariables = new ArrayList<TypeVariable>(3);
         }
         typeVariables.add(v);
@@ -80,15 +81,15 @@ abstract class AbstractGenerifiable implements Generifiable, Declaration {
     }
 
     public TypeVariable generify(String name, Class<?> bound) {
-        return generify(name,owner().ref(bound));
+        return generify(name, owner().ref(bound));
     }
 
     public TypeVariable generify(String name, TypeReference bound) {
         return generify(name).bound(bound);
     }
-    
+
     public TypeVariable[] typeParams() {
-        if(typeVariables==null) {
+        if (typeVariables == null) {
             return TypeVariable.EMPTY_ARRAY;
         } else {
             return typeVariables.toArray(new TypeVariable[typeVariables.size()]);

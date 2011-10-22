@@ -47,7 +47,7 @@ import java.io.StringWriter;
  */
 public class Modifiers implements Generable {
 
-//
+    //
 // mask
 //
     private static int VAR = Modifier.FINAL;
@@ -59,7 +59,9 @@ public class Modifiers implements Generable {
     private static int CLASS = (Modifier.PUBLIC | Modifier.PRIVATE | Modifier.PROTECTED
             | Modifier.STATIC | Modifier.FINAL | Modifier.ABSTRACT);
     private static int INTERFACE = Modifier.PUBLIC;
-    /** bit-packed representation of modifiers. */
+    /**
+     * bit-packed representation of modifiers.
+     */
     private int mods;
 
     private Modifiers(int mods) {
@@ -180,7 +182,7 @@ public class Modifiers implements Generable {
         if ((mods & Modifier.VOLATILE) != 0) {
             f.p("volatile");
         }
-        }
+    }
 
     @Override
     public String toString() {

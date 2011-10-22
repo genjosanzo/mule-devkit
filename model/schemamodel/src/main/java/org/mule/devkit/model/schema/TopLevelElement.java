@@ -32,9 +32,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for topLevelElement complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="topLevelElement">
  *   &lt;complexContent>
@@ -53,14 +53,11 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "topLevelElement")
 public class TopLevelElement
-    extends Element
-{
+        extends Element {
 
 
 }

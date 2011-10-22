@@ -55,49 +55,49 @@ import java.util.TreeSet;
  */
 public class Method extends AbstractGenerifiable implements Declaration, Annotable, DocCommentable {
 
-	/**
-	 * Modifiers for this method
-	 */
-	private Modifiers mods;
+    /**
+     * Modifiers for this method
+     */
+    private Modifiers mods;
 
-	/**
-	 * Return type for this method
-	 */
-	private Type type = null;
+    /**
+     * Return type for this method
+     */
+    private Type type = null;
 
-	/**
-	 * Name of this method
-	 */
-	private String name = null;
+    /**
+     * Name of this method
+     */
+    private String name = null;
 
-	/**
-	 * List of parameters for this method's declaration
-	 */
-	private final List<Variable> params = new ArrayList<Variable>();
+    /**
+     * List of parameters for this method's declaration
+     */
+    private final List<Variable> params = new ArrayList<Variable>();
 
-	/**
-	 * Set of exceptions that this method may throw.
+    /**
+     * Set of exceptions that this method may throw.
      * A set instance lazily created.
-	 */
-	private Set<TypeReference> _throws;
+     */
+    private Set<TypeReference> _throws;
 
-	/**
-	 * Block of statements that makes up the body this method
-	 */
-	private Block body = null;
+    /**
+     * Block of statements that makes up the body this method
+     */
+    private Block body = null;
 
-	private DefinedClass outer;
+    private DefinedClass outer;
 
-	/**
-	 * javadoc comments for this Method
-	 */
-	private DocComment jdoc = null;
+    /**
+     * javadoc comments for this Method
+     */
+    private DocComment jdoc = null;
 
-	/**
-	 * Variable parameter for this method's varargs declaration
-	 * introduced in J2SE 1.5
-	 */
-	private Variable varParam = null;
+    /**
+     * Variable parameter for this method's varargs declaration
+     * introduced in J2SE 1.5
+     */
+    private Variable varParam = null;
 
     /**
      * Annotations on this variable. Lazily created.
@@ -105,164 +105,146 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
     private List<AnnotationUse> annotations = null;
 
 
-	private boolean isConstructor() {
-		return type == null;
-	}
-    
-    /** To set the default value for the
-     *  annotation member
+    private boolean isConstructor() {
+        return type == null;
+    }
+
+    /**
+     * To set the default value for the
+     * annotation member
      */
     private Expression defaultValue = null;
-    
 
-	/**
-	 * Method constructor
-	 *
-	 * @param mods
-	 *        Modifiers for this method's declaration
-	 *
-	 * @param type
-	 *        Return type for the method
-	 *
-	 * @param name
-	 *        Name of this method
-	 */
-	Method(DefinedClass outer, int mods, Type type, String name) {
-		this.mods = Modifiers.forMethod(mods);
-		this.type = type;
-		this.name = name;
-		this.outer = outer;
-	}
 
-	/**
-	 * Constructor constructor
-	 *
-	 * @param mods
-	 *        Modifiers for this constructor's declaration
-	 *
-	 * @param _class
-	 *        TypeReference containing this constructor
-	 */
-	Method(int mods, DefinedClass _class) {
-		this.mods = Modifiers.forMethod(mods);
-		this.type = null;
-		this.name = _class.name();
-		this.outer = _class;
-	}
-    
+    /**
+     * Method constructor
+     *
+     * @param mods Modifiers for this method's declaration
+     * @param type Return type for the method
+     * @param name Name of this method
+     */
+    Method(DefinedClass outer, int mods, Type type, String name) {
+        this.mods = Modifiers.forMethod(mods);
+        this.type = type;
+        this.name = name;
+        this.outer = outer;
+    }
+
+    /**
+     * Constructor constructor
+     *
+     * @param mods   Modifiers for this constructor's declaration
+     * @param _class TypeReference containing this constructor
+     */
+    Method(int mods, DefinedClass _class) {
+        this.mods = Modifiers.forMethod(mods);
+        this.type = null;
+        this.name = _class.name();
+        this.outer = _class;
+    }
+
     private Set<TypeReference> getThrows() {
-        if(_throws==null) {
+        if (_throws == null) {
             _throws = new TreeSet<TypeReference>(ClassNameComparator.theInstance);
         }
         return _throws;
     }
 
-	/**
-	 * Add an exception to the list of exceptions that this
-	 * method may throw.
-	 *
-	 * @param exception
-	 *        Name of an exception that this method may throw
-	 */
-	public Method _throws(TypeReference exception) {
+    /**
+     * Add an exception to the list of exceptions that this
+     * method may throw.
+     *
+     * @param exception Name of an exception that this method may throw
+     */
+    public Method _throws(TypeReference exception) {
         getThrows().add(exception);
-		return this;
-	}
+        return this;
+    }
 
-	public Method _throws(Class<? extends Throwable> exception) {
-		return _throws(outer.owner().ref(exception));
-	}
+    public Method _throws(Class<? extends Throwable> exception) {
+        return _throws(outer.owner().ref(exception));
+    }
 
-	/**
-	 * Returns the list of variable of this method.
-	 *
-	 * @return List of parameters of this method. This list is not modifiable.
-	 */
-	public List<Variable> params() {
-		return Collections.<Variable>unmodifiableList(params);
-	}
-	
-	/**
-	 * Add the specified variable to the list of parameters
-	 * for this method signature.
-	 *
-	 * @param type
-	 *        Type of the parameter being added
-	 *
-	 * @param name
-	 *        Name of the parameter being added
-	 *
-	 * @return New parameter variable
-	 */
-	public Variable param(int mods, Type type, String name) {
-		Variable v = new Variable(Modifiers.forVar(mods), type, name, null);
-		params.add(v);
-		return v;
-	}
+    /**
+     * Returns the list of variable of this method.
+     *
+     * @return List of parameters of this method. This list is not modifiable.
+     */
+    public List<Variable> params() {
+        return Collections.<Variable>unmodifiableList(params);
+    }
 
-	public Variable param(Type type, String name) {
-		return param(Modifier.NONE, type, name);
-	}
+    /**
+     * Add the specified variable to the list of parameters
+     * for this method signature.
+     *
+     * @param type Type of the parameter being added
+     * @param name Name of the parameter being added
+     * @return New parameter variable
+     */
+    public Variable param(int mods, Type type, String name) {
+        Variable v = new Variable(Modifiers.forVar(mods), type, name, null);
+        params.add(v);
+        return v;
+    }
 
-	public Variable param(int mods, Class<?> type, String name) {
-		return param(mods, outer.owner()._ref(type), name);
-	}
+    public Variable param(Type type, String name) {
+        return param(Modifier.NONE, type, name);
+    }
 
-	public Variable param(Class<?> type, String name) {
-		return param(outer.owner()._ref(type), name);
-	}
+    public Variable param(int mods, Class<?> type, String name) {
+        return param(mods, outer.owner()._ref(type), name);
+    }
 
-	/**
-	 * @see #varParam(Type, String)
-	 */
-	public Variable varParam(Class<?> type, String name) {
-        return varParam(outer.owner()._ref(type),name);
+    public Variable param(Class<?> type, String name) {
+        return param(outer.owner()._ref(type), name);
+    }
+
+    /**
+     * @see #varParam(Type, String)
+     */
+    public Variable varParam(Class<?> type, String name) {
+        return varParam(outer.owner()._ref(type), name);
     }
 
     /**
      * Add the specified variable argument to the list of parameters
      * for this method signature.
      *
-     * @param type
-     *      Type of the parameter being added.
-     *
-     * @param name
-     *        Name of the parameter being added
-     *
+     * @param type Type of the parameter being added.
+     * @param name Name of the parameter being added
      * @return the variable parameter
-     * 
-     * @throws IllegalStateException
-     *      If this method is called twice.
-     *      varargs in J2SE 1.5 can appear only once in the 
-     *      method signature.
+     * @throws IllegalStateException If this method is called twice.
+     *                               varargs in J2SE 1.5 can appear only once in the
+     *                               method signature.
      */
     public Variable varParam(Type type, String name) {
-		if (!hasVarArgs()) {
+        if (!hasVarArgs()) {
 
             varParam =
-				new Variable(
-					Modifiers.forVar(Modifier.NONE),
-					type.array(),
-					name,
-					null);
-			return varParam;
-		} else {
-			throw new IllegalStateException(
-				"Cannot have two varargs in a method,\n"
-					+ "Check if varParam method of Method is"
-					+ " invoked more than once");
+                    new Variable(
+                            Modifiers.forVar(Modifier.NONE),
+                            type.array(),
+                            name,
+                            null);
+            return varParam;
+        } else {
+            throw new IllegalStateException(
+                    "Cannot have two varargs in a method,\n"
+                            + "Check if varParam method of Method is"
+                            + " invoked more than once");
 
-		}
+        }
 
-	}
+    }
 
     /**
      * Adds an annotation to this variable.
-     * @param clazz
-     *          The annotation class to annotate the field with
+     *
+     * @param clazz The annotation class to annotate the field with
      */
-    public AnnotationUse annotate(TypeReference clazz){
-        if(annotations==null) {
+    public AnnotationUse annotate(TypeReference clazz) {
+        if (annotations == null) {
             annotations = new ArrayList<AnnotationUse>();
         }
         AnnotationUse a = new AnnotationUse(clazz);
@@ -273,15 +255,14 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
     /**
      * Adds an annotation to this variable.
      *
-     * @param clazz
-     *          The annotation class to annotate the field with
+     * @param clazz The annotation class to annotate the field with
      */
-    public AnnotationUse annotate(Class <? extends Annotation> clazz){
+    public AnnotationUse annotate(Class<? extends Annotation> clazz) {
         return annotate(owner().ref(clazz));
     }
 
     public <W extends AnnotationWriter> W annotate2(Class<W> clazz) {
-        return TypedAnnotationWriter.create(clazz,this);
+        return TypedAnnotationWriter.create(clazz, this);
     }
 
     public Collection<AnnotationUse> annotations() {
@@ -292,16 +273,16 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
     }
 
     /**
-	 * Check if there are any varargs declared
-	 * for this method signature.
-	 */
-	public boolean hasVarArgs() {
-		return this.varParam!=null;
-	}
+     * Check if there are any varargs declared
+     * for this method signature.
+     */
+    public boolean hasVarArgs() {
+        return this.varParam != null;
+    }
 
-	public String name() {
-		return name;
-	}
+    public String name() {
+        return name;
+    }
 
     /**
      * Changes the name of the method.
@@ -311,11 +292,11 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
     }
 
     /**
-	 * Returns the return type.
-	 */
-	public Type type() {
-		return type;
-	}
+     * Returns the return type.
+     */
+    public Type type() {
+        return type;
+    }
 
     /**
      * Overrides the return type.
@@ -325,181 +306,179 @@ public class Method extends AbstractGenerifiable implements Declaration, Annotab
     }
 
     /**
-	 * Returns all the parameter types in an array.
-	 * @return
-	 *      If there's no parameter, an empty array will be returned.
-	 */
-	public Type[] listParamTypes() {
-		Type[] r = new Type[params.size()];
-		for (int i = 0; i < r.length; i++) {
+     * Returns all the parameter types in an array.
+     *
+     * @return If there's no parameter, an empty array will be returned.
+     */
+    public Type[] listParamTypes() {
+        Type[] r = new Type[params.size()];
+        for (int i = 0; i < r.length; i++) {
             r[i] = params.get(i).type();
         }
-		return r;
-	}
+        return r;
+    }
 
-	/**
-	 * Returns  the varags parameter type.
-	 * @return
-	 * If there's no vararg parameter type, null will be returned.
-	 */
-	public Type listVarParamType() {
-		if (varParam != null) {
+    /**
+     * Returns  the varags parameter type.
+     *
+     * @return If there's no vararg parameter type, null will be returned.
+     */
+    public Type listVarParamType() {
+        if (varParam != null) {
             return varParam.type();
         } else {
             return null;
         }
-	}
+    }
 
-	/**
-	 * Returns all the parameters in an array.
-	 * @return
-	 *      If there's no parameter, an empty array will be returned.
-	 */
-	public Variable[] listParams() {
-		return params.toArray(new Variable[params.size()]);
-	}
+    /**
+     * Returns all the parameters in an array.
+     *
+     * @return If there's no parameter, an empty array will be returned.
+     */
+    public Variable[] listParams() {
+        return params.toArray(new Variable[params.size()]);
+    }
 
-	/**
-	 * Returns the variable parameter
-	 * @return
-	 *      If there's no parameter, null will be returned.
-	 */
-	public Variable listVarParam() {
-		return varParam;
-	}
+    /**
+     * Returns the variable parameter
+     *
+     * @return If there's no parameter, null will be returned.
+     */
+    public Variable listVarParam() {
+        return varParam;
+    }
 
-	/**
-	 * Returns true if the method has the specified signature.
-	 */
-	public boolean hasSignature(Type[] argTypes) {
-		Variable[] p = listParams();
-		if (p.length != argTypes.length) {
+    /**
+     * Returns true if the method has the specified signature.
+     */
+    public boolean hasSignature(Type[] argTypes) {
+        Variable[] p = listParams();
+        if (p.length != argTypes.length) {
             return false;
         }
 
-		for (int i = 0; i < p.length; i++) {
+        for (int i = 0; i < p.length; i++) {
             if (!p[i].type().equals(argTypes[i])) {
                 return false;
             }
         }
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * Get the block that makes up body of this method
-	 *
-	 * @return Body of method
-	 */
-	public Block body() {
-		if (body == null) {
+    /**
+     * Get the block that makes up body of this method
+     *
+     * @return Body of method
+     */
+    public Block body() {
+        if (body == null) {
             body = new Block();
         }
-		return body;
-	}
-    
+        return body;
+    }
+
     /**
      * Specify the default value for this annotation member
-     * @param value 
-     *           Default value for the annotation member
-     * 
+     *
+     * @param value Default value for the annotation member
      */
-    public void declareDefaultValue(Expression value){
+    public void declareDefaultValue(Expression value) {
         this.defaultValue = value;
     }
 
-	/**
-	 * Creates, if necessary, and returns the class javadoc for this
-	 * DefinedClass
-	 *
-	 * @return JDocComment containing javadocs for this class
-	 */
-	public DocComment javadoc() {
-		if (jdoc == null) {
+    /**
+     * Creates, if necessary, and returns the class javadoc for this
+     * DefinedClass
+     *
+     * @return JDocComment containing javadocs for this class
+     */
+    public DocComment javadoc() {
+        if (jdoc == null) {
             jdoc = new DocComment(owner());
         }
-		return jdoc;
-	}
+        return jdoc;
+    }
 
-	public void declare(Formatter f) {
-		if (jdoc != null) {
+    public void declare(Formatter f) {
+        if (jdoc != null) {
             f.g(jdoc);
         }
 
-        if (annotations != null){
+        if (annotations != null) {
             for (AnnotationUse a : annotations) {
                 f.g(a).nl();
             }
         }
 
         f.g(mods);
-        
-        // declare the generics parameters
-		super.declare(f);
 
-		if (!isConstructor()) {
+        // declare the generics parameters
+        super.declare(f);
+
+        if (!isConstructor()) {
             f.g(type);
         }
-		f.id(name).p('(').i();
+        f.id(name).p('(').i();
         // when parameters are printed in new lines, we want them to be indented.
         // there's a good chance no newlines happen, too, but just in case it does.
-		boolean first = true;
+        boolean first = true;
         for (Variable var : params) {
             if (!first) {
                 f.p(',');
             }
-            if(var.isAnnotated()) {
+            if (var.isAnnotated()) {
                 f.nl();
             }
             f.b(var);
             first = false;
         }
-		if (hasVarArgs()) {
-			if (!first) {
+        if (hasVarArgs()) {
+            if (!first) {
                 f.p(',');
             }
-			f.g(varParam.type().elementType());
-			f.p("... ");
-			f.id(varParam.name());
-		}
+            f.g(varParam.type().elementType());
+            f.p("... ");
+            f.id(varParam.name());
+        }
 
-		f.o().p(')');
-		if (_throws!=null && !_throws.isEmpty()) {
-			f.nl().i().p("throws").g(_throws).nl().o();
-		}
-        
+        f.o().p(')');
+        if (_throws != null && !_throws.isEmpty()) {
+            f.nl().i().p("throws").g(_throws).nl().o();
+        }
+
         if (defaultValue != null) {
             f.p("default ");
             f.g(defaultValue);
         }
-		if (body != null) {
-			f.s(body);
-		} else if (
-			!outer.isInterface() && !outer.isAnnotationTypeDeclaration() && !mods.isAbstract() && !mods.isNative()) {
-			// Print an empty body for non-native, non-abstract methods
-			f.s(new Block());
-		} else {
-			f.p(';').nl();
-		}
-	}
+        if (body != null) {
+            f.s(body);
+        } else if (
+                !outer.isInterface() && !outer.isAnnotationTypeDeclaration() && !mods.isAbstract() && !mods.isNative()) {
+            // Print an empty body for non-native, non-abstract methods
+            f.s(new Block());
+        } else {
+            f.p(';').nl();
+        }
+    }
 
     /**
-     * @return
-     *      the current modifiers of this method.
-     *      Always return non-null valid object.
+     * @return the current modifiers of this method.
+     *         Always return non-null valid object.
      */
     public Modifiers mods() {
         return mods;
     }
 
     /**
-     * @deprecated use {@link #mods()} 
+     * @deprecated use {@link #mods()}
      */
     public Modifiers getMods() {
-		return mods;
-	}
+        return mods;
+    }
 
-	protected CodeModel owner() {
-		return outer.owner();
-	}
+    protected CodeModel owner() {
+        return outer.owner();
+    }
 }

@@ -35,18 +35,17 @@ import java.math.BigInteger;
 
 
 /**
- * This object contains factory methods for each 
- * Java content interface and Java element interface 
- * generated in the org.mule.devkit.it.rss package. 
- * <p>An ObjectFactory allows you to programatically 
- * construct new instances of the Java representation 
- * for XML content. The Java representation of XML 
- * content can consist of schema derived interfaces 
- * and classes representing the binding of schema 
- * type definitions, element declarations and model 
- * groups.  Factory methods for each of these are 
+ * This object contains factory methods for each
+ * Java content interface and Java element interface
+ * generated in the org.mule.devkit.it.rss package.
+ * <p>An ObjectFactory allows you to programatically
+ * construct new instances of the Java representation
+ * for XML content. The Java representation of XML
+ * content can consist of schema derived interfaces
+ * and classes representing the binding of schema
+ * type definitions, element declarations and model
+ * groups.  Factory methods for each of these are
  * provided in this class.
- * 
  */
 @XmlRegistry
 public class ObjectFactory {
@@ -78,14 +77,12 @@ public class ObjectFactory {
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.mule.devkit.it.rss
-     * 
      */
     public ObjectFactory() {
     }
 
     /**
      * Create an instance of {@link Rss }
-     * 
      */
     public Rss createRss() {
         return new Rss();
@@ -93,7 +90,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link RssChannel }
-     * 
      */
     public RssChannel createRssChannel() {
         return new RssChannel();
@@ -101,7 +97,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Cloud }
-     * 
      */
     public Cloud createCloud() {
         return new Cloud();
@@ -109,7 +104,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link SkipDaysList }
-     * 
      */
     public SkipDaysList createSkipDaysList() {
         return new SkipDaysList();
@@ -117,7 +111,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Source }
-     * 
      */
     public Source createSource() {
         return new Source();
@@ -125,7 +118,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Guid }
-     * 
      */
     public Guid createGuid() {
         return new Guid();
@@ -133,7 +125,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Category }
-     * 
      */
     public Category createCategory() {
         return new Category();
@@ -141,7 +132,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link TextInput }
-     * 
      */
     public TextInput createTextInput() {
         return new TextInput();
@@ -149,7 +139,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Image }
-     * 
      */
     public Image createImage() {
         return new Image();
@@ -157,7 +146,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link SkipHoursList }
-     * 
      */
     public SkipHoursList createSkipHoursList() {
         return new SkipHoursList();
@@ -165,7 +153,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Enclosure }
-     * 
      */
     public Enclosure createEnclosure() {
         return new Enclosure();
@@ -173,7 +160,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link RssItem }
-     * 
      */
     public RssItem createRssItem() {
         return new RssItem();
@@ -181,7 +167,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "pubDate", scope = RssChannel.class)
     public JAXBElement<String> createRssChannelPubDate(String value) {
@@ -190,7 +175,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "docs", scope = RssChannel.class)
     public JAXBElement<String> createRssChannelDocs(String value) {
@@ -199,7 +183,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "link", scope = RssChannel.class)
     public JAXBElement<String> createRssChannelLink(String value) {
@@ -208,7 +191,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link TextInput }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "textInput", scope = RssChannel.class)
     public JAXBElement<TextInput> createRssChannelTextInput(TextInput value) {
@@ -217,7 +199,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Image }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "image", scope = RssChannel.class)
     public JAXBElement<Image> createRssChannelImage(Image value) {
@@ -226,7 +207,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "copyright", scope = RssChannel.class)
     public JAXBElement<String> createRssChannelCopyright(String value) {
@@ -235,7 +215,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link BigInteger }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "ttl", scope = RssChannel.class)
     public JAXBElement<BigInteger> createRssChannelTtl(BigInteger value) {
@@ -244,7 +223,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link SkipDaysList }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "skipDays", scope = RssChannel.class)
     public JAXBElement<SkipDaysList> createRssChannelSkipDays(SkipDaysList value) {
@@ -253,7 +231,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "webMaster", scope = RssChannel.class)
     public JAXBElement<String> createRssChannelWebMaster(String value) {
@@ -262,7 +239,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "managingEditor", scope = RssChannel.class)
     public JAXBElement<String> createRssChannelManagingEditor(String value) {
@@ -271,7 +247,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Category }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "category", scope = RssChannel.class)
     public JAXBElement<Category> createRssChannelCategory(Category value) {
@@ -280,7 +255,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "title", scope = RssChannel.class)
     public JAXBElement<String> createRssChannelTitle(String value) {
@@ -289,7 +263,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "description", scope = RssChannel.class)
     public JAXBElement<String> createRssChannelDescription(String value) {
@@ -298,7 +271,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "lastBuildDate", scope = RssChannel.class)
     public JAXBElement<String> createRssChannelLastBuildDate(String value) {
@@ -307,7 +279,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link SkipHoursList }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "skipHours", scope = RssChannel.class)
     public JAXBElement<SkipHoursList> createRssChannelSkipHours(SkipHoursList value) {
@@ -316,7 +287,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Cloud }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "cloud", scope = RssChannel.class)
     public JAXBElement<Cloud> createRssChannelCloud(Cloud value) {
@@ -325,7 +295,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "generator", scope = RssChannel.class)
     public JAXBElement<String> createRssChannelGenerator(String value) {
@@ -334,7 +303,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "rating", scope = RssChannel.class)
     public JAXBElement<String> createRssChannelRating(String value) {
@@ -343,7 +311,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "language", scope = RssChannel.class)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
@@ -353,7 +320,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Guid }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "guid", scope = RssItem.class)
     public JAXBElement<Guid> createRssItemGuid(Guid value) {
@@ -362,7 +328,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "pubDate", scope = RssItem.class)
     public JAXBElement<String> createRssItemPubDate(String value) {
@@ -371,7 +336,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "author", scope = RssItem.class)
     public JAXBElement<String> createRssItemAuthor(String value) {
@@ -380,7 +344,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "title", scope = RssItem.class)
     public JAXBElement<String> createRssItemTitle(String value) {
@@ -389,7 +352,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Category }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "category", scope = RssItem.class)
     public JAXBElement<Category> createRssItemCategory(Category value) {
@@ -398,7 +360,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Source }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "source", scope = RssItem.class)
     public JAXBElement<Source> createRssItemSource(Source value) {
@@ -407,7 +368,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Enclosure }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "enclosure", scope = RssItem.class)
     public JAXBElement<Enclosure> createRssItemEnclosure(Enclosure value) {
@@ -416,7 +376,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "description", scope = RssItem.class)
     public JAXBElement<String> createRssItemDescription(String value) {
@@ -425,7 +384,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "link", scope = RssItem.class)
     public JAXBElement<String> createRssItemLink(String value) {
@@ -434,7 +392,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "comments", scope = RssItem.class)
     public JAXBElement<String> createRssItemComments(String value) {

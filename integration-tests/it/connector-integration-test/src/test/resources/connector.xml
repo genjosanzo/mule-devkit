@@ -29,12 +29,12 @@
 
     <connector:config name="configA" username="mulesoft" password="muleion">
         <connector:connection-pooling-profile maxActive="10" maxIdle="10"
-                                         exhaustedAction="WHEN_EXHAUSTED_GROW" maxWait="120"/>
+                                              exhaustedAction="WHEN_EXHAUSTED_GROW" maxWait="120"/>
     </connector:config>
 
     <connector:config name="configB" username="mulesoft" password="muleion">
         <connector:connection-pooling-profile maxActive="10" maxIdle="10"
-                                         exhaustedAction="WHEN_EXHAUSTED_GROW" maxWait="120"/>
+                                              exhaustedAction="WHEN_EXHAUSTED_GROW" maxWait="120"/>
     </connector:config>
 
     <flow name="testSession">
@@ -50,7 +50,8 @@
     </flow>
 
     <flow name="testSessionWithCredentials">
-        <connector:verify-session username="#[map-payload:username]" password="#[map-payload:password]" config-ref="configB"/>
+        <connector:verify-session username="#[map-payload:username]" password="#[map-payload:password]"
+                                  config-ref="configB"/>
     </flow>
 
     <flow name="testSessionWithUsername">

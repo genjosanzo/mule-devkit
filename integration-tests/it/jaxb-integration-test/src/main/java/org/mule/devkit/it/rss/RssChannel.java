@@ -46,9 +46,9 @@ import java.util.Map;
 
 /**
  * <p>Java class for RssChannel complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="RssChannel">
  *   &lt;complexContent>
@@ -84,37 +84,35 @@ import java.util.Map;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "RssChannel", propOrder = {
-    "titleOrLinkOrDescription",
-    "item",
-    "any"
+        "titleOrLinkOrDescription",
+        "item",
+        "any"
 })
 public class RssChannel {
 
     @XmlElementRefs({
-        @XmlElementRef(name = "description", type = JAXBElement.class),
-        @XmlElementRef(name = "title", type = JAXBElement.class),
-        @XmlElementRef(name = "copyright", type = JAXBElement.class),
-        @XmlElementRef(name = "cloud", type = JAXBElement.class),
-        @XmlElementRef(name = "textInput", type = JAXBElement.class),
-        @XmlElementRef(name = "generator", type = JAXBElement.class),
-        @XmlElementRef(name = "link", type = JAXBElement.class),
-        @XmlElementRef(name = "skipDays", type = JAXBElement.class),
-        @XmlElementRef(name = "category", type = JAXBElement.class),
-        @XmlElementRef(name = "ttl", type = JAXBElement.class),
-        @XmlElementRef(name = "rating", type = JAXBElement.class),
-        @XmlElementRef(name = "language", type = JAXBElement.class),
-        @XmlElementRef(name = "image", type = JAXBElement.class),
-        @XmlElementRef(name = "webMaster", type = JAXBElement.class),
-        @XmlElementRef(name = "docs", type = JAXBElement.class),
-        @XmlElementRef(name = "skipHours", type = JAXBElement.class),
-        @XmlElementRef(name = "lastBuildDate", type = JAXBElement.class),
-        @XmlElementRef(name = "managingEditor", type = JAXBElement.class),
-        @XmlElementRef(name = "pubDate", type = JAXBElement.class)
+            @XmlElementRef(name = "description", type = JAXBElement.class),
+            @XmlElementRef(name = "title", type = JAXBElement.class),
+            @XmlElementRef(name = "copyright", type = JAXBElement.class),
+            @XmlElementRef(name = "cloud", type = JAXBElement.class),
+            @XmlElementRef(name = "textInput", type = JAXBElement.class),
+            @XmlElementRef(name = "generator", type = JAXBElement.class),
+            @XmlElementRef(name = "link", type = JAXBElement.class),
+            @XmlElementRef(name = "skipDays", type = JAXBElement.class),
+            @XmlElementRef(name = "category", type = JAXBElement.class),
+            @XmlElementRef(name = "ttl", type = JAXBElement.class),
+            @XmlElementRef(name = "rating", type = JAXBElement.class),
+            @XmlElementRef(name = "language", type = JAXBElement.class),
+            @XmlElementRef(name = "image", type = JAXBElement.class),
+            @XmlElementRef(name = "webMaster", type = JAXBElement.class),
+            @XmlElementRef(name = "docs", type = JAXBElement.class),
+            @XmlElementRef(name = "skipHours", type = JAXBElement.class),
+            @XmlElementRef(name = "lastBuildDate", type = JAXBElement.class),
+            @XmlElementRef(name = "managingEditor", type = JAXBElement.class),
+            @XmlElementRef(name = "pubDate", type = JAXBElement.class)
     })
     @XmlAnyElement(lax = true)
     protected List<Object> titleOrLinkOrDescription;
@@ -127,21 +125,21 @@ public class RssChannel {
 
     /**
      * Gets the value of the titleOrLinkOrDescription property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the titleOrLinkOrDescription property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getTitleOrLinkOrDescription().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link JAXBElement }{@code <}{@link String }{@code >}
      * {@link JAXBElement }{@code <}{@link String }{@code >}
@@ -164,8 +162,6 @@ public class RssChannel {
      * {@link Object }
      * {@link JAXBElement }{@code <}{@link String }{@code >}
      * {@link JAXBElement }{@code <}{@link String }{@code >}
-     * 
-     * 
      */
     public List<Object> getTitleOrLinkOrDescription() {
         if (titleOrLinkOrDescription == null) {
@@ -176,25 +172,23 @@ public class RssChannel {
 
     /**
      * Gets the value of the item property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the item property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getItem().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link RssItem }
-     * 
-     * 
      */
     public List<RssItem> getItem() {
         if (item == null) {
@@ -205,26 +199,24 @@ public class RssChannel {
 
     /**
      * Gets the value of the any property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the any property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAny().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link Object }
      * {@link Element }
-     * 
-     * 
      */
     public List<Object> getAny() {
         if (any == null) {
@@ -235,17 +227,15 @@ public class RssChannel {
 
     /**
      * Gets a map that contains attributes that aren't bound to any typed property on this class.
-     * 
-     * <p>
-     * the map is keyed by the name of the attribute and 
+     * <p/>
+     * <p/>
+     * the map is keyed by the name of the attribute and
      * the value is the string value of the attribute.
-     * 
+     * <p/>
      * the map returned by this method is live, and you can add new attribute
      * by updating the map directly. Because of this design, there's no setter.
-     * 
-     * 
-     * @return
-     *     always non-null
+     *
+     * @return always non-null
      */
     public Map<QName, String> getOtherAttributes() {
         return otherAttributes;

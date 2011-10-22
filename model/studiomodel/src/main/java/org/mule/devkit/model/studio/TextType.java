@@ -33,9 +33,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for TextType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="TextType">
  *   &lt;complexContent>
@@ -48,14 +48,11 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "TextType")
 public class TextType
-    extends AttributeType
-{
+        extends AttributeType {
 
     @XmlAttribute(name = "isToElement")
     protected Boolean isToElement;
@@ -68,11 +65,9 @@ public class TextType
 
     /**
      * Gets the value of the isToElement property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isIsToElement() {
         return isToElement;
@@ -80,11 +75,9 @@ public class TextType
 
     /**
      * Sets the value of the isToElement property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setIsToElement(Boolean value) {
         this.isToElement = value;
@@ -92,11 +85,9 @@ public class TextType
 
     /**
      * Gets the value of the language property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getLanguage() {
         return language;
@@ -104,11 +95,9 @@ public class TextType
 
     /**
      * Sets the value of the language property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setLanguage(String value) {
         this.language = value;
@@ -116,11 +105,9 @@ public class TextType
 
     /**
      * Gets the value of the nestedName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getNestedName() {
         return nestedName;
@@ -128,11 +115,9 @@ public class TextType
 
     /**
      * Sets the value of the nestedName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setNestedName(String value) {
         this.nestedName = value;
@@ -140,11 +125,9 @@ public class TextType
 
     /**
      * Gets the value of the wrapWithCDATA property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isWrapWithCDATA() {
         return wrapWithCDATA;
@@ -152,11 +135,9 @@ public class TextType
 
     /**
      * Sets the value of the wrapWithCDATA property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setWrapWithCDATA(Boolean value) {
         this.wrapWithCDATA = value;

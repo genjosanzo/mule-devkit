@@ -22,5 +22,4 @@
 // Generated on: 2011.06.14 at 03:58:12 PM GMT-03:00 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.w3.org/2001/XMLSchema", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package org.mule.devkit.model.schema;
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.w3.org/2001/XMLSchema", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED) package org.mule.devkit.model.schema;

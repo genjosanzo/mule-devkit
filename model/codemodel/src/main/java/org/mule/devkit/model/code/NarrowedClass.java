@@ -48,11 +48,10 @@ import java.util.List;
 
 /**
  * Represents X&lt;Y>.
- *
+ * <p/>
  * TODO: consider separating the decl and the use.
- * 
- * @author
- *     Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
+ *
+ * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
 class NarrowedClass extends TypeReference {
     /**
@@ -65,9 +64,9 @@ class NarrowedClass extends TypeReference {
     private final List<TypeReference> args;
 
     NarrowedClass(TypeReference basis, TypeReference arg) {
-        this(basis,Collections.singletonList(arg));
+        this(basis, Collections.singletonList(arg));
     }
-    
+
     NarrowedClass(TypeReference basis, List<TypeReference> args) {
         super(basis.owner());
         this.basis = basis;
@@ -76,17 +75,17 @@ class NarrowedClass extends TypeReference {
     }
 
     @Override
-    public TypeReference narrow( TypeReference clazz ) {
+    public TypeReference narrow(TypeReference clazz) {
         List<TypeReference> newArgs = new ArrayList<TypeReference>(args);
         newArgs.add(clazz);
-        return new NarrowedClass(basis,newArgs);
+        return new NarrowedClass(basis, newArgs);
     }
 
     @Override
-    public TypeReference narrow( TypeReference... clazz ) {
+    public TypeReference narrow(TypeReference... clazz) {
         List<TypeReference> newArgs = new ArrayList<TypeReference>(args);
         newArgs.addAll(Arrays.asList(clazz));
-        return new NarrowedClass(basis,newArgs);
+        return new NarrowedClass(basis, newArgs);
     }
 
     public String name() {
@@ -95,7 +94,7 @@ class NarrowedClass extends TypeReference {
         buf.append('<');
         boolean first = true;
         for (TypeReference c : args) {
-            if(first) {
+            if (first) {
                 first = false;
             } else {
                 buf.append(',');
@@ -105,14 +104,14 @@ class NarrowedClass extends TypeReference {
         buf.append('>');
         return buf.toString();
     }
-    
+
     public String fullName() {
         StringBuilder buf = new StringBuilder();
         buf.append(basis.fullName());
         buf.append('<');
         boolean first = true;
         for (TypeReference c : args) {
-            if(first) {
+            if (first) {
                 first = false;
             } else {
                 buf.append(',');
@@ -130,7 +129,7 @@ class NarrowedClass extends TypeReference {
         buf.append('<');
         boolean first = true;
         for (TypeReference c : args) {
-            if(first) {
+            if (first) {
                 first = false;
             } else {
                 buf.append(',');
@@ -151,8 +150,8 @@ class NarrowedClass extends TypeReference {
         basis.printLink(f);
         f.p("{@code <}");
         boolean first = true;
-        for( TypeReference c : args ) {
-            if(first) {
+        for (TypeReference c : args) {
+            if (first) {
                 first = false;
             } else {
                 f.p(',');
@@ -168,21 +167,24 @@ class NarrowedClass extends TypeReference {
 
     public TypeReference _extends() {
         TypeReference base = basis._extends();
-        if(base==null) {
+        if (base == null) {
             return base;
         }
-        return base.substituteParams(basis.typeParams(),args);
+        return base.substituteParams(basis.typeParams(), args);
     }
 
     public Iterator<TypeReference> _implements() {
         return new Iterator<TypeReference>() {
             private final Iterator<TypeReference> core = basis._implements();
+
             public void remove() {
                 core.remove();
             }
+
             public TypeReference next() {
-                return core.next().substituteParams(basis.typeParams(),args);
+                return core.next().substituteParams(basis.typeParams(), args);
             }
+
             public boolean hasNext() {
                 return core.hasNext();
             }
@@ -214,10 +216,10 @@ class NarrowedClass extends TypeReference {
 
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof NarrowedClass)) {
+        if (!(obj instanceof NarrowedClass)) {
             return false;
         }
-        return fullName().equals(((TypeReference)obj).fullName());
+        return fullName().equals(((TypeReference) obj).fullName());
     }
 
     @Override
@@ -226,17 +228,17 @@ class NarrowedClass extends TypeReference {
     }
 
     protected TypeReference substituteParams(TypeVariable[] variables, List<TypeReference> bindings) {
-        TypeReference b = basis.substituteParams(variables,bindings);
-        boolean different = b!=basis;
-        
+        TypeReference b = basis.substituteParams(variables, bindings);
+        boolean different = b != basis;
+
         List<TypeReference> clazz = new ArrayList<TypeReference>(args.size());
-        for( int i=0; i<clazz.size(); i++ ) {
-            TypeReference c = args.get(i).substituteParams(variables,bindings);
-            clazz.set(i,c);
+        for (int i = 0; i < clazz.size(); i++) {
+            TypeReference c = args.get(i).substituteParams(variables, bindings);
+            clazz.set(i, c);
             different |= c != args.get(i);
         }
-        
-        if(different) {
+
+        if (different) {
             return new NarrowedClass(b, clazz);
         } else {
             return this;

@@ -54,11 +54,10 @@ class ReturnStatement implements Statement {
     /**
      * ReturnStatement constructor
      *
-     * @param expr
-     *        Expression which evaluates to return value
+     * @param expr Expression which evaluates to return value
      */
     ReturnStatement(Expression expr) {
-       this.expr = expr;
+        this.expr = expr;
     }
 
     public void state(Formatter f) {

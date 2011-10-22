@@ -45,21 +45,20 @@ package org.mule.devkit.model.code;
  * ContinueStatement statement
  */
 class ContinueStatement implements Statement {
-    
+
     private final Label label;
-    
+
     /**
      * ContinueStatement constructor.
-     * 
-     * @param _label
-     *      a valid label or null.
+     *
+     * @param _label a valid label or null.
      */
     ContinueStatement(Label _label) {
         this.label = _label;
     }
 
     public void state(Formatter f) {
-        if( label==null ) {
+        if (label == null) {
             f.p("continue;").nl();
         } else {
             f.p("continue").p(label.label).p(';').nl();

@@ -31,13 +31,12 @@ public abstract class AbstractGenerator implements Generator {
     @Override
     public final void generate(DevKitTypeElement typeElement, GeneratorContext context) throws GenerationException {
         this.context = context;
-        if(shouldGenerate(typeElement)) {
-           doGenerate(typeElement);
+        if (shouldGenerate(typeElement)) {
+            doGenerate(typeElement);
         }
     }
 
-    protected CodeModel getCodeModel()
-    {
+    protected CodeModel getCodeModel() {
         return context.getCodeModel();
     }
 }

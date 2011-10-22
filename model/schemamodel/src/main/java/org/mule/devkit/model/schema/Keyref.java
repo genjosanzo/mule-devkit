@@ -35,9 +35,9 @@ import javax.xml.namespace.QName;
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -48,26 +48,21 @@ import javax.xml.namespace.QName;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "keyref")
 public class Keyref
-    extends Keybase
-{
+        extends Keybase {
 
     @XmlAttribute(name = "refer", required = true)
     protected QName refer;
 
     /**
      * Gets the value of the refer property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link QName }
-     *     
+     *
+     * @return possible object is
+     *         {@link QName }
      */
     public QName getRefer() {
         return refer;
@@ -75,11 +70,9 @@ public class Keyref
 
     /**
      * Sets the value of the refer property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link QName }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link QName }
      */
     public void setRefer(QName value) {
         this.refer = value;

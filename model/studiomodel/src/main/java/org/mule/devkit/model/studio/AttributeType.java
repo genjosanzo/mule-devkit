@@ -32,9 +32,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for AttributeType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="AttributeType">
  *   &lt;complexContent>
@@ -62,23 +62,21 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "AttributeType")
 @XmlSeeAlso({
-    NestedElementReference.class,
-    TextType.class,
-    EnumType.class,
-    EncodingType.class,
-    ExpressionAttributeType.class,
-    IntegerType.class,
-    ClassType.class,
-    Booleantype.class,
-    StringAttributeType.class,
-    NewType.class,
-    ModeType.class
+        NestedElementReference.class,
+        TextType.class,
+        EnumType.class,
+        EncodingType.class,
+        ExpressionAttributeType.class,
+        IntegerType.class,
+        ClassType.class,
+        Booleantype.class,
+        StringAttributeType.class,
+        NewType.class,
+        ModeType.class
 })
 public class AttributeType {
 
@@ -119,11 +117,9 @@ public class AttributeType {
 
     /**
      * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getName() {
         return name;
@@ -131,11 +127,9 @@ public class AttributeType {
 
     /**
      * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setName(String value) {
         this.name = value;
@@ -143,11 +137,9 @@ public class AttributeType {
 
     /**
      * Gets the value of the alternativeTo property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getAlternativeTo() {
         return alternativeTo;
@@ -155,11 +147,9 @@ public class AttributeType {
 
     /**
      * Sets the value of the alternativeTo property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setAlternativeTo(String value) {
         this.alternativeTo = value;
@@ -167,11 +157,9 @@ public class AttributeType {
 
     /**
      * Gets the value of the updater property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getUpdater() {
         return updater;
@@ -179,11 +167,9 @@ public class AttributeType {
 
     /**
      * Sets the value of the updater property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setUpdater(String value) {
         this.updater = value;
@@ -191,11 +177,9 @@ public class AttributeType {
 
     /**
      * Gets the value of the xsdType property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getXsdType() {
         return xsdType;
@@ -203,11 +187,9 @@ public class AttributeType {
 
     /**
      * Sets the value of the xsdType property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setXsdType(String value) {
         this.xsdType = value;
@@ -215,11 +197,9 @@ public class AttributeType {
 
     /**
      * Gets the value of the caption property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getCaption() {
         return caption;
@@ -227,11 +207,9 @@ public class AttributeType {
 
     /**
      * Sets the value of the caption property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setCaption(String value) {
         this.caption = value;
@@ -239,11 +217,9 @@ public class AttributeType {
 
     /**
      * Gets the value of the description property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getDescription() {
         return description;
@@ -251,11 +227,9 @@ public class AttributeType {
 
     /**
      * Sets the value of the description property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDescription(String value) {
         this.description = value;
@@ -263,11 +237,9 @@ public class AttributeType {
 
     /**
      * Gets the value of the supportsExpressions property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isSupportsExpressions() {
         return supportsExpressions;
@@ -275,11 +247,9 @@ public class AttributeType {
 
     /**
      * Sets the value of the supportsExpressions property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setSupportsExpressions(Boolean value) {
         this.supportsExpressions = value;
@@ -287,11 +257,9 @@ public class AttributeType {
 
     /**
      * Gets the value of the visibleInDialog property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isVisibleInDialog() {
         return visibleInDialog;
@@ -299,11 +267,9 @@ public class AttributeType {
 
     /**
      * Sets the value of the visibleInDialog property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setVisibleInDialog(Boolean value) {
         this.visibleInDialog = value;
@@ -311,11 +277,9 @@ public class AttributeType {
 
     /**
      * Gets the value of the required property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isRequired() {
         return required;
@@ -323,11 +287,9 @@ public class AttributeType {
 
     /**
      * Sets the value of the required property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setRequired(Boolean value) {
         this.required = value;
@@ -335,11 +297,9 @@ public class AttributeType {
 
     /**
      * Gets the value of the alwaysFill property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isAlwaysFill() {
         return alwaysFill;
@@ -347,11 +307,9 @@ public class AttributeType {
 
     /**
      * Sets the value of the alwaysFill property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setAlwaysFill(Boolean value) {
         this.alwaysFill = value;
@@ -359,11 +317,9 @@ public class AttributeType {
 
     /**
      * Gets the value of the controlled property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getControlled() {
         return controlled;
@@ -371,11 +327,9 @@ public class AttributeType {
 
     /**
      * Sets the value of the controlled property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setControlled(String value) {
         this.controlled = value;
@@ -383,11 +337,9 @@ public class AttributeType {
 
     /**
      * Gets the value of the topAnchor property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getTopAnchor() {
         return topAnchor;
@@ -395,11 +347,9 @@ public class AttributeType {
 
     /**
      * Sets the value of the topAnchor property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setTopAnchor(String value) {
         this.topAnchor = value;
@@ -407,11 +357,9 @@ public class AttributeType {
 
     /**
      * Gets the value of the versions property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getVersions() {
         return versions;
@@ -419,11 +367,9 @@ public class AttributeType {
 
     /**
      * Sets the value of the versions property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setVersions(String value) {
         this.versions = value;
@@ -431,11 +377,9 @@ public class AttributeType {
 
     /**
      * Gets the value of the bottomAnchor property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getBottomAnchor() {
         return bottomAnchor;
@@ -443,11 +387,9 @@ public class AttributeType {
 
     /**
      * Sets the value of the bottomAnchor property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setBottomAnchor(String value) {
         this.bottomAnchor = value;
@@ -455,11 +397,9 @@ public class AttributeType {
 
     /**
      * Gets the value of the valuePersistence property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getValuePersistence() {
         return valuePersistence;
@@ -467,11 +407,9 @@ public class AttributeType {
 
     /**
      * Sets the value of the valuePersistence property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setValuePersistence(String value) {
         this.valuePersistence = value;
@@ -479,11 +417,9 @@ public class AttributeType {
 
     /**
      * Gets the value of the customValidator property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getCustomValidator() {
         return customValidator;
@@ -491,11 +427,9 @@ public class AttributeType {
 
     /**
      * Sets the value of the customValidator property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setCustomValidator(String value) {
         this.customValidator = value;
@@ -503,11 +437,9 @@ public class AttributeType {
 
     /**
      * Gets the value of the modeType property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link NewSimpleType }
-     *     
+     *
+     * @return possible object is
+     *         {@link NewSimpleType }
      */
     public NewSimpleType getModeType() {
         return modeType;
@@ -515,11 +447,9 @@ public class AttributeType {
 
     /**
      * Sets the value of the modeType property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link NewSimpleType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link NewSimpleType }
      */
     public void setModeType(NewSimpleType value) {
         this.modeType = value;

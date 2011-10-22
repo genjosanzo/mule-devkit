@@ -118,11 +118,11 @@ public class PackageMojo extends AbstractMuleMojo {
 
     private void addAppDirectory(ModuleArchiver archiver) throws ArchiverException {
         if (filterAppDirectory) {
-            if( getFilteredAppDirectory().exists() ) {
+            if (getFilteredAppDirectory().exists()) {
                 archiver.addResources(getFilteredAppDirectory());
             }
         } else {
-            if( appDirectory.exists() ) {
+            if (appDirectory.exists()) {
                 archiver.addResources(appDirectory);
             }
         }

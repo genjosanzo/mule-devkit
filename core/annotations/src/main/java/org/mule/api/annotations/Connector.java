@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation defines a class that will export its functionality as a Mule Cloud Connector.
- *
+ * <p/>
  * There are a few restrictions as to which types as valid for this annotation:
  * - It cannot be an interface
  * - It must be public

@@ -126,22 +126,22 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
 
         addCapability(isCapableOf, capability, ref(Capability.class).staticRef("LIFECYCLE_CAPABLE"));
 
-        if(typeElement.hasAnnotation(OAuth2.class)) {
+        if (typeElement.hasAnnotation(OAuth2.class)) {
             addCapability(isCapableOf, capability, ref(Capability.class).staticRef("OAUTH2_CAPABLE"));
         }
 
-        if(typeElement.hasAnnotation(OAuth.class)) {
+        if (typeElement.hasAnnotation(OAuth.class)) {
             addCapability(isCapableOf, capability, ref(Capability.class).staticRef("OAUTH1_CAPABLE"));
         }
 
-        if(typeElement.isPoolable()) {
+        if (typeElement.isPoolable()) {
             addCapability(isCapableOf, capability, ref(Capability.class).staticRef("POOLING_CAPABLE"));
         }
 
         ExecutableElement connectMethod = connectForClass(typeElement);
         ExecutableElement disconnectMethod = disconnectForClass(typeElement);
 
-        if( connectMethod != null && disconnectMethod != null ) {
+        if (connectMethod != null && disconnectMethod != null) {
             addCapability(isCapableOf, capability, ref(Capability.class).staticRef("CONNECTION_MANAGEMENT_CAPABLE"));
         }
 

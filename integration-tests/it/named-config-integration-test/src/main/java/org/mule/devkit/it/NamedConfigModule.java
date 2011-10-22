@@ -22,19 +22,16 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 
 @Module(name = "nc")
-public class NamedConfigModule
-{
-	@Configurable
-	private String append;
-	
+public class NamedConfigModule {
+    @Configurable
+    private String append;
+
     @Processor
-    public String passthruString(String value)
-    {
+    public String passthruString(String value) {
         return value + this.append;
     }
 
-	public void setAppend(String app)
-	{
-		this.append = app;
-	}
+    public void setAppend(String app) {
+        this.append = app;
+    }
 }

@@ -50,23 +50,22 @@
  * then writing it out as text files that is Java source files.
  * The AST looks like this:
  *
- * {@DotDiagram
-    digraph G {
-        cls1 [label="DefinedClass"];
-        cls2 [label="DefinedClass"];
-        CodeModel -> cls1 [label="generated class"];
-        CodeModel -> cls2 [label="generated class"];
+ * {@DotDiagram digraph G {
+cls1 [label="DefinedClass"];
+cls2 [label="DefinedClass"];
+CodeModel -> cls1 [label="generated class"];
+CodeModel -> cls2 [label="generated class"];
 
-        m1 [label="Method"];
-        m2 [label="Method"];
+m1 [label="Method"];
+m2 [label="Method"];
 
-        cls1 -> m1;
-        cls1 -> m2;
-        cls1 -> JField;
+cls1 -> m1;
+cls1 -> m2;
+cls1 -> JField;
 
-        m1 -> Variable [label="method parameter"];
-        m1 -> Block [label="code"];
-    }
+m1 -> Variable [label="method parameter"];
+m1 -> Block [label="code"];
+}
  * }
  *
  * <p>

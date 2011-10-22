@@ -60,42 +60,41 @@ import java.util.List;
 
 /**
  * Statically generated Java soruce file.
- * 
- * <p>
+ * <p/>
+ * <p/>
  * This {@link org.mule.devkit.model.code.ResourceFile} implementation will generate a Java source
  * file by copying the source code from a resource.
- * <p>
+ * <p/>
  * While copying a resource, we look for a package declaration and
  * replace it with the target package name. This allows the static Java
  * source code to have an arbitrary package declaration.
- * <p>
+ * <p/>
  * You can also use the getJClass method to obtain a {@link org.mule.devkit.model.code.TypeReference}
  * object that represents the static file. This allows the client code
  * to refer to the class from other CodeModel generated code.
- * <p>
+ * <p/>
  * Note that because we don't parse the static Java source code,
  * the returned {@link org.mule.devkit.model.code.TypeReference} object doesn't respond to methods like
- * "isInterface" or "_extends",  
- * 
- * @author
- *     Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
+ * "isInterface" or "_extends",
+ *
+ * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
 public final class StaticJavaFile extends ResourceFile {
-    
+
     private final org.mule.devkit.model.code.Package pkg;
     private final String className;
     private final URL source;
     private final JStaticClass clazz;
     private final LineFilter filter;
-    
+
     public StaticJavaFile(Package _pkg, String className, String _resourceName) {
-        this( _pkg, className,
-            StaticJavaFile.class.getClassLoader().getResource(_resourceName), null );
+        this(_pkg, className,
+                StaticJavaFile.class.getClassLoader().getResource(_resourceName), null);
     }
-    
+
     public StaticJavaFile(Package _pkg, String _className, URL _source, LineFilter _filter) {
-        super(_className+".java");
-        if(_source==null) {
+        super(_className + ".java");
+        if (_source == null) {
             throw new NullPointerException();
         }
         this.pkg = _pkg;
@@ -104,9 +103,9 @@ public final class StaticJavaFile extends ResourceFile {
         this.source = _source;
         this.filter = _filter;
     }
-    
+
     /**
-     * Returns a class object that represents a statically generated code. 
+     * Returns a class object that represents a statically generated code.
      */
     public final TypeReference getJClass() {
         return clazz;
@@ -116,34 +115,34 @@ public final class StaticJavaFile extends ResourceFile {
         return false;
     }
 
-    protected  void build(OutputStream os) throws IOException {
+    protected void build(OutputStream os) throws IOException {
         InputStream is = source.openStream();
-        
+
         BufferedReader r = new BufferedReader(new InputStreamReader(is));
         PrintWriter w = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)));
         LineFilter filter = createLineFilter();
-        int lineNumber=1;
-        
+        int lineNumber = 1;
+
         try {
             String line;
-            while((line=r.readLine())!=null) {
+            while ((line = r.readLine()) != null) {
                 line = filter.process(line);
-                if(line!=null) {
+                if (line != null) {
                     w.println(line);
                 }
                 lineNumber++;
             }
-        } catch( ParseException e ) {
-            throw new IOException("unable to process "+source+" line:"+lineNumber+"\n"+e.getMessage());
+        } catch (ParseException e) {
+            throw new IOException("unable to process " + source + " line:" + lineNumber + "\n" + e.getMessage());
         }
-        
+
         w.close();
         r.close();
     }
-    
+
     /**
      * Creates a {@link StaticJavaFile.LineFilter}.
-     * <p>
+     * <p/>
      * A derived class can override this method to process
      * the contents of the source file.
      */
@@ -151,70 +150,68 @@ public final class StaticJavaFile extends ResourceFile {
         // this filter replaces the package declaration.
         LineFilter f = new LineFilter() {
             public String process(String line) {
-                if(!line.startsWith("package ")) {
+                if (!line.startsWith("package ")) {
                     return line;
                 }
-                
+
                 // replace package decl
-                if( pkg.isUnnamed() ) {
+                if (pkg.isUnnamed()) {
                     return null;
                 } else {
                     return "package " + pkg.name() + ";";
                 }
             }
         };
-        if( filter!=null ) {
+        if (filter != null) {
             return new ChainFilter(filter, f);
         } else {
             return f;
         }
     }
-    
+
     /**
      * Filter that alters the Java source code.
-     * <p>
+     * <p/>
      * By implementing this interface, derived classes
      * can modify the Java source file before it's written out.
      */
     public interface LineFilter {
         /**
-         * @param line
-         *      a non-null valid String that corresponds to one line.
-         *      No '\n' included.
-         * @return
-         *      null to strip the line off. Otherwise the returned
-         *      String will be written out. Do not add '\n' at the end
-         *      of this string.
-         * 
-         * @exception java.text.ParseException
-         *      when for some reason there's an error in the line.
+         * @param line a non-null valid String that corresponds to one line.
+         *             No '\n' included.
+         * @return null to strip the line off. Otherwise the returned
+         *         String will be written out. Do not add '\n' at the end
+         *         of this string.
+         * @throws java.text.ParseException when for some reason there's an error in the line.
          */
         String process(String line) throws ParseException;
     }
-    
+
     /**
      * A {@link StaticJavaFile.LineFilter} that combines two {@link StaticJavaFile.LineFilter}s.
      */
     public final static class ChainFilter implements LineFilter {
-        private final LineFilter first,second;
-        public ChainFilter( LineFilter first, LineFilter second ) {
-            this.first=first;
-            this.second=second;
+        private final LineFilter first, second;
+
+        public ChainFilter(LineFilter first, LineFilter second) {
+            this.first = first;
+            this.second = second;
         }
+
         public String process(String line) throws ParseException {
             line = first.process(line);
-            if(line==null) {
+            if (line == null) {
                 return null;
             }
             return second.process(line);
         }
     }
-    
-    
+
+
     private class JStaticClass extends TypeReference {
 
         private final TypeVariable[] typeParams;
-        
+
         JStaticClass() {
             super(pkg.owner());
             // TODO: allow those to be specified
@@ -224,9 +221,9 @@ public final class StaticJavaFile extends ResourceFile {
         public String name() {
             return className;
         }
-        
+
         public String fullName() {
-            if(pkg.isUnnamed()) {
+            if (pkg.isUnnamed()) {
                 return className;
             } else {
                 return pkg.name() + '.' + className;
@@ -260,5 +257,7 @@ public final class StaticJavaFile extends ResourceFile {
         protected TypeReference substituteParams(TypeVariable[] variables, List<TypeReference> bindings) {
             return this;
         }
-    };
+    }
+
+    ;
 }

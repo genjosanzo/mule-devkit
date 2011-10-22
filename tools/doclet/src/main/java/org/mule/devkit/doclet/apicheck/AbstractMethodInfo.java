@@ -20,12 +20,13 @@ import org.mule.devkit.doclet.ParameterInfo;
 
 public interface AbstractMethodInfo {
 
-  public void addException(String exec);
+    public void addException(String exec);
 
-  public void addParameter(ParameterInfo p);
+    public void addParameter(ParameterInfo p);
 
-  public void setDeprecated(boolean deprecated);
-  
-  public void setVarargs(boolean varargs);
-  public boolean isVarArgs();
+    public void setDeprecated(boolean deprecated);
+
+    public void setVarargs(boolean varargs);
+
+    public boolean isVarArgs();
 }

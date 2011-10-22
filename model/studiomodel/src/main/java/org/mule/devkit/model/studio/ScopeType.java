@@ -33,9 +33,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for ScopeType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="ScopeType">
  *   &lt;complexContent>
@@ -46,14 +46,11 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ScopeType")
 public class ScopeType
-    extends AbstractElementType
-{
+        extends AbstractElementType {
 
     @XmlAttribute(name = "forcesResponce")
     protected Boolean forcesResponce;
@@ -62,11 +59,9 @@ public class ScopeType
 
     /**
      * Gets the value of the forcesResponce property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isForcesResponce() {
         return forcesResponce;
@@ -74,11 +69,9 @@ public class ScopeType
 
     /**
      * Sets the value of the forcesResponce property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setForcesResponce(Boolean value) {
         this.forcesResponce = value;
@@ -86,11 +79,9 @@ public class ScopeType
 
     /**
      * Gets the value of the scopeLabel property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getScopeLabel() {
         return scopeLabel;
@@ -98,11 +89,9 @@ public class ScopeType
 
     /**
      * Sets the value of the scopeLabel property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setScopeLabel(String value) {
         this.scopeLabel = value;

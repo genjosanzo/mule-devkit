@@ -111,14 +111,14 @@ public class JavaDocUtils {
                 return StringUtils.difference("@" + tagName, nextToken).trim();
             }
             if (nextToken.startsWith("{@" + tagName)) {
-                if(nextToken.endsWith("}")) {
-                    return  StringUtils.difference("{@" + tagName, nextToken).replaceAll("}", "").trim();
+                if (nextToken.endsWith("}")) {
+                    return StringUtils.difference("{@" + tagName, nextToken).replaceAll("}", "").trim();
                 } else {
                     tagContent.append(StringUtils.difference("{@" + tagName, nextToken).replaceAll("}", "").trim());
                     insideTag = true;
                 }
-            } else if(insideTag) {
-                if(nextToken.endsWith("}")) {
+            } else if (insideTag) {
+                if (nextToken.endsWith("}")) {
                     tagContent.append(' ').append(nextToken.replaceAll("}", ""));
                     insideTag = false;
                 } else {

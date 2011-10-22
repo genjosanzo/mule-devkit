@@ -17,17 +17,14 @@
 
 package org.mule.devkit.it;
 
-public class TransformerModuleTest extends AbstractModuleTest
-{
+public class TransformerModuleTest extends AbstractModuleTest {
 
     @Override
-    protected String getConfigResources()
-    {
+    protected String getConfigResources() {
         return "transformer.xml";
     }
 
-    public void testString() throws Exception
-    {
+    public void testString() throws Exception {
         runFlowWithPayload("transform", 'm', "mulesoft");
     }
 }

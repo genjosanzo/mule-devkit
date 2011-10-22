@@ -36,8 +36,7 @@ import java.io.StringWriter;
 import java.util.Arrays;
 
 public class ModuleContentLocator
-    implements ContentLocator
-{
+        implements ContentLocator {
     private final String repositoryId;
 
     private final IndexingContext indexingContext;
@@ -46,9 +45,8 @@ public class ModuleContentLocator
 
     private final NexusIndexer nexusIndexer;
 
-    public ModuleContentLocator( String repositoryId, IndexingContext indexingContext, NexusIndexer nexusIndexer,
-                                    ArtifactInfoFilter artifactInfoFilter )
-    {
+    public ModuleContentLocator(String repositoryId, IndexingContext indexingContext, NexusIndexer nexusIndexer,
+                                ArtifactInfoFilter artifactInfoFilter) {
         this.repositoryId = repositoryId;
         this.indexingContext = indexingContext;
         this.nexusIndexer = nexusIndexer;
@@ -57,75 +55,65 @@ public class ModuleContentLocator
 
     @Override
     public InputStream getContent()
-        throws IOException
-    {
+            throws IOException {
         Query pq = nexusIndexer.constructQuery(MAVEN.PACKAGING, "mule-module", SearchType.EXACT);
 
         // to have sorted results by version in descending order
-        IteratorSearchRequest sreq = new IteratorSearchRequest( pq, indexingContext );
+        IteratorSearchRequest sreq = new IteratorSearchRequest(pq, indexingContext);
 
         // filter that filters out classified artifacts
         ClassifierArtifactInfoFilter classifierFilter = new ClassifierArtifactInfoFilter();
 
         // combine it with others if needed (unused in cli, but perm filtering in server!)
-        if ( artifactInfoFilter != null )
-        {
+        if (artifactInfoFilter != null) {
             AndMultiArtifactInfoFilter andArtifactFilter =
-                new AndMultiArtifactInfoFilter( Arrays.asList(new ArtifactInfoFilter[]{classifierFilter,
-                        artifactInfoFilter}) );
+                    new AndMultiArtifactInfoFilter(Arrays.asList(new ArtifactInfoFilter[]{classifierFilter,
+                            artifactInfoFilter}));
 
-            sreq.setArtifactInfoFilter( andArtifactFilter );
-        }
-        else
-        {
-            sreq.setArtifactInfoFilter( classifierFilter );
+            sreq.setArtifactInfoFilter(andArtifactFilter);
+        } else {
+            sreq.setArtifactInfoFilter(classifierFilter);
         }
 
-        IteratorSearchResponse hits = nexusIndexer.searchIterator( sreq );
+        IteratorSearchResponse hits = nexusIndexer.searchIterator(sreq);
 
         ModuleCatalog catalog = new ModuleCatalog();
         Module module = null;
 
         // fill it in
-        for ( ArtifactInfo info : hits )
-        {
+        for (ArtifactInfo info : hits) {
             module = new Module();
-            module.setGroupId( info.groupId );
-            module.setArtifactId( info.artifactId );
-            module.setVersion( info.version );
-            module.setDescription( info.description );
+            module.setGroupId(info.groupId);
+            module.setArtifactId(info.artifactId);
+            module.setVersion(info.version);
+            module.setDescription(info.description);
 
-            if ( StringUtils.isNotEmpty( indexingContext.getRepositoryUrl() ) )
-            {
-                module.setRepository( indexingContext.getRepositoryUrl() );
+            if (StringUtils.isNotEmpty(indexingContext.getRepositoryUrl())) {
+                module.setRepository(indexingContext.getRepositoryUrl());
             }
 
-            catalog.addModule( module );
+            catalog.addModule(module);
         }
 
         // serialize it to XML
         StringWriter sw = new StringWriter();
 
-        return new StringContentLocator( sw.toString() ).getContent();
+        return new StringContentLocator(sw.toString()).getContent();
     }
 
     @Override
-    public String getMimeType()
-    {
+    public String getMimeType() {
         return "text/xml";
     }
 
     @Override
-    public boolean isReusable()
-    {
+    public boolean isReusable() {
         return true;
     }
 
     public static class ClassifierArtifactInfoFilter
-        implements ArtifactInfoFilter
-    {
-        public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
-        {
+            implements ArtifactInfoFilter {
+        public boolean accepts(IndexingContext ctx, ArtifactInfo ai) {
             return StringUtils.isBlank(ai.classifier);
         }
     }

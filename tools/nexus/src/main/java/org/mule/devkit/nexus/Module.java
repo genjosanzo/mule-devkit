@@ -17,7 +17,7 @@
 package org.mule.devkit.nexus;
 
 public class Module {
- /**
+    /**
      * Field groupId.
      */
     private String groupId;

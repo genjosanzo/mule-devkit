@@ -45,33 +45,41 @@ import java.util.Map;
 
 /**
  * JavaDoc comment.
- *
- * <p>
+ * <p/>
+ * <p/>
  * A javadoc comment consists of multiple parts. There's the main part (that comes the first in
  * in the comment section), then the parameter parts (@param), the return part (@return),
  * and the throws parts (@throws).
- *
+ * <p/>
  * TODO: it would be nice if we have JComment class and we can derive this class from there.
  */
 public class DocComment extends CommentPart implements Generable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/** list of @param tags */
-    private final Map<String,CommentPart> atParams = new HashMap<String,CommentPart>();
-    
-    /** list of xdoclets */
-    private final Map<String,Map<String,String>> atXdoclets = new HashMap<String,Map<String,String>>();
-    
-    /** list of @throws tags */
-    private final Map<TypeReference,CommentPart> atThrows = new HashMap<TypeReference,CommentPart>();
-    
+    /**
+     * list of @param tags
+     */
+    private final Map<String, CommentPart> atParams = new HashMap<String, CommentPart>();
+
+    /**
+     * list of xdoclets
+     */
+    private final Map<String, Map<String, String>> atXdoclets = new HashMap<String, Map<String, String>>();
+
+    /**
+     * list of @throws tags
+     */
+    private final Map<TypeReference, CommentPart> atThrows = new HashMap<TypeReference, CommentPart>();
+
     /**
      * The @return tag part.
      */
     private CommentPart atReturn = null;
-    
-    /** The @deprecated tag */
+
+    /**
+     * The @deprecated tag
+     */
     private CommentPart atDeprecated = null;
 
     private final CodeModel owner;
@@ -89,9 +97,9 @@ public class DocComment extends CommentPart implements Generable {
     /**
      * Append a text to a @param tag to the javadoc
      */
-    public CommentPart addParam( String param ) {
+    public CommentPart addParam(String param) {
         CommentPart p = atParams.get(param);
-        if(p==null) {
+        if (p == null) {
             atParams.put(param, p = new CommentPart());
         }
         return p;
@@ -100,34 +108,34 @@ public class DocComment extends CommentPart implements Generable {
     /**
      * Append a text to an @param tag.
      */
-    public CommentPart addParam( Variable param ) {
-        return addParam( param.name() );
+    public CommentPart addParam(Variable param) {
+        return addParam(param.name());
     }
 
 
     /**
      * add an @throws tag to the javadoc
      */
-    public CommentPart addThrows( Class<? extends Throwable> exception ) {
-        return addThrows( owner.ref(exception) );
+    public CommentPart addThrows(Class<? extends Throwable> exception) {
+        return addThrows(owner.ref(exception));
     }
-    
+
     /**
      * add an @throws tag to the javadoc
      */
-    public CommentPart addThrows( TypeReference exception ) {
+    public CommentPart addThrows(TypeReference exception) {
         CommentPart p = atThrows.get(exception);
-        if(p==null) {
+        if (p == null) {
             atThrows.put(exception, p = new CommentPart());
         }
         return p;
     }
-    
+
     /**
      * Appends a text to @return tag.
      */
-    public CommentPart addReturn( String ret) {
-        if(atReturn==null) {
+    public CommentPart addReturn(String ret) {
+        if (atReturn == null) {
             atReturn = new CommentPart();
         }
         return atReturn;
@@ -137,7 +145,7 @@ public class DocComment extends CommentPart implements Generable {
      * add an @deprecated tag to the javadoc, with the associated message.
      */
     public CommentPart addDeprecated() {
-        if(atDeprecated==null) {
+        if (atDeprecated == null) {
             atDeprecated = new CommentPart();
         }
         return atDeprecated;
@@ -146,9 +154,9 @@ public class DocComment extends CommentPart implements Generable {
     /**
      * add an xdoclet.
      */
-    public Map<String,String> addXdoclet(String name) {
-        Map<String,String> p = atXdoclets.get(name);
-        if(p==null) {
+    public Map<String, String> addXdoclet(String name) {
+        Map<String, String> p = atXdoclets.get(name);
+        if (p == null) {
             atXdoclets.put(name, p = new HashMap<String, String>());
         }
         return p;
@@ -157,9 +165,9 @@ public class DocComment extends CommentPart implements Generable {
     /**
      * add an xdoclet.
      */
-    public Map<String,String> addXdoclet(String name, Map<String,String> attributes) {
-        Map<String,String> p = atXdoclets.get(name);
-        if(p==null) {
+    public Map<String, String> addXdoclet(String name, Map<String, String> attributes) {
+        Map<String, String> p = atXdoclets.get(name);
+        if (p == null) {
             atXdoclets.put(name, p = new HashMap<String, String>());
         }
         p.putAll(attributes);
@@ -169,9 +177,9 @@ public class DocComment extends CommentPart implements Generable {
     /**
      * add an xdoclet.
      */
-    public Map<String,String> addXdoclet(String name, String attribute, String value) {
-        Map<String,String> p = atXdoclets.get(name);
-        if(p==null) {
+    public Map<String, String> addXdoclet(String name, String attribute, String value) {
+        Map<String, String> p = atXdoclets.get(name);
+        if (p == null) {
             atXdoclets.put(name, p = new HashMap<String, String>());
         }
         p.put(attribute, value);
@@ -184,29 +192,29 @@ public class DocComment extends CommentPart implements Generable {
 
         f.p("/**").nl();
 
-        format(f," * ");
+        format(f, " * ");
 
         f.p(" * ").nl();
-        for (Map.Entry<String,CommentPart> e : atParams.entrySet()) {
+        for (Map.Entry<String, CommentPart> e : atParams.entrySet()) {
             f.p(" * @param ").p(e.getKey()).nl();
-            e.getValue().format(f,INDENT);
+            e.getValue().format(f, INDENT);
         }
-        if( atReturn != null ) {
+        if (atReturn != null) {
             f.p(" * @return").nl();
-            atReturn.format(f,INDENT);
+            atReturn.format(f, INDENT);
         }
-        for (Map.Entry<TypeReference,CommentPart> e : atThrows.entrySet()) {
+        for (Map.Entry<TypeReference, CommentPart> e : atThrows.entrySet()) {
             f.p(" * @throws ").t(e.getKey()).nl();
-            e.getValue().format(f,INDENT);
+            e.getValue().format(f, INDENT);
         }
-        if( atDeprecated != null ) {
+        if (atDeprecated != null) {
             f.p(" * @deprecated").nl();
-            atDeprecated.format(f,INDENT);
+            atDeprecated.format(f, INDENT);
         }
-        for (Map.Entry<String,Map<String,String>> e : atXdoclets.entrySet()) {
+        for (Map.Entry<String, Map<String, String>> e : atXdoclets.entrySet()) {
             f.p(" * @").p(e.getKey());
             if (e.getValue() != null) {
-                for (Map.Entry<String,String> a : e.getValue().entrySet()) {
+                for (Map.Entry<String, String> a : e.getValue().entrySet()) {
                     f.p(" ").p(a.getKey()).p("= \"").p(a.getValue()).p("\"");
                 }
             }

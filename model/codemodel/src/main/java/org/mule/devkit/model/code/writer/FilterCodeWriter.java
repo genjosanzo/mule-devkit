@@ -59,11 +59,11 @@ public class FilterCodeWriter extends CodeWriter {
         this.core = core;
     }
 
-    public OutputStream openBinary( org.mule.devkit.model.code.Package pkg, String fileName ) throws IOException {
+    public OutputStream openBinary(org.mule.devkit.model.code.Package pkg, String fileName) throws IOException {
         return core.openBinary(pkg, fileName);
     }
 
-    public Writer openSource( Package pkg, String fileName ) throws IOException {
+    public Writer openSource(Package pkg, String fileName) throws IOException {
         return core.openSource(pkg, fileName);
     }
 

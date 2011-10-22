@@ -284,7 +284,7 @@ abstract public class Op {
     }
 
     public static Expression cond(Expression cond,
-                                   Expression ifTrue, Expression ifFalse) {
+                                  Expression ifTrue, Expression ifFalse) {
         return new TernaryOp("?", ":", cond, ifTrue, ifFalse);
     }
 

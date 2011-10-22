@@ -17,17 +17,14 @@
 
 package org.mule.devkit.it;
 
-public class JarModuleTest extends AbstractModuleTest
-{
+public class JarModuleTest extends AbstractModuleTest {
 
     @Override
-    protected String getConfigResources()
-    {
+    protected String getConfigResources() {
         return "jar.xml";
     }
 
-    public void testSetManifest() throws Exception
-    {
+    public void testSetManifest() throws Exception {
         runFlow("setManifest");
     }
 }

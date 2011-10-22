@@ -27,45 +27,40 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Module(name = "source")
-public class SourceModule
-{
+public class SourceModule {
     @Source
-    public void count(int startAt, int endAt, int step, SourceCallback callback) throws Exception
-    {
-		int count = startAt;
-        while(true)
-        {
-            if(Thread.interrupted() || count == endAt) {
+    public void count(int startAt, int endAt, int step, SourceCallback callback) throws Exception {
+        int count = startAt;
+        while (true) {
+            if (Thread.interrupted() || count == endAt) {
                 throw new InterruptedException();
             }
 
             callback.process(count);
 
-			count += step;
-        }	
+            count += step;
+        }
     }
 
     @Source
-    public void countWithProperty(int startAt, int endAt, int step, String key, String value, SourceCallback callback) throws Exception
-    {
+    public void countWithProperty(int startAt, int endAt, int step, String key, String value, SourceCallback callback) throws Exception {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(key, value);
-		int count = startAt;
-        while(true)
-        {
-            if(Thread.interrupted() || count == endAt) {
+        int count = startAt;
+        while (true) {
+            if (Thread.interrupted() || count == endAt) {
                 throw new InterruptedException();
             }
 
             callback.process(count, properties);
 
-			count += step;
+            count += step;
         }
     }
 
     @Processor
     public void throwExceptionIfNoProperty(String key, @InboundHeaders("*") Map<String, Object> properties) throws Exception {
-        if( !properties.containsKey(key) ) {
+        if (!properties.containsKey(key)) {
             throw new IllegalArgumentException();
         }
     }

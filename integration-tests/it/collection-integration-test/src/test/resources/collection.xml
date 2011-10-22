@@ -150,7 +150,7 @@
     </flow>
 
     <flow name="flowCountTwoLists">
-        <collection:count-two-lists  config-ref="configE">
+        <collection:count-two-lists config-ref="configE">
             <collection:first-lists>
                 <collection:first-list>itemA</collection:first-list>
                 <collection:first-list>itemB</collection:first-list>

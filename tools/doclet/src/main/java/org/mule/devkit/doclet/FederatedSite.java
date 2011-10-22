@@ -29,50 +29,50 @@ import java.net.URL;
  * be referenced or shared across codebases.
  */
 public final class FederatedSite {
-  public static final String XML_API_PATH = "/current.xml";
-  private final String name;
-  private final URL baseUrl;
-  private final ApiInfo apiInfo;
-  
-  public FederatedSite(String name, URL baseUrl) throws ApiParseException {
-    this.name = name;
-    this.baseUrl = baseUrl;
-    
-    try {
-      URL xmlUrl = new URL(baseUrl + XML_API_PATH);
-      this.apiInfo = new ApiCheck().parseApi(xmlUrl);
-    } catch (MalformedURLException e) {
-      throw new AssertionError(e);
+    public static final String XML_API_PATH = "/current.xml";
+    private final String name;
+    private final URL baseUrl;
+    private final ApiInfo apiInfo;
+
+    public FederatedSite(String name, URL baseUrl) throws ApiParseException {
+        this.name = name;
+        this.baseUrl = baseUrl;
+
+        try {
+            URL xmlUrl = new URL(baseUrl + XML_API_PATH);
+            this.apiInfo = new ApiCheck().parseApi(xmlUrl);
+        } catch (MalformedURLException e) {
+            throw new AssertionError(e);
+        }
     }
-  }
 
-  /**
-   * Constructs a federated site using an xml file not contained on
-   * the site itself.
-   */
-  public FederatedSite(String name, URL baseUrl, String xml) throws ApiParseException {
-    this.name = name;
-    this.baseUrl = baseUrl;
-    this.apiInfo = new ApiCheck().parseApi(xml);
-  }
-  
-  public String linkFor(String htmlPage) {
-    String urlStr = baseUrl.toString();
-    if (urlStr.endsWith("/") || urlStr.endsWith("?")) {
-      return baseUrl + htmlPage;
+    /**
+     * Constructs a federated site using an xml file not contained on
+     * the site itself.
+     */
+    public FederatedSite(String name, URL baseUrl, String xml) throws ApiParseException {
+        this.name = name;
+        this.baseUrl = baseUrl;
+        this.apiInfo = new ApiCheck().parseApi(xml);
     }
-    return urlStr + "/" + htmlPage;
-  }
 
-  public String name() {
-    return name;
-  }
+    public String linkFor(String htmlPage) {
+        String urlStr = baseUrl.toString();
+        if (urlStr.endsWith("/") || urlStr.endsWith("?")) {
+            return baseUrl + htmlPage;
+        }
+        return urlStr + "/" + htmlPage;
+    }
 
-  public ApiInfo apiInfo() {
-    return apiInfo;
-  }
-  
-  public URL baseUrl() {
-    return baseUrl;
-  }
+    public String name() {
+        return name;
+    }
+
+    public ApiInfo apiInfo() {
+        return apiInfo;
+    }
+
+    public URL baseUrl() {
+        return baseUrl;
+    }
 }

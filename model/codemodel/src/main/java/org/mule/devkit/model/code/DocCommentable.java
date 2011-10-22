@@ -42,7 +42,7 @@ package org.mule.devkit.model.code;
 
 /**
  * Program elements that can have Javadoc
- * 
+ *
  * @author Jonas von Malottki
  */
 public interface DocCommentable {

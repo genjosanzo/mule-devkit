@@ -27,7 +27,8 @@
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd">
 
     <oauth:config name="default-oauth" consumerKey="consumerKey123" consumerSecret="consumerSecret123">
-        <oauth:http-callback-config domain="localhost" localPort="${http.port}" remotePort="${http.port}" async="false"/>
+        <oauth:http-callback-config domain="localhost" localPort="${http.port}" remotePort="${http.port}"
+                                    async="false"/>
     </oauth:config>
 
     <flow name="protectedResource">
@@ -39,12 +40,12 @@
     </flow>
 
     <flow name="requestToken">
-        <http:inbound-endpoint host="localhost" port="9098" path="requestToken" exchange-pattern="request-response" />
+        <http:inbound-endpoint host="localhost" port="9098" path="requestToken" exchange-pattern="request-response"/>
         <component class="org.mule.devkit.it.RequestTokenComponent"/>
     </flow>
 
     <flow name="accessToken">
-        <http:inbound-endpoint host="localhost" port="9098" path="accessToken" exchange-pattern="request-response" />
+        <http:inbound-endpoint host="localhost" port="9098" path="accessToken" exchange-pattern="request-response"/>
         <component class="org.mule.devkit.it.AccessTokenComponent"/>
     </flow>
 

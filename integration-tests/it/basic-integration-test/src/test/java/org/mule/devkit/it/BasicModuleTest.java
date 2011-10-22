@@ -17,51 +17,41 @@
 
 package org.mule.devkit.it;
 
-public class BasicModuleTest extends AbstractModuleTest
-{
+public class BasicModuleTest extends AbstractModuleTest {
 
     @Override
-    protected String getConfigResources()
-    {
+    protected String getConfigResources() {
         return "basic.xml";
     }
 
-    public void testPollString() throws Exception
-    {
+    public void testPollString() throws Exception {
         runFlow("pollPassthruStringFlow", "mulesoft");
     }
 
-    public void testString() throws Exception
-    {
+    public void testString() throws Exception {
         runFlow("passthruStringFlow", "mulesoft");
     }
 
-    public void testInteger() throws Exception
-    {
+    public void testInteger() throws Exception {
         runFlow("passthruIntegerFlow", 3);
     }
 
-    public void testFloat() throws Exception
-    {
+    public void testFloat() throws Exception {
     }
 
-    public void testBoolean() throws Exception
-    {
+    public void testBoolean() throws Exception {
         runFlow("passthruBooleanFlow", true);
     }
 
-    public void testLong() throws Exception
-    {
+    public void testLong() throws Exception {
         runFlow("passthruLongFlow", 3456443463342345734L);
     }
 
-    public void testEnum() throws Exception
-    {
+    public void testEnum() throws Exception {
         runFlow("passthruEnumFlow", "In");
     }
 
-    public void testComplexRef() throws Exception
-    {
+    public void testComplexRef() throws Exception {
         runFlow("passthruComplexRef", "MuleSoft$");
     }
 }

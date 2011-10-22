@@ -33,9 +33,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for NestedElementReference complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="NestedElementReference">
  *   &lt;complexContent>
@@ -52,14 +52,11 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "NestedElementReference")
 public class NestedElementReference
-    extends AttributeType
-{
+        extends AttributeType {
 
     @XmlAttribute(name = "inplace")
     protected Boolean inplace;
@@ -76,11 +73,9 @@ public class NestedElementReference
 
     /**
      * Gets the value of the inplace property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isInplace() {
         return inplace;
@@ -88,11 +83,9 @@ public class NestedElementReference
 
     /**
      * Sets the value of the inplace property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setInplace(Boolean value) {
         this.inplace = value;
@@ -100,11 +93,9 @@ public class NestedElementReference
 
     /**
      * Gets the value of the allowMultiple property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isAllowMultiple() {
         return allowMultiple;
@@ -112,11 +103,9 @@ public class NestedElementReference
 
     /**
      * Sets the value of the allowMultiple property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setAllowMultiple(Boolean value) {
         this.allowMultiple = value;
@@ -124,11 +113,9 @@ public class NestedElementReference
 
     /**
      * Gets the value of the tableUI property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isTableUI() {
         return tableUI;
@@ -136,11 +123,9 @@ public class NestedElementReference
 
     /**
      * Sets the value of the tableUI property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setTableUI(Boolean value) {
         this.tableUI = value;
@@ -148,11 +133,9 @@ public class NestedElementReference
 
     /**
      * Gets the value of the treeUI property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isTreeUI() {
         return treeUI;
@@ -160,11 +143,9 @@ public class NestedElementReference
 
     /**
      * Sets the value of the treeUI property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setTreeUI(Boolean value) {
         this.treeUI = value;
@@ -172,11 +153,9 @@ public class NestedElementReference
 
     /**
      * Gets the value of the allowSubTypes property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isAllowSubTypes() {
         return allowSubTypes;
@@ -184,11 +163,9 @@ public class NestedElementReference
 
     /**
      * Sets the value of the allowSubTypes property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setAllowSubTypes(Boolean value) {
         this.allowSubTypes = value;
@@ -196,11 +173,9 @@ public class NestedElementReference
 
     /**
      * Gets the value of the allowedSubTypes property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getAllowedSubTypes() {
         return allowedSubTypes;
@@ -208,11 +183,9 @@ public class NestedElementReference
 
     /**
      * Sets the value of the allowedSubTypes property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setAllowedSubTypes(String value) {
         this.allowedSubTypes = value;

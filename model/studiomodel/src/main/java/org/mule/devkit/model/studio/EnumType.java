@@ -36,9 +36,9 @@ import java.util.List;
 
 /**
  * <p>Java class for EnumType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="EnumType">
  *   &lt;complexContent>
@@ -52,16 +52,13 @@ import java.util.List;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "EnumType", propOrder = {
-    "option"
+        "option"
 })
 public class EnumType
-    extends AttributeType
-{
+        extends AttributeType {
 
     @XmlElement(required = true)
     protected List<EnumElement> option;
@@ -72,25 +69,23 @@ public class EnumType
 
     /**
      * Gets the value of the option property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the option property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getOption().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link EnumElement }
-     * 
-     * 
      */
     public List<EnumElement> getOption() {
         if (option == null) {
@@ -101,11 +96,9 @@ public class EnumType
 
     /**
      * Gets the value of the defaultValue property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getDefaultValue() {
         return defaultValue;
@@ -113,11 +106,9 @@ public class EnumType
 
     /**
      * Sets the value of the defaultValue property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDefaultValue(String value) {
         this.defaultValue = value;
@@ -125,11 +116,9 @@ public class EnumType
 
     /**
      * Gets the value of the allowsCustom property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isAllowsCustom() {
         return allowsCustom;
@@ -137,11 +126,9 @@ public class EnumType
 
     /**
      * Sets the value of the allowsCustom property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setAllowsCustom(Boolean value) {
         this.allowsCustom = value;

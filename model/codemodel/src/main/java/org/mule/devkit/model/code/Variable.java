@@ -79,18 +79,12 @@ public class Variable extends AbstractExpression implements Declaration, Assignm
     private List<AnnotationUse> annotations = null;
 
 
-
     /**
      * Variable constructor
      *
-     * @param type
-     *        Datatype of this variable
-     *
-     * @param name
-     *        Name of this variable
-     *
-     * @param init
-     *        Value to initialize this variable to
+     * @param type Datatype of this variable
+     * @param name Name of this variable
+     * @param init Value to initialize this variable to
      */
     Variable(Modifiers mods, Type type, String name, Expression init) {
         this.mods = mods;
@@ -103,8 +97,7 @@ public class Variable extends AbstractExpression implements Declaration, Assignm
     /**
      * Initialize this variable
      *
-     * @param init
-     *        Expression to be used to initialize this field
+     * @param init Expression to be used to initialize this field
      */
     public Variable init(Expression init) {
         this.init = init;
@@ -124,7 +117,7 @@ public class Variable extends AbstractExpression implements Declaration, Assignm
      * Changes the name of this variable.
      */
     public void name(String name) {
-        if(!JavaName.isJavaIdentifier(name)) {
+        if (!JavaName.isJavaIdentifier(name)) {
             throw new IllegalArgumentException();
         }
         this.name = name;
@@ -132,17 +125,16 @@ public class Variable extends AbstractExpression implements Declaration, Assignm
 
     /**
      * Return the type of this variable.
-     * @return
-     *      always non-null.
+     *
+     * @return always non-null.
      */
     public Type type() {
         return type;
     }
 
     /**
-     * @return
-     *      the current modifiers of this method.
-     *      Always return non-null valid object.
+     * @return the current modifiers of this method.
+     *         Always return non-null valid object.
      */
     public Modifiers mods() {
         return mods;
@@ -151,15 +143,12 @@ public class Variable extends AbstractExpression implements Declaration, Assignm
     /**
      * Sets the type of this variable.
      *
-     * @param newType
-     *      must not be null.
-     *
-     * @return
-     *      the old type value. always non-null.
+     * @param newType must not be null.
+     * @return the old type value. always non-null.
      */
     public Type type(Type newType) {
         Type r = type;
-        if(newType==null) {
+        if (newType == null) {
             throw new IllegalArgumentException();
         }
         type = newType;
@@ -169,11 +158,11 @@ public class Variable extends AbstractExpression implements Declaration, Assignm
 
     /**
      * Adds an annotation to this variable.
-     * @param clazz
-     *          The annotation class to annotate the field with
+     *
+     * @param clazz The annotation class to annotate the field with
      */
-    public AnnotationUse annotate(TypeReference clazz){
-        if(annotations==null) {
+    public AnnotationUse annotate(TypeReference clazz) {
+        if (annotations == null) {
             annotations = new ArrayList<AnnotationUse>();
         }
         AnnotationUse a = new AnnotationUse(clazz);
@@ -184,15 +173,14 @@ public class Variable extends AbstractExpression implements Declaration, Assignm
     /**
      * Adds an annotation to this variable.
      *
-     * @param clazz
-     *          The annotation class to annotate the field with
+     * @param clazz The annotation class to annotate the field with
      */
-    public AnnotationUse annotate(Class <? extends Annotation> clazz){
+    public AnnotationUse annotate(Class<? extends Annotation> clazz) {
         return annotate(type.owner().ref(clazz));
     }
 
     public <W extends AnnotationWriter> W annotate2(Class<W> clazz) {
-        return TypedAnnotationWriter.create(clazz,this);
+        return TypedAnnotationWriter.create(clazz, this);
     }
 
     public Collection<AnnotationUse> annotations() {
@@ -203,12 +191,12 @@ public class Variable extends AbstractExpression implements Declaration, Assignm
     }
 
     protected boolean isAnnotated() {
-        return annotations!=null;
+        return annotations != null;
     }
 
     public void bind(Formatter f) {
-        if (annotations != null){
-            for( int i=0; i<annotations.size(); i++ ) {
+        if (annotations != null) {
+            for (int i = 0; i < annotations.size(); i++) {
                 f.g(annotations.get(i)).nl();
             }
         }
@@ -226,12 +214,13 @@ public class Variable extends AbstractExpression implements Declaration, Assignm
         f.id(name);
     }
 
-	
+
     public Expression assign(Expression rhs) {
-		return ExpressionFactory.assign(this, rhs);
+        return ExpressionFactory.assign(this, rhs);
     }
+
     public Expression assignPlus(Expression rhs) {
-		return ExpressionFactory.assignPlus(this, rhs);
+        return ExpressionFactory.assignPlus(this, rhs);
     }
-	
+
 }

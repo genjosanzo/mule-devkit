@@ -42,26 +42,24 @@ package org.mule.devkit.model.code;
 
 /**
  * Label that can be used for continue and break.
- * 
- * @author
- *     Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
+ *
+ * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
 public class Label implements Statement {
-    
+
     final String label;
-    
+
     /**
      * BreakStatement constructor
-     * 
-     * @param   _label
-     *      break label or null.
+     *
+     * @param _label break label or null.
      */
     Label(String _label) {
         this.label = _label;
     }
 
     public void state(Formatter f) {
-        f.p(label+':').nl();
+        f.p(label + ':').nl();
     }
 
 }

@@ -27,8 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class TransformerArchetypeIT
-{
+public class TransformerArchetypeIT {
 
     private static final File ROOT = new File("target/integration-tests/");
     private static final String ARCHETYPE_PROPERTIES = "/transformer-archetype.properties";
@@ -37,8 +36,7 @@ public class TransformerArchetypeIT
     private Properties verifierProperties;
 
     @Before
-    public void setUp() throws VerificationException, IOException
-    {
+    public void setUp() throws VerificationException, IOException {
         InputStream stream = getClass().getResourceAsStream(ARCHETYPE_PROPERTIES);
         archetypeProperties = new Properties();
         archetypeProperties.load(stream);
@@ -55,24 +53,20 @@ public class TransformerArchetypeIT
         verifier.deleteDirectory(getArtifactId());
     }
 
-    private String getVersion()
-    {
+    private String getVersion() {
         return archetypeProperties.getProperty("version");
     }
 
-    private String getArtifactId()
-    {
+    private String getArtifactId() {
         return archetypeProperties.getProperty("artifactId");
     }
 
-    private String getGroupId()
-    {
+    private String getGroupId() {
         return archetypeProperties.getProperty("groupId");
     }
 
     @Test
-    public void testGenerateArchetype() throws VerificationException
-    {
+    public void testGenerateArchetype() throws VerificationException {
         Verifier verifier = new Verifier(ROOT.getAbsolutePath());
         verifier.setSystemProperties(archetypeProperties);
         verifier.setVerifierProperties(verifierProperties);

@@ -49,29 +49,26 @@ import java.io.OutputStream;
 /**
  * Allows the application to use OutputStream to define data
  * that will be stored into a file.
- * 
- * @author
- *     Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
+ *
+ * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
 public final class BinaryFile extends ResourceFile {
-    
+
     private final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    
+
     public BinaryFile(String name) {
         super(name);
     }
-    
+
     /**
-     * 
-     * @return
-     *      Data written to the returned output stream will be written
-     *      to the file.
+     * @return Data written to the returned output stream will be written
+     *         to the file.
      */
     public OutputStream getDataStore() {
         return baos;
     }
-    
+
     public void build(OutputStream os) throws IOException {
-        os.write( baos.toByteArray() );
+        os.write(baos.toByteArray());
     }
 }

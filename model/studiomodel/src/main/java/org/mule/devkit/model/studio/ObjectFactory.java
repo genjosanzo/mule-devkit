@@ -32,18 +32,17 @@ import javax.xml.namespace.QName;
 
 
 /**
- * This object contains factory methods for each 
- * Java content interface and Java element interface 
+ * This object contains factory methods for each
+ * Java content interface and Java element interface
  * generated in the org.mule.devkit.model.studio package.
- * <p>An ObjectFactory allows you to programatically 
- * construct new instances of the Java representation 
- * for XML content. The Java representation of XML 
- * content can consist of schema derived interfaces 
- * and classes representing the binding of schema 
- * type definitions, element declarations and model 
- * groups.  Factory methods for each of these are 
+ * <p>An ObjectFactory allows you to programatically
+ * construct new instances of the Java representation
+ * for XML content. The Java representation of XML
+ * content can consist of schema derived interfaces
+ * and classes representing the binding of schema
+ * type definitions, element declarations and model
+ * groups.  Factory methods for each of these are
  * provided in this class.
- * 
  */
 @XmlRegistry
 public class ObjectFactory {
@@ -91,14 +90,12 @@ public class ObjectFactory {
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.mule.devkit.model.studio
-     * 
      */
     public ObjectFactory() {
     }
 
     /**
      * Create an instance of {@link LongType }
-     * 
      */
     public LongType createLongType() {
         return new LongType();
@@ -106,7 +103,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link EndpointType }
-     * 
      */
     public EndpointType createEndpointType() {
         return new EndpointType();
@@ -114,7 +110,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link ModeElementType }
-     * 
      */
     public ModeElementType createModeElementType() {
         return new ModeElementType();
@@ -122,7 +117,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link NestedElementReference }
-     * 
      */
     public NestedElementReference createNestedElementReference() {
         return new NestedElementReference();
@@ -130,7 +124,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Group }
-     * 
      */
     public Group createGroup() {
         return new Group();
@@ -138,7 +131,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link EncodingType }
-     * 
      */
     public EncodingType createEncodingType() {
         return new EncodingType();
@@ -146,7 +138,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link NamespaceType }
-     * 
      */
     public NamespaceType createNamespaceType() {
         return new NamespaceType();
@@ -154,7 +145,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link ExpressionAttributeType }
-     * 
      */
     public ExpressionAttributeType createExpressionAttributeType() {
         return new ExpressionAttributeType();
@@ -162,7 +152,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link ConnectorType }
-     * 
      */
     public ConnectorType createConnectorType() {
         return new ConnectorType();
@@ -170,7 +159,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link ScopeType }
-     * 
      */
     public ScopeType createScopeType() {
         return new ScopeType();
@@ -178,7 +166,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link AlternativesType.Alternative }
-     * 
      */
     public AlternativesType.Alternative createAlternativesTypeAlternative() {
         return new AlternativesType.Alternative();
@@ -186,7 +173,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link NewType }
-     * 
      */
     public NewType createNewType() {
         return new NewType();
@@ -194,7 +180,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Attributes }
-     * 
      */
     public Attributes createAttributes() {
         return new Attributes();
@@ -202,7 +187,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Module }
-     * 
      */
     public Module createModule() {
         return new Module();
@@ -210,7 +194,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link IntegerType }
-     * 
      */
     public IntegerType createIntegerType() {
         return new IntegerType();
@@ -218,7 +201,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link NestedElementType }
-     * 
      */
     public NestedElementType createNestedElementType() {
         return new NestedElementType();
@@ -226,7 +208,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link AttributeCategory }
-     * 
      */
     public AttributeCategory createAttributeCategory() {
         return new AttributeCategory();
@@ -234,7 +215,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Booleantype }
-     * 
      */
     public Booleantype createBooleantype() {
         return new Booleantype();
@@ -242,7 +222,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link TextType }
-     * 
      */
     public TextType createTextType() {
         return new TextType();
@@ -250,7 +229,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link FixedAttributeType }
-     * 
      */
     public FixedAttributeType createFixedAttributeType() {
         return new FixedAttributeType();
@@ -258,7 +236,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link AbstractElementType }
-     * 
      */
     public AbstractElementType createAbstractElementType() {
         return new AbstractElementType();
@@ -266,7 +243,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link ClassType }
-     * 
      */
     public ClassType createClassType() {
         return new ClassType();
@@ -274,7 +250,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link EnumElement }
-     * 
      */
     public EnumElement createEnumElement() {
         return new EnumElement();
@@ -282,7 +257,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link PatternType }
-     * 
      */
     public PatternType createPatternType() {
         return new PatternType();
@@ -290,7 +264,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link AlternativesType }
-     * 
      */
     public AlternativesType createAlternativesType() {
         return new AlternativesType();
@@ -298,7 +271,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link StringAttributeType }
-     * 
      */
     public StringAttributeType createStringAttributeType() {
         return new StringAttributeType();
@@ -306,7 +278,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link GlobalType }
-     * 
      */
     public GlobalType createGlobalType() {
         return new GlobalType();
@@ -314,7 +285,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link ModeType }
-     * 
      */
     public ModeType createModeType() {
         return new ModeType();
@@ -322,7 +292,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link AlwaysAdd }
-     * 
      */
     public AlwaysAdd createAlwaysAdd() {
         return new AlwaysAdd();
@@ -330,7 +299,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link EnumType }
-     * 
      */
     public EnumType createEnumType() {
         return new EnumType();
@@ -338,7 +306,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link AttributeType }
-     * 
      */
     public AttributeType createAttributeType() {
         return new AttributeType();
@@ -346,7 +313,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Group }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "group")
     public JAXBElement<Group> createGroup(Group value) {
@@ -355,7 +321,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link NamespaceType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "namespace")
     public JAXBElement<NamespaceType> createNamespace(NamespaceType value) {
@@ -364,7 +329,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link EndpointType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "endpoint")
     public JAXBElement<EndpointType> createEndpoint(EndpointType value) {
@@ -373,7 +337,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ConnectorType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "connector")
     public JAXBElement<ConnectorType> createConnector(ConnectorType value) {
@@ -382,7 +345,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Attributes }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "attributes")
     public JAXBElement<Attributes> createAttributes(Attributes value) {
@@ -391,7 +353,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AttributeCategory }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "attribute-category")
     public JAXBElement<AttributeCategory> createAttributeCategory(AttributeCategory value) {
@@ -400,7 +361,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link PatternType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "pattern")
     public JAXBElement<PatternType> createPattern(PatternType value) {
@@ -409,7 +369,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link NestedElementType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "nested")
     public JAXBElement<NestedElementType> createNested(NestedElementType value) {
@@ -418,7 +377,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GlobalType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "global")
     public JAXBElement<GlobalType> createGlobal(GlobalType value) {
@@ -427,7 +385,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ScopeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "scope")
     public JAXBElement<ScopeType> createScope(ScopeType value) {
@@ -436,7 +393,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ModeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "modeSwitch", scope = Group.class)
     public JAXBElement<ModeType> createGroupModeSwitch(ModeType value) {
@@ -445,7 +401,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "regexp", scope = Group.class)
     public JAXBElement<AttributeType> createGroupRegexp(AttributeType value) {
@@ -454,7 +409,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Booleantype }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "transientBoolean", scope = Group.class)
     public JAXBElement<Booleantype> createGroupTransientBoolean(Booleantype value) {
@@ -463,7 +417,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link EncodingType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "encoding", scope = Group.class)
     public JAXBElement<EncodingType> createGroupEncoding(EncodingType value) {
@@ -472,7 +425,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "path", scope = Group.class)
     public JAXBElement<AttributeType> createGroupPath(AttributeType value) {
@@ -481,7 +433,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Booleantype }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "boolean", scope = Group.class)
     public JAXBElement<Booleantype> createGroupBoolean(Booleantype value) {
@@ -490,7 +441,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link NestedElementReference }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "childElement", scope = Group.class)
     public JAXBElement<NestedElementReference> createGroupChildElement(NestedElementReference value) {
@@ -499,7 +449,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link StringAttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "string", scope = Group.class)
     public JAXBElement<StringAttributeType> createGroupString(StringAttributeType value) {
@@ -508,7 +457,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "name", scope = Group.class)
     public JAXBElement<AttributeType> createGroupName(AttributeType value) {
@@ -517,7 +465,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "file", scope = Group.class)
     public JAXBElement<AttributeType> createGroupFile(AttributeType value) {
@@ -526,7 +473,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link StringAttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "password", scope = Group.class)
     public JAXBElement<StringAttributeType> createGroupPassword(StringAttributeType value) {
@@ -535,7 +481,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link LongType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "long", scope = Group.class)
     public JAXBElement<LongType> createGroupLong(LongType value) {
@@ -544,7 +489,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "url", scope = Group.class)
     public JAXBElement<AttributeType> createGroupUrl(AttributeType value) {
@@ -553,7 +497,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link NewType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "globalRef", scope = Group.class)
     public JAXBElement<NewType> createGroupGlobalRef(NewType value) {
@@ -562,7 +505,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link EnumType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "enum", scope = Group.class)
     public JAXBElement<EnumType> createGroupEnum(EnumType value) {
@@ -571,7 +513,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "list", scope = Group.class)
     public JAXBElement<AttributeType> createGroupList(AttributeType value) {
@@ -580,7 +521,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link IntegerType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "integer", scope = Group.class)
     public JAXBElement<IntegerType> createGroupInteger(IntegerType value) {
@@ -589,7 +529,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ClassType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "classname", scope = Group.class)
     public JAXBElement<ClassType> createGroupClassname(ClassType value) {
@@ -598,7 +537,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ExpressionAttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "expression", scope = Group.class)
     public JAXBElement<ExpressionAttributeType> createGroupExpression(ExpressionAttributeType value) {
@@ -607,7 +545,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link TextType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "text", scope = Group.class)
     public JAXBElement<TextType> createGroupText(TextType value) {
@@ -616,7 +553,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link PatternType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "cloud-connector", scope = NamespaceType.class)
     public JAXBElement<PatternType> createNamespaceTypeCloudConnector(PatternType value) {
@@ -625,7 +561,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link PatternType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "filter", scope = NamespaceType.class)
     public JAXBElement<PatternType> createNamespaceTypeFilter(PatternType value) {
@@ -634,7 +569,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link PatternType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "transformer", scope = NamespaceType.class)
     public JAXBElement<PatternType> createNamespaceTypeTransformer(PatternType value) {
@@ -643,7 +577,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GlobalType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "global-cloud-connector", scope = NamespaceType.class)
     public JAXBElement<GlobalType> createNamespaceTypeGlobalCloudConnector(GlobalType value) {
@@ -652,7 +585,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link PatternType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "flow", scope = NamespaceType.class)
     public JAXBElement<PatternType> createNamespaceTypeFlow(PatternType value) {
@@ -661,7 +593,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GlobalType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "global-transformer", scope = NamespaceType.class)
     public JAXBElement<GlobalType> createNamespaceTypeGlobalTransformer(GlobalType value) {
@@ -670,7 +601,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link PatternType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "component", scope = NamespaceType.class)
     public JAXBElement<PatternType> createNamespaceTypeComponent(PatternType value) {
@@ -679,7 +609,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GlobalType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "global-endpoint", scope = NamespaceType.class)
     public JAXBElement<GlobalType> createNamespaceTypeGlobalEndpoint(GlobalType value) {
@@ -688,7 +617,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link PatternType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "router", scope = NamespaceType.class)
     public JAXBElement<PatternType> createNamespaceTypeRouter(PatternType value) {
@@ -697,7 +625,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GlobalType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "global-filter", scope = NamespaceType.class)
     public JAXBElement<GlobalType> createNamespaceTypeGlobalFilter(GlobalType value) {
@@ -706,7 +633,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "regexp", scope = NestedElementType.class)
     public JAXBElement<AttributeType> createNestedElementTypeRegexp(AttributeType value) {
@@ -715,7 +641,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Booleantype }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "transientBoolean", scope = NestedElementType.class)
     public JAXBElement<Booleantype> createNestedElementTypeTransientBoolean(Booleantype value) {
@@ -724,7 +649,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "path", scope = NestedElementType.class)
     public JAXBElement<AttributeType> createNestedElementTypePath(AttributeType value) {
@@ -733,7 +657,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "encoding", scope = NestedElementType.class)
     public JAXBElement<AttributeType> createNestedElementTypeEncoding(AttributeType value) {
@@ -742,7 +665,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Booleantype }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "boolean", scope = NestedElementType.class)
     public JAXBElement<Booleantype> createNestedElementTypeBoolean(Booleantype value) {
@@ -751,7 +673,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link NestedElementReference }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "childElement", scope = NestedElementType.class)
     public JAXBElement<NestedElementReference> createNestedElementTypeChildElement(NestedElementReference value) {
@@ -760,7 +681,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "name", scope = NestedElementType.class)
     public JAXBElement<AttributeType> createNestedElementTypeName(AttributeType value) {
@@ -769,7 +689,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "string", scope = NestedElementType.class)
     public JAXBElement<AttributeType> createNestedElementTypeString(AttributeType value) {
@@ -778,7 +697,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "file", scope = NestedElementType.class)
     public JAXBElement<AttributeType> createNestedElementTypeFile(AttributeType value) {
@@ -787,7 +705,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link StringAttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "password", scope = NestedElementType.class)
     public JAXBElement<StringAttributeType> createNestedElementTypePassword(StringAttributeType value) {
@@ -796,7 +713,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link LongType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "long", scope = NestedElementType.class)
     public JAXBElement<LongType> createNestedElementTypeLong(LongType value) {
@@ -805,7 +721,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "url", scope = NestedElementType.class)
     public JAXBElement<AttributeType> createNestedElementTypeUrl(AttributeType value) {
@@ -814,7 +729,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "globalRef", scope = NestedElementType.class)
     public JAXBElement<AttributeType> createNestedElementTypeGlobalRef(AttributeType value) {
@@ -823,7 +737,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "list", scope = NestedElementType.class)
     public JAXBElement<AttributeType> createNestedElementTypeList(AttributeType value) {
@@ -832,7 +745,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link EnumType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "enum", scope = NestedElementType.class)
     public JAXBElement<EnumType> createNestedElementTypeEnum(EnumType value) {
@@ -841,7 +753,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link IntegerType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "integer", scope = NestedElementType.class)
     public JAXBElement<IntegerType> createNestedElementTypeInteger(IntegerType value) {
@@ -850,7 +761,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ClassType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "classname", scope = NestedElementType.class)
     public JAXBElement<ClassType> createNestedElementTypeClassname(ClassType value) {
@@ -859,7 +769,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ExpressionAttributeType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "expression", scope = NestedElementType.class)
     public JAXBElement<ExpressionAttributeType> createNestedElementTypeExpression(ExpressionAttributeType value) {
@@ -868,7 +777,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link TextType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "text", scope = NestedElementType.class)
     public JAXBElement<TextType> createNestedElementTypeText(TextType value) {

@@ -34,9 +34,9 @@ import javax.xml.bind.annotation.XmlValue;
 
 /**
  * <p>Java class for Guid complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="Guid">
  *   &lt;simpleContent>
@@ -46,12 +46,10 @@ import javax.xml.bind.annotation.XmlValue;
  *   &lt;/simpleContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Guid", propOrder = {
-    "value"
+        "value"
 })
 public class Guid {
 
@@ -62,11 +60,9 @@ public class Guid {
 
     /**
      * Gets the value of the value property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getValue() {
         return value;
@@ -74,11 +70,9 @@ public class Guid {
 
     /**
      * Sets the value of the value property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setValue(String value) {
         this.value = value;
@@ -86,11 +80,9 @@ public class Guid {
 
     /**
      * Gets the value of the isPermaLink property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public boolean isIsPermaLink() {
         if (isPermaLink == null) {
@@ -102,11 +94,9 @@ public class Guid {
 
     /**
      * Sets the value of the isPermaLink property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setIsPermaLink(Boolean value) {
         this.isPermaLink = value;

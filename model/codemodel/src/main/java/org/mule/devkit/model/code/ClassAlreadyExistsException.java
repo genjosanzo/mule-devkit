@@ -42,25 +42,23 @@ package org.mule.devkit.model.code;
 
 /**
  * Indicates that the class is already created.
- * 
- * @author
- * 	Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
+ *
+ * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
 public class ClassAlreadyExistsException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private final DefinedClass existing;
-    
+    private final DefinedClass existing;
+
     public ClassAlreadyExistsException(DefinedClass _existing) {
         this.existing = _existing;
     }
-    
+
     /**
      * Gets a reference to the existing {@link DefinedClass}.
-     * 
-     * @return
-     *      This method always return non-null valid object.
+     *
+     * @return This method always return non-null valid object.
      */
     public DefinedClass getExistingClass() {
         return existing;

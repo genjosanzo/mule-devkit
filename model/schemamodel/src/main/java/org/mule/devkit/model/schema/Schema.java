@@ -42,9 +42,9 @@ import java.util.List;
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -74,35 +74,32 @@ import java.util.List;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "includeOrImportOrRedefine",
-    "simpleTypeOrComplexTypeOrGroup"
+        "includeOrImportOrRedefine",
+        "simpleTypeOrComplexTypeOrGroup"
 })
 @XmlRootElement(name = "schema")
 public class Schema
-    extends OpenAttrs
-{
+        extends OpenAttrs {
 
     @XmlElements({
-        @XmlElement(name = "redefine", type = Redefine.class),
-        @XmlElement(name = "annotation", type = Annotation.class),
-        @XmlElement(name = "import", type = Import.class),
-        @XmlElement(name = "include", type = Include.class)
+            @XmlElement(name = "redefine", type = Redefine.class),
+            @XmlElement(name = "annotation", type = Annotation.class),
+            @XmlElement(name = "import", type = Import.class),
+            @XmlElement(name = "include", type = Include.class)
     })
     protected List<OpenAttrs> includeOrImportOrRedefine;
     @XmlElements({
-        @XmlElement(name = "attribute", type = TopLevelAttribute.class),
-        @XmlElement(name = "group", type = NamedGroup.class),
-        @XmlElement(name = "notation", type = Notation.class),
-        @XmlElement(name = "attributeGroup", type = NamedAttributeGroup.class),
-        @XmlElement(name = "element", type = TopLevelElement.class),
-        @XmlElement(name = "annotation", type = Annotation.class),
-        @XmlElement(name = "complexType", type = TopLevelComplexType.class),
-        @XmlElement(name = "simpleType", type = TopLevelSimpleType.class)
+            @XmlElement(name = "attribute", type = TopLevelAttribute.class),
+            @XmlElement(name = "group", type = NamedGroup.class),
+            @XmlElement(name = "notation", type = Notation.class),
+            @XmlElement(name = "attributeGroup", type = NamedAttributeGroup.class),
+            @XmlElement(name = "element", type = TopLevelElement.class),
+            @XmlElement(name = "annotation", type = Annotation.class),
+            @XmlElement(name = "complexType", type = TopLevelComplexType.class),
+            @XmlElement(name = "simpleType", type = TopLevelSimpleType.class)
     })
     protected List<OpenAttrs> simpleTypeOrComplexTypeOrGroup;
     @XmlAttribute(name = "targetNamespace")
@@ -132,28 +129,26 @@ public class Schema
 
     /**
      * Gets the value of the includeOrImportOrRedefine property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the includeOrImportOrRedefine property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getIncludeOrImportOrRedefine().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link Redefine }
      * {@link Annotation }
      * {@link Import }
      * {@link Include }
-     * 
-     * 
      */
     public List<OpenAttrs> getIncludeOrImportOrRedefine() {
         if (includeOrImportOrRedefine == null) {
@@ -164,21 +159,21 @@ public class Schema
 
     /**
      * Gets the value of the simpleTypeOrComplexTypeOrGroup property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the simpleTypeOrComplexTypeOrGroup property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getSimpleTypeOrComplexTypeOrGroup().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link TopLevelAttribute }
      * {@link NamedGroup }
@@ -188,8 +183,6 @@ public class Schema
      * {@link Annotation }
      * {@link TopLevelComplexType }
      * {@link TopLevelSimpleType }
-     * 
-     * 
      */
     public List<OpenAttrs> getSimpleTypeOrComplexTypeOrGroup() {
         if (simpleTypeOrComplexTypeOrGroup == null) {
@@ -200,11 +193,9 @@ public class Schema
 
     /**
      * Gets the value of the targetNamespace property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getTargetNamespace() {
         return targetNamespace;
@@ -212,11 +203,9 @@ public class Schema
 
     /**
      * Sets the value of the targetNamespace property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setTargetNamespace(String value) {
         this.targetNamespace = value;
@@ -224,11 +213,9 @@ public class Schema
 
     /**
      * Gets the value of the version property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getVersion() {
         return version;
@@ -236,11 +223,9 @@ public class Schema
 
     /**
      * Sets the value of the version property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setVersion(String value) {
         this.version = value;
@@ -248,25 +233,23 @@ public class Schema
 
     /**
      * Gets the value of the finalDefault property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the finalDefault property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getFinalDefault().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link String }
-     * 
-     * 
      */
     public List<String> getFinalDefault() {
         if (finalDefault == null) {
@@ -277,25 +260,23 @@ public class Schema
 
     /**
      * Gets the value of the blockDefault property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the blockDefault property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getBlockDefault().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link String }
-     * 
-     * 
      */
     public List<String> getBlockDefault() {
         if (blockDefault == null) {
@@ -306,11 +287,9 @@ public class Schema
 
     /**
      * Gets the value of the attributeFormDefault property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link FormChoice }
-     *     
+     *
+     * @return possible object is
+     *         {@link FormChoice }
      */
     public FormChoice getAttributeFormDefault() {
         if (attributeFormDefault == null) {
@@ -322,11 +301,9 @@ public class Schema
 
     /**
      * Sets the value of the attributeFormDefault property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link FormChoice }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link FormChoice }
      */
     public void setAttributeFormDefault(FormChoice value) {
         this.attributeFormDefault = value;
@@ -334,11 +311,9 @@ public class Schema
 
     /**
      * Gets the value of the elementFormDefault property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link FormChoice }
-     *     
+     *
+     * @return possible object is
+     *         {@link FormChoice }
      */
     public FormChoice getElementFormDefault() {
         if (elementFormDefault == null) {
@@ -350,11 +325,9 @@ public class Schema
 
     /**
      * Sets the value of the elementFormDefault property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link FormChoice }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link FormChoice }
      */
     public void setElementFormDefault(FormChoice value) {
         this.elementFormDefault = value;
@@ -362,11 +335,9 @@ public class Schema
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getId() {
         return id;
@@ -374,11 +345,9 @@ public class Schema
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setId(String value) {
         this.id = value;
@@ -386,11 +355,9 @@ public class Schema
 
     /**
      * Gets the value of the lang property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getLang() {
         return lang;
@@ -398,11 +365,9 @@ public class Schema
 
     /**
      * Sets the value of the lang property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setLang(String value) {
         this.lang = value;

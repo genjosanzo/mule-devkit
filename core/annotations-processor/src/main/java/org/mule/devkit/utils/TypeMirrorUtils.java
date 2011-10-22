@@ -66,18 +66,18 @@ public final class TypeMirrorUtils {
     }
 
     public boolean isNestedProcessor(TypeMirror type) {
-        if( type.toString().contains(NestedProcessor.class.getName()) ) {
+        if (type.toString().contains(NestedProcessor.class.getName())) {
             return true;
         }
 
         if (type.toString().contains(java.util.List.class.getName())) {
             DeclaredType variableType = (DeclaredType) type;
             java.util.List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
-            if( variableTypeParameters.size() == 0 ) {
+            if (variableTypeParameters.size() == 0) {
                 return false;
             }
 
-            if( variableTypeParameters.get(0).toString().contains(NestedProcessor.class.getName()) ) {
+            if (variableTypeParameters.get(0).toString().contains(NestedProcessor.class.getName())) {
                 return true;
             }
         }
@@ -86,7 +86,7 @@ public final class TypeMirrorUtils {
     }
 
     public boolean isArrayOrList(TypeMirror type) {
-        if( type.toString().equals("byte[]") ) {
+        if (type.toString().equals("byte[]")) {
             return false;
         }
 

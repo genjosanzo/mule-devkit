@@ -70,7 +70,7 @@ public class DocFile {
                 if (prop.matches()) {
                     String key = prop.group(1);
                     String value = prop.group(2);
-                    if( key.equalsIgnoreCase(property)) {
+                    if (key.equalsIgnoreCase(property)) {
                         return value;
                     }
                 } else {
@@ -86,10 +86,10 @@ public class DocFile {
         Data hdf = Doclava.makeHDF();
 
         int i = 0;
-        for( String topic : toc.keySet() ) {
+        for (String topic : toc.keySet()) {
             hdf.setValue("topics." + i + ".title", topic == null ? "Root" : topic);
             int j = 0;
-            for( TocInfo page : toc.get(topic) ) {
+            for (TocInfo page : toc.get(topic)) {
                 hdf.setValue("topics." + i + ".topics." + j + ".title", page.getTitle());
                 hdf.setValue("topics." + i + ".topics." + j + ".link", "../" + page.getFilename());
                 j++;

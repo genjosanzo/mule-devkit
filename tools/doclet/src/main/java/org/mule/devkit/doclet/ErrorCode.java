@@ -17,27 +17,27 @@
 package org.mule.devkit.doclet;
 
 public final class ErrorCode {
-  private final int code;
-  private int level;
+    private final int code;
+    private int level;
 
-  public ErrorCode(int code, int level) {
-    this.code = code;
-    this.level = level;
-  }
-    
-  public String toString() {
-    return "Error #" + this.getCode();
-  }
+    public ErrorCode(int code, int level) {
+        this.code = code;
+        this.level = level;
+    }
 
-  public int getCode() {
-    return code;
-  }
+    public String toString() {
+        return "Error #" + this.getCode();
+    }
 
-  protected void setLevel(int level) {
-    this.level = level;
-  }
+    public int getCode() {
+        return code;
+    }
 
-  public int getLevel() {
-    return level;
-  }
+    protected void setLevel(int level) {
+        this.level = level;
+    }
+
+    public int getLevel() {
+        return level;
+    }
 }

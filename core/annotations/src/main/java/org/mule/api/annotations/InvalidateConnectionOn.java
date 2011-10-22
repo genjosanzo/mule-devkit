@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
  * This annotation can be attached to any method also annotated with {@link org.mule.api.annotations.Processor} or
  * {@link org.mule.api.annotations.Source}. It receives a single argument which is the class of the exception to
  * be catch.
- *
+ * <p/>
  * If the exception is thrown by the Processor/Source it will automatically invalidate the connection.
  */
 @Target(ElementType.METHOD)

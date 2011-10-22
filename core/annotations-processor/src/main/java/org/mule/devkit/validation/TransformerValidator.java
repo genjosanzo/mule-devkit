@@ -37,7 +37,7 @@ public class TransformerValidator implements Validator {
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
         if (!typeElement.hasAnnotation(Module.class) &&
-            !typeElement.hasAnnotation(Connector.class)) {
+                !typeElement.hasAnnotation(Connector.class)) {
             return;
         }
 
@@ -51,15 +51,15 @@ public class TransformerValidator implements Validator {
                 throw new ValidationException(method, "@Transformer cannot be applied to a non-public method");
             }
 
-            if( method.getReturnType().toString().equals("void") ) {
+            if (method.getReturnType().toString().equals("void")) {
                 throw new ValidationException(method, "@Transformer cannot be void");
             }
 
-            if( method.getReturnType().toString().equals("java.lang.Object") ) {
+            if (method.getReturnType().toString().equals("java.lang.Object")) {
                 throw new ValidationException(method, "@Transformer cannot return java.lang.Object");
             }
 
-            if( method.getParameters().size() != 1 ) {
+            if (method.getParameters().size() != 1) {
                 throw new ValidationException(method, "@Transformer must receive exactly one argument.");
             }
         }

@@ -19,10 +19,9 @@ package org.mule.devkit.doclet;
 /**
  * Inline tag for code references, such as {@code CodeTagInfo info}.
  * Code tags are html-encoded.
- *
  */
 public class CodeTagInfo extends TagInfo {
-  public CodeTagInfo(String text, SourcePositionInfo sp) {
-    super("@code", "@code", LiteralTagInfo.encode(text), sp);
-  }
+    public CodeTagInfo(String text, SourcePositionInfo sp) {
+        super("@code", "@code", LiteralTagInfo.encode(text), sp);
+    }
 }

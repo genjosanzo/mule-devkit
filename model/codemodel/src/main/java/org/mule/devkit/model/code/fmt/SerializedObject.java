@@ -54,20 +54,19 @@ import java.io.OutputStream;
 public class SerializedObject extends ResourceFile {
 
     private final Object obj;
-    
+
     /**
-     * @exception   java.io.IOException
-     *      If the serialization fails, this exception is thrown
+     * @throws java.io.IOException If the serialization fails, this exception is thrown
      */
     public SerializedObject(String name, Object obj) throws IOException {
         super(name);
         this.obj = obj;
     }
-    
+
     /**
      * called by Package to serialize the object
      */
-    protected void build( OutputStream os ) throws IOException {
+    protected void build(OutputStream os) throws IOException {
         // serialize the obj into a ByteArrayOutputStream
         ObjectOutputStream oos = new ObjectOutputStream(os);
         oos.writeObject(obj);

@@ -169,7 +169,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                                 getAttribute
                         ))));
                 ifNotNull._then().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
-                    ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(element.invoke("getAttribute").arg(fieldName + "-ref"))
+                        ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(element.invoke("getAttribute").arg(fieldName + "-ref"))
                 ));
             }
         }
@@ -348,7 +348,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         int requiredChildElements = 0;
         for (VariableElement variable : executableElement.getParameters()) {
-            if(context.getTypeMirrorUtils().ignoreParameter(variable)) {
+            if (context.getTypeMirrorUtils().ignoreParameter(variable)) {
                 continue;
             }
             if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
@@ -420,8 +420,8 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                         ))));
                 ifNotNull._then().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
                         Op.plus(Op.plus(ExpressionFactory.lit("#[registry:"),
-                        element.invoke("getAttribute").arg(fieldName + "-ref")),
-                        ExpressionFactory.lit("]"))
+                                element.invoke("getAttribute").arg(fieldName + "-ref")),
+                                ExpressionFactory.lit("]"))
                 ));
             }
         }
@@ -514,7 +514,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         ifTextElement._else().add(parserContext.invoke("getRegistry").invoke("removeBeanDefinition")
                 .arg(ExpressionFactory.invoke("generateChildBeanName").arg(elements)));
 
-        if( !isList ) {
+        if (!isList) {
             ifTextElement._else().add(builder.invoke("addPropertyValue").arg(fieldName)
                     .arg(beanDefinition));
         } else {

@@ -36,7 +36,7 @@ public class OAuthModuleTest extends FunctionalTestCase {
     }
 
     public void testEnsureCapability() throws Exception {
-        Capabilities capabilities = (Capabilities)AbstractMuleTestCase.muleContext.getRegistry().lookupObject("default-oauth");
+        Capabilities capabilities = (Capabilities) AbstractMuleTestCase.muleContext.getRegistry().lookupObject("default-oauth");
 
         assertTrue(capabilities.isCapableOf(Capability.OAUTH1_CAPABLE));
     }

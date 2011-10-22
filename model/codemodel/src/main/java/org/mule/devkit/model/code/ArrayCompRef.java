@@ -58,12 +58,9 @@ final class ArrayCompRef extends AbstractExpression implements AssignmentTarget 
      * JArray component reference constructor given an array expression
      * and index.
      *
-     * @param array
-     *        Expression for the array upon which
-     *        the component will be accessed,
-     *
-     * @param index
-     *        Expression for index of component to access
+     * @param array Expression for the array upon which
+     *              the component will be accessed,
+     * @param index Expression for index of component to access
      */
     ArrayCompRef(Expression array, Expression index) {
         if ((array == null) || (index == null)) {
@@ -78,9 +75,10 @@ final class ArrayCompRef extends AbstractExpression implements AssignmentTarget 
     }
 
     public Expression assign(Expression rhs) {
-		return ExpressionFactory.assign(this, rhs);
+        return ExpressionFactory.assign(this, rhs);
     }
+
     public Expression assignPlus(Expression rhs) {
-		return ExpressionFactory.assignPlus(this, rhs);
+        return ExpressionFactory.assignPlus(this, rhs);
     }
 }

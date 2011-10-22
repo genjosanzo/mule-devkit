@@ -42,22 +42,21 @@ package org.mule.devkit.model.code;
 
 /**
  * String literal.
- * 
- * @author
- *     Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
+ *
+ * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
 public class StringLiteral extends AbstractExpression {
 
     public final String str;
-    
+
 
     StringLiteral(String what) {
         this.str = what;
-    
+
     }
-   
-    
+
+
     public void generate(Formatter f) {
-    	f.p(ExpressionFactory.quotify('"', str));
+        f.p(ExpressionFactory.quotify('"', str));
     }
 }

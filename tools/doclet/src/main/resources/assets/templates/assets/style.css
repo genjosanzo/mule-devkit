@@ -144,10 +144,12 @@ div#jd-content .jd-lettertable {
     margin-top: 15px;
     margin-right: 10px;
 }
+
 div#jd-content .jd-letterentries {
-	list-style: none;
-	margin-left: 0;
+    list-style: none;
+    margin-left: 0;
 }
+
 div#jd-content .jd-letterentrycomments {
     color: gray;
 }
@@ -224,12 +226,12 @@ div#jd-content .jd-tagtable th {
     background: white;
     padding-left: 10px;
     padding-right: 10px;
-line-height: 120%;
+    line-height: 120%;
 }
 
 div#jd-content .jd-tagtable th,
 div#jd-content .jd-tagtable td {
-line-height: 120%;
+    line-height: 120%;
     border: none;
     margin: 0;
     text-align: left;
@@ -237,7 +239,7 @@ line-height: 120%;
     padding-bottom: 5px;
 }
 
-div#jd-content .Code,code,pre,samp,var {
+div#jd-content .Code, code, pre, samp, var {
     color: #004000;
 }
 
@@ -247,7 +249,7 @@ div#jd-content pre.Code {
 
 /* XXX I would really like to apply font-size: 9pt only if var/samp
    is NOT inside of a .jd-descr div. */
-div#jd-content .jd-descr code,var,samp {
+div#jd-content .jd-descr code, var, samp {
     padding-left: 0px;
 }
 
@@ -306,6 +308,7 @@ div#jd-build-id {
     #jd-searchbox, .jd-nav {
         display: none;
     }
+
     div#jd-content {
         margin-top: 0px;
     }

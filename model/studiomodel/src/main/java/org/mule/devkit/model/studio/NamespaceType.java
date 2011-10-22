@@ -38,9 +38,9 @@ import java.util.List;
 
 /**
  * <p>Java class for NamespaceType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="NamespaceType">
  *   &lt;complexContent>
@@ -72,32 +72,30 @@ import java.util.List;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "NamespaceType", propOrder = {
-    "connectorOrEndpointOrGlobal"
+        "connectorOrEndpointOrGlobal"
 })
 public class NamespaceType {
 
     @XmlElementRefs({
-        @XmlElementRef(name = "global-transformer", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "pattern", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "nested", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "endpoint", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "global-cloud-connector", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "transformer", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "connector", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "component", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "scope", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "filter", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "global", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "flow", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "router", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "global-endpoint", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "cloud-connector", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "global-filter", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class)
+            @XmlElementRef(name = "global-transformer", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "pattern", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "nested", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "endpoint", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "global-cloud-connector", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "transformer", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "connector", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "component", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "scope", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "filter", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "global", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "flow", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "router", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "global-endpoint", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "cloud-connector", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "global-filter", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class)
     })
     protected List<JAXBElement<? extends AbstractElementType>> connectorOrEndpointOrGlobal;
     @XmlAttribute(name = "url")
@@ -109,21 +107,21 @@ public class NamespaceType {
 
     /**
      * Gets the value of the connectorOrEndpointOrGlobal property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the connectorOrEndpointOrGlobal property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getConnectorOrEndpointOrGlobal().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link JAXBElement }{@code <}{@link GlobalType }{@code >}
      * {@link JAXBElement }{@code <}{@link PatternType }{@code >}
@@ -141,8 +139,6 @@ public class NamespaceType {
      * {@link JAXBElement }{@code <}{@link GlobalType }{@code >}
      * {@link JAXBElement }{@code <}{@link PatternType }{@code >}
      * {@link JAXBElement }{@code <}{@link GlobalType }{@code >}
-     * 
-     * 
      */
     public List<JAXBElement<? extends AbstractElementType>> getConnectorOrEndpointOrGlobal() {
         if (connectorOrEndpointOrGlobal == null) {
@@ -153,11 +149,9 @@ public class NamespaceType {
 
     /**
      * Gets the value of the url property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getUrl() {
         return url;
@@ -165,11 +159,9 @@ public class NamespaceType {
 
     /**
      * Sets the value of the url property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setUrl(String value) {
         this.url = value;
@@ -177,11 +169,9 @@ public class NamespaceType {
 
     /**
      * Gets the value of the prefix property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getPrefix() {
         return prefix;
@@ -189,11 +179,9 @@ public class NamespaceType {
 
     /**
      * Sets the value of the prefix property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setPrefix(String value) {
         this.prefix = value;
@@ -201,11 +189,9 @@ public class NamespaceType {
 
     /**
      * Gets the value of the description property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getDescription() {
         return description;
@@ -213,11 +199,9 @@ public class NamespaceType {
 
     /**
      * Sets the value of the description property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDescription(String value) {
         this.description = value;

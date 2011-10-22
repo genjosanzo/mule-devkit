@@ -45,13 +45,13 @@ package org.mule.devkit.model.code;
  * JAtoms: Simple code components that merely generate themselves.
  */
 final class Atom extends AbstractExpression {
-    
+
     private final String what;
-    
+
     Atom(String what) {
         this.what = what;
     }
-    
+
     public void generate(Formatter f) {
         f.p(what);
     }

@@ -22,26 +22,26 @@ public final class ErrorMessage implements Comparable<ErrorMessage> {
     private String msg;
 
     public ErrorMessage(ErrorCode error, SourcePositionInfo position, String msg) {
-      this.error = error;
-      this.pos = position;
-      this.msg = msg;
+        this.error = error;
+        this.pos = position;
+        this.msg = msg;
     }
 
     public int compareTo(ErrorMessage other) {
-      int r = this.pos.compareTo(other.pos);
-      if (r != 0) {
-        return r;
-      }
-      return this.msg.compareTo(other.msg);
+        int r = this.pos.compareTo(other.pos);
+        if (r != 0) {
+            return r;
+        }
+        return this.msg.compareTo(other.msg);
     }
 
     @Override
     public String toString() {
-      String whereText = this.pos == null ? "unknown: " : this.pos.toString() + ':';
-      return whereText + this.msg;
+        String whereText = this.pos == null ? "unknown: " : this.pos.toString() + ':';
+        return whereText + this.msg;
     }
-    
+
     public ErrorCode getError() {
-      return error;
+        return error;
     }
-  }
+}

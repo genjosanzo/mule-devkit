@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
  * Marks a {@link org.mule.api.annotations.Configurable} field or a
  * {@link org.mule.api.annotations.Processor}/{@link org.mule.api.annotations.Source} parameters as optional.
  */
-@Target(value={ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD})
+@Target(value = {ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Optional {

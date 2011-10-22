@@ -34,7 +34,7 @@ public interface SourceCallback {
     /**
      * Dispatch message to the flow with properties
      *
-     * @param payload The payload of the message
+     * @param payload    The payload of the message
      * @param properties Properties to be attached with inbound scope
      * @return The response of the flow
      */

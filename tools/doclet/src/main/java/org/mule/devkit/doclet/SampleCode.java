@@ -23,157 +23,157 @@ import java.util.TreeSet;
 
 
 public class SampleCode {
-  String mSource;
-  String mDest;
-  String mTitle;
+    String mSource;
+    String mDest;
+    String mTitle;
 
-  public SampleCode(String source, String dest, String title) {
-    mSource = source;
-    mTitle = title;
-    int len = dest.length();
-    if (len > 1 && dest.charAt(len - 1) != '/') {
-      mDest = dest + '/';
-    } else {
-      mDest = dest;
-    }
-  }
-
-  public void write(boolean offlineMode) {
-    File f = new File(mSource);
-    if (!f.isDirectory()) {
-      System.out.println("-samplecode not a directory: " + mSource);
-      return;
-    }
-    
-    writeDirectory(f, mDest, offlineMode);
-  }
-
-  public static String convertExtension(String s, String ext) {
-    return s.substring(0, s.lastIndexOf('.')) + ext;
-  }
-
-  public static String[] IMAGES = {".png", ".jpg", ".gif"};
-  public static String[] TEMPLATED = {".java", ".xml", ".aidl", ".rs"};
-
-  public static boolean inList(String s, String[] list) {
-    for (String t : list) {
-      if (s.endsWith(t)) {
-        return true;
-      }
-    }
-    return false;
-  }
-  
-  public void writeDirectory(File dir, String relative) {
-    writeDirectory(dir, relative, false);
-  }
-
-  public void writeDirectory(File dir, String relative, boolean offline) {
-    TreeSet<String> dirs = new TreeSet<String>();
-    TreeSet<String> files = new TreeSet<String>();
-
-    String subdir = relative; // .substring(mDest.length());
-
-    for (File f : dir.listFiles()) {
-      String name = f.getName();
-      if (name.startsWith(".") || name.startsWith("_")) {
-        continue;
-      }
-      if (f.isFile()) {
-        String out = relative + name;
-
-        if (inList(out, IMAGES)) {
-          // copied directly
-          ClearPage.copyFile(f, new File(ClearPage.outputDir + "/" + out));
-          writeImagePage(f, convertExtension(out, Doclava.htmlExtension), subdir);
-          files.add(name);
+    public SampleCode(String source, String dest, String title) {
+        mSource = source;
+        mTitle = title;
+        int len = dest.length();
+        if (len > 1 && dest.charAt(len - 1) != '/') {
+            mDest = dest + '/';
+        } else {
+            mDest = dest;
         }
-        if (inList(out, TEMPLATED)) {
-          // copied and goes through the template
-          ClearPage.copyFile(f, new File(ClearPage.outputDir + "/" + out));
-          writePage(f, convertExtension(out, Doclava.htmlExtension), subdir);
-          files.add(name);
+    }
+
+    public void write(boolean offlineMode) {
+        File f = new File(mSource);
+        if (!f.isDirectory()) {
+            System.out.println("-samplecode not a directory: " + mSource);
+            return;
         }
-        // else ignored
-      } else if (f.isDirectory()) {
-        writeDirectory(f, relative + name + "/", offline);
-        dirs.add(name);
-      }
+
+        writeDirectory(f, mDest, offlineMode);
     }
 
-    // write the index page
-    int i;
-
-    Data hdf = writeIndex(dir);
-    hdf.setValue("subdir", subdir);
-    i = 0;
-    for (String d : dirs) {
-      hdf.setValue("subdirs." + i + ".name", d);
-      i++;
-    }
-    i = 0;
-    for (String f : files) {
-      hdf.setValue("files." + i + ".name", f);
-      hdf.setValue("files." + i + ".href", convertExtension(f, ".html"));
-      i++;
+    public static String convertExtension(String s, String ext) {
+        return s.substring(0, s.lastIndexOf('.')) + ext;
     }
 
-    if (!offline) {
-        relative = "/" + relative;
+    public static String[] IMAGES = {".png", ".jpg", ".gif"};
+    public static String[] TEMPLATED = {".java", ".xml", ".aidl", ".rs"};
+
+    public static boolean inList(String s, String[] list) {
+        for (String t : list) {
+            if (s.endsWith(t)) {
+                return true;
+            }
+        }
+        return false;
     }
-    ClearPage.write(hdf, "sampleindex.cs", relative + "index" + Doclava.htmlExtension);
-  }
 
-  public Data writeIndex(File dir) {
-    Data hdf = Doclava.makeHDF();
-
-    hdf.setValue("page.title", dir.getName() + " - " + mTitle);
-    hdf.setValue("projectTitle", mTitle);
-
-    String filename = dir.getPath() + "/_index.html";
-    String summary =
-        SampleTagInfo.readFile(new SourcePositionInfo(filename, -1, -1), filename, "sample code",
-            true, false, true);
-
-    if (summary == null) {
-      summary = "";
+    public void writeDirectory(File dir, String relative) {
+        writeDirectory(dir, relative, false);
     }
-    hdf.setValue("summary", summary);
 
-    return hdf;
-  }
+    public void writeDirectory(File dir, String relative, boolean offline) {
+        TreeSet<String> dirs = new TreeSet<String>();
+        TreeSet<String> files = new TreeSet<String>();
 
-  public void writePage(File f, String out, String subdir) {
-    String name = f.getName();
+        String subdir = relative; // .substring(mDest.length());
 
-    String filename = f.getPath();
-    String data =
-        SampleTagInfo.readFile(new SourcePositionInfo(filename, -1, -1), filename, "sample code",
-            true, true, true);
-    data = Doclava.escape(data);
+        for (File f : dir.listFiles()) {
+            String name = f.getName();
+            if (name.startsWith(".") || name.startsWith("_")) {
+                continue;
+            }
+            if (f.isFile()) {
+                String out = relative + name;
 
-    Data hdf = Doclava.makeHDF();
+                if (inList(out, IMAGES)) {
+                    // copied directly
+                    ClearPage.copyFile(f, new File(ClearPage.outputDir + "/" + out));
+                    writeImagePage(f, convertExtension(out, Doclava.htmlExtension), subdir);
+                    files.add(name);
+                }
+                if (inList(out, TEMPLATED)) {
+                    // copied and goes through the template
+                    ClearPage.copyFile(f, new File(ClearPage.outputDir + "/" + out));
+                    writePage(f, convertExtension(out, Doclava.htmlExtension), subdir);
+                    files.add(name);
+                }
+                // else ignored
+            } else if (f.isDirectory()) {
+                writeDirectory(f, relative + name + "/", offline);
+                dirs.add(name);
+            }
+        }
 
-    hdf.setValue("page.title", name);
-    hdf.setValue("subdir", subdir);
-    hdf.setValue("realFile", name);
-    hdf.setValue("fileContents", data);
+        // write the index page
+        int i;
 
-    ClearPage.write(hdf, "sample.cs", out);
-  }
+        Data hdf = writeIndex(dir);
+        hdf.setValue("subdir", subdir);
+        i = 0;
+        for (String d : dirs) {
+            hdf.setValue("subdirs." + i + ".name", d);
+            i++;
+        }
+        i = 0;
+        for (String f : files) {
+            hdf.setValue("files." + i + ".name", f);
+            hdf.setValue("files." + i + ".href", convertExtension(f, ".html"));
+            i++;
+        }
 
-  public void writeImagePage(File f, String out, String subdir) {
-    String name = f.getName();
+        if (!offline) {
+            relative = "/" + relative;
+        }
+        ClearPage.write(hdf, "sampleindex.cs", relative + "index" + Doclava.htmlExtension);
+    }
 
-    String data = "<img src=\"" + name + "\" title=\"" + name + "\" />";
+    public Data writeIndex(File dir) {
+        Data hdf = Doclava.makeHDF();
 
-    Data hdf = Doclava.makeHDF();
+        hdf.setValue("page.title", dir.getName() + " - " + mTitle);
+        hdf.setValue("projectTitle", mTitle);
 
-    hdf.setValue("page.title", name);
-    hdf.setValue("subdir", subdir);
-    hdf.setValue("realFile", name);
-    hdf.setValue("fileContents", data);
+        String filename = dir.getPath() + "/_index.html";
+        String summary =
+                SampleTagInfo.readFile(new SourcePositionInfo(filename, -1, -1), filename, "sample code",
+                        true, false, true);
 
-    ClearPage.write(hdf, "sample.cs", out);
-  }
+        if (summary == null) {
+            summary = "";
+        }
+        hdf.setValue("summary", summary);
+
+        return hdf;
+    }
+
+    public void writePage(File f, String out, String subdir) {
+        String name = f.getName();
+
+        String filename = f.getPath();
+        String data =
+                SampleTagInfo.readFile(new SourcePositionInfo(filename, -1, -1), filename, "sample code",
+                        true, true, true);
+        data = Doclava.escape(data);
+
+        Data hdf = Doclava.makeHDF();
+
+        hdf.setValue("page.title", name);
+        hdf.setValue("subdir", subdir);
+        hdf.setValue("realFile", name);
+        hdf.setValue("fileContents", data);
+
+        ClearPage.write(hdf, "sample.cs", out);
+    }
+
+    public void writeImagePage(File f, String out, String subdir) {
+        String name = f.getName();
+
+        String data = "<img src=\"" + name + "\" title=\"" + name + "\" />";
+
+        Data hdf = Doclava.makeHDF();
+
+        hdf.setValue("page.title", name);
+        hdf.setValue("subdir", subdir);
+        hdf.setValue("realFile", name);
+        hdf.setValue("fileContents", data);
+
+        ClearPage.write(hdf, "sample.cs", out);
+    }
 }

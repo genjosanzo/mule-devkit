@@ -21,15 +21,12 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Transformer;
 
 @Module(name = "transformer")
-public class TransformerModule
-{
+public class TransformerModule {
 
-    @Transformer(sourceTypes={String.class})
-    public static Character transformStringToChar(Object payload)
-    {
-        if( payload != null )
-        {
-            return ((String)payload).charAt(0);
+    @Transformer(sourceTypes = {String.class})
+    public static Character transformStringToChar(Object payload) {
+        if (payload != null) {
+            return ((String) payload).charAt(0);
         }
 
         return null;

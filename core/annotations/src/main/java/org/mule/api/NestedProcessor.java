@@ -21,7 +21,7 @@ import java.util.Map;
 
 /**
  * Callback interface used by {@link org.mule.api.annotations.Processor} annotated methods.
- *
+ * <p/>
  * The method paremeters of type {@link NestedProcessor} will be able to receive other
  * message processors. The {@link org.mule.api.annotations.Processor} annotated method
  * can use the process method to execute them.
@@ -38,7 +38,7 @@ public interface NestedProcessor {
     /**
      * Dispatch message to the processor chain
      *
-     * @param payload The payload of the message
+     * @param payload    The payload of the message
      * @param properties Additional invocation properties
      * @return The return payload for the processor chain
      */

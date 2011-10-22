@@ -39,15 +39,14 @@ import java.util.List;
 
 
 /**
- * 
- *           base attribute and simpleType child are mutually
- *           exclusive, but one or other is required
- *         
- * 
+ * base attribute and simpleType child are mutually
+ * exclusive, but one or other is required
+ * <p/>
+ * <p/>
  * <p>Java class for anonymous complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -59,33 +58,30 @@ import java.util.List;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "simpleType",
-    "facets"
+        "simpleType",
+        "facets"
 })
 @XmlRootElement(name = "restriction")
 public class Restriction
-    extends Annotated
-{
+        extends Annotated {
 
     protected LocalSimpleType simpleType;
     @XmlElementRefs({
-        @XmlElementRef(name = "minLength", namespace = "http://www.w3.org/2001/XMLSchema", type = JAXBElement.class),
-        @XmlElementRef(name = "maxInclusive", namespace = "http://www.w3.org/2001/XMLSchema", type = JAXBElement.class),
-        @XmlElementRef(name = "minInclusive", namespace = "http://www.w3.org/2001/XMLSchema", type = JAXBElement.class),
-        @XmlElementRef(name = "totalDigits", namespace = "http://www.w3.org/2001/XMLSchema", type = TotalDigits.class),
-        @XmlElementRef(name = "pattern", namespace = "http://www.w3.org/2001/XMLSchema", type = Pattern.class),
-        @XmlElementRef(name = "minExclusive", namespace = "http://www.w3.org/2001/XMLSchema", type = JAXBElement.class),
-        @XmlElementRef(name = "enumeration", namespace = "http://www.w3.org/2001/XMLSchema", type = JAXBElement.class),
-        @XmlElementRef(name = "fractionDigits", namespace = "http://www.w3.org/2001/XMLSchema", type = JAXBElement.class),
-        @XmlElementRef(name = "whiteSpace", namespace = "http://www.w3.org/2001/XMLSchema", type = WhiteSpace.class),
-        @XmlElementRef(name = "maxLength", namespace = "http://www.w3.org/2001/XMLSchema", type = JAXBElement.class),
-        @XmlElementRef(name = "length", namespace = "http://www.w3.org/2001/XMLSchema", type = JAXBElement.class),
-        @XmlElementRef(name = "maxExclusive", namespace = "http://www.w3.org/2001/XMLSchema", type = JAXBElement.class)
+            @XmlElementRef(name = "minLength", namespace = "http://www.w3.org/2001/XMLSchema", type = JAXBElement.class),
+            @XmlElementRef(name = "maxInclusive", namespace = "http://www.w3.org/2001/XMLSchema", type = JAXBElement.class),
+            @XmlElementRef(name = "minInclusive", namespace = "http://www.w3.org/2001/XMLSchema", type = JAXBElement.class),
+            @XmlElementRef(name = "totalDigits", namespace = "http://www.w3.org/2001/XMLSchema", type = TotalDigits.class),
+            @XmlElementRef(name = "pattern", namespace = "http://www.w3.org/2001/XMLSchema", type = Pattern.class),
+            @XmlElementRef(name = "minExclusive", namespace = "http://www.w3.org/2001/XMLSchema", type = JAXBElement.class),
+            @XmlElementRef(name = "enumeration", namespace = "http://www.w3.org/2001/XMLSchema", type = JAXBElement.class),
+            @XmlElementRef(name = "fractionDigits", namespace = "http://www.w3.org/2001/XMLSchema", type = JAXBElement.class),
+            @XmlElementRef(name = "whiteSpace", namespace = "http://www.w3.org/2001/XMLSchema", type = WhiteSpace.class),
+            @XmlElementRef(name = "maxLength", namespace = "http://www.w3.org/2001/XMLSchema", type = JAXBElement.class),
+            @XmlElementRef(name = "length", namespace = "http://www.w3.org/2001/XMLSchema", type = JAXBElement.class),
+            @XmlElementRef(name = "maxExclusive", namespace = "http://www.w3.org/2001/XMLSchema", type = JAXBElement.class)
     })
     protected List<Object> facets;
     @XmlAttribute(name = "base")
@@ -93,11 +89,9 @@ public class Restriction
 
     /**
      * Gets the value of the simpleType property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link LocalSimpleType }
-     *     
+     *
+     * @return possible object is
+     *         {@link LocalSimpleType }
      */
     public LocalSimpleType getSimpleType() {
         return simpleType;
@@ -105,11 +99,9 @@ public class Restriction
 
     /**
      * Sets the value of the simpleType property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link LocalSimpleType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link LocalSimpleType }
      */
     public void setSimpleType(LocalSimpleType value) {
         this.simpleType = value;
@@ -117,21 +109,21 @@ public class Restriction
 
     /**
      * Gets the value of the facets property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the facets property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getFacets().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link JAXBElement }{@code <}{@link Facet }{@code >}
      * {@link JAXBElement }{@code <}{@link NumFacet }{@code >}
@@ -145,8 +137,6 @@ public class Restriction
      * {@link JAXBElement }{@code <}{@link NumFacet }{@code >}
      * {@link JAXBElement }{@code <}{@link Facet }{@code >}
      * {@link JAXBElement }{@code <}{@link NumFacet }{@code >}
-     * 
-     * 
      */
     public List<Object> getFacets() {
         if (facets == null) {
@@ -157,11 +147,9 @@ public class Restriction
 
     /**
      * Gets the value of the base property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link QName }
-     *     
+     *
+     * @return possible object is
+     *         {@link QName }
      */
     public QName getBase() {
         return base;
@@ -169,11 +157,9 @@ public class Restriction
 
     /**
      * Sets the value of the base property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link QName }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link QName }
      */
     public void setBase(QName value) {
         this.base = value;

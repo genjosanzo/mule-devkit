@@ -19,26 +19,21 @@ package org.mule.devkit.it;
 
 import java.io.File;
 
-public class HttpCallbackIT extends AbstractMavenIT
-{
+public class HttpCallbackIT extends AbstractMavenIT {
 
-    protected String getArtifactVersion()
-    {
+    protected String getArtifactVersion() {
         return "1.0";
     }
 
-    protected String getArtifactId()
-    {
+    protected String getArtifactId() {
         return "http-callback-integration-test";
     }
 
-    protected String getGroupId()
-    {
+    protected String getGroupId() {
         return "org.mule.devkit.it";
     }
 
-    protected File getRoot()
-    {
+    protected File getRoot() {
         return new File("target/integration-tests/" + getArtifactId());
     }
 }

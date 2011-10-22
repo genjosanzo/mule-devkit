@@ -34,9 +34,9 @@ public class ConnectionException extends Exception {
     /**
      * Create a new connection exception
      *
-     * @param code Code describing what went wrong. Use {@link ConnectionExceptionCode.UNKNOWN} for unexpected problems.
+     * @param code           Code describing what went wrong. Use {@link ConnectionExceptionCode.UNKNOWN} for unexpected problems.
      * @param thirdPartyCode Code as provided by the third party API
-     * @param message Message describing what went wrong
+     * @param message        Message describing what went wrong
      */
     public ConnectionException(ConnectionExceptionCode code, String thirdPartyCode, String message) {
         super(message);
@@ -48,10 +48,10 @@ public class ConnectionException extends Exception {
     /**
      * Create a new connection exception
      *
-     * @param code Code describing what went wrong. Use {@link ConnectionExceptionCode.UNKNOWN} for unexpected problems.
+     * @param code           Code describing what went wrong. Use {@link ConnectionExceptionCode.UNKNOWN} for unexpected problems.
      * @param thirdPartyCode Code as provided by the third party API
-     * @param throwable Inner exception
-     * @param message Message describing what went wrong
+     * @param throwable      Inner exception
+     * @param message        Message describing what went wrong
      */
     public ConnectionException(ConnectionExceptionCode code, String thirdPartyCode, String message, Throwable throwable) {
         super(message, throwable);

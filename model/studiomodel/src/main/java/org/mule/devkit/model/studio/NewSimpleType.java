@@ -32,9 +32,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for NewSimpleType.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ * <p/>
  * <pre>
  * &lt;simpleType name="NewSimpleType">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
@@ -44,7 +44,6 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
- * 
  */
 @XmlType(name = "NewSimpleType")
 @XmlEnum
@@ -67,7 +66,7 @@ public enum NewSimpleType {
     }
 
     public static NewSimpleType fromValue(String v) {
-        for (NewSimpleType c: NewSimpleType.values()) {
+        for (NewSimpleType c : NewSimpleType.values()) {
             if (c.value.equals(v)) {
                 return c;
             }

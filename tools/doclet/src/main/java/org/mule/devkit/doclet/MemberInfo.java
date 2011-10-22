@@ -17,136 +17,136 @@
 package org.mule.devkit.doclet;
 
 public abstract class MemberInfo extends DocInfo implements Comparable, Scoped {
-  public MemberInfo(String rawCommentText, String name, String signature,
-      ClassInfo containingClass, ClassInfo realContainingClass, boolean isPublic,
-      boolean isProtected, boolean isPackagePrivate, boolean isPrivate, boolean isFinal,
-      boolean isStatic, boolean isSynthetic, String kind, SourcePositionInfo position,
-      AnnotationInstanceInfo[] annotations) {
-    super(rawCommentText, position);
-    mName = name;
-    mSignature = signature;
-    mContainingClass = containingClass;
-    mRealContainingClass = realContainingClass;
-    mIsPublic = isPublic;
-    mIsProtected = isProtected;
-    mIsPackagePrivate = isPackagePrivate;
-    mIsPrivate = isPrivate;
-    mIsFinal = isFinal;
-    mIsStatic = isStatic;
-    mIsSynthetic = isSynthetic;
-    mKind = kind;
-    mAnnotations = annotations;
-  }
-
-  public abstract boolean isExecutable();
-
-  public String anchor() {
-    if (mSignature != null) {
-      return mName + mSignature;
-    } else {
-      return mName;
+    public MemberInfo(String rawCommentText, String name, String signature,
+                      ClassInfo containingClass, ClassInfo realContainingClass, boolean isPublic,
+                      boolean isProtected, boolean isPackagePrivate, boolean isPrivate, boolean isFinal,
+                      boolean isStatic, boolean isSynthetic, String kind, SourcePositionInfo position,
+                      AnnotationInstanceInfo[] annotations) {
+        super(rawCommentText, position);
+        mName = name;
+        mSignature = signature;
+        mContainingClass = containingClass;
+        mRealContainingClass = realContainingClass;
+        mIsPublic = isPublic;
+        mIsProtected = isProtected;
+        mIsPackagePrivate = isPackagePrivate;
+        mIsPrivate = isPrivate;
+        mIsFinal = isFinal;
+        mIsStatic = isStatic;
+        mIsSynthetic = isSynthetic;
+        mKind = kind;
+        mAnnotations = annotations;
     }
-  }
 
-  public boolean isDefinedLocally() {
-    return mContainingClass.isDefinedLocally();
-  }
+    public abstract boolean isExecutable();
 
-  public String relativePath() {
-    return mContainingClass.relativePath() + "#" + anchor();
-  }
-
-  public int compareTo(Object that) {
-    return this.htmlPage().compareTo(((MemberInfo) that).htmlPage());
-  }
-
-  public String name() {
-    return mName;
-  }
-
-  public String signature() {
-    return mSignature;
-  }
-
-  public ClassInfo realContainingClass() {
-    return mRealContainingClass;
-  }
-
-  public ClassInfo containingClass() {
-    return mContainingClass;
-  }
-
-  public boolean isPublic() {
-    return mIsPublic;
-  }
-
-  public boolean isProtected() {
-    return mIsProtected;
-  }
-
-  public boolean isPackagePrivate() {
-    return mIsPackagePrivate;
-  }
-
-  public boolean isPrivate() {
-    return mIsPrivate;
-  }
-  
-  public String scope() {
-    if (isPublic()) {
-      return "public";
-    } else if (isProtected()) {
-      return "protected";
-    } else if (isPackagePrivate()) {
-      return "";
-    } else if (isPrivate()) {
-      return "private";
-    } else {
-      throw new RuntimeException("invalid scope for object " + this);
+    public String anchor() {
+        if (mSignature != null) {
+            return mName + mSignature;
+        } else {
+            return mName;
+        }
     }
-  }
 
-  public boolean isStatic() {
-    return mIsStatic;
-  }
+    public boolean isDefinedLocally() {
+        return mContainingClass.isDefinedLocally();
+    }
 
-  public boolean isFinal() {
-    return mIsFinal;
-  }
+    public String relativePath() {
+        return mContainingClass.relativePath() + "#" + anchor();
+    }
 
-  public boolean isSynthetic() {
-    return mIsSynthetic;
-  }
+    public int compareTo(Object that) {
+        return this.htmlPage().compareTo(((MemberInfo) that).htmlPage());
+    }
 
-  @Override
-  public ContainerInfo parent() {
-    return mContainingClass;
-  }
+    public String name() {
+        return mName;
+    }
 
-  public boolean checkLevel() {
-    return Doclava.checkLevel(mIsPublic, mIsProtected, mIsPackagePrivate, mIsPrivate, isHidden());
-  }
+    public String signature() {
+        return mSignature;
+    }
 
-  public String kind() {
-    return mKind;
-  }
+    public ClassInfo realContainingClass() {
+        return mRealContainingClass;
+    }
 
-  public AnnotationInstanceInfo[] annotations() {
-    return mAnnotations;
-  }
+    public ClassInfo containingClass() {
+        return mContainingClass;
+    }
 
-  ClassInfo mContainingClass;
-  ClassInfo mRealContainingClass;
-  String mName;
-  String mSignature;
-  boolean mIsPublic;
-  boolean mIsProtected;
-  boolean mIsPackagePrivate;
-  boolean mIsPrivate;
-  boolean mIsFinal;
-  boolean mIsStatic;
-  boolean mIsSynthetic;
-  String mKind;
-  private AnnotationInstanceInfo[] mAnnotations;
+    public boolean isPublic() {
+        return mIsPublic;
+    }
+
+    public boolean isProtected() {
+        return mIsProtected;
+    }
+
+    public boolean isPackagePrivate() {
+        return mIsPackagePrivate;
+    }
+
+    public boolean isPrivate() {
+        return mIsPrivate;
+    }
+
+    public String scope() {
+        if (isPublic()) {
+            return "public";
+        } else if (isProtected()) {
+            return "protected";
+        } else if (isPackagePrivate()) {
+            return "";
+        } else if (isPrivate()) {
+            return "private";
+        } else {
+            throw new RuntimeException("invalid scope for object " + this);
+        }
+    }
+
+    public boolean isStatic() {
+        return mIsStatic;
+    }
+
+    public boolean isFinal() {
+        return mIsFinal;
+    }
+
+    public boolean isSynthetic() {
+        return mIsSynthetic;
+    }
+
+    @Override
+    public ContainerInfo parent() {
+        return mContainingClass;
+    }
+
+    public boolean checkLevel() {
+        return Doclava.checkLevel(mIsPublic, mIsProtected, mIsPackagePrivate, mIsPrivate, isHidden());
+    }
+
+    public String kind() {
+        return mKind;
+    }
+
+    public AnnotationInstanceInfo[] annotations() {
+        return mAnnotations;
+    }
+
+    ClassInfo mContainingClass;
+    ClassInfo mRealContainingClass;
+    String mName;
+    String mSignature;
+    boolean mIsPublic;
+    boolean mIsProtected;
+    boolean mIsPackagePrivate;
+    boolean mIsPrivate;
+    boolean mIsFinal;
+    boolean mIsStatic;
+    boolean mIsSynthetic;
+    String mKind;
+    private AnnotationInstanceInfo[] mAnnotations;
 
 }

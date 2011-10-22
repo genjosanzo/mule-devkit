@@ -46,8 +46,8 @@ import java.util.List;
 
 /**
  * A block of Java code, which may contain statements and local declarations.
- *
- * <p>
+ * <p/>
+ * <p/>
  * {@link Block} contains a large number of factory methods that creates new
  * statements/declarations. Those newly created statements/declarations are
  * inserted into the {@link #pos() "current position"}. The position advances
@@ -73,7 +73,7 @@ public final class Block implements Generable, Statement {
     private int pos;
 
     public Block() {
-        this(true,true);
+        this(true, true);
     }
 
     public Block(boolean bracesRequired, boolean indentRequired) {
@@ -89,15 +89,15 @@ public final class Block implements Generable, Statement {
         return Collections.unmodifiableList(content);
     }
 
-    private <T> T insert( T statementOrDeclaration ) {
-        content.add(pos,statementOrDeclaration);
+    private <T> T insert(T statementOrDeclaration) {
+        content.add(pos, statementOrDeclaration);
         pos++;
         return statementOrDeclaration;
     }
 
     /**
      * Gets the current position to which new statements will be inserted.
-     *
+     * <p/>
      * For example if the value is 0, newly created instructions will be
      * inserted at the very beginning of the block.
      *
@@ -110,16 +110,13 @@ public final class Block implements Generable, Statement {
     /**
      * Sets the current position.
      *
-     * @return
-     *      the old value of the current position.
-     * @throws IllegalArgumentException
-     *      if the new position value is illegal.
-     *
+     * @return the old value of the current position.
+     * @throws IllegalArgumentException if the new position value is illegal.
      * @see #pos()
      */
     public int pos(int newPos) {
         int r = pos;
-        if(newPos>content.size() || newPos<0) {
+        if (newPos > content.size() || newPos < 0) {
             throw new IllegalArgumentException();
         }
         pos = newPos;
@@ -138,12 +135,8 @@ public final class Block implements Generable, Statement {
     /**
      * Adds a local variable declaration to this block
      *
-     * @param type
-     *        Type of the variable
-     *
-     * @param name
-     *        Name of the variable
-     *
+     * @param type Type of the variable
+     * @param name Name of the variable
      * @return Newly generated Variable
      */
     public Variable decl(Type type, String name) {
@@ -153,15 +146,9 @@ public final class Block implements Generable, Statement {
     /**
      * Adds a local variable declaration to this block
      *
-     * @param type
-     *        Type of the variable
-     *
-     * @param name
-     *        Name of the variable
-     *
-     * @param init
-     *        Initialization expression for this variable.  May be null.
-     *
+     * @param type Type of the variable
+     * @param name Name of the variable
+     * @param init Initialization expression for this variable.  May be null.
      * @return Newly generated Variable
      */
     public Variable decl(Type type, String name, Expression init) {
@@ -171,18 +158,10 @@ public final class Block implements Generable, Statement {
     /**
      * Adds a local variable declaration to this block
      *
-     * @param mods
-     *        Modifiers for the variable
-     *
-     * @param type
-     *        Type of the variable
-     *
-     * @param name
-     *        Name of the variable
-     *
-     * @param init
-     *        Initialization expression for this variable.  May be null.
-     *
+     * @param mods Modifiers for the variable
+     * @param type Type of the variable
+     * @param name Name of the variable
+     * @param init Initialization expression for this variable.  May be null.
      * @return Newly generated Variable
      */
     public Variable decl(int mods, Type type, String name, Expression init) {
@@ -196,11 +175,8 @@ public final class Block implements Generable, Statement {
     /**
      * Creates an assignment statement and adds it to this block.
      *
-     * @param lhs
-     *        Assignable variable or field for left hand side of expression
-     *
-     * @param exp
-     *        Right hand side expression
+     * @param lhs Assignable variable or field for left hand side of expression
+     * @param exp Right hand side expression
      */
     public Block assign(AssignmentTarget lhs, Expression exp) {
         insert(new Assignment(lhs, exp));
@@ -215,13 +191,9 @@ public final class Block implements Generable, Statement {
     /**
      * Creates an invocation statement and adds it to this block.
      *
-     * @param expr
-     *        Expression evaluating to the class or object upon which
-     *        the named method will be invoked
-     *
-     * @param method
-     *        Name of method to invoke
-     *
+     * @param expr   Expression evaluating to the class or object upon which
+     *               the named method will be invoked
+     * @param method Name of method to invoke
      * @return Newly generated Invocation
      */
     public Invocation invoke(Expression expr, String method) {
@@ -233,13 +205,9 @@ public final class Block implements Generable, Statement {
     /**
      * Creates an invocation statement and adds it to this block.
      *
-     * @param expr
-     *        Expression evaluating to the class or object upon which
-     *        the method will be invoked
-     *
-     * @param method
-     *        Method to invoke
-     *
+     * @param expr   Expression evaluating to the class or object upon which
+     *               the method will be invoked
+     * @param method Method to invoke
      * @return Newly generated Invocation
      */
     public Invocation invoke(Expression expr, Method method) {
@@ -256,33 +224,27 @@ public final class Block implements Generable, Statement {
     /**
      * Creates an invocation statement and adds it to this block.
      *
-     * @param method
-     *        Name of method to invoke
-     *
+     * @param method Name of method to invoke
      * @return Newly generated Invocation
      */
     public Invocation invoke(String method) {
-        return insert(new Invocation((Expression)null, method));
+        return insert(new Invocation((Expression) null, method));
     }
 
     /**
      * Creates an invocation statement and adds it to this block.
      *
-     * @param method
-     *        Method to invoke
-     *
+     * @param method Method to invoke
      * @return Newly generated Invocation
      */
     public Invocation invoke(Method method) {
-        return insert(new Invocation((Expression)null, method));
+        return insert(new Invocation((Expression) null, method));
     }
 
     /**
      * Adds a statement to this block
      *
-     * @param s
-     *        Statement to be added
-     *
+     * @param s Statement to be added
      * @return This block
      */
     public Block add(Statement s) { // ## Needed?
@@ -293,9 +255,7 @@ public final class Block implements Generable, Statement {
     /**
      * Create an If statement and add it to this block
      *
-     * @param expr
-     *        Expression to be tested to determine branching
-     *
+     * @param expr Expression to be tested to determine branching
      * @return Newly generated conditional statement
      */
     public Conditional _if(Expression expr) {
@@ -410,12 +370,12 @@ public final class Block implements Generable, Statement {
 
     /**
      * Creates a "literal" statement directly.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * Specified string is printed as-is.
      * This is useful as a short-cut.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, you can invoke this method as:
      * <code>directStatement("a=b+c;")</code>.
      */
@@ -460,12 +420,13 @@ public final class Block implements Generable, Statement {
      * and add it to this block
      *
      * @return Newly generated enhanced For statement per j2se 1.5
-     * specification
-    */
+     *         specification
+     */
     public ForEach forEach(Type varType, String name, Expression collection) {
-        return insert(new ForEach( varType, name, collection));
+        return insert(new ForEach(varType, name, collection));
 
     }
+
     public void state(Formatter f) {
         f.g(this);
         if (bracesRequired) {

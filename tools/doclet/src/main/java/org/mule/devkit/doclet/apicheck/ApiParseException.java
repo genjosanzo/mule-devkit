@@ -17,17 +17,17 @@
 package org.mule.devkit.doclet.apicheck;
 
 public final class ApiParseException extends Exception {
-  private static final long serialVersionUID = 435829894462754L;
-  
-  public ApiParseException(String message, Exception cause) {
-    super(message, cause);
-  }
-  
-  public ApiParseException() {
-    
-  }
-  
-  ApiParseException(String message) {
-    super(message);
-  }
+    private static final long serialVersionUID = 435829894462754L;
+
+    public ApiParseException(String message, Exception cause) {
+        super(message, cause);
+    }
+
+    public ApiParseException() {
+
+    }
+
+    ApiParseException(String message) {
+        super(message);
+    }
 }

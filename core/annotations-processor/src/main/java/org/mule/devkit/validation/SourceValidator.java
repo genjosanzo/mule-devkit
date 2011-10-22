@@ -41,7 +41,7 @@ public class SourceValidator implements Validator {
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
 
         if (!typeElement.hasAnnotation(Module.class) &&
-            !typeElement.hasAnnotation(Connector.class)) {
+                !typeElement.hasAnnotation(Connector.class)) {
             return;
         }
 

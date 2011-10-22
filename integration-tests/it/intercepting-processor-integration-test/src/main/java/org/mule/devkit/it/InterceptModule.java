@@ -22,21 +22,19 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.callback.InterceptCallback;
 
 @Module(name = "intercept")
-public class InterceptModule
-{
-    @Processor(intercepting=true)
-    public Object shouldContinue(boolean cont, InterceptCallback afterChain) throws Exception
-    {
-		if( !cont ) {
-			afterChain.doNotContinue();
-		}
+public class InterceptModule {
+    @Processor(intercepting = true)
+    public Object shouldContinue(boolean cont, InterceptCallback afterChain) throws Exception {
+        if (!cont) {
+            afterChain.doNotContinue();
+        }
 
         return null;
     }
 
-	@Processor
-	public String setPayload(String payload) {
-		return payload;
-	}
+    @Processor
+    public String setPayload(String payload) {
+        return payload;
+    }
 
 }

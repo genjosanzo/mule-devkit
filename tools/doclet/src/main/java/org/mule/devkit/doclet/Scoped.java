@@ -17,13 +17,13 @@
 package org.mule.devkit.doclet;
 
 public interface Scoped {
-  boolean isPublic();
+    boolean isPublic();
 
-  boolean isProtected();
+    boolean isProtected();
 
-  boolean isPackagePrivate();
+    boolean isPackagePrivate();
 
-  boolean isPrivate();
+    boolean isPrivate();
 
-  boolean isHidden();
+    boolean isHidden();
 }

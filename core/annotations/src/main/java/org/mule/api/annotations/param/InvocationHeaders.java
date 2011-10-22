@@ -25,18 +25,18 @@ import java.lang.annotation.Target;
 /**
  * Used on {@link org.mule.api.annotations.Processor} methods, this annotation marks the method parameter that will be
  * used to pass in one or more of the headers received.
- *
+ * <p/>
  * This annotation value can define a single header, a comma-separated list of header names, '*' to denote all headers,
  * or a comma-separated list of wildcard expressions such as 'MULE_*, X-*'. By default, if a named header is not
  * present on the current message, an exception will be thrown.
- *
+ * <p/>
  * However, if the header name is defined with the '?' post fix, it will be marked as optional.
- *
+ * <p/>
  * When defining multiple header names or using wildcards, the parameter can be a {@link java.util.Map} or
  * {@link java.util.List}. If a {@link java.util.Map} is used, the header name and value is passed in.
  * If {@link java.util.List} is used, just the header values are used. If a single header name is defined, the header
  * type can be used as the parameter type, though {@link java.util.List} or {@link java.util.Map} can be used too.
- *
+ * <p/>
  * The Invocation headers collection is immutable, so the headers Map or List passed in will be immutable too.
  * Attempting to write to the Map or List will result in an {@link UnsupportedOperationException}.
  */
@@ -53,5 +53,5 @@ public @interface InvocationHeaders {
      *
      * @return the header expression used to query the message for headers
      */
-     String value();
+    String value();
 }

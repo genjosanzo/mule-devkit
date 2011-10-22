@@ -35,9 +35,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -49,15 +49,12 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "import")
 public class Import
-    extends Annotated
-{
+        extends Annotated {
 
     @XmlAttribute(name = "namespace")
     @XmlSchemaType(name = "anyURI")
@@ -68,11 +65,9 @@ public class Import
 
     /**
      * Gets the value of the namespace property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getNamespace() {
         return namespace;
@@ -80,11 +75,9 @@ public class Import
 
     /**
      * Sets the value of the namespace property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setNamespace(String value) {
         this.namespace = value;
@@ -92,11 +85,9 @@ public class Import
 
     /**
      * Gets the value of the schemaLocation property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getSchemaLocation() {
         return schemaLocation;
@@ -104,11 +95,9 @@ public class Import
 
     /**
      * Sets the value of the schemaLocation property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setSchemaLocation(String value) {
         this.schemaLocation = value;

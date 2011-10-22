@@ -50,23 +50,21 @@ import java.io.Writer;
 
 /**
  * Simple text file.
- * 
- * @author
- * 	Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
+ *
+ * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
-public class TextFile extends ResourceFile
-{
+public class TextFile extends ResourceFile {
     public TextFile(String name) {
         super(name);
     }
-    
+
     private String contents = null;
-    
-    public void setContents( String _contents ) {
+
+    public void setContents(String _contents) {
         this.contents = _contents;
     }
-    
-    public void build( OutputStream out ) throws IOException {
+
+    public void build(OutputStream out) throws IOException {
         Writer w = new OutputStreamWriter(out);
         w.write(contents);
         w.close();

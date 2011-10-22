@@ -47,56 +47,54 @@ import java.io.Writer;
 /**
  * {@link java.io.Writer} that escapes characters that are unsafe
  * as Javadoc comments.
- * 
+ * <p/>
  * Such characters include '&lt;' and '&amp;'.
- * 
- * <p>
+ * <p/>
+ * <p/>
  * Note that this class doesn't escape other Unicode characters
  * that are typically unsafe. For example, &#x611B; (A kanji
  * that means "love") can be considered as unsafe because
  * javac with English Windows cannot accept this character in the
  * source code.
- * 
- * <p>
+ * <p/>
+ * <p/>
  * If the application needs to escape such characters as well, then
  * they are on their own.
- * 
- * @author
- * 	Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
+ *
+ * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
 public class JavadocEscapeWriter extends FilterWriter {
-    
-    public JavadocEscapeWriter( Writer next ) {
+
+    public JavadocEscapeWriter(Writer next) {
         super(next);
     }
 
     public void write(int ch) throws IOException {
-        if(ch=='<') {
+        if (ch == '<') {
             out.write("&lt;");
-        } else
-        if(ch=='&') {
+        } else if (ch == '&') {
             out.write("&amp;");
         } else {
             out.write(ch);
         }
     }
-    
+
     public void write(char[] buf, int off, int len) throws IOException {
-        for( int i=0; i<len; i++ ) {
+        for (int i = 0; i < len; i++) {
             write(buf[off + i]);
         }
     }
 
     public void write(char[] buf) throws IOException {
-        write(buf,0,buf.length);
+        write(buf, 0, buf.length);
     }
 
     public void write(String buf, int off, int len) throws IOException {
-        write( buf.toCharArray(), off, len );
+        write(buf.toCharArray(), off, len);
     }
-    
+
     public void write(String buf) throws IOException {
-        write( buf.toCharArray(), 0, buf.length() );
+        write(buf.toCharArray(), 0, buf.length());
     }
 
 }

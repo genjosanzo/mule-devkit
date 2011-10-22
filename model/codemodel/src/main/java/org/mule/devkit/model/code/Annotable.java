@@ -51,16 +51,15 @@ import java.util.Collection;
 public interface Annotable {
     /**
      * Adds an annotation to this program element.
-     * @param clazz
-     *          The annotation class to annotate the program element with
+     *
+     * @param clazz The annotation class to annotate the program element with
      */
     AnnotationUse annotate(TypeReference clazz);
 
     /**
      * Adds an annotation to this program element.
      *
-     * @param clazz
-     *          The annotation class to annotate the program element with
+     * @param clazz The annotation class to annotate the program element with
      */
     AnnotationUse annotate(Class<? extends Annotation> clazz);
 
@@ -69,12 +68,11 @@ public interface Annotable {
      * and returns a type-safe writer to fill in the values of such annotations.
      */
     <W extends AnnotationWriter> W annotate2(Class<W> clazz);
-    
+
     /**
      * Read-only live view of all annotations on this {@link Annotable}
-     * 
-     * @return
-     *      Can be empty but never null.
+     *
+     * @return Can be empty but never null.
      */
     Collection<AnnotationUse> annotations();
 }

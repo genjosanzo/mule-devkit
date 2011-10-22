@@ -46,32 +46,31 @@ import java.util.List;
 
 /**
  * Array class.
- * 
- * @author
- * 	Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
+ *
+ * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
 final class ArrayClass extends TypeReference {
-    
+
     // array component type
     private final Type componentType;
-    
-    
+
+
     ArrayClass(CodeModel owner, Type component) {
         super(owner);
         this.componentType = component;
     }
-    
-    
+
+
     public String name() {
-        return componentType.name()+"[]";
+        return componentType.name() + "[]";
     }
-    
+
     public String fullName() {
-        return componentType.fullName()+"[]";
+        return componentType.fullName() + "[]";
     }
 
     public String binaryName() {
-        return componentType.binaryName()+"[]";
+        return componentType.binaryName() + "[]";
     }
 
     public void generate(Formatter f) {
@@ -112,14 +111,14 @@ final class ArrayClass extends TypeReference {
     //
 
     public boolean equals(Object obj) {
-        if(!(obj instanceof ArrayClass)) {
+        if (!(obj instanceof ArrayClass)) {
             return false;
         }
-        
-        if( componentType.equals( ((ArrayClass)obj).componentType ) ) {
+
+        if (componentType.equals(((ArrayClass) obj).componentType)) {
             return true;
         }
-        
+
         return false;
     }
 
@@ -128,16 +127,16 @@ final class ArrayClass extends TypeReference {
     }
 
     protected TypeReference substituteParams(TypeVariable[] variables, List<TypeReference> bindings) {
-        if( componentType.isPrimitive() ) {
+        if (componentType.isPrimitive()) {
             return this;
         }
-        
-        TypeReference c = ((TypeReference)componentType).substituteParams(variables,bindings);
-        if(c==componentType) {
+
+        TypeReference c = ((TypeReference) componentType).substituteParams(variables, bindings);
+        if (c == componentType) {
             return this;
         }
-        
-        return new ArrayClass(owner(),c);
+
+        return new ArrayClass(owner(), c);
     }
 
 }

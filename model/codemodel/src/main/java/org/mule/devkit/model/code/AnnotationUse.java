@@ -43,11 +43,11 @@ import java.util.Map;
 
 /**
  * Represents an annotation on a program element.
- *
+ * <p/>
  * TODO
- *    How to add enums to the annotations
- * @author
- *     Bhakti Mehta (bhakti.mehta@sun.com)
+ * How to add enums to the annotations
+ *
+ * @author Bhakti Mehta (bhakti.mehta@sun.com)
  */
 public final class AnnotationUse extends AnnotationValue {
 
@@ -59,9 +59,9 @@ public final class AnnotationUse extends AnnotationValue {
     /**
      * Map of member values.
      */
-    private Map<String,AnnotationValue> memberValues;
+    private Map<String, AnnotationValue> memberValues;
 
-    AnnotationUse(TypeReference clazz){
+    AnnotationUse(TypeReference clazz) {
         this.clazz = clazz;
     }
 
@@ -72,7 +72,7 @@ public final class AnnotationUse extends AnnotationValue {
     public Map<String, AnnotationValue> getAnnotationMembers() {
         return Collections.unmodifiableMap(memberValues);
     }
-    
+
     private CodeModel owner() {
         return clazz.owner();
     }
@@ -80,162 +80,125 @@ public final class AnnotationUse extends AnnotationValue {
     private void addValue(String name, AnnotationValue annotationValue) {
         // Use ordered map to keep the code generation the same on any JVM.
         // Lazily created.
-        if(memberValues==null) {
+        if (memberValues == null) {
             memberValues = new LinkedHashMap<String, AnnotationValue>();
         }
-        memberValues.put(name,annotationValue);
+        memberValues.put(name, annotationValue);
     }
 
     /**
      * Adds a member value pair to this annotation
      *
-     * @param name
-     *        The simple name for this annotation
-     *
-     * @param value
-     *        The boolean value for this annotation
-     * @return
-     *         The AnnotationUse. More member value pairs can
+     * @param name  The simple name for this annotation
+     * @param value The boolean value for this annotation
+     * @return The AnnotationUse. More member value pairs can
      *         be added to it using the same or the overloaded methods.
-     *
      */
-    public AnnotationUse param(String name, boolean value){
+    public AnnotationUse param(String name, boolean value) {
         addValue(name, new AnnotationStringValue(ExpressionFactory.lit(value)));
         return this;
     }
 
     /**
      * Adds a member value pair to this annotation
-     * @param name
-     *        The simple name for this annotation
      *
-     * @param value
-     *        The byte member value for this annotation
-     * @return
-     *         The AnnotationUse. More member value pairs can
+     * @param name  The simple name for this annotation
+     * @param value The byte member value for this annotation
+     * @return The AnnotationUse. More member value pairs can
      *         be added to it using the same or the overloaded methods.
-     *
      */
-    public AnnotationUse param(String name, byte value){
+    public AnnotationUse param(String name, byte value) {
         addValue(name, new AnnotationStringValue(ExpressionFactory.lit(value)));
         return this;
     }
 
     /**
      * Adds a member value pair to this annotation
-     * @param name
-     *        The simple name for this annotation
      *
-     * @param value
-     *        The char member value for this annotation
-     * @return
-     *         The AnnotationUse. More member value pairs can
+     * @param name  The simple name for this annotation
+     * @param value The char member value for this annotation
+     * @return The AnnotationUse. More member value pairs can
      *         be added to it using the same or the overloaded methods.
-     *
      */
-    public AnnotationUse param(String name, char value){
+    public AnnotationUse param(String name, char value) {
         addValue(name, new AnnotationStringValue(ExpressionFactory.lit(value)));
         return this;
     }
 
     /**
      * Adds a member value pair to this annotation
-     * @param name
-     *        The simple name for this annotation
      *
-     * @param value
-     *        The double member value for this annotation
-     * @return
-     *         The AnnotationUse. More member value pairs can
+     * @param name  The simple name for this annotation
+     * @param value The double member value for this annotation
+     * @return The AnnotationUse. More member value pairs can
      *         be added to it using the same or the overloaded methods.
-     *
      */
-    public AnnotationUse param(String name, double value){
+    public AnnotationUse param(String name, double value) {
         addValue(name, new AnnotationStringValue(ExpressionFactory.lit(value)));
         return this;
     }
 
     /**
      * Adds a member value pair to this annotation
-     * @param name
-     *        The simple name for this annotation
      *
-     * @param value
-     *        The float member value for this annotation
-     * @return
-     *         The AnnotationUse. More member value pairs can
+     * @param name  The simple name for this annotation
+     * @param value The float member value for this annotation
+     * @return The AnnotationUse. More member value pairs can
      *         be added to it using the same or the overloaded methods.
-     *
      */
-    public AnnotationUse param(String name, float value){
+    public AnnotationUse param(String name, float value) {
         addValue(name, new AnnotationStringValue(ExpressionFactory.lit(value)));
         return this;
     }
 
     /**
      * Adds a member value pair to this annotation
-     * @param name
-     *        The simple name for this annotation
      *
-     * @param value
-     *        The long member value for this annotation
-     * @return
-     *         The AnnotationUse. More member value pairs can
+     * @param name  The simple name for this annotation
+     * @param value The long member value for this annotation
+     * @return The AnnotationUse. More member value pairs can
      *         be added to it using the same or the overloaded methods.
-     *
      */
-    public AnnotationUse param(String name, long value){
+    public AnnotationUse param(String name, long value) {
         addValue(name, new AnnotationStringValue(ExpressionFactory.lit(value)));
         return this;
     }
 
     /**
      * Adds a member value pair to this annotation
-     * @param name
-     *        The simple name for this annotation
      *
-     * @param value
-     *        The short member value for this annotation
-     * @return
-     *         The AnnotationUse. More member value pairs can
+     * @param name  The simple name for this annotation
+     * @param value The short member value for this annotation
+     * @return The AnnotationUse. More member value pairs can
      *         be added to it using the same or the overloaded methods.
-     *
      */
-    public AnnotationUse param(String name, short value){
+    public AnnotationUse param(String name, short value) {
         addValue(name, new AnnotationStringValue(ExpressionFactory.lit(value)));
         return this;
     }
 
     /**
      * Adds a member value pair to this annotation
-     * @param name
-     *        The simple name for this annotation
      *
-     * @param value
-     *        The int member value for this annotation
-     * @return
-     *         The AnnotationUse. More member value pairs can
+     * @param name  The simple name for this annotation
+     * @param value The int member value for this annotation
+     * @return The AnnotationUse. More member value pairs can
      *         be added to it using the same or the overloaded methods.
-     *
      */
-    public AnnotationUse param(String name, int value){
+    public AnnotationUse param(String name, int value) {
         addValue(name, new AnnotationStringValue(ExpressionFactory.lit(value)));
         return this;
     }
 
     /**
      * Adds a member value pair to this annotation
-     * @param name
-     *        The simple name for this annotation
      *
-     * @param value
-     *        The String member value for this annotation
-     * @return
-     *         The AnnotationUse. More member value pairs can
+     * @param name  The simple name for this annotation
+     * @param value The String member value for this annotation
+     * @return The AnnotationUse. More member value pairs can
      *         be added to it using the same or the overloaded methods.
-     *
      */
-    public AnnotationUse param(String name, String value){
+    public AnnotationUse param(String name, String value) {
         //Escape string values with quotes so that they can
         //be generated accordingly
         addValue(name, new AnnotationStringValue(ExpressionFactory.lit(value)));
@@ -245,16 +208,12 @@ public final class AnnotationUse extends AnnotationValue {
     /**
      * Adds a member value pair to this annotation
      * For adding class values as param
-     * @see #param(String, Class)
-     * @param name
-     *        The simple name for this annotation
      *
-     * @param value
-     *        The annotation class which is member value for this annotation
-     * @return
-     *         The AnnotationUse. More member value pairs can
+     * @param name  The simple name for this annotation
+     * @param value The annotation class which is member value for this annotation
+     * @return The AnnotationUse. More member value pairs can
      *         be added to it using the same or the overloaded methods.
-     *
+     * @see #param(String, Class)
      */
     public AnnotationUse annotationParam(String name, Class<? extends Annotation> value) {
         AnnotationUse annotationUse = new AnnotationUse(owner().ref(value));
@@ -264,72 +223,57 @@ public final class AnnotationUse extends AnnotationValue {
 
     /**
      * Adds a member value pair to this annotation
-     * @param name
-     *        The simple name for this annotation
      *
-     * @param value
-     *        The enum class which is member value for this annotation
-     * @return
-     *         The AnnotationUse. More member value pairs can
+     * @param name  The simple name for this annotation
+     * @param value The enum class which is member value for this annotation
+     * @return The AnnotationUse. More member value pairs can
      *         be added to it using the same or the overloaded methods.
-     *
      */
     public AnnotationUse param(String name, final Enum<?> value) {
         addValue(name, new AnnotationValue() {
-                    public void generate(Formatter f) {
-                        f.t(owner().ref(value.getDeclaringClass())).p('.').p(value.name());
-                    }
-                });
+            public void generate(Formatter f) {
+                f.t(owner().ref(value.getDeclaringClass())).p('.').p(value.name());
+            }
+        });
         return this;
     }
 
     /**
      * Adds a member value pair to this annotation
-     * @param name
-     *        The simple name for this annotation
      *
-     * @param value
-     *        The EnumConstant which is member value for this annotation
-     * @return
-     *         The AnnotationUse. More member value pairs can
+     * @param name  The simple name for this annotation
+     * @param value The EnumConstant which is member value for this annotation
+     * @return The AnnotationUse. More member value pairs can
      *         be added to it using the same or the overloaded methods.
-     *
      */
-    public AnnotationUse param(String name, EnumConstant value){
+    public AnnotationUse param(String name, EnumConstant value) {
         addValue(name, new AnnotationStringValue(value));
         return this;
     }
 
-     /**
-      * Adds a member value pair to this annotation
-      *  This can be used for e.g to specify
-      * <pre>
-      *        &#64;XmlCollectionItem(type=Integer.class);
-      * <pre>
-      * For adding a value of Class<? extends Annotation>
-      * @link
-      * #annotationParam(java.lang.String, java.lang.Class<? extends java.lang.annotation.Annotation>)
-      * @param name
-      *        The simple name for this annotation param
-      *
-      * @param value
-      *        The class type of the param
-      * @return
-      *         The AnnotationUse. More member value pairs can
-      *         be added to it using the same or the overloaded methods.
-      *
-      *
-      *
-      */
-     public AnnotationUse param(String name, final Class<?> value){
-         addValue(name, new AnnotationStringValue(
-        		 new AbstractExpression() {
-        			 public void generate(Formatter f) {
-        				 f.p(value.getName().replace('$', '.'));
-        				 f.p(".class");
-        			}
-        		 }));
-         return this;
+    /**
+     * Adds a member value pair to this annotation
+     * This can be used for e.g to specify
+     * <pre>
+     *        &#64;XmlCollectionItem(type=Integer.class);
+     * <pre>
+     * For adding a value of Class<? extends Annotation>
+     *
+     * @param name  The simple name for this annotation param
+     * @param value The class type of the param
+     * @return The AnnotationUse. More member value pairs can
+     *         be added to it using the same or the overloaded methods.
+     * @link #annotationParam(java.lang.String, java.lang.Class<? extends java.lang.annotation.Annotation>)
+     */
+    public AnnotationUse param(String name, final Class<?> value) {
+        addValue(name, new AnnotationStringValue(
+                new AbstractExpression() {
+                    public void generate(Formatter f) {
+                        f.p(value.getName().replace('$', '.'));
+                        f.p(".class");
+                    }
+                }));
+        return this;
     }
 
     /**
@@ -341,40 +285,33 @@ public final class AnnotationUse extends AnnotationValue {
      * @return The AnnotationUse. More member value pairs can
      *         be added to it using the same or the overloaded methods.
      */
-    public AnnotationUse param(String name, Type type){
+    public AnnotationUse param(String name, Type type) {
         TypeReference c = type.boxify();
-        addValue(name, new AnnotationStringValue( c.dotclass() ));
+        addValue(name, new AnnotationStringValue(c.dotclass()));
         return this;
     }
 
     /**
      * Adds a member value pair to this annotation.
-     * @param name
-     *        The simple name for this annotation
      *
-     * @param value
-     *        The Expression which provides the contant value for this annotation
-     * @return
-     *         The AnnotationUse. More member value pairs can
+     * @param name  The simple name for this annotation
+     * @param value The Expression which provides the contant value for this annotation
+     * @return The AnnotationUse. More member value pairs can
      *         be added to it using the same or the overloaded methods.
-     *
      */
-    public AnnotationUse param(String name, Expression value){
+    public AnnotationUse param(String name, Expression value) {
         addValue(name, new AnnotationStringValue(value));
         return this;
     }
 
     /**
      * Adds a member value pair which is of type array to this annotation
-     * @param name
-     *        The simple name for this annotation
      *
-     * @return
-     *         The AnnotationArrayMember. For adding array values
-     *         @see AnnotationArrayMember
-     *
+     * @param name The simple name for this annotation
+     * @return The AnnotationArrayMember. For adding array values
+     * @see AnnotationArrayMember
      */
-    public AnnotationArrayMember paramArray(String name){
+    public AnnotationArrayMember paramArray(String name) {
         AnnotationArrayMember arrayMember = new AnnotationArrayMember(owner());
         addValue(name, arrayMember);
         return arrayMember;
@@ -399,25 +336,23 @@ public final class AnnotationUse extends AnnotationValue {
     /**
      * This can be used to add annotations inside annotations
      * for e.g  &#64;XmlCollection(values= &#64;XmlCollectionItem(type=Foo.class))
-     * @param clazz
-     *         The annotation class to be included
-     * @return
-     *     The AnnotationUse that can be used as a member within this AnnotationUse
-     * @deprecated
-     *      use {@link AnnotationArrayMember#annotate}
+     *
+     * @param clazz The annotation class to be included
+     * @return The AnnotationUse that can be used as a member within this AnnotationUse
+     * @deprecated use {@link AnnotationArrayMember#annotate}
      */
-    public AnnotationUse annotate(Class <? extends Annotation> clazz) {
-         AnnotationUse annotationUse = new AnnotationUse(owner().ref(clazz));
-         return annotationUse;
+    public AnnotationUse annotate(Class<? extends Annotation> clazz) {
+        AnnotationUse annotationUse = new AnnotationUse(owner().ref(clazz));
+        return annotationUse;
     }
 
     public void generate(Formatter f) {
         f.p('@').g(clazz);
-        if(memberValues!=null) {
+        if (memberValues != null) {
             f.p('(');
             boolean first = true;
 
-            if(isOptimizable()) {
+            if (isOptimizable()) {
                 // short form
                 f.g(memberValues.get("value"));
             } else {
@@ -434,7 +369,7 @@ public final class AnnotationUse extends AnnotationValue {
     }
 
     private boolean isOptimizable() {
-        return memberValues.size()==1 && memberValues.containsKey("value");
+        return memberValues.size() == 1 && memberValues.containsKey("value");
     }
 }
 

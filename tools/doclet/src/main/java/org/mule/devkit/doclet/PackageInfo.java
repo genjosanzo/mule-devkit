@@ -128,7 +128,7 @@ public class PackageInfo extends DocInfo implements ContainerInfo {
         ArrayList<ClassInfo> out = new ArrayList<ClassInfo>();
 
         for (ClassInfo cl : classes) {
-            if(cl.isModule()) {
+            if (cl.isModule()) {
                 out.add(cl);
             }
         }

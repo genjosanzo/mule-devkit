@@ -24,21 +24,18 @@ import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 
 @Module(name = "optional")
-public class OptionalModule
-{
+public class OptionalModule {
     @Configurable
     @Optional
     @Default("10")
     private int base;
 
     @Processor
-    public int sumMultiplyAndDivide(int sum1, int sum2, @Optional @Default("1") int multiply)
-    {
-        return ((sum1 + sum2) * multiply ) / base;
+    public int sumMultiplyAndDivide(int sum1, int sum2, @Optional @Default("1") int multiply) {
+        return ((sum1 + sum2) * multiply) / base;
     }
 
-    public void setBase(int value)
-    {
+    public void setBase(int value) {
         this.base = value;
     }
 

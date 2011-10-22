@@ -32,9 +32,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for attributeGroupRef complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="attributeGroupRef">
  *   &lt;complexContent>
@@ -48,14 +48,11 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "attributeGroupRef")
 public class AttributeGroupRef
-    extends AttributeGroup
-{
+        extends AttributeGroup {
 
 
 }

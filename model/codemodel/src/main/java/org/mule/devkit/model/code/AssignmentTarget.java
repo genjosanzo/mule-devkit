@@ -44,11 +44,12 @@ package org.mule.devkit.model.code;
 /**
  * Marker interface for code components that can be placed to
  * the left of '=' in an assignment.
- * 
+ * <p/>
  * A left hand value can always be a right hand value, so
  * this interface derives from {@link Expression}.
  */
 public interface AssignmentTarget extends Generable, Expression {
     Expression assign(Expression rhs);
+
     Expression assignPlus(Expression rhs);
 }

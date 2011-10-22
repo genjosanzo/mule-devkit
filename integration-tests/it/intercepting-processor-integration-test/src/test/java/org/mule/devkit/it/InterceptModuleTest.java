@@ -19,22 +19,18 @@ package org.mule.devkit.it;
 
 import org.mule.transport.NullPayload;
 
-public class InterceptModuleTest extends AbstractModuleTest
-{
+public class InterceptModuleTest extends AbstractModuleTest {
 
     @Override
-    protected String getConfigResources()
-    {
+    protected String getConfigResources() {
         return "intercept.xml";
     }
 
-    public void testShouldContinue() throws Exception
-    {
+    public void testShouldContinue() throws Exception {
         runFlow("shouldContinue", "itDidContinue");
     }
 
-    public void testShouldNotContinue() throws Exception
-    {
+    public void testShouldNotContinue() throws Exception {
         runFlow("shouldNotContinue", NullPayload.getInstance());
     }
 }

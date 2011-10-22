@@ -44,11 +44,11 @@ import java.util.Map;
 
 /**
  * An item may represent a "story" -- much like a story in a newspaper or magazine; if so its description is a synopsis of the story, and the link points to the full story. An item may also be complete in itself, if so, the description contains the text (entity-encoded HTML is allowed), and the link and title may be omitted.
- * 
+ * <p/>
  * <p>Java class for RssItem complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="RssItem">
  *   &lt;complexContent>
@@ -73,26 +73,24 @@ import java.util.Map;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "RssItem", propOrder = {
-    "titleOrDescriptionOrLink"
+        "titleOrDescriptionOrLink"
 })
 public class RssItem {
 
     @XmlElementRefs({
-        @XmlElementRef(name = "pubDate", type = JAXBElement.class),
-        @XmlElementRef(name = "link", type = JAXBElement.class),
-        @XmlElementRef(name = "description", type = JAXBElement.class),
-        @XmlElementRef(name = "comments", type = JAXBElement.class),
-        @XmlElementRef(name = "title", type = JAXBElement.class),
-        @XmlElementRef(name = "author", type = JAXBElement.class),
-        @XmlElementRef(name = "category", type = JAXBElement.class),
-        @XmlElementRef(name = "enclosure", type = JAXBElement.class),
-        @XmlElementRef(name = "source", type = JAXBElement.class),
-        @XmlElementRef(name = "guid", type = JAXBElement.class)
+            @XmlElementRef(name = "pubDate", type = JAXBElement.class),
+            @XmlElementRef(name = "link", type = JAXBElement.class),
+            @XmlElementRef(name = "description", type = JAXBElement.class),
+            @XmlElementRef(name = "comments", type = JAXBElement.class),
+            @XmlElementRef(name = "title", type = JAXBElement.class),
+            @XmlElementRef(name = "author", type = JAXBElement.class),
+            @XmlElementRef(name = "category", type = JAXBElement.class),
+            @XmlElementRef(name = "enclosure", type = JAXBElement.class),
+            @XmlElementRef(name = "source", type = JAXBElement.class),
+            @XmlElementRef(name = "guid", type = JAXBElement.class)
     })
     @XmlAnyElement(lax = true)
     protected List<Object> titleOrDescriptionOrLink;
@@ -101,21 +99,21 @@ public class RssItem {
 
     /**
      * Gets the value of the titleOrDescriptionOrLink property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the titleOrDescriptionOrLink property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getTitleOrDescriptionOrLink().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link JAXBElement }{@code <}{@link String }{@code >}
      * {@link JAXBElement }{@code <}{@link String }{@code >}
@@ -129,8 +127,6 @@ public class RssItem {
      * {@link JAXBElement }{@code <}{@link Source }{@code >}
      * {@link Object }
      * {@link JAXBElement }{@code <}{@link Guid }{@code >}
-     * 
-     * 
      */
     public List<Object> getTitleOrDescriptionOrLink() {
         if (titleOrDescriptionOrLink == null) {
@@ -141,17 +137,15 @@ public class RssItem {
 
     /**
      * Gets a map that contains attributes that aren't bound to any typed property on this class.
-     * 
-     * <p>
-     * the map is keyed by the name of the attribute and 
+     * <p/>
+     * <p/>
+     * the map is keyed by the name of the attribute and
      * the value is the string value of the attribute.
-     * 
+     * <p/>
      * the map returned by this method is live, and you can add new attribute
      * by updating the map directly. Because of this design, there's no setter.
-     * 
-     * 
-     * @return
-     *     always non-null
+     *
+     * @return always non-null
      */
     public Map<QName, String> getOtherAttributes() {
         return otherAttributes;

@@ -31,9 +31,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for ModeElementType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="ModeElementType">
  *   &lt;complexContent>
@@ -44,8 +44,6 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ModeElementType")
@@ -58,11 +56,9 @@ public class ModeElementType {
 
     /**
      * Gets the value of the modeId property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getModeId() {
         return modeId;
@@ -70,11 +66,9 @@ public class ModeElementType {
 
     /**
      * Sets the value of the modeId property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setModeId(String value) {
         this.modeId = value;
@@ -82,11 +76,9 @@ public class ModeElementType {
 
     /**
      * Gets the value of the modeLabel property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getModeLabel() {
         return modeLabel;
@@ -94,11 +86,9 @@ public class ModeElementType {
 
     /**
      * Sets the value of the modeLabel property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setModeLabel(String value) {
         this.modeLabel = value;

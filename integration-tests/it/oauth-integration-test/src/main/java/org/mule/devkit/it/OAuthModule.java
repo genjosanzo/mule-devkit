@@ -47,8 +47,8 @@ public class OAuthModule {
 
     @Processor
     public String protectedResource(@OAuthAccessToken String accessToken, @OAuthAccessTokenSecret String accessTokenSecret) {
-        if(!accessToken.equals(Constants.ACCESS_TOKEN) || !accessTokenSecret.equals(Constants.ACCESS_TOKEN_SECRET)) {
-             throw new RuntimeException("Access token or access token secret do not match expected");
+        if (!accessToken.equals(Constants.ACCESS_TOKEN) || !accessTokenSecret.equals(Constants.ACCESS_TOKEN_SECRET)) {
+            throw new RuntimeException("Access token or access token secret do not match expected");
         }
         return PROTECTED_RESOURCE;
     }

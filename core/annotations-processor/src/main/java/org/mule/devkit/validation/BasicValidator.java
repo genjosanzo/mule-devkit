@@ -67,7 +67,7 @@ public class BasicValidator implements Validator {
                 throw new ValidationException(variable, "@Configurable cannot be applied to field with static modifier");
             }
 
-            if(variable.asType().getKind() == TypeKind.ARRAY) {
+            if (variable.asType().getKind() == TypeKind.ARRAY) {
                 throw new ValidationException(variable, "@Configurable cannot be applied to arrays");
             }
 
@@ -77,7 +77,7 @@ public class BasicValidator implements Validator {
                 throw new ValidationException(variable, "@Optional @Configurable fields can only be applied to non-primitive types with a @Default value");
             }
 
-            if( def != null && optional == null) {
+            if (def != null && optional == null) {
                 throw new ValidationException(variable, "@Default @Configurable fields must also include @Optional, otherwise the @Default will never take place.");
             }
         }

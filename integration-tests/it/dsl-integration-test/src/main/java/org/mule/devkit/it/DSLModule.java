@@ -49,17 +49,17 @@ public class DSLModule {
 
     @Processor
     public void checkProcessValue(String param) {
-        if (!isExecuted){
+        if (!isExecuted) {
             throw new RuntimeException("Never Executed!");
         }
-        if (!param.equalsIgnoreCase(processedParamValue)){
+        if (!param.equalsIgnoreCase(processedParamValue)) {
             throw new RuntimeException("Error");
         }
     }
 
     @Processor
     public void checkConfigValue(String param) {
-        if (!param.equalsIgnoreCase(configValue)){
+        if (!param.equalsIgnoreCase(configValue)) {
             throw new RuntimeException("Error");
         }
     }

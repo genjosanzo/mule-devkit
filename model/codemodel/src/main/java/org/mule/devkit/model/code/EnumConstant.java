@@ -48,11 +48,10 @@ import java.util.List;
 
 /**
  * Enum Constant.
- *
+ * <p/>
  * When used as an {@link Expression}, this object represents a reference to the enum constant.
  *
- * @author
- *     Bhakti Mehta (Bhakti.Mehta@sun.com)
+ * @author Bhakti Mehta (Bhakti.Mehta@sun.com)
  */
 public final class EnumConstant extends AbstractExpression implements Declaration, Annotable, DocCommentable {
 
@@ -87,16 +86,15 @@ public final class EnumConstant extends AbstractExpression implements Declaratio
     }
 
     /**
-     *  Add an expression to this constructor's argument list
+     * Add an expression to this constructor's argument list
      *
-     * @param arg
-     *        Argument to add to argument list
+     * @param arg Argument to add to argument list
      */
     public EnumConstant arg(Expression arg) {
-        if(arg==null) {
+        if (arg == null) {
             throw new IllegalArgumentException();
         }
-        if(args==null) {
+        if (args == null) {
             args = new ArrayList<Expression>();
         }
         args.add(arg);
@@ -109,7 +107,7 @@ public final class EnumConstant extends AbstractExpression implements Declaratio
      * @return never null.
      */
     public String getName() {
-    	return this.type.fullName().concat(".").concat(this.name);
+        return this.type.fullName().concat(".").concat(this.name);
     }
 
     /**
@@ -126,11 +124,11 @@ public final class EnumConstant extends AbstractExpression implements Declaratio
 
     /**
      * Adds an annotation to this variable.
-     * @param clazz
-     *          The annotation class to annotate the field with
+     *
+     * @param clazz The annotation class to annotate the field with
      */
-    public AnnotationUse annotate(TypeReference clazz){
-        if(annotations==null) {
+    public AnnotationUse annotate(TypeReference clazz) {
+        if (annotations == null) {
             annotations = new ArrayList<AnnotationUse>();
         }
         AnnotationUse a = new AnnotationUse(clazz);
@@ -141,15 +139,14 @@ public final class EnumConstant extends AbstractExpression implements Declaratio
     /**
      * Adds an annotation to this variable.
      *
-     * @param clazz
-     *          The annotation class to annotate the field with
+     * @param clazz The annotation class to annotate the field with
      */
-    public AnnotationUse annotate(Class <? extends Annotation> clazz){
+    public AnnotationUse annotate(Class<? extends Annotation> clazz) {
         return annotate(type.owner().ref(clazz));
     }
 
     public <W extends AnnotationWriter> W annotate2(Class<W> clazz) {
-        return TypedAnnotationWriter.create(clazz,this);
+        return TypedAnnotationWriter.create(clazz, this);
     }
 
     /**
@@ -163,21 +160,21 @@ public final class EnumConstant extends AbstractExpression implements Declaratio
     }
 
     public void declare(Formatter f) {
-        if( jdoc != null ) {
+        if (jdoc != null) {
             f.nl().g(jdoc);
         }
         if (annotations != null) {
-            for( int i=0; i<annotations.size(); i++ ) {
+            for (int i = 0; i < annotations.size(); i++) {
                 f.g(annotations.get(i)).nl();
             }
         }
         f.id(name);
-        if(args!=null) {
+        if (args != null) {
             f.p('(').g(args).p(')');
         }
     }
 
     public void generate(Formatter f) {
-    	f.t(type).p('.').p(name);
+        f.t(type).p('.').p(name);
     }
 }

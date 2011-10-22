@@ -32,9 +32,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for typeDerivationControl.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ * <p/>
  * <pre>
  * &lt;simpleType name="typeDerivationControl">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}derivationControl">
@@ -45,7 +45,6 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
- * 
  */
 @XmlType(name = "typeDerivationControl")
 @XmlEnum(DerivationControl.class)
@@ -70,7 +69,7 @@ public enum TypeDerivationControl {
     }
 
     public static TypeDerivationControl fromValue(DerivationControl v) {
-        for (TypeDerivationControl c: TypeDerivationControl.values()) {
+        for (TypeDerivationControl c : TypeDerivationControl.values()) {
             if (c.value.equals(v)) {
                 return c;
             }

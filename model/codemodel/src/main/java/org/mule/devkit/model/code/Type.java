@@ -43,7 +43,7 @@ package org.mule.devkit.model.code;
 
 /**
  * A representation of a type in codeModel.
- *
+ * <p/>
  * A type is always either primitive ({@link PrimitiveType}) or
  * a reference type ({@link TypeReference}).
  */
@@ -76,27 +76,27 @@ public abstract class Type implements Generable, Comparable<Type> {
         }
     }
 
-    /** Gets the owner code model object. */
+    /**
+     * Gets the owner code model object.
+     */
     public abstract CodeModel owner();
-    
+
     /**
      * Gets the full name of the type.
-     *
+     * <p/>
      * See http://java.sun.com/docs/books/jls/second_edition/html/names.doc.html#25430 for the details.
      *
-     * @return
-     *      Strings like "int", "java.lang.String",
-     *      "java.io.File[]". Never null.
+     * @return Strings like "int", "java.lang.String",
+     *         "java.io.File[]". Never null.
      */
     public abstract String fullName();
 
     /**
      * Gets the binary name of the type.
-     *
+     * <p/>
      * See http://java.sun.com/docs/books/jls/third_edition/html/binaryComp.html#44909
      *
-     * @return
-     *      Name like "Foo$Bar", "int", "java.lang.String", "java.io.File[]". Never null.
+     * @return Name like "Foo$Bar", "int", "java.lang.String", "java.io.File[]". Never null.
      */
     public String binaryName() {
         return fullName();
@@ -105,14 +105,13 @@ public abstract class Type implements Generable, Comparable<Type> {
     /**
      * Gets the name of this type.
      *
-     * @return
-     *     Names like "int", "void", "BigInteger".
+     * @return Names like "int", "void", "BigInteger".
      */
     public abstract String name();
-    
+
     /**
      * Create an array type of this type.
-     * 
+     * <p/>
      * This method is undefined for primitive void type, which
      * doesn't have any corresponding array representation.
      *
@@ -121,20 +120,24 @@ public abstract class Type implements Generable, Comparable<Type> {
      */
     public abstract TypeReference array();
 
-    /** Tell whether or not this is an array type. */
+    /**
+     * Tell whether or not this is an array type.
+     */
     public boolean isArray() {
         return false;
     }
 
-    /** Tell whether or not this is a built-in primitive type, such as int or void. */
+    /**
+     * Tell whether or not this is a built-in primitive type, such as int or void.
+     */
     public boolean isPrimitive() {
         return false;
     }
 
     /**
      * If this class is a primitive type, return the boxed class. Otherwise return <tt>this</tt>.
-     *
-     * <p>
+     * <p/>
+     * <p/>
      * For example, for "int", this method returns "java.lang.Integer".
      */
     public abstract TypeReference boxify();
@@ -142,8 +145,8 @@ public abstract class Type implements Generable, Comparable<Type> {
     /**
      * If this class is a wrapper type for a primitive, return the primitive type.
      * Otherwise return <tt>this</tt>.
-     *
-     * <p>
+     * <p/>
+     * <p/>
      * For example, for "java.lang.Integer", this method returns "int".
      */
     public abstract Type unboxify();
@@ -154,12 +157,12 @@ public abstract class Type implements Generable, Comparable<Type> {
     public Type erasure() {
         return this;
     }
-    
+
     /**
      * Returns true if this is a referenced type.
      */
     public final boolean isReference() {
-    	return !isPrimitive();
+        return !isPrimitive();
     }
 
     /**
@@ -178,7 +181,7 @@ public abstract class Type implements Generable, Comparable<Type> {
     /**
      * Compare two JTypes by FQCN, giving sorting precedence to types
      * that belong to packages java and javax over all others.
-     *
+     * <p/>
      * This method is used to sort generated import statments in a
      * conventional way for readability.
      */
@@ -187,9 +190,9 @@ public abstract class Type implements Generable, Comparable<Type> {
         boolean p = fullName().startsWith("java");
         boolean q = rhs.startsWith("java");
 
-        if( p && !q ) {
+        if (p && !q) {
             return -1;
-        } else if( !p && q ) {
+        } else if (!p && q) {
             return 1;
         } else {
             return fullName().compareTo(rhs);

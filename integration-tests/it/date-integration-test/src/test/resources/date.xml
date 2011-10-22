@@ -24,18 +24,18 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
         http://www.mulesoft.org/schema/mule/date http://www.mulesoft.org/schema/mule/date/current/mule-date.xsd">
 
-    <date:config />
+    <date:config/>
 
     <flow name="setDate">
-        <date:set-date date="#[payload]" />
+        <date:set-date date="#[payload]"/>
     </flow>
 
     <flow name="setOptionalDate">
-        <date:set-optional-date />
+        <date:set-optional-date/>
     </flow>
 
     <flow name="getDate">
-        <date:get-date />
+        <date:get-date/>
     </flow>
 
 </mule>

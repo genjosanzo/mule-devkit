@@ -39,9 +39,9 @@ import java.util.List;
 
 /**
  * <p>Java class for wildcard complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="wildcard">
  *   &lt;complexContent>
@@ -61,17 +61,14 @@ import java.util.List;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "wildcard")
 @XmlSeeAlso({
-    Any.class
+        Any.class
 })
 public class Wildcard
-    extends Annotated
-{
+        extends Annotated {
 
     @XmlAttribute(name = "namespace")
     @XmlSchemaType(name = "namespaceList")
@@ -82,25 +79,23 @@ public class Wildcard
 
     /**
      * Gets the value of the namespace property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the namespace property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getNamespace().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link String }
-     * 
-     * 
      */
     public List<String> getNamespace() {
         if (namespace == null) {
@@ -111,11 +106,9 @@ public class Wildcard
 
     /**
      * Gets the value of the processContents property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getProcessContents() {
         if (processContents == null) {
@@ -127,11 +120,9 @@ public class Wildcard
 
     /**
      * Sets the value of the processContents property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setProcessContents(String value) {
         this.processContents = value;

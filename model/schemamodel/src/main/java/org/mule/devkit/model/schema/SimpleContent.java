@@ -33,9 +33,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -49,29 +49,24 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "restriction",
-    "extension"
+        "restriction",
+        "extension"
 })
 @XmlRootElement(name = "simpleContent")
 public class SimpleContent
-    extends Annotated
-{
+        extends Annotated {
 
     protected SimpleRestrictionType restriction;
     protected SimpleExtensionType extension;
 
     /**
      * Gets the value of the restriction property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SimpleRestrictionType }
-     *     
+     *
+     * @return possible object is
+     *         {@link SimpleRestrictionType }
      */
     public SimpleRestrictionType getRestriction() {
         return restriction;
@@ -79,11 +74,9 @@ public class SimpleContent
 
     /**
      * Sets the value of the restriction property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SimpleRestrictionType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link SimpleRestrictionType }
      */
     public void setRestriction(SimpleRestrictionType value) {
         this.restriction = value;
@@ -91,11 +84,9 @@ public class SimpleContent
 
     /**
      * Gets the value of the extension property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SimpleExtensionType }
-     *     
+     *
+     * @return possible object is
+     *         {@link SimpleExtensionType }
      */
     public SimpleExtensionType getExtension() {
         return extension;
@@ -103,11 +94,9 @@ public class SimpleContent
 
     /**
      * Sets the value of the extension property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SimpleExtensionType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link SimpleExtensionType }
      */
     public void setExtension(SimpleExtensionType value) {
         this.extension = value;

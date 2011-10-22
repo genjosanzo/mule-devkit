@@ -57,10 +57,14 @@ import java.util.List;
  */
 public final class Formatter {
     /** all classes and ids encountered during the collection mode **/
-    /** map from short type name to ReferenceList (list of TypeReference and ids sharing that name) **/
-    private HashMap<String,ReferenceList> collectedReferences;
+    /**
+     * map from short type name to ReferenceList (list of TypeReference and ids sharing that name) *
+     */
+    private HashMap<String, ReferenceList> collectedReferences;
 
-    /** set of imported types (including package java types, eventhough we won't generate imports for them) */
+    /**
+     * set of imported types (including package java types, eventhough we won't generate imports for them)
+     */
     private HashSet<TypeReference> importedClasses;
 
     private static enum Mode {
@@ -100,16 +104,13 @@ public final class Formatter {
     /**
      * Creates a Formatter.
      *
-     * @param s
-     *        PrintWriter to Formatter to use.
-     *
-     * @param space
-     *        Incremental indentation string, similar to tab value.
+     * @param s     PrintWriter to Formatter to use.
+     * @param space Incremental indentation string, similar to tab value.
      */
     public Formatter(PrintWriter s, String space) {
         pw = s;
         indentSpace = space;
-        collectedReferences = new HashMap<String,ReferenceList>();
+        collectedReferences = new HashMap<String, ReferenceList>();
         //ids = new HashSet<String>();
         importedClasses = new HashSet<TypeReference>();
     }
@@ -129,7 +130,7 @@ public final class Formatter {
     public Formatter(Writer w) {
         this(new PrintWriter(w));
     }
-    
+
     /**
      * Closes this formatter.
      */
@@ -140,7 +141,7 @@ public final class Formatter {
     /**
      * Returns true if we are in the printing mode,
      * where we actually produce text.
-     *
+     * <p/>
      * The other mode is the "collecting mode'
      */
     public boolean isPrinting() {
@@ -172,7 +173,7 @@ public final class Formatter {
         }
         if (c1 == CLOSE_TYPE_ARGS) {
             // e.g., "public Foo<Bar> test;"
-            if(c2=='(') // but not "new Foo<Bar>()"
+            if (c2 == '(') // but not "new Foo<Bar>()"
             {
                 return false;
             }
@@ -195,25 +196,25 @@ public final class Formatter {
         }
         if (Character.isJavaIdentifierPart(c1)) {
             switch (c2) {
-            case '{':
-            case '}':
-            case '+':
-            case '>':
-            case '@':
-                return true;
-            default:
-                return Character.isJavaIdentifierStart(c2);
+                case '{':
+                case '}':
+                case '+':
+                case '>':
+                case '@':
+                    return true;
+                default:
+                    return Character.isJavaIdentifierStart(c2);
             }
         }
         if (Character.isJavaIdentifierStart(c2)) {
             switch (c1) {
-            case ']':
-            case ')':
-            case '}':
-            case '+':
-                return true;
-            default:
-                return false;
+                case ']':
+                case ')':
+                case '}':
+                case '+':
+                    return true;
+                default:
+                    return false;
             }
         }
         if (Character.isDigit(c2)) {
@@ -245,8 +246,8 @@ public final class Formatter {
      * @param c the char
      */
     public Formatter p(char c) {
-        if(mode==Mode.PRINTING) {
-            if(c==CLOSE_TYPE_ARGS) {
+        if (mode == Mode.PRINTING) {
+            if (c == CLOSE_TYPE_ARGS) {
                 pw.print('>');
             } else {
                 spaceIfNeeded(c);
@@ -263,7 +264,7 @@ public final class Formatter {
      * @param s the String
      */
     public Formatter p(String s) {
-        if(mode==Mode.PRINTING) {
+        if (mode == Mode.PRINTING) {
             spaceIfNeeded(s.charAt(0));
             pw.print(s);
             lastChar = s.charAt(s.length() - 1);
@@ -272,8 +273,8 @@ public final class Formatter {
     }
 
     public Formatter t(Type type) {
-        if(type.isReference()) {
-            return t((TypeReference)type);
+        if (type.isReference()) {
+            return t((TypeReference) type);
         } else {
             return g(type);
         }
@@ -281,36 +282,36 @@ public final class Formatter {
 
     /**
      * Print a type name.
-     *
-     * <p>
+     * <p/>
+     * <p/>
      * In the collecting mode we use this information to
      * decide what types to import and what not to.
      */
     public Formatter t(TypeReference type) {
-        switch(mode) {
-        case PRINTING:
-            // many of the JTypes in this list are either primitive or belong to package java
-            // so we don't need a FQCN
-            if(importedClasses.contains(type)) {
-                p(type.name()); // FQCN imported or not necessary, so generate short name
-            } else {
-                if(type.outer()!=null) {
-                    t(type.outer()).p('.').p(type.name());
+        switch (mode) {
+            case PRINTING:
+                // many of the JTypes in this list are either primitive or belong to package java
+                // so we don't need a FQCN
+                if (importedClasses.contains(type)) {
+                    p(type.name()); // FQCN imported or not necessary, so generate short name
                 } else {
-                    p(type.fullName()); // collision was detected, so generate FQCN
+                    if (type.outer() != null) {
+                        t(type.outer()).p('.').p(type.name());
+                    } else {
+                        p(type.fullName()); // collision was detected, so generate FQCN
+                    }
                 }
-            }
-            break;
-        case COLLECTING:
-            final String shortName = type.name();
-            if(collectedReferences.containsKey(shortName)) {
-                collectedReferences.get(shortName).add(type);
-            } else {
-                ReferenceList tl = new ReferenceList();
-                tl.add(type);
-                collectedReferences.put(shortName, tl);
-            }
-            break;
+                break;
+            case COLLECTING:
+                final String shortName = type.name();
+                if (collectedReferences.containsKey(shortName)) {
+                    collectedReferences.get(shortName).add(type);
+                } else {
+                    ReferenceList tl = new ReferenceList();
+                    tl.add(type);
+                    collectedReferences.put(shortName, tl);
+                }
+                break;
         }
         return this;
     }
@@ -319,30 +320,30 @@ public final class Formatter {
      * Print an identifier
      */
     public Formatter id(String id) {
-        switch(mode) {
-        case PRINTING:
-            p(id);
-            break;
-        case COLLECTING:
-            // see if there is a type name that collides with this id
-            if(collectedReferences.containsKey(id)) {
-                if( !collectedReferences.get(id).getClasses().isEmpty() ) {
-                    for( TypeReference type : collectedReferences.get(id).getClasses() ) {
-                        if (type.outer()!=null) {
-                            collectedReferences.get(id).setId(false);
-                            return this;
+        switch (mode) {
+            case PRINTING:
+                p(id);
+                break;
+            case COLLECTING:
+                // see if there is a type name that collides with this id
+                if (collectedReferences.containsKey(id)) {
+                    if (!collectedReferences.get(id).getClasses().isEmpty()) {
+                        for (TypeReference type : collectedReferences.get(id).getClasses()) {
+                            if (type.outer() != null) {
+                                collectedReferences.get(id).setId(false);
+                                return this;
+                            }
                         }
                     }
+                    collectedReferences.get(id).setId(true);
+                } else {
+                    // not a type, but we need to create a place holder to
+                    // see if there might be a collision with a type
+                    ReferenceList tl = new ReferenceList();
+                    tl.setId(true);
+                    collectedReferences.put(id, tl);
                 }
-                collectedReferences.get(id).setId(true);
-            } else {
-                // not a type, but we need to create a place holder to
-                // see if there might be a collision with a type
-                ReferenceList tl = new ReferenceList();
-                tl.setId(true);
-                collectedReferences.put(id, tl);
-            }
-            break;
+                break;
         }
         return this;
     }
@@ -351,7 +352,7 @@ public final class Formatter {
      * Print a new line into the stream
      */
     public Formatter nl() {
-        if(mode==Mode.PRINTING) {
+        if (mode == Mode.PRINTING) {
             pw.println();
             lastChar = 0;
             atBeginningOfLine = true;
@@ -374,7 +375,7 @@ public final class Formatter {
      */
     public Formatter g(Collection<? extends Generable> list) {
         boolean first = true;
-        if(!list.isEmpty()) {
+        if (!list.isEmpty()) {
             for (Generable item : list) {
                 if (!first) {
                     p(',');
@@ -427,8 +428,8 @@ public final class Formatter {
         javaLang = c.owner()._package("java.lang");
 
         // collate type names and identifiers to determine which types can be imported
-        for( ReferenceList tl : collectedReferences.values() ) {
-            if(!tl.collisions(c) && !tl.isId()) {
+        for (ReferenceList tl : collectedReferences.values()) {
+            if (!tl.collisions(c) && !tl.isId()) {
                 assert tl.getClasses().size() == 1;
 
                 // add to list of collected types
@@ -456,11 +457,11 @@ public final class Formatter {
             // suppress import statements for primitive types, built-in types,
             // types in the root package, and types in
             // the same package as the current type
-            if(!supressImport(clazz, c)) {
+            if (!supressImport(clazz, c)) {
                 if (clazz instanceof NarrowedClass) {
                     clazz = clazz.erasure();
                 }
-                
+
                 p("import").p(clazz.fullName()).p(';').nl();
             }
         }
@@ -473,7 +474,7 @@ public final class Formatter {
      * determine if an import statement should be supressed
      *
      * @param clazz Type that may or may not have an import
-     * @param c Type that is the current class being processed
+     * @param c     Type that is the current class being processed
      * @return true if an import statement should be suppressed, false otherwise
      */
     private boolean supressImport(TypeReference clazz, TypeReference c) {
@@ -483,21 +484,21 @@ public final class Formatter {
         if (clazz instanceof AnonymousClass) {
             clazz = clazz._extends();
         }
-         
-        if(clazz._package().isUnnamed()) {
+
+        if (clazz._package().isUnnamed()) {
             return true;
         }
 
         final String packageName = clazz._package().name();
-        if(packageName.equals("java.lang")) {
+        if (packageName.equals("java.lang")) {
             return true;    // no need to explicitly import java.lang classes
         }
-    
-        if (clazz._package() == c._package()){ 
+
+        if (clazz._package() == c._package()) {
             // inner classes require an import stmt.
             // All other pkg local classes do not need an
             // import stmt for ref.
-            if(clazz.outer()==null) {
+            if (clazz.outer() == null) {
                 return true;    // no need to explicitly import a class into itself
             }
         }
@@ -505,7 +506,6 @@ public final class Formatter {
     }
 
     private Package javaLang;
-
 
 
     /**
@@ -518,7 +518,7 @@ public final class Formatter {
 
     /**
      * Used during the optimization of class imports.
-     *
+     * <p/>
      * List of {@link TypeReference}es whose short name is the same.
      *
      * @author Ryan.Shoemaker@Sun.COM
@@ -526,7 +526,9 @@ public final class Formatter {
     final class ReferenceList {
         private final ArrayList<TypeReference> classes = new ArrayList<TypeReference>();
 
-        /** true if this name is used as an identifier (like a variable name.) **/
+        /**
+         * true if this name is used as an identifier (like a variable name.) *
+         */
         private boolean id;
 
         /**
@@ -537,33 +539,33 @@ public final class Formatter {
             // special case where a generated type collides with a type in package java
 
             // more than one type with the same name
-            if(classes.size() > 1) {
+            if (classes.size() > 1) {
                 return true;
             }
 
             // an id and (at least one) type with the same name
-            if(id && classes.size() != 0) {
+            if (id && classes.size() != 0) {
                 return true;
             }
 
-            for(TypeReference c : classes) {
+            for (TypeReference c : classes) {
                 if (c instanceof AnonymousClass) {
                     c = c._extends();
-                } 
-                if(c._package()==javaLang) {
+                }
+                if (c._package() == javaLang) {
                     // make sure that there's no other class with this name within the same package
                     Iterator<DefinedClass> itr = enclosingClass._package().classes();
-                    while(itr.hasNext()) {
+                    while (itr.hasNext()) {
                         // even if this is the only "String" class we use,
                         // if the class called "String" is in the same package,
                         // we still need to import it.
                         DefinedClass n = itr.next();
-                        if(n.name().equals(c.name())) {
+                        if (n.name().equals(c.name())) {
                             return true;    //collision
                         }
                     }
                 }
-                if(c.outer()!=null) {
+                if (c.outer() != null) {
                     return true; // avoid importing inner class to work around 6431987. Also see jaxb issue 166
                 }
             }
@@ -572,7 +574,7 @@ public final class Formatter {
         }
 
         public void add(TypeReference clazz) {
-            if(!classes.contains(clazz)) {
+            if (!classes.contains(clazz)) {
                 classes.add(clazz);
             }
         }

@@ -37,15 +37,14 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * 
- *        This type is extended by all types which allow annotation
- *        other than <schema> itself
- *      
- * 
+ * This type is extended by all types which allow annotation
+ * other than <schema> itself
+ * <p/>
+ * <p/>
  * <p>Java class for annotated complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="annotated">
  *   &lt;complexContent>
@@ -59,39 +58,36 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "annotated", propOrder = {
-    "annotation"
+        "annotation"
 })
 @XmlSeeAlso({
-    ExtensionType.class,
-    Element.class,
-    AttributeGroup.class,
-    ComplexType.class,
-    Attribute.class,
-    RestrictionType.class,
-    SimpleType.class,
-    Group.class,
-    SimpleContent.class,
-    List.class,
-    Restriction.class,
-    Facet.class,
-    Wildcard.class,
-    Union.class,
-    Notation.class,
-    Import.class,
-    Include.class,
-    Field.class,
-    Keybase.class,
-    ComplexContent.class,
-    Selector.class
+        ExtensionType.class,
+        Element.class,
+        AttributeGroup.class,
+        ComplexType.class,
+        Attribute.class,
+        RestrictionType.class,
+        SimpleType.class,
+        Group.class,
+        SimpleContent.class,
+        List.class,
+        Restriction.class,
+        Facet.class,
+        Wildcard.class,
+        Union.class,
+        Notation.class,
+        Import.class,
+        Include.class,
+        Field.class,
+        Keybase.class,
+        ComplexContent.class,
+        Selector.class
 })
 public class Annotated
-    extends OpenAttrs
-{
+        extends OpenAttrs {
 
     protected Annotation annotation;
     @XmlAttribute(name = "id")
@@ -102,11 +98,9 @@ public class Annotated
 
     /**
      * Gets the value of the annotation property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Annotation }
-     *     
+     *
+     * @return possible object is
+     *         {@link Annotation }
      */
     public Annotation getAnnotation() {
         return annotation;
@@ -114,11 +108,9 @@ public class Annotated
 
     /**
      * Sets the value of the annotation property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Annotation }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Annotation }
      */
     public void setAnnotation(Annotation value) {
         this.annotation = value;
@@ -126,11 +118,9 @@ public class Annotated
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getId() {
         return id;
@@ -138,11 +128,9 @@ public class Annotated
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setId(String value) {
         this.id = value;

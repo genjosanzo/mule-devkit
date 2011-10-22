@@ -17,15 +17,15 @@
 package org.mule.devkit.doclet;
 
 public class Sorter implements Comparable {
-  public String label;
-  public Object data;
+    public String label;
+    public Object data;
 
-  public Sorter(String l, Object d) {
-    label = l;
-    data = d;
-  }
+    public Sorter(String l, Object d) {
+        label = l;
+        data = d;
+    }
 
-  public int compareTo(Object other) {
-    return label.compareToIgnoreCase(((Sorter) other).label);
-  }
+    public int compareTo(Object other) {
+        return label.compareToIgnoreCase(((Sorter) other).label);
+    }
 }

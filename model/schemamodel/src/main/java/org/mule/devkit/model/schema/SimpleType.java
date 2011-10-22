@@ -38,9 +38,9 @@ import java.util.ArrayList;
 
 /**
  * <p>Java class for simpleType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="simpleType">
  *   &lt;complexContent>
@@ -53,22 +53,19 @@ import java.util.ArrayList;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "simpleType", propOrder = {
-    "restriction",
-    "list",
-    "union"
+        "restriction",
+        "list",
+        "union"
 })
 @XmlSeeAlso({
-    TopLevelSimpleType.class,
-    LocalSimpleType.class
+        TopLevelSimpleType.class,
+        LocalSimpleType.class
 })
 public abstract class SimpleType
-    extends Annotated
-{
+        extends Annotated {
 
     protected Restriction restriction;
     protected List list;
@@ -83,11 +80,9 @@ public abstract class SimpleType
 
     /**
      * Gets the value of the restriction property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Restriction }
-     *     
+     *
+     * @return possible object is
+     *         {@link Restriction }
      */
     public Restriction getRestriction() {
         return restriction;
@@ -95,11 +90,9 @@ public abstract class SimpleType
 
     /**
      * Sets the value of the restriction property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Restriction }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Restriction }
      */
     public void setRestriction(Restriction value) {
         this.restriction = value;
@@ -107,11 +100,9 @@ public abstract class SimpleType
 
     /**
      * Gets the value of the list property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link List }
-     *     
+     *
+     * @return possible object is
+     *         {@link List }
      */
     public List getList() {
         return list;
@@ -119,11 +110,9 @@ public abstract class SimpleType
 
     /**
      * Sets the value of the list property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link List }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link List }
      */
     public void setList(List value) {
         this.list = value;
@@ -131,11 +120,9 @@ public abstract class SimpleType
 
     /**
      * Gets the value of the union property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Union }
-     *     
+     *
+     * @return possible object is
+     *         {@link Union }
      */
     public Union getUnion() {
         return union;
@@ -143,11 +130,9 @@ public abstract class SimpleType
 
     /**
      * Sets the value of the union property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Union }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Union }
      */
     public void setUnion(Union value) {
         this.union = value;
@@ -155,25 +140,23 @@ public abstract class SimpleType
 
     /**
      * Gets the value of the final property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the final property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getFinal().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link String }
-     * 
-     * 
      */
     public java.util.List<String> getFinal() {
         if (_final == null) {
@@ -184,11 +167,9 @@ public abstract class SimpleType
 
     /**
      * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getName() {
         return name;
@@ -196,11 +177,9 @@ public abstract class SimpleType
 
     /**
      * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setName(String value) {
         this.name = value;

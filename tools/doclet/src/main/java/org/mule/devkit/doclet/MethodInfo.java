@@ -675,7 +675,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
         data.setValue(base + ".since.key", SinceTagger.keyForName(getSince()));
         data.setValue(base + ".since.name", getSince());
         ParamTagInfo.makeHDF(data, base + ".paramTags", paramTags());
-        if( containingClass().hasConnectionManager() ) {
+        if (containingClass().hasConnectionManager()) {
             ParamTagInfo.makeHDF(data, base + ".connectionTags", containingClass().connectionTags());
         }
         AttrTagInfo.makeReferenceHDF(data, base + ".attrRefs", comment().attrTags());

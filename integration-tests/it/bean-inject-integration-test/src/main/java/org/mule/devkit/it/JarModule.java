@@ -29,13 +29,12 @@ import java.util.jar.Manifest;
  * @author MuleSoft, Inc.
  */
 @Module(name = "jar")
-public class JarModule
-{
+public class JarModule {
     /**
      * Configurable manifest
      */
-	@Configurable
-	private Manifest manifest;
+    @Configurable
+    private Manifest manifest;
 
     /**
      * Update manifest
@@ -43,12 +42,10 @@ public class JarModule
      * @param manifest Manifest to update
      */
     @Processor
-    public void updateManifest(Manifest manifest)
-    {
+    public void updateManifest(Manifest manifest) {
     }
 
-	public void setManifest(Manifest manifest)
-	{
-		this.manifest = manifest;
-	}
+    public void setManifest(Manifest manifest) {
+        this.manifest = manifest;
+    }
 }

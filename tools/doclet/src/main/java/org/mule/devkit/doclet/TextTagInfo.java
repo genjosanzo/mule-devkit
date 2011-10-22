@@ -17,7 +17,7 @@
 package org.mule.devkit.doclet;
 
 public class TextTagInfo extends TagInfo {
-  TextTagInfo(String n, String k, String t, SourcePositionInfo p) {
-    super(n, k, Doclava.escape(t), p);
-  }
+    TextTagInfo(String n, String k, String t, SourcePositionInfo p) {
+        super(n, k, Doclava.escape(t), p);
+    }
 }

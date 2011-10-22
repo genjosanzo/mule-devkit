@@ -38,9 +38,9 @@ import java.util.List;
 
 /**
  * <p>Java class for Group complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="Group">
  *   &lt;complexContent>
@@ -80,36 +80,34 @@ import java.util.List;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Group", propOrder = {
-    "regexpOrEncodingOrModeSwitch"
+        "regexpOrEncodingOrModeSwitch"
 })
 public class Group {
 
     @XmlElementRefs({
-        @XmlElementRef(name = "string", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "list", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "classname", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "integer", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "url", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "modeSwitch", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "childElement", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "regexp", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "enum", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "transientBoolean", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "password", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "text", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "file", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "path", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "expression", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "encoding", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "boolean", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "name", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "globalRef", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-        @XmlElementRef(name = "long", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class)
+            @XmlElementRef(name = "string", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "list", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "classname", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "integer", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "url", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "modeSwitch", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "childElement", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "regexp", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "enum", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "transientBoolean", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "password", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "text", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "file", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "path", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "expression", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "encoding", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "boolean", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "name", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "globalRef", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "long", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class)
     })
     protected List<JAXBElement<? extends AttributeType>> regexpOrEncodingOrModeSwitch;
     @XmlAttribute(name = "id", required = true)
@@ -129,21 +127,21 @@ public class Group {
 
     /**
      * Gets the value of the regexpOrEncodingOrModeSwitch property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the regexpOrEncodingOrModeSwitch property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getRegexpOrEncodingOrModeSwitch().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link JAXBElement }{@code <}{@link StringAttributeType }{@code >}
      * {@link JAXBElement }{@code <}{@link AttributeType }{@code >}
@@ -165,8 +163,6 @@ public class Group {
      * {@link JAXBElement }{@code <}{@link AttributeType }{@code >}
      * {@link JAXBElement }{@code <}{@link LongType }{@code >}
      * {@link JAXBElement }{@code <}{@link NewType }{@code >}
-     * 
-     * 
      */
     public List<JAXBElement<? extends AttributeType>> getRegexpOrEncodingOrModeSwitch() {
         if (regexpOrEncodingOrModeSwitch == null) {
@@ -177,11 +173,9 @@ public class Group {
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getId() {
         return id;
@@ -189,11 +183,9 @@ public class Group {
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setId(String value) {
         this.id = value;
@@ -201,11 +193,9 @@ public class Group {
 
     /**
      * Gets the value of the mode property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link NewSimpleType }
-     *     
+     *
+     * @return possible object is
+     *         {@link NewSimpleType }
      */
     public NewSimpleType getMode() {
         return mode;
@@ -213,11 +203,9 @@ public class Group {
 
     /**
      * Sets the value of the mode property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link NewSimpleType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link NewSimpleType }
      */
     public void setMode(NewSimpleType value) {
         this.mode = value;
@@ -225,11 +213,9 @@ public class Group {
 
     /**
      * Gets the value of the description property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getDescription() {
         return description;
@@ -237,11 +223,9 @@ public class Group {
 
     /**
      * Sets the value of the description property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDescription(String value) {
         this.description = value;
@@ -249,11 +233,9 @@ public class Group {
 
     /**
      * Gets the value of the versions property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getVersions() {
         return versions;
@@ -261,11 +243,9 @@ public class Group {
 
     /**
      * Sets the value of the versions property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setVersions(String value) {
         this.versions = value;
@@ -273,11 +253,9 @@ public class Group {
 
     /**
      * Gets the value of the topAnchor property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getTopAnchor() {
         return topAnchor;
@@ -285,11 +263,9 @@ public class Group {
 
     /**
      * Sets the value of the topAnchor property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setTopAnchor(String value) {
         this.topAnchor = value;
@@ -297,11 +273,9 @@ public class Group {
 
     /**
      * Gets the value of the bottomAnchor property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getBottomAnchor() {
         return bottomAnchor;
@@ -309,11 +283,9 @@ public class Group {
 
     /**
      * Sets the value of the bottomAnchor property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setBottomAnchor(String value) {
         this.bottomAnchor = value;
@@ -321,11 +293,9 @@ public class Group {
 
     /**
      * Gets the value of the caption property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getCaption() {
         return caption;
@@ -333,11 +303,9 @@ public class Group {
 
     /**
      * Sets the value of the caption property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setCaption(String value) {
         this.caption = value;

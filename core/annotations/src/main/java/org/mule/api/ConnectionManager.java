@@ -22,7 +22,7 @@ import org.mule.config.PoolingProfile;
 /**
  * Wrapper around {@link org.mule.api.annotations.Connector} annotated class that will infuse it with
  * connection management capabilities.
- *
+ * <p/>
  * It can receive a {@link PoolingProfile} which is a configuration object used to
  * define the connection pooling parameters.
  *
@@ -58,7 +58,7 @@ public interface ConnectionManager<K, C> {
      * Return a connection to the pool
      *
      * @param connectorKey Key used to borrow the connector
-     * @param connector connector to be returned to the pool
+     * @param connector    connector to be returned to the pool
      * @throws Exception If the connection cannot be returned
      */
     void releaseConnection(K connectorKey, C connector) throws Exception;
@@ -67,7 +67,7 @@ public interface ConnectionManager<K, C> {
      * Destroy a connection
      *
      * @param connectorKey Key used to borrow the connector
-     * @param connector Connector to be destroyed
+     * @param connector    Connector to be destroyed
      * @throws Exception If the connection could not be destroyed.
      */
     void destroyConnection(K connectorKey, C connector) throws Exception;

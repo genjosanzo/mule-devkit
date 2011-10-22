@@ -25,8 +25,7 @@ import org.mule.api.annotations.lifecycle.Start;
 import javax.annotation.PostConstruct;
 
 @Module(name = "lifecycle")
-public class LifecycleModule
-{
+public class LifecycleModule {
     @Configurable
     private String cycleName;
 
@@ -36,7 +35,7 @@ public class LifecycleModule
 
     @PostConstruct
     public void init() {
-        if( cycleName == null ) {
+        if (cycleName == null) {
             throw new RuntimeException("@PostConstruct before setting variables");
         }
 

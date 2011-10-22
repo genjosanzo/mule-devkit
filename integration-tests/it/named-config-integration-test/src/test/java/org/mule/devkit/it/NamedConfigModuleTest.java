@@ -17,22 +17,18 @@
 
 package org.mule.devkit.it;
 
-public class NamedConfigModuleTest extends AbstractModuleTest
-{
+public class NamedConfigModuleTest extends AbstractModuleTest {
 
     @Override
-    protected String getConfigResources()
-    {
+    protected String getConfigResources() {
         return "nc.xml";
     }
 
-    public void testConfigA() throws Exception
-    {
+    public void testConfigA() throws Exception {
         runFlow("passthruStringFlowConfigA", "mulesoft123");
     }
 
-    public void testConfigB() throws Exception
-    {
+    public void testConfigB() throws Exception {
         runFlow("passthruStringFlowConfigB", "ftw456");
     }
 }

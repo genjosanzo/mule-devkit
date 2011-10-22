@@ -49,13 +49,12 @@ import java.util.List;
 
 /**
  * Represents an arrays as annotation members
- *
- * <p>
+ * <p/>
+ * <p/>
  * This class implements {@link Annotable} to allow
  * new annotations to be added as a member of the array.
  *
- * @author
- *     Bhakti Mehta (bhakti.mehta@sun.com)
+ * @author Bhakti Mehta (bhakti.mehta@sun.com)
  */
 public final class AnnotationArrayMember extends AnnotationValue implements Annotable {
     private final List<AnnotationValue> values = new ArrayList<AnnotationValue>();
@@ -90,7 +89,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
         values.add(annotationValue);
         return this;
     }
-    
+
     /**
      * Adds an array member to this annotation
      *
@@ -103,7 +102,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
         values.add(annotationValue);
         return this;
     }
-    
+
     /**
      * Adds an array member to this annotation
      *
@@ -142,7 +141,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
         values.add(annotationValue);
         return this;
     }
-    
+
     /**
      * Adds an array member to this annotation
      *
@@ -181,7 +180,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
         values.add(annotationValue);
         return this;
     }
-    
+
     /**
      * Adds a enum array member to this annotation
      *
@@ -211,7 +210,7 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
         values.add(annotationValue);
         return this;
     }
-    
+
     /**
      * Adds an expression array member to this annotation
      *
@@ -232,21 +231,21 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
      * @return The AnnotationArrayMember. More elements can be added by calling
      *         the same method multiple times
      */
-    public AnnotationArrayMember param(final Class<?> value){
-       AnnotationValue annotationValue = new AnnotationStringValue(
-    		   new AbstractExpression() {
-      			 public void generate(Formatter f) {
-      				 f.p(value.getName().replace('$', '.'));
-      				 f.p(".class");
-      			}
-      		 });
-       values.add(annotationValue);
-       return this;
-   }
+    public AnnotationArrayMember param(final Class<?> value) {
+        AnnotationValue annotationValue = new AnnotationStringValue(
+                new AbstractExpression() {
+                    public void generate(Formatter f) {
+                        f.p(value.getName().replace('$', '.'));
+                        f.p(".class");
+                    }
+                });
+        values.add(annotationValue);
+        return this;
+    }
 
-    public AnnotationArrayMember param(Type type){
+    public AnnotationArrayMember param(Type type) {
         TypeReference clazz = type.boxify();
-        AnnotationValue annotationValue = new AnnotationStringValue( clazz.dotclass() );
+        AnnotationValue annotationValue = new AnnotationStringValue(clazz.dotclass());
         values.add(annotationValue);
         return this;
     }
@@ -254,46 +253,43 @@ public final class AnnotationArrayMember extends AnnotationValue implements Anno
     /**
      * Adds a new annotation to the array.
      */
-    public AnnotationUse annotate(Class<? extends Annotation> clazz){
+    public AnnotationUse annotate(Class<? extends Annotation> clazz) {
         return annotate(owner.ref(clazz));
     }
 
     /**
      * Adds a new annotation to the array.
      */
-    public AnnotationUse annotate(TypeReference clazz){
+    public AnnotationUse annotate(TypeReference clazz) {
         AnnotationUse a = new AnnotationUse(clazz);
         values.add(a);
         return a;
     }
 
     public <W extends AnnotationWriter> W annotate2(Class<W> clazz) {
-        return TypedAnnotationWriter.create(clazz,this);
+        return TypedAnnotationWriter.create(clazz, this);
     }
-    
+
     /**
      * {@link Annotable#annotations()}
      */
     @SuppressWarnings("unchecked")
-	public Collection<AnnotationUse> annotations() {
+    public Collection<AnnotationUse> annotations() {
         // this invocation is invalid if the caller isn't adding annotations into an array
         // so this potentially type-unsafe conversion would be justified.
-        return Collections.<AnnotationUse>unmodifiableList((List)values);
+        return Collections.<AnnotationUse>unmodifiableList((List) values);
     }
 
     /**
      * Adds an annotation member to this annotation  array
      * This can be used for e.g &#64;XmlCollection(values= &#64;XmlCollectionItem(type=Foo.class))
-     * @param value
-     *        Adds a annotation  to the array member
-     * @return
-     *        The AnnotationArrayMember. More elements can be added by calling
-     *        the same method multiple times
      *
-     * @deprecated
-     *      use {@link #annotate}
+     * @param value Adds a annotation  to the array member
+     * @return The AnnotationArrayMember. More elements can be added by calling
+     *         the same method multiple times
+     * @deprecated use {@link #annotate}
      */
-    public AnnotationArrayMember param (AnnotationUse value ){
+    public AnnotationArrayMember param(AnnotationUse value) {
         values.add(value);
         return this;
     }

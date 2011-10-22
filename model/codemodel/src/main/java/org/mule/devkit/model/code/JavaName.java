@@ -54,14 +54,14 @@ public class JavaName {
      * Checks if a given string is usable as a Java identifier.
      */
     public static boolean isJavaIdentifier(String s) {
-        if(s.length()==0) {
+        if (s.length() == 0) {
             return false;
         }
-        if( reservedKeywords.contains(s) ) {
+        if (reservedKeywords.contains(s)) {
             return false;
         }
 
-        if(!Character.isJavaIdentifierStart(s.charAt(0))) {
+        if (!Character.isJavaIdentifierStart(s.charAt(0))) {
             return false;
         }
 
@@ -85,17 +85,17 @@ public class JavaName {
      * Checks if the given string is a valid Java package name.
      */
     public static boolean isJavaPackageName(String s) {
-        while(s.length()!=0) {
+        while (s.length() != 0) {
             int idx = s.indexOf('.');
-            if(idx==-1) {
+            if (idx == -1) {
                 idx = s.length();
             }
-            if( !isJavaIdentifier(s.substring(0,idx)) ) {
+            if (!isJavaIdentifier(s.substring(0, idx))) {
                 return false;
             }
 
             s = s.substring(idx);
-            if(s.length()!=0) {
+            if (s.length() != 0) {
                 s = s.substring(1);    // remove '.'
             }
         }
@@ -105,22 +105,19 @@ public class JavaName {
     /**
      * <b>Experimental API:</b> converts an English word into a plural form.
      *
-     * @param word
-     *      a word, such as "child", "apple". Must not be null.
-     *      It accepts word concatanation forms
-     *      that are common in programming languages, such as "my_child", "MyChild",
-     *      "myChild", "MY-CHILD", "CODE003-child", etc, and mostly tries to do the right thing.
-     *      ("my_children","MyChildren","myChildren", and "MY-CHILDREN", "CODE003-children" respectively)
-     *      <p>
-     *      Although this method only works for English words, it handles non-English
-     *      words gracefully (by just returning it as-is.) For example, &#x65E5;&#x672C;&#x8A9E;
-     *      will be returned as-is without modified, not "&#x65E5;&#x672C;&#x8A9E;s"
-     *      <p>
-     *      This method doesn't handle suffixes very well. For example, passing
-     *      "person56" will return "person56s", not "people56".
-     *
-     * @return
-     *      always non-null.
+     * @param word a word, such as "child", "apple". Must not be null.
+     *             It accepts word concatanation forms
+     *             that are common in programming languages, such as "my_child", "MyChild",
+     *             "myChild", "MY-CHILD", "CODE003-child", etc, and mostly tries to do the right thing.
+     *             ("my_children","MyChildren","myChildren", and "MY-CHILDREN", "CODE003-children" respectively)
+     *             <p/>
+     *             Although this method only works for English words, it handles non-English
+     *             words gracefully (by just returning it as-is.) For example, &#x65E5;&#x672C;&#x8A9E;
+     *             will be returned as-is without modified, not "&#x65E5;&#x672C;&#x8A9E;s"
+     *             <p/>
+     *             This method doesn't handle suffixes very well. For example, passing
+     *             "person56" will return "person56s", not "people56".
+     * @return always non-null.
      */
     public static String getPluralForm(String word) {
         // remember the casing of the word
@@ -128,9 +125,9 @@ public class JavaName {
 
         // check if the word looks like an English word.
         // if we see non-ASCII characters, abort
-        for(int i=0; i<word.length(); i++ ) {
+        for (int i = 0; i < word.length(); i++) {
             char ch = word.charAt(i);
-            if(ch >=0x80) {
+            if (ch >= 0x80) {
                 return word;
             }
 
@@ -140,8 +137,8 @@ public class JavaName {
 
         for (Entry e : TABLE) {
             String r = e.apply(word);
-            if(r!=null) {
-                if(allUpper) {
+            if (r != null) {
+                if (allUpper) {
                     r = r.toUpperCase();
                 }
                 return r;
@@ -153,72 +150,74 @@ public class JavaName {
     }
 
 
-    /** All reserved keywords of Java. */
+    /**
+     * All reserved keywords of Java.
+     */
     private static HashSet<String> reservedKeywords = new HashSet<String>();
 
     static {
         // see http://java.sun.com/docs/books/tutorial/java/nutsandbolts/_keywords.html
         String[] words = new String[]{
-            "abstract",
-            "boolean",
-            "break",
-            "byte",
-            "case",
-            "catch",
-            "char",
-            "class",
-            "const",
-            "continue",
-            "default",
-            "do",
-            "double",
-            "else",
-            "extends",
-            "final",
-            "finally",
-            "float",
-            "for",
-            "goto",
-            "if",
-            "implements",
-            "import",
-            "instanceof",
-            "int",
-            "interface",
-            "long",
-            "native",
-            "new",
-            "package",
-            "private",
-            "protected",
-            "public",
-            "return",
-            "short",
-            "static",
-            "strictfp",
-            "super",
-            "switch",
-            "synchronized",
-            "this",
-            "throw",
-            "throws",
-            "transient",
-            "try",
-            "void",
-            "volatile",
-            "while",
+                "abstract",
+                "boolean",
+                "break",
+                "byte",
+                "case",
+                "catch",
+                "char",
+                "class",
+                "const",
+                "continue",
+                "default",
+                "do",
+                "double",
+                "else",
+                "extends",
+                "final",
+                "finally",
+                "float",
+                "for",
+                "goto",
+                "if",
+                "implements",
+                "import",
+                "instanceof",
+                "int",
+                "interface",
+                "long",
+                "native",
+                "new",
+                "package",
+                "private",
+                "protected",
+                "public",
+                "return",
+                "short",
+                "static",
+                "strictfp",
+                "super",
+                "switch",
+                "synchronized",
+                "this",
+                "throw",
+                "throws",
+                "transient",
+                "try",
+                "void",
+                "volatile",
+                "while",
 
-            // technically these are not reserved words but they cannot be used as identifiers.
-            "true",
-            "false",
-            "null",
+                // technically these are not reserved words but they cannot be used as identifiers.
+                "true",
+                "false",
+                "null",
 
-            // and I believe assert is also a new keyword
-            "assert",
+                // and I believe assert is also a new keyword
+                "assert",
 
-            // and 5.0 keywords
-            "enum"
-            };
+                // and 5.0 keywords
+                "enum"
+        };
         for (String w : words) {
             reservedKeywords.add(w);
         }
@@ -230,15 +229,15 @@ public class JavaName {
         private final String replacement;
 
         public Entry(String pattern, String replacement) {
-            this.pattern = Pattern.compile(pattern,Pattern.CASE_INSENSITIVE);
+            this.pattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
             this.replacement = replacement;
         }
 
         String apply(String word) {
             Matcher m = pattern.matcher(word);
-            if(m.matches()) {
+            if (m.matches()) {
                 StringBuffer buf = new StringBuffer();
-                m.appendReplacement(buf,replacement);
+                m.appendReplacement(buf, replacement);
                 return buf.toString();
             } else {
                 return null;
@@ -250,35 +249,35 @@ public class JavaName {
 
     static {
         String[] source = {
-              "(.*)child","$1children",
-                 "(.+)fe","$1ves",
-              "(.*)mouse","$1mise",
-                  "(.+)f","$1ves",
-                 "(.+)ch","$1ches",
-                 "(.+)sh","$1shes",
-              "(.*)tooth","$1teeth",
-                 "(.+)um","$1a",
-                 "(.+)an","$1en",
-                "(.+)ato","$1atoes",
-              "(.*)basis","$1bases",
-               "(.*)axis","$1axes",
-                 "(.+)is","$1ises",
-                 "(.+)ss","$1sses",
-                 "(.+)us","$1uses",
-                  "(.+)s","$1s",
-               "(.*)foot","$1feet",
-                 "(.+)ix","$1ixes",
-                 "(.+)ex","$1ices",
-                 "(.+)nx","$1nxes",
-                  "(.+)x","$1xes",
-                  "(.+)y","$1ies",
-                   "(.+)","$1s",
+                "(.*)child", "$1children",
+                "(.+)fe", "$1ves",
+                "(.*)mouse", "$1mise",
+                "(.+)f", "$1ves",
+                "(.+)ch", "$1ches",
+                "(.+)sh", "$1shes",
+                "(.*)tooth", "$1teeth",
+                "(.+)um", "$1a",
+                "(.+)an", "$1en",
+                "(.+)ato", "$1atoes",
+                "(.*)basis", "$1bases",
+                "(.*)axis", "$1axes",
+                "(.+)is", "$1ises",
+                "(.+)ss", "$1sses",
+                "(.+)us", "$1uses",
+                "(.+)s", "$1s",
+                "(.*)foot", "$1feet",
+                "(.+)ix", "$1ixes",
+                "(.+)ex", "$1ices",
+                "(.+)nx", "$1nxes",
+                "(.+)x", "$1xes",
+                "(.+)y", "$1ies",
+                "(.+)", "$1s",
         };
 
-        TABLE = new Entry[source.length/2];
+        TABLE = new Entry[source.length / 2];
 
-        for( int i=0; i<source.length; i+=2 ) {
-            TABLE[i/2] = new Entry(source[i],source[i+1]);
+        for (int i = 0; i < source.length; i += 2) {
+            TABLE[i / 2] = new Entry(source[i], source[i + 1]);
         }
     }
 }

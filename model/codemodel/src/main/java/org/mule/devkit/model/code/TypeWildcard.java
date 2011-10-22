@@ -45,13 +45,13 @@ import java.util.List;
 
 /**
  * Represents a wildcard type like "? extends Foo".
- *
- * <p>
+ * <p/>
+ * <p/>
  * Instances of this class can be obtained from {@link TypeReference#wildcard()}
- *
+ * <p/>
  * TODO: extend this to cover "? super Integer".
- *
- * <p>
+ * <p/>
+ * <p/>
  * Our modeling of types are starting to look really ugly.
  * ideally it should have been done somewhat like APT,
  * but it's too late now.
@@ -68,11 +68,11 @@ final class TypeWildcard extends TypeReference {
     }
 
     public String name() {
-        return "? extends "+bound.name();
+        return "? extends " + bound.name();
     }
 
     public String fullName() {
-        return "? extends "+bound.fullName();
+        return "? extends " + bound.fullName();
     }
 
     public Package _package() {
@@ -81,12 +81,12 @@ final class TypeWildcard extends TypeReference {
 
     /**
      * Returns the class bound of this variable.
-     *
-     * <p>
+     * <p/>
+     * <p/>
      * If no bound is given, this method returns {@link Object}.
      */
     public TypeReference _extends() {
-        if(bound!=null) {
+        if (bound != null) {
             return bound;
         } else {
             return owner().ref(Object.class);
@@ -109,8 +109,8 @@ final class TypeWildcard extends TypeReference {
     }
 
     protected TypeReference substituteParams(TypeVariable[] variables, List<TypeReference> bindings) {
-        TypeReference nb = bound.substituteParams(variables,bindings);
-        if(nb==bound) {
+        TypeReference nb = bound.substituteParams(variables, bindings);
+        if (nb == bound) {
             return this;
         } else {
             return new TypeWildcard(nb);
@@ -118,7 +118,7 @@ final class TypeWildcard extends TypeReference {
     }
 
     public void generate(Formatter f) {
-        if(bound._extends()==null) {
+        if (bound._extends() == null) {
             f.p("?");   // instead of "? extends Object"
         } else {
             f.p("? extends").g(bound);

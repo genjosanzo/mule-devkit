@@ -131,7 +131,7 @@ public class MyModule {
      */
     @Connect
     public void connect(@ConnectionKey String user, String password)
-        throws ConnectionException {
+            throws ConnectionException {
     }
 
     /**

@@ -41,8 +41,6 @@
 package org.mule.devkit.model.code;
 
 
-
-
 /**
  * A field that can have a {@link DocComment} associated with it
  */
@@ -59,30 +57,25 @@ public class FieldVariable extends Variable implements DocCommentable {
     /**
      * FieldVariable constructor
      *
-     * @param type
-     *        Datatype of this variable
-     *
-     * @param name
-     *        Name of this variable
-     *
-     * @param init
-     *        Value to initialize this variable to
+     * @param type Datatype of this variable
+     * @param name Name of this variable
+     * @param init Value to initialize this variable to
      */
     FieldVariable(DefinedClass owner, Modifiers mods, Type type, String name, Expression init) {
-        super( mods, type, name, init );
+        super(mods, type, name, init);
         this.owner = owner;
     }
 
     @Override
     public void name(String name) {
         // make sure that the new name is available
-        if(owner.fields.containsKey(name)) {
+        if (owner.fields.containsKey(name)) {
             throw new IllegalArgumentException("name " + name + " is already in use");
         }
         String oldName = name();
         super.name(name);
         owner.fields.remove(oldName);
-        owner.fields.put(name,this);
+        owner.fields.put(name, this);
     }
 
     /**
@@ -92,19 +85,19 @@ public class FieldVariable extends Variable implements DocCommentable {
      * @return JDocComment containing javadocs for this class
      */
     public DocComment javadoc() {
-        if( jdoc == null ) {
+        if (jdoc == null) {
             jdoc = new DocComment(owner.owner());
         }
         return jdoc;
     }
 
     public void declare(Formatter f) {
-        if( jdoc != null ) {
+        if (jdoc != null) {
             f.g(jdoc);
         }
-        super.declare( f );
+        super.declare(f);
     }
 
-   
+
 }
 

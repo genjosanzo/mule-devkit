@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 /**
  * Marks a field inside a {@link Module} as being configurable. A user will be able to use XML attributes to set this
  * bean properties when using the Module.
- *
+ * <p/>
  * The field must be a Java bean property (ie it needs to have setters and getters matching the field name).
  */
 @Target(ElementType.FIELD)

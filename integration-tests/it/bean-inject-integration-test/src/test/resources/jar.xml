@@ -27,7 +27,7 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
         http://www.mulesoft.org/schema/mule/jar http://www.mulesoft.org/schema/mule/jar/current/mule-jar.xsd">
 
-	<spring:bean id="manifest" class="java.util.jar.Manifest"></spring:bean>
+    <spring:bean id="manifest" class="java.util.jar.Manifest"></spring:bean>
 
     <jar:config manifest-ref="manifest"/>
 

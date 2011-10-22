@@ -51,7 +51,7 @@
     </flow>
 
     <flow name="getPropertyValue">
-        <enums:get-property-value property="LAST_NAME" />
+        <enums:get-property-value property="LAST_NAME"/>
     </flow>
 
 </mule>

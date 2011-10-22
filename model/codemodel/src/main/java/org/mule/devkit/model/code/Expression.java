@@ -43,13 +43,13 @@ package org.mule.devkit.model.code;
 
 /**
  * A Java expression.
- *
- * <p>
+ * <p/>
+ * <p/>
  * Unlike most of CodeModel, JExpressions are built bottom-up (
  * meaning you start from leaves and then gradually build compliated expressions
  * by combining them.)
- *
- * <p>
+ * <p/>
+ * <p/>
  * {@link Expression} defines a series of composer methods,
  * which returns a complicated expression (by often taking other {@link Expression}s
  * as parameters.
@@ -66,6 +66,7 @@ public interface Expression extends Generable {
      * Returns "![this]" from "[this]".
      */
     Expression not();
+
     /**
      * Returns "~[this]" from "[this]".
      */
@@ -121,24 +122,38 @@ public interface Expression extends Generable {
      */
     Expression shrz(Expression right);
 
-    /** Bit-wise AND '&amp;'. */
+    /**
+     * Bit-wise AND '&amp;'.
+     */
     Expression band(Expression right);
 
-    /** Bit-wise OR '|'. */
+    /**
+     * Bit-wise OR '|'.
+     */
     Expression bor(Expression right);
 
-    /** Logical AND '&amp;&amp;'. */
+    /**
+     * Logical AND '&amp;&amp;'.
+     */
     Expression cand(Expression right);
 
-    /** Logical OR '||'. */
+    /**
+     * Logical OR '||'.
+     */
     Expression cor(Expression right);
 
     Expression xor(Expression right);
+
     Expression lt(Expression right);
+
     Expression lte(Expression right);
+
     Expression gt(Expression right);
+
     Expression gte(Expression right);
+
     Expression eq(Expression right);
+
     Expression ne(Expression right);
 
     /**
@@ -148,18 +163,21 @@ public interface Expression extends Generable {
 
     /**
      * Returns "[this].[method]".
-     *
+     * <p/>
      * Arguments shall be added to the returned {@link Invocation} object.
      */
     Invocation invoke(Method method);
 
     /**
      * Returns "[this].[method]".
-     *
+     * <p/>
      * Arguments shall be added to the returned {@link Invocation} object.
      */
     Invocation invoke(String method);
+
     FieldRef ref(Variable field);
+
     FieldRef ref(String field);
+
     ArrayCompRef component(Expression index);
 }

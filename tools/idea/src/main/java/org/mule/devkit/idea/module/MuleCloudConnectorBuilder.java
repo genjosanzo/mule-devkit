@@ -11,7 +11,7 @@ public class MuleCloudConnectorBuilder extends MuleModuleBuilder {
 
     @Override
     public MavenArchetype getArchetype() {
-        return new MavenArchetype("org.mule.tools.devkit", "mule-devkit-archetype-cloud-connector", "1.0-SNAPSHOT", "http://repository.mulesoft.org/releases/", null);
+        return new MavenArchetype("org.mule.tools.devkit", "mule-devkit-archetype-cloud-connector", "3.0-SNAPSHOT", "http://repository.mulesoft.org/releases/", null);
     }
 
     @Override

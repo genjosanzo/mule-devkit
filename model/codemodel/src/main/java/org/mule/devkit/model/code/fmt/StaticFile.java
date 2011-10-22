@@ -47,31 +47,29 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Allows an application to copy a resource file to the output. 
- * 
- * @author
- *     Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
+ * Allows an application to copy a resource file to the output.
+ *
+ * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
 public final class StaticFile extends ResourceFile {
-    
+
     private final ClassLoader classLoader;
     private final String resourceName;
     private final boolean isResource;
 
     public StaticFile(String _resourceName) {
-        this(_resourceName,!_resourceName.endsWith(".java"));
+        this(_resourceName, !_resourceName.endsWith(".java"));
     }
-    
+
     public StaticFile(String _resourceName, boolean isResource) {
-        this( StaticFile.class.getClassLoader(), _resourceName, isResource );
+        this(StaticFile.class.getClassLoader(), _resourceName, isResource);
     }
 
     /**
-     * @param isResource
-     *      false if this is a Java source file. True if this is other resource files.
+     * @param isResource false if this is a Java source file. True if this is other resource files.
      */
     public StaticFile(ClassLoader _classLoader, String _resourceName, boolean isResource) {
-        super(_resourceName.substring(_resourceName.lastIndexOf('/')+1));
+        super(_resourceName.substring(_resourceName.lastIndexOf('/') + 1));
         this.classLoader = _classLoader;
         this.resourceName = _resourceName;
         this.isResource = isResource;
@@ -83,14 +81,14 @@ public final class StaticFile extends ResourceFile {
 
     protected void build(OutputStream os) throws IOException {
         DataInputStream dis = new DataInputStream(classLoader.getResourceAsStream(resourceName));
-        
+
         byte[] buf = new byte[256];
         int sz;
-        while( (sz=dis.read(buf))>0 ) {
+        while ((sz = dis.read(buf)) > 0) {
             os.write(buf, 0, sz);
         }
-        
+
         dis.close();
     }
-    
+
 }

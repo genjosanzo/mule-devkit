@@ -30,121 +30,122 @@ import java.util.Map;
  * against when overlapping content is discovered.
  */
 public final class FederationTagger {
-  private final Map<String, URL> federatedUrls = new HashMap<String, URL>();
-  private final Map<String, String> federatedXmls = new HashMap<String, String>();
-  private final List<FederatedSite> federatedSites = new ArrayList<FederatedSite>();
-  private boolean initialized = false;
-  /**
-   * Adds a Doclava documentation site for federation. Accepts the base URL of
-   * the remote API.
-   */
-  public void addSiteUrl(String name, URL site) {
-    federatedUrls.put(name, site);
-  }
-  
-  public void addSiteXml(String name, String file) {
-    federatedXmls.put(name, file);
-  }
-  
-  public void tagAll(ClassInfo[] classDocs) {
-    initialize();
-    for (FederatedSite site : federatedSites) {
-      applyFederation(site, classDocs);
+    private final Map<String, URL> federatedUrls = new HashMap<String, URL>();
+    private final Map<String, String> federatedXmls = new HashMap<String, String>();
+    private final List<FederatedSite> federatedSites = new ArrayList<FederatedSite>();
+    private boolean initialized = false;
+
+    /**
+     * Adds a Doclava documentation site for federation. Accepts the base URL of
+     * the remote API.
+     */
+    public void addSiteUrl(String name, URL site) {
+        federatedUrls.put(name, site);
     }
-  }
-  
-  private void initialize() {
-    if (initialized) {
-      return;
+
+    public void addSiteXml(String name, String file) {
+        federatedXmls.put(name, file);
     }
-    
-    for (String name : federatedXmls.keySet()) {
-      if (!federatedUrls.containsKey(name)) {
-        Errors.error(Errors.NO_FEDERATION_DATA, null, "Unknown documentation site for " + name);
-      }
-    }
-    
-    for (String name : federatedUrls.keySet()) {
-      try {
-        if (federatedXmls.containsKey(name)) {
-          federatedSites.add(new FederatedSite(name, federatedUrls.get(name),
-              federatedXmls.get(name)));
-        } else {
-          federatedSites.add(new FederatedSite(name, federatedUrls.get(name)));
+
+    public void tagAll(ClassInfo[] classDocs) {
+        initialize();
+        for (FederatedSite site : federatedSites) {
+            applyFederation(site, classDocs);
         }
-      } catch (ApiParseException e) {
-        String error = "Could not add site for federation: " + name;
-        if (e.getMessage() != null) {
-          error += ": " + e.getMessage();
+    }
+
+    private void initialize() {
+        if (initialized) {
+            return;
         }
-        Errors.error(Errors.NO_FEDERATION_DATA, null, error);
-      }
-    }
-    
-    initialized = true;
-  }
-  
-  private void applyFederation(FederatedSite federationSource, ClassInfo[] classDocs) {
-    for (ClassInfo classDoc : classDocs) {
-      // Make sure we're not referencing a class outside of our documentation scope
-      if (classDoc.containingPackage() == null || classDoc.containingPackage().name() == null) {
-    	  continue;
-      }
 
-      PackageInfo packageSpec
-          = federationSource.apiInfo().getPackages().get(classDoc.containingPackage().name());
-
-      if (packageSpec == null) {
-    	  continue;
-      }
-
-      ClassInfo classSpec = packageSpec.allClasses().get(classDoc.name());
-      
-      if (classSpec == null) {
-        continue;
-      }
-
-      federateMethods(federationSource, classSpec, classDoc);
-      federateConstructors(federationSource, classSpec, classDoc);
-      federateFields(federationSource, classSpec, classDoc);
-      federateClass(federationSource, classDoc);
-      federatePackage(federationSource, classDoc.containingPackage());
-    }
-  }
-
-  private void federateMethods(FederatedSite site, ClassInfo federatedClass, ClassInfo localClass) {
-    for (MethodInfo method : localClass.methods()) {
-      for (ClassInfo superclass : federatedClass.hierarchy()) {
-        if (superclass.allMethods().containsKey(method.getHashableName())) {
-          method.addFederatedReference(site);
-          break;
+        for (String name : federatedXmls.keySet()) {
+            if (!federatedUrls.containsKey(name)) {
+                Errors.error(Errors.NO_FEDERATION_DATA, null, "Unknown documentation site for " + name);
+            }
         }
-      }
+
+        for (String name : federatedUrls.keySet()) {
+            try {
+                if (federatedXmls.containsKey(name)) {
+                    federatedSites.add(new FederatedSite(name, federatedUrls.get(name),
+                            federatedXmls.get(name)));
+                } else {
+                    federatedSites.add(new FederatedSite(name, federatedUrls.get(name)));
+                }
+            } catch (ApiParseException e) {
+                String error = "Could not add site for federation: " + name;
+                if (e.getMessage() != null) {
+                    error += ": " + e.getMessage();
+                }
+                Errors.error(Errors.NO_FEDERATION_DATA, null, error);
+            }
+        }
+
+        initialized = true;
     }
-  }
-  
-  private void federateConstructors(FederatedSite site, ClassInfo federatedClass,
-      ClassInfo localClass) {
-    for (MethodInfo constructor : localClass.constructors()) {
-      if (federatedClass.hasConstructor(constructor)) {
-        constructor.addFederatedReference(site);
-      }
+
+    private void applyFederation(FederatedSite federationSource, ClassInfo[] classDocs) {
+        for (ClassInfo classDoc : classDocs) {
+            // Make sure we're not referencing a class outside of our documentation scope
+            if (classDoc.containingPackage() == null || classDoc.containingPackage().name() == null) {
+                continue;
+            }
+
+            PackageInfo packageSpec
+                    = federationSource.apiInfo().getPackages().get(classDoc.containingPackage().name());
+
+            if (packageSpec == null) {
+                continue;
+            }
+
+            ClassInfo classSpec = packageSpec.allClasses().get(classDoc.name());
+
+            if (classSpec == null) {
+                continue;
+            }
+
+            federateMethods(federationSource, classSpec, classDoc);
+            federateConstructors(federationSource, classSpec, classDoc);
+            federateFields(federationSource, classSpec, classDoc);
+            federateClass(federationSource, classDoc);
+            federatePackage(federationSource, classDoc.containingPackage());
+        }
     }
-  }
-  
-  private void federateFields(FederatedSite site, ClassInfo federatedClass, ClassInfo localClass) {
-    for (FieldInfo field : localClass.fields()) {
-      if (federatedClass.allFields().containsKey(field.name())) {
-        field.addFederatedReference(site);
-      }
+
+    private void federateMethods(FederatedSite site, ClassInfo federatedClass, ClassInfo localClass) {
+        for (MethodInfo method : localClass.methods()) {
+            for (ClassInfo superclass : federatedClass.hierarchy()) {
+                if (superclass.allMethods().containsKey(method.getHashableName())) {
+                    method.addFederatedReference(site);
+                    break;
+                }
+            }
+        }
     }
-  }
-  
-  private void federateClass(FederatedSite source, ClassInfo doc) {
-    doc.addFederatedReference(source);
-  }
-  
-  private void federatePackage(FederatedSite source, PackageInfo pkg) {
-    pkg.addFederatedReference(source);
-  }
+
+    private void federateConstructors(FederatedSite site, ClassInfo federatedClass,
+                                      ClassInfo localClass) {
+        for (MethodInfo constructor : localClass.constructors()) {
+            if (federatedClass.hasConstructor(constructor)) {
+                constructor.addFederatedReference(site);
+            }
+        }
+    }
+
+    private void federateFields(FederatedSite site, ClassInfo federatedClass, ClassInfo localClass) {
+        for (FieldInfo field : localClass.fields()) {
+            if (federatedClass.allFields().containsKey(field.name())) {
+                field.addFederatedReference(site);
+            }
+        }
+    }
+
+    private void federateClass(FederatedSite source, ClassInfo doc) {
+        doc.addFederatedReference(source);
+    }
+
+    private void federatePackage(FederatedSite source, PackageInfo pkg) {
+        pkg.addFederatedReference(source);
+    }
 }

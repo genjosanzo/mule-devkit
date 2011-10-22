@@ -29,7 +29,7 @@ public class PoolModuleTest extends AbstractModuleTest {
     }
 
     public void testEnsureCapability() throws Exception {
-        Capabilities capabilities = (Capabilities)AbstractMuleTestCase.muleContext.getRegistry().lookupObject("poolConfig");
+        Capabilities capabilities = (Capabilities) AbstractMuleTestCase.muleContext.getRegistry().lookupObject("poolConfig");
 
         assertTrue(capabilities.isCapableOf(Capability.POOLING_CAPABLE));
     }
@@ -43,8 +43,7 @@ public class PoolModuleTest extends AbstractModuleTest {
         runFlow("count");
     }
 
-        public void testTransformer() throws Exception
-    {
+    public void testTransformer() throws Exception {
         runFlowWithPayload("transform", 'm', "mulesoft");
     }
 }

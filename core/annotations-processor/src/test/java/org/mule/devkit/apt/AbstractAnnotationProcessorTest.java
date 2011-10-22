@@ -56,12 +56,11 @@ public abstract class AbstractAnnotationProcessorTest {
     /**
      * Attempts to compile the given compilation units using the Java Compiler
      * API.
-     * <p>
+     * <p/>
      * The compilation units and all their dependencies are expected to be on
      * the classpath.
      *
-     * @param compilationUnits
-     *            the classes to compile
+     * @param compilationUnits the classes to compile
      * @return the {@link Diagnostic diagnostics} returned by the compilation,
      *         as demonstrated in the documentation for {@link JavaCompiler}
      * @see #compileTestCase(String...)
@@ -86,16 +85,14 @@ public abstract class AbstractAnnotationProcessorTest {
 
     /**
      * Attempts to compile the given compilation units using the Java Compiler API.
-     * <p>
+     * <p/>
      * The compilation units and all their dependencies are expected to be on the classpath.
      *
-     * @param compilationUnitPaths
-     *            the paths of the source files to compile, as would be expected
-     *            by {@link ClassLoader#getResource(String)}
+     * @param compilationUnitPaths the paths of the source files to compile, as would be expected
+     *                             by {@link ClassLoader#getResource(String)}
      * @return the {@link Diagnostic diagnostics} returned by the compilation,
      *         as demonstrated in the documentation for {@link JavaCompiler}
      * @see #compileTestCase(Class...)
-     *
      */
     protected List<Diagnostic<? extends JavaFileObject>> compileTestCase(
             String... compilationUnitPaths) {
@@ -113,9 +110,9 @@ public abstract class AbstractAnnotationProcessorTest {
         }
 
         DiagnosticCollector<JavaFileObject> diagnosticCollector =
-            new DiagnosticCollector<JavaFileObject>();
+                new DiagnosticCollector<JavaFileObject>();
         StandardJavaFileManager fileManager =
-            COMPILER.getStandardFileManager(diagnosticCollector, null, null);
+                COMPILER.getStandardFileManager(diagnosticCollector, null, null);
 
         /*
          * Call the compiler with the "-proc:only" option. The "class names"
@@ -135,7 +132,8 @@ public abstract class AbstractAnnotationProcessorTest {
 
         try {
             fileManager.close();
-        } catch (IOException exception) {}
+        } catch (IOException exception) {
+        }
 
         return diagnosticCollector.getDiagnostics();
     }
@@ -154,8 +152,7 @@ public abstract class AbstractAnnotationProcessorTest {
      * Asserts that the compilation produced no errors, i.e. no diagnostics of
      * type {@link Kind#ERROR}.
      *
-     * @param diagnostics
-     *            the result of the compilation
+     * @param diagnostics the result of the compilation
      * @see #assertCompilationReturned(Kind, long, List)
      * @see #assertCompilationReturned(Kind[], long[], List)
      */
@@ -173,15 +170,12 @@ public abstract class AbstractAnnotationProcessorTest {
      * Asserts that the compilation produced results of the following
      * {@link Kind Kinds} at the given line numbers, where the <em>n</em>th kind
      * is expected at the <em>n</em>th line number.
-     * <p>
+     * <p/>
      * Does not check that these is the <em>only</em> diagnostic kinds returned!
      *
-     * @param expectedDiagnosticKinds
-     *            the kinds of diagnostic expected
-     * @param expectedLineNumbers
-     *            the line numbers at which the diagnostics are expected
-     * @param diagnostics
-     *            the result of the compilation
+     * @param expectedDiagnosticKinds the kinds of diagnostic expected
+     * @param expectedLineNumbers     the line numbers at which the diagnostics are expected
+     * @param diagnostics             the result of the compilation
      * @see #assertCompilationSuccessful(List)
      * @see #assertCompilationReturned(Kind, long, List)
      */
@@ -193,7 +187,7 @@ public abstract class AbstractAnnotationProcessorTest {
 
         for (int i = 0; i < expectedDiagnosticKinds.length; i++) {
             assertCompilationReturned(expectedDiagnosticKinds[i], expectedLineNumbers[i],
-                                      diagnostics);
+                    diagnostics);
         }
 
     }
@@ -201,15 +195,12 @@ public abstract class AbstractAnnotationProcessorTest {
     /**
      * Asserts that the compilation produced a result of the following
      * {@link Kind} at the given line number.
-     * <p>
+     * <p/>
      * Does not check that this is the <em>only</em> diagnostic kind returned!
      *
-     * @param expectedDiagnosticKind
-     *            the kind of diagnostic expected
-     * @param expectedLineNumber
-     *            the line number at which the diagnostic is expected
-     * @param diagnostics
-     *            the result of the compilation
+     * @param expectedDiagnosticKind the kind of diagnostic expected
+     * @param expectedLineNumber     the line number at which the diagnostic is expected
+     * @param diagnostics            the result of the compilation
      * @see #assertCompilationSuccessful(List)
      * @see #assertCompilationReturned(Kind[], long[], List)
      */
@@ -229,7 +220,7 @@ public abstract class AbstractAnnotationProcessorTest {
         }
 
         assertTrue("Expected a result of kind " + expectedDiagnosticKind
-                   + " at line " + expectedLineNumber, expectedDiagnosticFound);
+                + " at line " + expectedLineNumber, expectedDiagnosticFound);
     }
 
 }

@@ -54,62 +54,80 @@ import java.util.TreeSet;
 
 /**
  * A generated Java class/interface/enum/....
- *
- * <p>
+ * <p/>
+ * <p/>
  * This class models a declaration, and since a declaration can be always
  * used as a reference, it inherits {@link TypeReference}.
- *
+ * <p/>
  * <h2>Where to go from here?</h2>
- * <p>
+ * <p/>
  * You'd want to generate fields and methods on a class.
  * See {@link #method(int, Type, String)} and {@link #field(int, Type, String)}.
  */
 public class DefinedClass
-    extends TypeReference
-    implements Declaration, ClassContainer, Generifiable, Annotable, DocCommentable {
+        extends TypeReference
+        implements Declaration, ClassContainer, Generifiable, Annotable, DocCommentable {
 
-    /** Name of this class. Null if anonymous. */
+    /**
+     * Name of this class. Null if anonymous.
+     */
     private String name = null;
-    
-    /** Modifiers for the class declaration */
+
+    /**
+     * Modifiers for the class declaration
+     */
     private Modifiers mods;
 
-    /** Name of the super class of this class. */
+    /**
+     * Name of the super class of this class.
+     */
     private TypeReference superClass;
 
-    /** List of interfaces that this class implements */
+    /**
+     * List of interfaces that this class implements
+     */
     private final Set<TypeReference> interfaces = new TreeSet<TypeReference>();
 
-    /** Fields keyed by their names. */
-    /*package*/ final Map<String,FieldVariable> fields = new LinkedHashMap<String,FieldVariable>();
+    /**
+     * Fields keyed by their names.
+     */
+    /*package*/ final Map<String, FieldVariable> fields = new LinkedHashMap<String, FieldVariable>();
 
-    /** Static initializer, if this class has one */
+    /**
+     * Static initializer, if this class has one
+     */
     private Block init = null;
 
-    /** class javadoc */
+    /**
+     * class javadoc
+     */
     private DocComment jdoc = null;
 
-    /** Set of constructors for this class, if any */
+    /**
+     * Set of constructors for this class, if any
+     */
     private final List<Method> constructors = new ArrayList<Method>();
 
-    /** Set of methods that are members of this class */
+    /**
+     * Set of methods that are members of this class
+     */
     private final List<Method> methods = new ArrayList<Method>();
 
     /**
      * Nested classes as a map from name to DefinedClass.
      * The name is all capitalized in a case sensitive file system
      * ({@link CodeModel#isCaseSensitiveFileSystem}) to avoid conflicts.
-     *
+     * <p/>
      * Lazily created to save footprint.
      *
      * @see #getClasses()
      */
-    private Map<String,DefinedClass> classes;
+    private Map<String, DefinedClass> classes;
 
 
     /**
      * Flag that controls whether this class should be really generated or not.
-     * 
+     * <p/>
      * Sometimes it is useful to generate code that refers to class X,
      * without actually generating the code of X.
      * This flag is used to surpress X.java file in the output.
@@ -134,25 +152,25 @@ public class DefinedClass
      */
     private ClassContainer outer = null;
 
-    
-    /** Default value is class or interface
-     *  or annotationTypeDeclaration
-     *  or enum
-     * 
+
+    /**
+     * Default value is class or interface
+     * or annotationTypeDeclaration
+     * or enum
      */
     private final ClassType classType;
-    
+
     /** List containing the enum value declarations
-     *  
+     *
      */
 //    private List enumValues = new ArrayList();
-    
+
     /**
      * Set of enum constants that are keyed by names.
      * In Java, enum constant order is actually significant,
      * because of order ID they get. So let's preserve the order.
      */
-    private final Map<String,EnumConstant> enumConstantsByName = new LinkedHashMap<String,EnumConstant>();
+    private final Map<String, EnumConstant> enumConstantsByName = new LinkedHashMap<String, EnumConstant>();
 
     /**
      * Annotations on this variable. Lazily created.
@@ -182,23 +200,20 @@ public class DefinedClass
             String name) {
         this(mods, name, null, owner);
     }
-    
+
     private DefinedClass(
             int mods,
             String name,
             ClassContainer parent,
             CodeModel owner) {
-    	this (mods,name,parent,owner,ClassType.CLASS);
+        this(mods, name, parent, owner, ClassType.CLASS);
     }
 
     /**
      * TypeReference constructor
      *
-     * @param mods
-     *        Modifiers for this class declaration
-     *
-     * @param name
-     *        Name of this class
+     * @param mods Modifiers for this class declaration
+     * @param name Name of this class
      */
     private DefinedClass(
             int mods,
@@ -208,27 +223,27 @@ public class DefinedClass
             ClassType classTypeVal) {
         super(owner);
 
-        if(name!=null) {
+        if (name != null) {
             if (name.trim().length() == 0) {
                 throw new IllegalArgumentException("TypeReference name empty");
             }
-    
+
             if (!Character.isJavaIdentifierStart(name.charAt(0))) {
                 String msg =
-                    "TypeReference name "
-                        + name
-                        + " contains illegal character"
-                        + " for beginning of identifier: "
-                        + name.charAt(0);
+                        "TypeReference name "
+                                + name
+                                + " contains illegal character"
+                                + " for beginning of identifier: "
+                                + name.charAt(0);
                 throw new IllegalArgumentException(msg);
             }
             for (int i = 1; i < name.length(); i++) {
                 if (!Character.isJavaIdentifierPart(name.charAt(i))) {
                     String msg =
-                        "TypeReference name "
-                            + name
-                            + " contains illegal character "
-                            + name.charAt(i);
+                            "TypeReference name "
+                                    + name
+                                    + " contains illegal character "
+                                    + name.charAt(i);
                     throw new IllegalArgumentException(msg);
                 }
             }
@@ -256,13 +271,11 @@ public class DefinedClass
     /**
      * This class extends the specifed class.
      *
-     * @param superClass
-     *        Superclass for this class
-     *
+     * @param superClass Superclass for this class
      * @return This class
      */
     public DefinedClass _extends(TypeReference superClass) {
-        if (this.classType==ClassType.INTERFACE) {
+        if (this.classType == ClassType.INTERFACE) {
             if (superClass.isInterface()) {
                 return this._implements(superClass);
             } else {
@@ -272,14 +285,14 @@ public class DefinedClass
         if (superClass == null) {
             throw new NullPointerException();
         }
-        
-        for( TypeReference o=superClass.outer(); o!=null; o=o.outer() ){
-            if(this==o){
+
+        for (TypeReference o = superClass.outer(); o != null; o = o.outer()) {
+            if (this == o) {
                 throw new IllegalArgumentException("Illegal class inheritance loop." +
-                "  Outer class " + this.name + " may not subclass from inner class: " + o.name());
+                        "  Outer class " + this.name + " may not subclass from inner class: " + o.name());
             }
         }
-        
+
         this.superClass = superClass;
         return this;
     }
@@ -292,7 +305,7 @@ public class DefinedClass
      * Returns the class extended by this class.
      */
     public TypeReference _extends() {
-        if(superClass==null) {
+        if (superClass == null) {
             superClass = owner().ref(Object.class);
         }
         return superClass;
@@ -301,9 +314,7 @@ public class DefinedClass
     /**
      * This class implements the specifed interface.
      *
-     * @param iface
-     *        Interface that this class implements
-     *
+     * @param iface Interface that this class implements
      * @return This class
      */
     public DefinedClass _implements(TypeReference iface) {
@@ -325,8 +336,8 @@ public class DefinedClass
 
     /**
      * TypeReference name accessor.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, for <code>java.util.List</code>, this method
      * returns <code>"List"</code>"
      *
@@ -335,18 +346,16 @@ public class DefinedClass
     public String name() {
         return name;
     }
-    
+
     /**
      * If the named enum already exists, the reference to it is returned.
      * Otherwise this method generates a new enum reference with the given
      * name and returns it.
      *
-     * @param name
-     *  	The name of the constant.
-     * @return
-     *      The generated type-safe enum constant.
+     * @param name The name of the constant.
+     * @return The generated type-safe enum constant.
      */
-    public EnumConstant enumConstant(String name){
+    public EnumConstant enumConstant(String name) {
         EnumConstant ec = enumConstantsByName.get(name);
         if (null == ec) {
             ec = new EnumConstant(this, name);
@@ -381,7 +390,7 @@ public class DefinedClass
     }
 
     public boolean isInterface() {
-        return this.classType==ClassType.INTERFACE;
+        return this.classType == ClassType.INTERFACE;
     }
 
     public boolean isAbstract() {
@@ -391,15 +400,9 @@ public class DefinedClass
     /**
      * Adds a field to the list of field members of this DefinedClass.
      *
-     * @param mods
-     *        Modifiers for this field
-     *
-     * @param type
-     *        Type of this field
-     *
-     * @param name
-     *        Name of this field
-     *
+     * @param mods Modifiers for this field
+     * @param type Type of this field
+     * @param name Name of this field
      * @return Newly generated field
      */
     public FieldVariable field(int mods, Type type, String name) {
@@ -413,99 +416,81 @@ public class DefinedClass
     /**
      * Adds a field to the list of field members of this DefinedClass.
      *
-     * @param mods
-     *        Modifiers for this field.
-     * @param type
-     *        Type of this field.
-     * @param name
-     *        Name of this field.
-     * @param init
-     *        Initial value of this field.
-     *
+     * @param mods Modifiers for this field.
+     * @param type Type of this field.
+     * @param name Name of this field.
+     * @param init Initial value of this field.
      * @return Newly generated field
      */
     public FieldVariable field(
-        int mods,
-        Type type,
-        String name,
-        Expression init) {
+            int mods,
+            Type type,
+            String name,
+            Expression init) {
         FieldVariable f = new FieldVariable(this, Modifiers.forField(mods), type, name, init);
 
         if (fields.containsKey(name)) {
-            throw new IllegalArgumentException("trying to create the same field twice: "+name);
+            throw new IllegalArgumentException("trying to create the same field twice: " + name);
         }
-        
+
         fields.put(name, f);
         return f;
     }
 
-    /**  This method indicates if the interface
-     *   is an annotationTypeDeclaration
-     *
+    /**
+     * This method indicates if the interface
+     * is an annotationTypeDeclaration
      */
     public boolean isAnnotationTypeDeclaration() {
-        return this.classType==ClassType.ANNOTATION_TYPE_DECL;
-        
+        return this.classType == ClassType.ANNOTATION_TYPE_DECL;
+
 
     }
 
     /**
      * Add an annotationType Declaration to this package
-     * @param name
-     *      Name of the annotation Type declaration to be added to this package
-     * @return
-     *      newly created Annotation Type Declaration
-     * @exception ClassAlreadyExistsException
-     *      When the specified class/interface was already created.
-     
+     *
+     * @param name Name of the annotation Type declaration to be added to this package
+     * @return newly created Annotation Type Declaration
+     * @throws ClassAlreadyExistsException When the specified class/interface was already created.
      */
     public DefinedClass _annotationTypeDeclaration(String name) throws ClassAlreadyExistsException {
-    	return _class (Modifier.PUBLIC,name,ClassType.ANNOTATION_TYPE_DECL);
+        return _class(Modifier.PUBLIC, name, ClassType.ANNOTATION_TYPE_DECL);
     }
-   
+
     /**
      * Add a public enum to this package
-     * @param name
-     *      Name of the enum to be added to this package
-     * @return
-     *      newly created Enum
-     * @exception ClassAlreadyExistsException
-     *      When the specified class/interface was already created.
-     
+     *
+     * @param name Name of the enum to be added to this package
+     * @return newly created Enum
+     * @throws ClassAlreadyExistsException When the specified class/interface was already created.
      */
-    public DefinedClass _enum (String name) throws ClassAlreadyExistsException {
-    	return _class (Modifier.PUBLIC,name,ClassType.ENUM);
+    public DefinedClass _enum(String name) throws ClassAlreadyExistsException {
+        return _class(Modifier.PUBLIC, name, ClassType.ENUM);
     }
-    
+
     /**
      * Add a public enum to this package
-     * @param name
-     *      Name of the enum to be added to this package
-     * @param mods
-     * 		Modifiers for this enum declaration
-     * @return
-     *      newly created Enum
-     * @exception ClassAlreadyExistsException
-     *      When the specified class/interface was already created.
-     
+     *
+     * @param name Name of the enum to be added to this package
+     * @param mods Modifiers for this enum declaration
+     * @return newly created Enum
+     * @throws ClassAlreadyExistsException When the specified class/interface was already created.
      */
-    public DefinedClass _enum (int mods,String name) throws ClassAlreadyExistsException {
-    	return _class (mods,name,ClassType.ENUM);
+    public DefinedClass _enum(int mods, String name) throws ClassAlreadyExistsException {
+        return _class(mods, name, ClassType.ENUM);
     }
-    
-    
 
-    
 
-    public ClassType getClassType(){
+    public ClassType getClassType() {
         return this.classType;
     }
-    
+
     public FieldVariable field(
-        int mods,
-        Class<?> type,
-        String name,
-        Expression init) {
+            int mods,
+            Class<?> type,
+            String name,
+            Expression init) {
         return field(mods, owner()._ref(type), name, init);
     }
 
@@ -515,18 +500,17 @@ public class DefinedClass
      *
      * @return always non-null.
      */
-    public Map<String,FieldVariable> fields() {
+    public Map<String, FieldVariable> fields() {
         return Collections.unmodifiableMap(fields);
     }
 
     /**
      * Removes a {@link FieldVariable} from this class.
      *
-     * @throws IllegalArgumentException
-     *      if the given field is not a field on this class. 
+     * @throws IllegalArgumentException if the given field is not a field on this class.
      */
     public void removeField(FieldVariable field) {
-        if(fields.remove(field.name())!=field) {
+        if (fields.remove(field.name()) != field) {
             throw new IllegalArgumentException();
         }
     }
@@ -547,8 +531,7 @@ public class DefinedClass
     /**
      * Adds a constructor to this class.
      *
-     * @param mods
-     *        Modifiers for this constructor
+     * @param mods Modifiers for this constructor
      */
     public Method constructor(int mods) {
         Method c = new Method(mods, this);
@@ -566,9 +549,8 @@ public class DefinedClass
     /**
      * Looks for a method that has the specified method signature
      * and return it.
-     * 
-     * @return
-     *      null if not found.
+     *
+     * @return null if not found.
      */
     public Method getConstructor(Type[] argTypes) {
         for (Method m : constructors) {
@@ -582,15 +564,9 @@ public class DefinedClass
     /**
      * Add a method to the list of method members of this DefinedClass instance.
      *
-     * @param mods
-     *        Modifiers for this method
-     *
-     * @param type
-     *        Return type for this method
-     *
-     * @param name
-     *        Name of the method
-     *
+     * @param mods Modifiers for this method
+     * @param type Return type for this method
+     * @param name Name of the method
      * @return Newly generated Method
      */
     public Method method(int mods, Type type, String name) {
@@ -618,9 +594,8 @@ public class DefinedClass
     /**
      * Looks for a method that has the specified method signature
      * and return it.
-     * 
-     * @return
-     *      null if not found.
+     *
+     * @return null if not found.
      */
     public Method getMethod(String name, Type[] argTypes) {
         for (Method m : methods) {
@@ -638,24 +613,24 @@ public class DefinedClass
     public boolean isClass() {
         return true;
     }
+
     public boolean isPackage() {
         return false;
     }
-    public Package getPackage() { return parentContainer().getPackage(); }
+
+    public Package getPackage() {
+        return parentContainer().getPackage();
+    }
 
     /**
      * Add a new nested class to this class.
      *
-     * @param mods
-     *        Modifiers for this class declaration
-     *
-     * @param name
-     *        Name of class to be added to this package
-     *
+     * @param mods Modifiers for this class declaration
+     * @param name Name of class to be added to this package
      * @return Newly generated class
      */
     public DefinedClass _class(int mods, String name)
-        throws ClassAlreadyExistsException {
+            throws ClassAlreadyExistsException {
         return _class(mods, name, ClassType.CLASS);
     }
 
@@ -665,11 +640,11 @@ public class DefinedClass
      * @deprecated
      */
     public DefinedClass _class(int mods, String name, boolean isInterface) throws ClassAlreadyExistsException {
-    	return _class(mods,name,isInterface?ClassType.INTERFACE:ClassType.CLASS);
+        return _class(mods, name, isInterface ? ClassType.INTERFACE : ClassType.CLASS);
     }
 
     public DefinedClass _class(int mods, String name, ClassType classTypeVal)
-        throws ClassAlreadyExistsException {
+            throws ClassAlreadyExistsException {
 
         String NAME;
         if (CodeModel.isCaseSensitiveFileSystem) {
@@ -683,7 +658,7 @@ public class DefinedClass
         } else {
             // XXX problems caught in the NC constructor
             DefinedClass c = new DefinedClass(this, mods, name, classTypeVal);
-            getClasses().put(NAME,c);
+            getClasses().put(NAME, c);
             return c;
         }
     }
@@ -692,10 +667,9 @@ public class DefinedClass
      * Add a new public nested class to this class.
      */
     public DefinedClass _class(String name) {
-        try
-        {
+        try {
             return _class(Modifier.PUBLIC, name);
-        } catch( ClassAlreadyExistsException caee ) {
+        } catch (ClassAlreadyExistsException caee) {
             return caee.getExistingClass();
         }
     }
@@ -703,16 +677,12 @@ public class DefinedClass
     /**
      * Add an interface to this package.
      *
-     * @param mods
-     *        Modifiers for this interface declaration
-     *
-     * @param name
-     *        Name of interface to be added to this package
-     *
+     * @param mods Modifiers for this interface declaration
+     * @param name Name of interface to be added to this package
      * @return Newly generated interface
      */
     public DefinedClass _interface(int mods, String name)
-        throws ClassAlreadyExistsException {
+            throws ClassAlreadyExistsException {
         return _class(mods, name, ClassType.INTERFACE);
     }
 
@@ -720,7 +690,7 @@ public class DefinedClass
      * Adds a public interface to this package.
      */
     public DefinedClass _interface(String name)
-        throws ClassAlreadyExistsException {
+            throws ClassAlreadyExistsException {
         return _interface(Modifier.PUBLIC, name);
     }
 
@@ -740,8 +710,8 @@ public class DefinedClass
     /**
      * Mark this file as hidden, so that this file won't be
      * generated.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This feature could be used to generate code that refers
      * to class X, without actually generating X.java.
      */
@@ -758,15 +728,15 @@ public class DefinedClass
      * class.
      */
     public final Iterator<DefinedClass> classes() {
-        if(classes==null) {
+        if (classes == null) {
             return Collections.<DefinedClass>emptyList().iterator();
         } else {
             return classes.values().iterator();
         }
     }
 
-    private Map<String,DefinedClass> getClasses() {
-        if(classes==null) {
+    private Map<String, DefinedClass> getClasses() {
+        if (classes == null) {
             classes = new TreeMap<String, DefinedClass>();
         }
         return classes;
@@ -777,7 +747,7 @@ public class DefinedClass
      * Returns all the nested classes defined in this class.
      */
     public final TypeReference[] listClasses() {
-        if(classes==null) {
+        if (classes == null) {
             return new TypeReference[0];
         } else {
             return classes.values().toArray(new TypeReference[classes.values().size()]);
@@ -798,7 +768,7 @@ public class DefinedClass
             f.nl().g(jdoc);
         }
 
-        if (annotations != null){
+        if (annotations != null) {
             for (AnnotationUse annotation : annotations) {
                 f.g(annotation).nl();
             }
@@ -814,7 +784,7 @@ public class DefinedClass
             if (superClass == null) {
                 f.nl();
             }
-            f.i().p(classType==ClassType.INTERFACE ? "extends" : "implements");
+            f.i().p(classType == ClassType.INTERFACE ? "extends" : "implements");
             f.g(interfaces);
             f.nl().o();
         }
@@ -836,10 +806,10 @@ public class DefinedClass
                 f.d(c);
                 first = false;
             }
-        	f.p(';').nl();
+            f.p(';').nl();
         }
 
-        for( FieldVariable field : fields.values() ) {
+        for (FieldVariable field : fields.values()) {
             f.d(field);
         }
         if (init != null) {
@@ -851,13 +821,13 @@ public class DefinedClass
         for (Method m : methods) {
             f.nl().d(m);
         }
-        if(classes!=null) {
+        if (classes != null) {
             for (DefinedClass dc : classes.values()) {
                 f.nl().d(dc);
             }
         }
 
-        
+
         if (directBlock != null) {
             f.p(directBlock);
         }
@@ -866,7 +836,7 @@ public class DefinedClass
 
     /**
      * Places the given string directly inside the generated class.
-     * 
+     * <p/>
      * This method can be used to add methods/fields that are not
      * generated by CodeModel.
      * This method should be used only as the last resort.
@@ -894,37 +864,42 @@ public class DefinedClass
     public TypeVariable generify(String name) {
         return generifiable.generify(name);
     }
+
     public TypeVariable generify(String name, Class<?> bound) {
         return generifiable.generify(name, bound);
     }
+
     public TypeVariable generify(String name, TypeReference bound) {
         return generifiable.generify(name, bound);
     }
+
     @Override
     public TypeVariable[] typeParams() {
         return generifiable.typeParams();
     }
 
     protected TypeReference substituteParams(
-        TypeVariable[] variables,
-        List<TypeReference> bindings) {
+            TypeVariable[] variables,
+            List<TypeReference> bindings) {
         return this;
     }
 
-    /** Adding ability to annotate a class
-     * @param clazz
-     *          The annotation class to annotate the class with
+    /**
+     * Adding ability to annotate a class
+     *
+     * @param clazz The annotation class to annotate the class with
      */
-    public AnnotationUse annotate(Class <? extends Annotation> clazz){
+    public AnnotationUse annotate(Class<? extends Annotation> clazz) {
         return annotate(owner().ref(clazz));
     }
 
-    /** Adding ability to annotate a class
-      * @param clazz
-      *          The annotation class to annotate the class with
-      */
-     public AnnotationUse annotate(TypeReference clazz){
-        if(annotations==null) {
+    /**
+     * Adding ability to annotate a class
+     *
+     * @param clazz The annotation class to annotate the class with
+     */
+    public AnnotationUse annotate(TypeReference clazz) {
+        if (annotations == null) {
             annotations = new ArrayList<AnnotationUse>();
         }
         AnnotationUse a = new AnnotationUse(clazz);
@@ -933,7 +908,7 @@ public class DefinedClass
     }
 
     public <W extends AnnotationWriter> W annotate2(Class<W> clazz) {
-        return TypedAnnotationWriter.create(clazz,this);
+        return TypedAnnotationWriter.create(clazz, this);
     }
 
     /**
@@ -947,9 +922,8 @@ public class DefinedClass
     }
 
     /**
-     * @return
-     *      the current modifiers of this class.
-     *      Always return non-null valid object.
+     * @return the current modifiers of this class.
+     *         Always return non-null valid object.
      */
     public Modifiers mods() {
         return mods;

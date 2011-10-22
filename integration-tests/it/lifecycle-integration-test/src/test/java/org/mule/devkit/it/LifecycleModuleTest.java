@@ -17,22 +17,18 @@
 
 package org.mule.devkit.it;
 
-public class LifecycleModuleTest extends AbstractModuleTest
-{
+public class LifecycleModuleTest extends AbstractModuleTest {
 
     @Override
-    protected String getConfigResources()
-    {
+    protected String getConfigResources() {
         return "lifecycle.xml";
     }
 
-    public void testIsStarted() throws Exception
-    {
+    public void testIsStarted() throws Exception {
         runFlow("isStarted", true);
     }
 
-    public void testHasBeenInitialized() throws Exception
-    {
+    public void testHasBeenInitialized() throws Exception {
         runFlow("hasBeenInitialized", true);
     }
 

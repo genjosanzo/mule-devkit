@@ -33,9 +33,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for EndpointType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="EndpointType">
  *   &lt;complexContent>
@@ -49,14 +49,11 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "EndpointType")
 public class EndpointType
-    extends AbstractElementType
-{
+        extends AbstractElementType {
 
     @XmlAttribute(name = "supportsInbound")
     protected Boolean supportsInbound;
@@ -71,11 +68,9 @@ public class EndpointType
 
     /**
      * Gets the value of the supportsInbound property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isSupportsInbound() {
         return supportsInbound;
@@ -83,11 +78,9 @@ public class EndpointType
 
     /**
      * Sets the value of the supportsInbound property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setSupportsInbound(Boolean value) {
         this.supportsInbound = value;
@@ -95,11 +88,9 @@ public class EndpointType
 
     /**
      * Gets the value of the supportsOutbound property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isSupportsOutbound() {
         return supportsOutbound;
@@ -107,11 +98,9 @@ public class EndpointType
 
     /**
      * Sets the value of the supportsOutbound property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setSupportsOutbound(Boolean value) {
         this.supportsOutbound = value;
@@ -119,11 +108,9 @@ public class EndpointType
 
     /**
      * Gets the value of the inboundLocalName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getInboundLocalName() {
         return inboundLocalName;
@@ -131,11 +118,9 @@ public class EndpointType
 
     /**
      * Sets the value of the inboundLocalName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setInboundLocalName(String value) {
         this.inboundLocalName = value;
@@ -143,11 +128,9 @@ public class EndpointType
 
     /**
      * Gets the value of the defaultMep property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link DefaultMepType }
-     *     
+     *
+     * @return possible object is
+     *         {@link DefaultMepType }
      */
     public DefaultMepType getDefaultMep() {
         return defaultMep;
@@ -155,11 +138,9 @@ public class EndpointType
 
     /**
      * Sets the value of the defaultMep property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link DefaultMepType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link DefaultMepType }
      */
     public void setDefaultMep(DefaultMepType value) {
         this.defaultMep = value;
@@ -167,11 +148,9 @@ public class EndpointType
 
     /**
      * Gets the value of the outboundLocalName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getOutboundLocalName() {
         return outboundLocalName;
@@ -179,11 +158,9 @@ public class EndpointType
 
     /**
      * Sets the value of the outboundLocalName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setOutboundLocalName(String value) {
         this.outboundLocalName = value;

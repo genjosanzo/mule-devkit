@@ -33,9 +33,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for encodingType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="encodingType">
  *   &lt;complexContent>
@@ -45,25 +45,20 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "encodingType")
 public class EncodingType
-    extends AttributeType
-{
+        extends AttributeType {
 
     @XmlAttribute(name = "defaultValue")
     protected String defaultValue;
 
     /**
      * Gets the value of the defaultValue property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getDefaultValue() {
         return defaultValue;
@@ -71,11 +66,9 @@ public class EncodingType
 
     /**
      * Sets the value of the defaultValue property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDefaultValue(String value) {
         this.defaultValue = value;

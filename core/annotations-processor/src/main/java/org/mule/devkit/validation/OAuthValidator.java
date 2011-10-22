@@ -44,7 +44,7 @@ public class OAuthValidator implements Validator {
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
 
         if (!typeElement.hasAnnotation(Module.class) &&
-            !typeElement.hasAnnotation(Connector.class)) {
+                !typeElement.hasAnnotation(Connector.class)) {
             return;
         }
 
@@ -62,7 +62,7 @@ public class OAuthValidator implements Validator {
     }
 
     private void checkClassHasFieldWithAnnotation(DevKitTypeElement typeElement, Class<? extends Annotation> annotation, String errorMessage) throws ValidationException {
-        if(typeElement.getFieldsAnnotatedWith(annotation).isEmpty()) {
+        if (typeElement.getFieldsAnnotatedWith(annotation).isEmpty()) {
             throw new ValidationException(typeElement, errorMessage);
         }
     }

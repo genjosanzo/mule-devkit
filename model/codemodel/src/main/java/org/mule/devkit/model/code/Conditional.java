@@ -64,11 +64,10 @@ public class Conditional implements Statement {
     /**
      * Constructor
      *
-     * @param test
-     *        Expression which will determine branching
+     * @param test Expression which will determine branching
      */
     Conditional(Expression test) {
-       this.test = test;
+        this.test = test;
     }
 
     /**
@@ -100,11 +99,11 @@ public class Conditional implements Statement {
     }
 
     public void state(Formatter f) {
-        if(test== ExpressionFactory.TRUE) {
+        if (test == ExpressionFactory.TRUE) {
             _then.generateBody(f);
             return;
         }
-        if(test== ExpressionFactory.FALSE) {
+        if (test == ExpressionFactory.FALSE) {
             _else.generateBody(f);
             return;
         }

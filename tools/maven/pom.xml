@@ -43,11 +43,11 @@
             <version>4.8.2</version>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>org.eclipse.mylyn.github</groupId>
-			<artifactId>org.eclipse.egit.github.core</artifactId>
-			<version>1.1.0</version>
-		</dependency>
+        <dependency>
+            <groupId>org.eclipse.mylyn.github</groupId>
+            <artifactId>org.eclipse.egit.github.core</artifactId>
+            <version>1.1.0</version>
+        </dependency>
     </dependencies>
 
     <build>

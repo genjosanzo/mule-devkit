@@ -17,17 +17,14 @@
 
 package org.mule.devkit.it;
 
-public class OutboundHeadersModuleTest extends AbstractModuleTest
-{
+public class OutboundHeadersModuleTest extends AbstractModuleTest {
 
     @Override
-    protected String getConfigResources()
-    {
+    protected String getConfigResources() {
         return "outbound-headers.xml";
     }
 
-    public void testSetOutboundHeader() throws Exception
-    {
+    public void testSetOutboundHeader() throws Exception {
         runFlowWithOutboundHeader("setOutboundHeader", "mule", "soft");
     }
 }

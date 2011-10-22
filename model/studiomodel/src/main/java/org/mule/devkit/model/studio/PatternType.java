@@ -33,9 +33,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for PatternType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="PatternType">
  *   &lt;complexContent>
@@ -48,14 +48,11 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "PatternType")
 public class PatternType
-    extends AbstractElementType
-{
+        extends AbstractElementType {
 
     @XmlAttribute(name = "causesSplit")
     protected Boolean causesSplit;
@@ -68,11 +65,9 @@ public class PatternType
 
     /**
      * Gets the value of the causesSplit property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isCausesSplit() {
         return causesSplit;
@@ -80,11 +75,9 @@ public class PatternType
 
     /**
      * Sets the value of the causesSplit property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setCausesSplit(Boolean value) {
         this.causesSplit = value;
@@ -92,11 +85,9 @@ public class PatternType
 
     /**
      * Gets the value of the processesResponse property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isProcessesResponse() {
         return processesResponse;
@@ -104,11 +95,9 @@ public class PatternType
 
     /**
      * Sets the value of the processesResponse property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setProcessesResponse(Boolean value) {
         this.processesResponse = value;
@@ -116,11 +105,9 @@ public class PatternType
 
     /**
      * Gets the value of the causesJoin property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isCausesJoin() {
         return causesJoin;
@@ -128,11 +115,9 @@ public class PatternType
 
     /**
      * Sets the value of the causesJoin property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setCausesJoin(Boolean value) {
         this.causesJoin = value;
@@ -140,11 +125,9 @@ public class PatternType
 
     /**
      * Gets the value of the xmlname property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getXmlname() {
         return xmlname;
@@ -152,11 +135,9 @@ public class PatternType
 
     /**
      * Sets the value of the xmlname property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setXmlname(String value) {
         this.xmlname = value;

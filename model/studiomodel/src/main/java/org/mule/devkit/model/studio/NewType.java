@@ -33,9 +33,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for NewType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="NewType">
  *   &lt;complexContent>
@@ -45,25 +45,20 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "NewType")
 public class NewType
-    extends AttributeType
-{
+        extends AttributeType {
 
     @XmlAttribute(name = "requiredType")
     protected String requiredType;
 
     /**
      * Gets the value of the requiredType property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getRequiredType() {
         return requiredType;
@@ -71,11 +66,9 @@ public class NewType
 
     /**
      * Sets the value of the requiredType property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setRequiredType(String value) {
         this.requiredType = value;

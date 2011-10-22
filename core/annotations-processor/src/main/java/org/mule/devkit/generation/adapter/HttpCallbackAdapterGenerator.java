@@ -48,8 +48,8 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.hasAnnotation(OAuth.class) ||
-               typeElement.hasAnnotation(OAuth2.class) ||
-               typeElement.hasProcessorMethodWithParameter(HttpCallback.class);
+                typeElement.hasAnnotation(OAuth2.class) ||
+                typeElement.hasProcessorMethodWithParameter(HttpCallback.class);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
 
     private void generateInitialiseMethod(DefinedClass httpCallbackAdapter, FieldVariable localPort, FieldVariable remotePort, FieldVariable domain, FieldVariable logger) {
         Method initialise = httpCallbackAdapter.method(Modifier.PUBLIC, this.context.getCodeModel().VOID, "initialise");
-        if(ref(Initialisable.class).isAssignableFrom(httpCallbackAdapter._extends())) {
+        if (ref(Initialisable.class).isAssignableFrom(httpCallbackAdapter._extends())) {
             initialise.body().invoke(ExpressionFactory._super(), "initialise");
         }
 

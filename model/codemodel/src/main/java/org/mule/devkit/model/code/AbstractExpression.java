@@ -43,8 +43,7 @@ package org.mule.devkit.model.code;
 /**
  * Provides default implementations for {@link Expression}.
  */
-public abstract class AbstractExpression implements Expression
-{
+public abstract class AbstractExpression implements Expression {
     //
     //
     // from Op

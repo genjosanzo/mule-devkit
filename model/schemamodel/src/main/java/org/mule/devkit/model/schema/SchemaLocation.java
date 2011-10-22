@@ -24,8 +24,7 @@ public class SchemaLocation {
     private String namespaceHandler;
     private String targetNamespace;
 
-    public SchemaLocation(Schema schema, String targetNamespace, String fileName, String location, String namespaceHandler)
-    {
+    public SchemaLocation(Schema schema, String targetNamespace, String fileName, String location, String namespaceHandler) {
         this.fileName = fileName;
         this.location = location;
         this.schema = schema;

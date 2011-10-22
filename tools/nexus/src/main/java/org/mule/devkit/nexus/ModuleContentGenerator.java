@@ -34,10 +34,9 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-@Named( ModuleContentGenerator.ID )
+@Named(ModuleContentGenerator.ID)
 public class ModuleContentGenerator
-    implements ContentGenerator
-{
+        implements ContentGenerator {
     public static final String ID = "ModuleContentGenerator";
 
     @Inject
@@ -50,26 +49,22 @@ public class ModuleContentGenerator
     private NexusIndexer nexusIndexer;
 
     @Override
-    public String getGeneratorId()
-    {
+    public String getGeneratorId() {
         return ID;
     }
 
     @Override
-    public ContentLocator generateContent( Repository repository, String path, StorageFileItem item )
-        throws IllegalOperationException, ItemNotFoundException, LocalStorageException
-    {
+    public ContentLocator generateContent(Repository repository, String path, StorageFileItem item)
+            throws IllegalOperationException, ItemNotFoundException, LocalStorageException {
         // make length unknown (since it will be known only in the moment of actual content pull)
-        item.setLength( -1 );
+        item.setLength(-1);
 
-        return new ModuleContentLocator( repository.getId(),
-            ( (DefaultIndexerManager) indexerManager ).getRepositoryIndexContext( repository ), nexusIndexer,
-            new ArtifactInfoFilter()
-            {
-                public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
-                {
-                    return indexArtifactFilter.filterArtifactInfo( ai );
-                }
-            } );
+        return new ModuleContentLocator(repository.getId(),
+                ((DefaultIndexerManager) indexerManager).getRepositoryIndexContext(repository), nexusIndexer,
+                new ArtifactInfoFilter() {
+                    public boolean accepts(IndexingContext ctx, ArtifactInfo ai) {
+                        return indexArtifactFilter.filterArtifactInfo(ai);
+                    }
+                });
     }
 }

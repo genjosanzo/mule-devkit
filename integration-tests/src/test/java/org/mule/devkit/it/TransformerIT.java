@@ -19,26 +19,21 @@ package org.mule.devkit.it;
 
 import java.io.File;
 
-public class TransformerIT extends AbstractMavenIT
-{
+public class TransformerIT extends AbstractMavenIT {
 
-    protected String getArtifactVersion()
-    {
+    protected String getArtifactVersion() {
         return "1.0";
     }
 
-    protected String getArtifactId()
-    {
+    protected String getArtifactId() {
         return "transformer-integration-test";
     }
 
-    protected String getGroupId()
-    {
+    protected String getGroupId() {
         return "org.mule.devkit.it";
     }
 
-    protected File getRoot()
-    {
+    protected File getRoot() {
         return new File("target/integration-tests/" + getArtifactId());
     }
 }

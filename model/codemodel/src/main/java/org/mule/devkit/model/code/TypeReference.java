@@ -49,13 +49,12 @@ import java.util.List;
 /**
  * Represents a Java reference type, such as a class, an interface,
  * an enum, an array type, a parameterized type.
- * 
- * <p>
+ * <p/>
+ * <p/>
  * To be exact, this object represents an "use" of a reference type,
  * not necessarily a declaration of it, which is modeled as {@link DefinedClass}.
  */
-public abstract class TypeReference extends Type
-{
+public abstract class TypeReference extends Type {
     protected TypeReference(CodeModel _owner) {
         this._owner = _owner;
     }
@@ -63,14 +62,13 @@ public abstract class TypeReference extends Type
     /**
      * Gets the name of this class.
      *
-     * @return
-     *	name of this class, without any qualification.
-     *	For example, this method returns "String" for
-     *  <code>java.lang.String</code>.
+     * @return name of this class, without any qualification.
+     *         For example, this method returns "String" for
+     *         <code>java.lang.String</code>.
      */
     abstract public String name();
-	
-	/**
+
+    /**
      * Gets the package to which this class belongs.
      * TODO: shall we move move this down?
      */
@@ -83,39 +81,42 @@ public abstract class TypeReference extends Type
     public TypeReference outer() {
         return null;
     }
-	
+
     private final CodeModel _owner;
-    /** Gets the CodeModel object to which this object belongs. */
-    public final CodeModel owner() { return _owner; }
-    
+
+    /**
+     * Gets the CodeModel object to which this object belongs.
+     */
+    public final CodeModel owner() {
+        return _owner;
+    }
+
     /**
      * Gets the super class of this class.
-     * 
-     * @return
-     *      Returns the TypeReference representing the superclass of the
-     *      entity (class or interface) represented by this {@link TypeReference}.
-     *      Even if no super class is given explicitly or this {@link TypeReference}
-     *      is not a class, this method still returns
-     *      {@link TypeReference} for {@link Object}.
-     *      If this TypeReference represents {@link Object}, return null.
+     *
+     * @return Returns the TypeReference representing the superclass of the
+     *         entity (class or interface) represented by this {@link TypeReference}.
+     *         Even if no super class is given explicitly or this {@link TypeReference}
+     *         is not a class, this method still returns
+     *         {@link TypeReference} for {@link Object}.
+     *         If this TypeReference represents {@link Object}, return null.
      */
     abstract public TypeReference _extends();
-    
+
     /**
      * Iterates all super interfaces directly implemented by
      * this class/interface.
-     * 
-     * @return
-     *		A non-null valid iterator that iterates all
-     *		{@link TypeReference} objects that represents those interfaces
-     *		implemented by this object.
+     *
+     * @return A non-null valid iterator that iterates all
+     *         {@link TypeReference} objects that represents those interfaces
+     *         implemented by this object.
      */
     abstract public Iterator<TypeReference> _implements();
-    
+
     /**
      * Iterates all the type parameters of this class/interface.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, if this {@link TypeReference} represents
      * <code>Set&lt;T></code>, this method returns an array
      * that contains single {@link TypeVariable} for 'T'.
@@ -144,18 +145,22 @@ public abstract class TypeReference extends Type
      * defined in the java.lang package, return the corresponding
      * primitive type. Otherwise null.
      */
-    public PrimitiveType getPrimitiveType() { return null; }
+    public PrimitiveType getPrimitiveType() {
+        return null;
+    }
 
     /**
      * @deprecated calling this method from {@link TypeReference}
-     * would be meaningless, since it's always guaranteed to
-     * return <tt>this</tt>.
+     *             would be meaningless, since it's always guaranteed to
+     *             return <tt>this</tt>.
      */
-    public TypeReference boxify() { return this; }
+    public TypeReference boxify() {
+        return this;
+    }
 
     public Type unboxify() {
         PrimitiveType pt = getPrimitiveType();
-        return pt==null ? (Type)this : pt;
+        return pt == null ? (Type) this : pt;
     }
 
     public TypeReference erasure() {
@@ -164,49 +169,49 @@ public abstract class TypeReference extends Type
 
     /**
      * Checks the relationship between two classes.
-     * <p>
+     * <p/>
      * This method works in the same way as {@link Class#isAssignableFrom(Class)}
      * works. For example, baseClass.isAssignableFrom(derivedClass)==true.
      */
-    public final boolean isAssignableFrom( TypeReference derived ) {
+    public final boolean isAssignableFrom(TypeReference derived) {
         // to avoid the confusion, always use "this" explicitly in this method.
-        
+
         // null can be assigned to any type.
-        if( derived instanceof NullType) {
+        if (derived instanceof NullType) {
             return true;
         }
-        
-        if( this==derived ) {
+
+        if (this == derived) {
             return true;
         }
-        
+
         // the only class that is assignable from an interface is
         // java.lang.Object
-        if( this==_package().owner().ref(Object.class) ) {
+        if (this == _package().owner().ref(Object.class)) {
             return true;
         }
-        
+
         TypeReference b = derived._extends();
-        if( b!=null && this.isAssignableFrom(b) ) {
+        if (b != null && this.isAssignableFrom(b)) {
             return true;
         }
-        
-        if( this.isInterface() ) {
+
+        if (this.isInterface()) {
             Iterator<TypeReference> itfs = derived._implements();
-            while( itfs.hasNext() ) {
+            while (itfs.hasNext()) {
                 if (this.isAssignableFrom(itfs.next())) {
                     return true;
                 }
             }
         }
-        
+
         return false;
     }
 
     /**
      * Gets the parameterization of the given base type.
-     *
-     * <p>
+     * <p/>
+     * <p/>
      * For example, given the following
      * <pre><xmp>
      * interface Foo<T> extends List<List<T>> {}
@@ -220,30 +225,28 @@ public abstract class TypeReference extends Type
      * getBaseClass( ArrayList<? extends BigInteger>, List ) = List<? extends BigInteger>
      * </xmp></pre>
      *
-     * @param baseType
-     *      The class whose parameterization we are interested in.
-     * @return
-     *      The use of {@code baseType} in {@code this} type.
-     *      or null if the type is not assignable to the base type.
+     * @param baseType The class whose parameterization we are interested in.
+     * @return The use of {@code baseType} in {@code this} type.
+     *         or null if the type is not assignable to the base type.
      */
-    public final TypeReference getBaseClass( TypeReference baseType ) {
+    public final TypeReference getBaseClass(TypeReference baseType) {
 
-        if( this.erasure().equals(baseType) ) {
+        if (this.erasure().equals(baseType)) {
             return this;
         }
 
         TypeReference b = _extends();
-        if( b!=null ) {
+        if (b != null) {
             TypeReference bc = b.getBaseClass(baseType);
-            if(bc!=null) {
+            if (bc != null) {
                 return bc;
             }
         }
 
         Iterator<TypeReference> itfs = _implements();
-        while( itfs.hasNext() ) {
+        while (itfs.hasNext()) {
             TypeReference bc = itfs.next().getBaseClass(baseType);
-            if(bc!=null) {
+            if (bc != null) {
                 return bc;
             }
         }
@@ -251,14 +254,15 @@ public abstract class TypeReference extends Type
         return null;
     }
 
-    public final TypeReference getBaseClass( Class<?> baseType ) {
+    public final TypeReference getBaseClass(Class<?> baseType) {
         return getBaseClass(owner().ref(baseType));
     }
 
 
     private TypeReference arrayClass;
+
     public TypeReference array() {
-        if(arrayClass==null) {
+        if (arrayClass == null) {
             arrayClass = new ArrayClass(owner(), this);
         }
         return arrayClass;
@@ -267,17 +271,17 @@ public abstract class TypeReference extends Type
     /**
      * "Narrows" a generic class to a concrete class by specifying
      * a type argument.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * <code>.narrow(X)</code> builds <code>Set&lt;X></code> from <code>Set</code>.
      */
-    public TypeReference narrow( Class<?> clazz ) {
+    public TypeReference narrow(Class<?> clazz) {
         return narrow(owner().ref(clazz));
     }
 
-    public TypeReference narrow( Class<?>... clazz ) {
+    public TypeReference narrow(Class<?>... clazz) {
         TypeReference[] r = new TypeReference[clazz.length];
-        for( int i=0; i<clazz.length; i++ ) {
+        for (int i = 0; i < clazz.length; i++) {
             r[i] = owner().ref(clazz[i]);
         }
         return narrow(r);
@@ -286,24 +290,24 @@ public abstract class TypeReference extends Type
     /**
      * "Narrows" a generic class to a concrete class by specifying
      * a type argument.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * <code>.narrow(X)</code> builds <code>Set&lt;X></code> from <code>Set</code>.
      */
-    public TypeReference narrow( TypeReference clazz ) {
-        return new NarrowedClass(this,clazz);
+    public TypeReference narrow(TypeReference clazz) {
+        return new NarrowedClass(this, clazz);
     }
 
-    public TypeReference narrow( Type type ) {
+    public TypeReference narrow(Type type) {
         return narrow(type.boxify());
     }
 
-    public TypeReference narrow( TypeReference... clazz ) {
-        return new NarrowedClass(this,Arrays.asList(clazz.clone()));
+    public TypeReference narrow(TypeReference... clazz) {
+        return new NarrowedClass(this, Arrays.asList(clazz.clone()));
     }
 
-    public TypeReference narrow( List<? extends TypeReference> clazz ) {
-        return new NarrowedClass(this,new ArrayList<TypeReference>(clazz));
+    public TypeReference narrow(List<? extends TypeReference> clazz) {
+        return new NarrowedClass(this, new ArrayList<TypeReference>(clazz));
     }
 
     /**
@@ -317,7 +321,7 @@ public abstract class TypeReference extends Type
      * Returns true if this class is a parameterized class.
      */
     public final boolean isParameterized() {
-        return erasure()!=this;
+        return erasure() != this;
     }
 
     /**
@@ -331,18 +335,18 @@ public abstract class TypeReference extends Type
 
     /**
      * Substitutes the type variables with their actual arguments.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, when this class is Map&lt;String,Map&lt;V>>,
      * (where V then doing
      * substituteParams( V, Integer ) returns a {@link TypeReference}
      * for <code>Map&lt;String,Map&lt;Integer>></code>.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This method needs to work recursively.
      */
-    protected abstract TypeReference substituteParams( TypeVariable[] variables, List<TypeReference> bindings );
-    
+    protected abstract TypeReference substituteParams(TypeVariable[] variables, List<TypeReference> bindings);
+
     public String toString() {
         return this.getClass().getName() + '(' + name() + ')';
     }
@@ -352,22 +356,30 @@ public abstract class TypeReference extends Type
         return ExpressionFactory.dotclass(this);
     }
 
-    /** Generates a static method invocation. */
+    /**
+     * Generates a static method invocation.
+     */
     public final Invocation staticInvoke(Method method) {
-        return new Invocation(this,method);
+        return new Invocation(this, method);
     }
-    
-    /** Generates a static method invocation. */
+
+    /**
+     * Generates a static method invocation.
+     */
     public final Invocation staticInvoke(String method) {
-        return new Invocation(this,method);
+        return new Invocation(this, method);
     }
-    
-    /** Static field reference. */
+
+    /**
+     * Static field reference.
+     */
     public final FieldRef staticRef(String field) {
         return new FieldRef(this, field);
     }
 
-    /** Static field reference. */
+    /**
+     * Static field reference.
+     */
     public final FieldRef staticRef(Variable field) {
         return new FieldRef(this, field);
     }

@@ -54,8 +54,8 @@ import java.util.Map;
  *
  * @author Kohsuke Kawaguchi
  */
-class TypedAnnotationWriter<A extends Annotation,W extends AnnotationWriter<A>>
-    implements InvocationHandler, AnnotationWriter<A> {
+class TypedAnnotationWriter<A extends Annotation, W extends AnnotationWriter<A>>
+        implements InvocationHandler, AnnotationWriter<A> {
     /**
      * This is what we are writing to.
      */
@@ -75,7 +75,7 @@ class TypedAnnotationWriter<A extends Annotation,W extends AnnotationWriter<A>>
      * Keeps track of writers for array members.
      * Lazily created.
      */
-    private Map<String,AnnotationArrayMember> arrays;
+    private Map<String, AnnotationArrayMember> arrays;
 
     public TypedAnnotationWriter(Class<A> annotation, Class<W> writer, AnnotationUse use) {
         this.annotation = annotation;
@@ -92,19 +92,19 @@ class TypedAnnotationWriter<A extends Annotation,W extends AnnotationWriter<A>>
     }
 
     @SuppressWarnings("unchecked")
-	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-        if(method.getDeclaringClass()==AnnotationWriter.class) {
+        if (method.getDeclaringClass() == AnnotationWriter.class) {
             try {
-                return method.invoke(this,args);
+                return method.invoke(this, args);
             } catch (InvocationTargetException e) {
                 throw e.getTargetException();
             }
         }
 
         String name = method.getName();
-        Object arg=null;
-        if(args!=null && args.length>0) {
+        Object arg = null;
+        if (args != null && args.length > 0) {
             arg = args[0];
         }
 
@@ -113,105 +113,105 @@ class TypedAnnotationWriter<A extends Annotation,W extends AnnotationWriter<A>>
         Class<?> rt = m.getReturnType();
 
         // array value
-        if(rt.isArray()) {
-            return addArrayValue(proxy,name,rt.getComponentType(),method.getReturnType(),arg);
+        if (rt.isArray()) {
+            return addArrayValue(proxy, name, rt.getComponentType(), method.getReturnType(), arg);
         }
 
         // sub annotation
-        if(Annotation.class.isAssignableFrom(rt)) {
-            Class<? extends Annotation> r = (Class<? extends Annotation>)rt;
+        if (Annotation.class.isAssignableFrom(rt)) {
+            Class<? extends Annotation> r = (Class<? extends Annotation>) rt;
             return new TypedAnnotationWriter(
-                r,method.getReturnType(),use.annotationParam(name,r)).createProxy();
+                    r, method.getReturnType(), use.annotationParam(name, r)).createProxy();
         }
 
         // scalar value
 
-        if(arg instanceof Type) {
+        if (arg instanceof Type) {
             Type targ = (Type) arg;
-            checkType(Class.class,rt);
-            if(m.getDefaultValue()!=null) {
+            checkType(Class.class, rt);
+            if (m.getDefaultValue() != null) {
                 // check the default
-                if(targ.equals(targ.owner().ref((Class)m.getDefaultValue()))) {
+                if (targ.equals(targ.owner().ref((Class) m.getDefaultValue()))) {
                     return proxy;   // defaulted
                 }
             }
-            use.param(name,targ);
+            use.param(name, targ);
             return proxy;
         }
 
         // other Java built-in types
-        checkType(arg.getClass(),rt);
-        if(m.getDefaultValue()!=null && m.getDefaultValue().equals(arg))
-            // defaulted. no need to write out.
+        checkType(arg.getClass(), rt);
+        if (m.getDefaultValue() != null && m.getDefaultValue().equals(arg))
+        // defaulted. no need to write out.
         {
             return proxy;
         }
 
-        if(arg instanceof String) {
-            use.param(name,(String)arg);
+        if (arg instanceof String) {
+            use.param(name, (String) arg);
             return proxy;
         }
-        if(arg instanceof Boolean) {
-            use.param(name,(Boolean)arg);
+        if (arg instanceof Boolean) {
+            use.param(name, (Boolean) arg);
             return proxy;
         }
-        if(arg instanceof Integer) {
-            use.param(name,(Integer)arg);
+        if (arg instanceof Integer) {
+            use.param(name, (Integer) arg);
             return proxy;
         }
-        if(arg instanceof Class) {
-            use.param(name,(Class)arg);
+        if (arg instanceof Class) {
+            use.param(name, (Class) arg);
             return proxy;
         }
-        if(arg instanceof Enum) {
-            use.param(name,(Enum)arg);
+        if (arg instanceof Enum) {
+            use.param(name, (Enum) arg);
             return proxy;
         }
 
-        throw new IllegalArgumentException("Unable to handle this method call "+method.toString());
+        throw new IllegalArgumentException("Unable to handle this method call " + method.toString());
     }
 
     @SuppressWarnings("unchecked")
-	private Object addArrayValue(Object proxy,String name, Class itemType, Class expectedReturnType, Object arg) {
-        if(arrays==null) {
+    private Object addArrayValue(Object proxy, String name, Class itemType, Class expectedReturnType, Object arg) {
+        if (arrays == null) {
             arrays = new HashMap<String, AnnotationArrayMember>();
         }
         AnnotationArrayMember m = arrays.get(name);
-        if(m==null) {
+        if (m == null) {
             m = use.paramArray(name);
-            arrays.put(name,m);
+            arrays.put(name, m);
         }
 
         // sub annotation
-        if(Annotation.class.isAssignableFrom(itemType)) {
-            Class<? extends Annotation> r = (Class<? extends Annotation>)itemType;
-            if(!AnnotationWriter.class.isAssignableFrom(expectedReturnType)) {
+        if (Annotation.class.isAssignableFrom(itemType)) {
+            Class<? extends Annotation> r = (Class<? extends Annotation>) itemType;
+            if (!AnnotationWriter.class.isAssignableFrom(expectedReturnType)) {
                 throw new IllegalArgumentException("Unexpected return type " + expectedReturnType);
             }
-            return new TypedAnnotationWriter(r,expectedReturnType,m.annotate(r)).createProxy();
+            return new TypedAnnotationWriter(r, expectedReturnType, m.annotate(r)).createProxy();
         }
 
         // primitive
-        if(arg instanceof Type) {
-            checkType(Class.class,itemType);
-            m.param((Type)arg);
+        if (arg instanceof Type) {
+            checkType(Class.class, itemType);
+            m.param((Type) arg);
             return proxy;
         }
-        checkType(arg.getClass(),itemType);
-        if(arg instanceof String) {
-            m.param((String)arg);
+        checkType(arg.getClass(), itemType);
+        if (arg instanceof String) {
+            m.param((String) arg);
             return proxy;
         }
-        if(arg instanceof Boolean) {
-            m.param((Boolean)arg);
+        if (arg instanceof Boolean) {
+            m.param((Boolean) arg);
             return proxy;
         }
-        if(arg instanceof Integer) {
-            m.param((Integer)arg);
+        if (arg instanceof Integer) {
+            m.param((Integer) arg);
             return proxy;
         }
-        if(arg instanceof Class) {
-            m.param((Class)arg);
+        if (arg instanceof Class) {
+            m.param((Class) arg);
             return proxy;
         }
         // TODO: enum constant. how should we handle it?
@@ -225,47 +225,47 @@ class TypedAnnotationWriter<A extends Annotation,W extends AnnotationWriter<A>>
      * If not, report an error.
      */
     private void checkType(Class<?> actual, Class<?> expected) {
-        if(expected==actual || expected.isAssignableFrom(actual)) {
+        if (expected == actual || expected.isAssignableFrom(actual)) {
             return; // no problem
         }
 
-        if( expected== CodeModel.boxToPrimitive.get(actual) ) {
+        if (expected == CodeModel.boxToPrimitive.get(actual)) {
             return; // no problem
         }
 
-        throw new IllegalArgumentException("Expected "+expected+" but found "+actual);
+        throw new IllegalArgumentException("Expected " + expected + " but found " + actual);
     }
 
     /**
      * Creates a proxy and returns it.
      */
     @SuppressWarnings("unchecked")
-	private W createProxy() {
-        return (W)Proxy.newProxyInstance(
-            writerType.getClassLoader(),new Class[]{writerType},this);
+    private W createProxy() {
+        return (W) Proxy.newProxyInstance(
+                writerType.getClassLoader(), new Class[]{writerType}, this);
     }
 
     /**
      * Creates a new typed annotation writer.
      */
     @SuppressWarnings("unchecked")
-	static <W extends AnnotationWriter<?>> W create(Class<W> w, Annotable annotatable) {
+    static <W extends AnnotationWriter<?>> W create(Class<W> w, Annotable annotatable) {
         Class<? extends Annotation> a = findAnnotationType(w);
-        return (W)new TypedAnnotationWriter(a,w,annotatable.annotate(a)).createProxy();
+        return (W) new TypedAnnotationWriter(a, w, annotatable.annotate(a)).createProxy();
     }
 
     private static Class<? extends Annotation> findAnnotationType(Class<?> clazz) {
-        for( java.lang.reflect.Type t : clazz.getGenericInterfaces()) {
-            if(t instanceof ParameterizedType) {
+        for (java.lang.reflect.Type t : clazz.getGenericInterfaces()) {
+            if (t instanceof ParameterizedType) {
                 ParameterizedType p = (ParameterizedType) t;
-                if(p.getRawType()==AnnotationWriter.class) {
+                if (p.getRawType() == AnnotationWriter.class) {
                     return (Class<? extends Annotation>) p.getActualTypeArguments()[0];
                 }
             }
-            if(t instanceof Class<?>) {
+            if (t instanceof Class<?>) {
                 // recursive search
-                Class<? extends Annotation> r = findAnnotationType((Class<?>)t);
-                if(r!=null) {
+                Class<? extends Annotation> r = findAnnotationType((Class<?>) t);
+                if (r != null) {
                     return r;
                 }
             }

@@ -70,12 +70,9 @@ public class FieldRef extends AbstractExpression implements AssignmentTarget {
     /**
      * Field reference constructor given an object expression and field name
      *
-     * @param object
-     *        Expression for the object upon which
-     *        the named field will be accessed,
-     *
-     * @param name
-     *        Name of field to access
+     * @param object Expression for the object upon which
+     *               the named field will be accessed,
+     * @param name   Name of field to access
      */
     FieldRef(Expression object, String name) {
         this(object, name, false);
@@ -113,7 +110,7 @@ public class FieldRef extends AbstractExpression implements AssignmentTarget {
 
     public void generate(Formatter f) {
         String name = this.name;
-        if(name==null) {
+        if (name == null) {
             name = var.name();
         }
 
@@ -131,6 +128,7 @@ public class FieldRef extends AbstractExpression implements AssignmentTarget {
     public Expression assign(Expression rhs) {
         return ExpressionFactory.assign(this, rhs);
     }
+
     public Expression assignPlus(Expression rhs) {
         return ExpressionFactory.assignPlus(this, rhs);
     }

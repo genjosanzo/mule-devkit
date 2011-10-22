@@ -37,96 +37,74 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 public class ModuleCatalogEventInspector
-    implements EventInspector
-{
+        implements EventInspector {
     private static final String ARCHETYPE_PATH = "/module-catalog.xml";
 
     @Inject
     private Logger logger;
 
     @Inject
-    @Named( "maven2" )
+    @Named("maven2")
     private ContentClass maven2ContentClass;
 
-    public boolean accepts( Event<?> evt )
-    {
-        if ( evt instanceof RepositoryRegistryEventAdd )
-        {
+    public boolean accepts(Event<?> evt) {
+        if (evt instanceof RepositoryRegistryEventAdd) {
             RepositoryRegistryRepositoryEvent registryEvent = (RepositoryRegistryRepositoryEvent) evt;
 
             Repository repository = registryEvent.getRepository();
 
-            return maven2ContentClass.isCompatible( repository.getRepositoryContentClass() )
-                && ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class )
-                    || repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) || repository.getRepositoryKind().isFacetAvailable(
-                    GroupRepository.class ) );
-        }
-        else if ( evt instanceof RepositoryEventLocalStatusChanged )
-        {
+            return maven2ContentClass.isCompatible(repository.getRepositoryContentClass())
+                    && (repository.getRepositoryKind().isFacetAvailable(HostedRepository.class)
+                    || repository.getRepositoryKind().isFacetAvailable(ProxyRepository.class) || repository.getRepositoryKind().isFacetAvailable(
+                    GroupRepository.class));
+        } else if (evt instanceof RepositoryEventLocalStatusChanged) {
             RepositoryEventLocalStatusChanged localStatusEvent = (RepositoryEventLocalStatusChanged) evt;
 
             // only if put into service
-            return LocalStatus.IN_SERVICE.equals( localStatusEvent.getNewLocalStatus() );
-        }
-        else
-        {
+            return LocalStatus.IN_SERVICE.equals(localStatusEvent.getNewLocalStatus());
+        } else {
             return false;
         }
     }
 
-    public void inspect( Event<?> evt )
-    {
+    public void inspect(Event<?> evt) {
         Repository repository = null;
 
-        if ( evt instanceof RepositoryRegistryEventAdd )
-        {
+        if (evt instanceof RepositoryRegistryEventAdd) {
             RepositoryRegistryRepositoryEvent registryEvent = (RepositoryRegistryRepositoryEvent) evt;
 
             repository = registryEvent.getRepository();
-        }
-        else if ( evt instanceof RepositoryEventLocalStatusChanged )
-        {
+        } else if (evt instanceof RepositoryEventLocalStatusChanged) {
             RepositoryEventLocalStatusChanged localStatusEvent = (RepositoryEventLocalStatusChanged) evt;
 
             repository = localStatusEvent.getRepository();
-        }
-        else
-        {
+        } else {
             // huh?
             return;
         }
 
         // check is it a maven2 content, and either a "hosted", "proxy" or "group" repository
-        if ( maven2ContentClass.isCompatible( repository.getRepositoryContentClass() )
-            && ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class )
-                || repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) || repository.getRepositoryKind().isFacetAvailable(
-                GroupRepository.class ) ) )
-        {
+        if (maven2ContentClass.isCompatible(repository.getRepositoryContentClass())
+                && (repository.getRepositoryKind().isFacetAvailable(HostedRepository.class)
+                || repository.getRepositoryKind().isFacetAvailable(ProxyRepository.class) || repository.getRepositoryKind().isFacetAvailable(
+                GroupRepository.class))) {
             // new repo added or enabled, "install" the archetype catalog
-            try
-            {
+            try {
                 DefaultStorageFileItem file =
-                    new DefaultStorageFileItem( repository, new ResourceStoreRequest( ARCHETYPE_PATH ), true, false,
-                        new StringContentLocator( ModuleContentGenerator.ID ) );
+                        new DefaultStorageFileItem(repository, new ResourceStoreRequest(ARCHETYPE_PATH), true, false,
+                                new StringContentLocator(ModuleContentGenerator.ID));
 
-                file.setContentGeneratorId( ModuleContentGenerator.ID );
+                file.setContentGeneratorId(ModuleContentGenerator.ID);
 
-                repository.storeItem( false, file );
-            }
-            catch ( RepositoryNotAvailableException e )
-            {
-                logger.info( "Unable to install the generated module catalog, repository \""
-                    + e.getRepository().getId() + "\" is out of service." );
-            }
-            catch ( Exception e )
-            {
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.info( "Unable to install the generated module catalog!", e );
-                }
-                else
-                {
-                    logger.info( "Unable to install the generated module catalog:" + e.getMessage() );
+                repository.storeItem(false, file);
+            } catch (RepositoryNotAvailableException e) {
+                logger.info("Unable to install the generated module catalog, repository \""
+                        + e.getRepository().getId() + "\" is out of service.");
+            } catch (Exception e) {
+                if (logger.isDebugEnabled()) {
+                    logger.info("Unable to install the generated module catalog!", e);
+                } else {
+                    logger.info("Unable to install the generated module catalog:" + e.getMessage());
                 }
             }
         }

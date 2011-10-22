@@ -49,23 +49,23 @@ import java.io.OutputStream;
 public abstract class ResourceFile {
 
     private final String name;
-    
+
     protected ResourceFile(String name) {
         this.name = name;
     }
-    
+
     /**
      * Gets the name of this property file
      */
-    public String name() { 
-        return name; 
+    public String name() {
+        return name;
     }
 
     /**
      * Returns true if this file should be generated into the directory
      * that the resource files go into.
-     *
-     * <p>
+     * <p/>
+     * <p/>
      * Returns false if this file should be generated into the directory
      * where other source files go.
      */
@@ -76,5 +76,5 @@ public abstract class ResourceFile {
     /**
      * called by Package to produce the file image.
      */
-    protected abstract void build( OutputStream os ) throws IOException;
+    protected abstract void build(OutputStream os) throws IOException;
 }

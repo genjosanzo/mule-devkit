@@ -75,16 +75,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-           <groupId>org.mule.dsl</groupId>
-           <artifactId>dsl-api</artifactId>
-           <version>0.7</version>
-           <exclusions>
-               <exclusion>
-                   <groupId>org.mule</groupId>
-                   <artifactId>core</artifactId>
-               </exclusion>
-           </exclusions>
-       </dependency>
+            <groupId>org.mule.dsl</groupId>
+            <artifactId>dsl-api</artifactId>
+            <version>0.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mule</groupId>
+                    <artifactId>core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>

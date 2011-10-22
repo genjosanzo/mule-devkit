@@ -43,8 +43,7 @@ package org.mule.devkit.model.code;
 /**
  * Things that can be values of an annotation element.
  *
- * @author
- *     Bhakti Mehta (bhakti.mehta@sun.com)
+ * @author Bhakti Mehta (bhakti.mehta@sun.com)
  */
 public abstract class AnnotationValue implements Generable {
 }

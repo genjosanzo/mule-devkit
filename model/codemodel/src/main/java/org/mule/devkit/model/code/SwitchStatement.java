@@ -58,7 +58,7 @@ public final class SwitchStatement implements Statement {
      * vector of JCases.
      */
     private List<CaseStatement> cases = new ArrayList<CaseStatement>();
-    
+
     /**
      * a single default case
      */
@@ -71,34 +71,38 @@ public final class SwitchStatement implements Statement {
         this.test = test;
     }
 
-    public Expression test() { return test; }
+    public Expression test() {
+        return test;
+    }
 
-    public Iterator<CaseStatement> cases() { return cases.iterator(); }
+    public Iterator<CaseStatement> cases() {
+        return cases.iterator();
+    }
 
-    public CaseStatement _case( Expression label ) {
-        CaseStatement c = new CaseStatement( label );
+    public CaseStatement _case(Expression label) {
+        CaseStatement c = new CaseStatement(label);
         cases.add(c);
         return c;
     }
 
     public CaseStatement _default() {
         // what if (default != null) ???
-        
+
         // default cases statements don't have a label
         defaultCase = new CaseStatement(null, true);
         return defaultCase;
     }
-    
+
     public void state(Formatter f) {
         if (Op.hasTopOp(test)) {
             f.p("switch ").g(test).p(" {").nl();
         } else {
             f.p("switch (").g(test).p(')').p(" {").nl();
         }
-        for( CaseStatement c : cases ) {
+        for (CaseStatement c : cases) {
             f.s(c);
         }
-        if( defaultCase != null ) {
+        if (defaultCase != null) {
             f.s(defaultCase);
         }
         f.p('}').nl();

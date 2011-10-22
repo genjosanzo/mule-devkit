@@ -22,11 +22,9 @@ import org.mule.api.annotations.Processor;
 import org.mule.devkit.it.rss.RssChannel;
 
 @Module(name = "rss")
-public class RssModule
-{
+public class RssModule {
     @Processor
-    public int itemCount(RssChannel channel)
-    {
+    public int itemCount(RssChannel channel) {
         return channel.getItem().size();
     }
 }

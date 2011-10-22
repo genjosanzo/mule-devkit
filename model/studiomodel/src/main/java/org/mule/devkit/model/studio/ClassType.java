@@ -33,9 +33,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for ClassType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="ClassType">
  *   &lt;complexContent>
@@ -45,25 +45,20 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ClassType")
 public class ClassType
-    extends AttributeType
-{
+        extends AttributeType {
 
     @XmlAttribute(name = "implements")
     protected String _implements;
 
     /**
      * Gets the value of the implements property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     *         {@link String }
      */
     public String getImplements() {
         return _implements;
@@ -71,11 +66,9 @@ public class ClassType
 
     /**
      * Sets the value of the implements property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setImplements(String value) {
         this._implements = value;

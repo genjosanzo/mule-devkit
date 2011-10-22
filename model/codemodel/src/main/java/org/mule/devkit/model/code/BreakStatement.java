@@ -45,21 +45,20 @@ package org.mule.devkit.model.code;
  * BreakStatement statement
  */
 final class BreakStatement implements Statement {
-    
+
     private final Label label;
-    
+
     /**
      * BreakStatement constructor
-     * 
-     * @param   _label
-     *      break label or null.
+     *
+     * @param _label break label or null.
      */
     BreakStatement(Label _label) {
         this.label = _label;
     }
 
     public void state(Formatter f) {
-        if( label==null ) {
+        if (label == null) {
             f.p("break;").nl();
         } else {
             f.p("break").p(label.label).p(';').nl();

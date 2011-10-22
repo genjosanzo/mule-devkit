@@ -17,22 +17,18 @@
 
 package org.mule.devkit.it;
 
-public class PayloadModuleTest extends AbstractModuleTest
-{
+public class PayloadModuleTest extends AbstractModuleTest {
 
     @Override
-    protected String getConfigResources()
-    {
+    protected String getConfigResources() {
         return "payload.xml";
     }
 
-    public void testReturnPayload() throws Exception
-    {
+    public void testReturnPayload() throws Exception {
         runFlowWithPayload("returnPayload", "MULESOFT", "MULESOFT");
     }
 
-    public void testReturnPayloadByteArray() throws Exception
-    {
+    public void testReturnPayloadByteArray() throws Exception {
         runFlowWithPayload("returnPayloadByteArray", "MULESOFT", "MULESOFT");
     }
 }

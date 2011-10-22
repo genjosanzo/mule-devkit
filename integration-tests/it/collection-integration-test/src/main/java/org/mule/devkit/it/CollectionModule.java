@@ -31,35 +31,34 @@ import java.util.Map;
  * @author MuleSoft, Inc.
  */
 @Module(name = "collection")
-public class CollectionModule
-{
+public class CollectionModule {
     /**
      * Configurable strings
      */
-	@Configurable
+    @Configurable
     @Optional
-	private List<String> strings;
+    private List<String> strings;
 
     /**
      * Configurable items
      */
-	@Configurable
+    @Configurable
     @Optional
-	private List items;
+    private List items;
 
     /**
      * Configurable map of strings
      */
-	@Configurable
+    @Configurable
     @Optional
-	private Map<String, String> mapStrings;
+    private Map<String, String> mapStrings;
 
     /**
      * Configurable list of strings
      */
-	@Configurable
+    @Configurable
     @Optional
-	private Map mapItems;
+    private Map mapItems;
 
     /**
      * Count list of strings
@@ -68,8 +67,7 @@ public class CollectionModule
      * @return Count
      */
     @Processor
-    public int countListOfStrings(List<String> strings)
-    {
+    public int countListOfStrings(List<String> strings) {
         return strings.size();
     }
 
@@ -79,8 +77,7 @@ public class CollectionModule
      * @return Count
      */
     @Processor
-    public int countConfigStrings()
-    {
+    public int countConfigStrings() {
         return this.strings.size();
     }
 
@@ -90,40 +87,34 @@ public class CollectionModule
      * @return Count
      */
     @Processor
-    public int countConfigItems()
-    {
+    public int countConfigItems() {
         return this.items.size();
     }
 
     @Processor
-    public int countMapOfStrings(Map<String, String> mapStrings)
-    {
+    public int countMapOfStrings(Map<String, String> mapStrings) {
         return mapStrings.size();
     }
 
     @Processor
-    public int countMapOfObjects(Map<String, Object> mapObjects)
-    {
+    public int countMapOfObjects(Map<String, Object> mapObjects) {
         return mapObjects.size();
     }
 
     @Processor
-    public String retrieveKey(String key, Map<String, String> mapStrings)
-    {
+    public String retrieveKey(String key, Map<String, String> mapStrings) {
         return mapStrings.get(key);
     }
+
     @Processor
-    public int countConfigMapStrings()
-    {
+    public int countConfigMapStrings() {
         return this.mapStrings.size();
     }
 
     @Processor
-    public String appendConfigMapItems()
-    {
+    public String appendConfigMapItems() {
         String result = "";
-        for( Object part : this.mapItems.keySet() )
-        {
+        for (Object part : this.mapItems.keySet()) {
             result += this.mapItems.get(part);
         }
 
@@ -131,19 +122,16 @@ public class CollectionModule
     }
 
     @Processor
-    public void hasFirstName(Map properties)
-    {
-        if( !properties.containsKey("FirstName") ) {
+    public void hasFirstName(Map properties) {
+        if (!properties.containsKey("FirstName")) {
             throw new RuntimeException("Does not have a first name");
         }
     }
 
     @Processor
-    public void acceptNested(List<Map<String, String>> objects)
-    {
-        for( Map<String, String> object : objects )
-        {
-            if( object.keySet().size() != 3 ) {
+    public void acceptNested(List<Map<String, String>> objects) {
+        for (Map<String, String> object : objects) {
+            if (object.keySet().size() != 3) {
                 throw new RuntimeException("Invalid object");
             }
         }
@@ -154,23 +142,19 @@ public class CollectionModule
         return firstLists.size() + secondLists.size();
     }
 
-	public void setStrings(List strings)
-	{
-		this.strings = strings;
-	}
+    public void setStrings(List strings) {
+        this.strings = strings;
+    }
 
-	public void setItems(List<String> items)
-	{
-		this.items = items;
-	}
+    public void setItems(List<String> items) {
+        this.items = items;
+    }
 
-	public void setMapStrings(Map mapStrings)
-	{
-		this.mapStrings = mapStrings;
-	}
+    public void setMapStrings(Map mapStrings) {
+        this.mapStrings = mapStrings;
+    }
 
-	public void setMapItems(Map<String, String> mapItems)
-	{
-		this.mapItems = mapItems;
-	}
+    public void setMapItems(Map<String, String> mapItems) {
+        this.mapItems = mapItems;
+    }
 }

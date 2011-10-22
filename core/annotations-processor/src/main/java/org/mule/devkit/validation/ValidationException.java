@@ -50,7 +50,7 @@ public class ValidationException extends Exception {
     }
 
     public Element getElement() {
-        if(element instanceof DefaultDevKitTypeElement) {
+        if (element instanceof DefaultDevKitTypeElement) {
             return ((DefaultDevKitTypeElement) element).unWrap();
         }
         return element;

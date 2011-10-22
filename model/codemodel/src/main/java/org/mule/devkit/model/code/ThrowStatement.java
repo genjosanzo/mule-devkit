@@ -55,11 +55,10 @@ class ThrowStatement implements Statement {
     /**
      * ThrowStatement constructor
      *
-     * @param expr
-     *        Expression which evaluates to ThrowStatement value
+     * @param expr Expression which evaluates to ThrowStatement value
      */
     ThrowStatement(Expression expr) {
-       this.expr = expr;
+        this.expr = expr;
     }
 
     public void state(Formatter f) {

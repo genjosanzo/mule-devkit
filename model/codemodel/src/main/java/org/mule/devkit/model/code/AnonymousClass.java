@@ -42,9 +42,8 @@ package org.mule.devkit.model.code;
 
 /**
  * Anonymous class quick hack.
- * 
- * @author
- * 	Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
+ *
+ * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
 class AnonymousClass extends DefinedClass {
 
@@ -52,20 +51,20 @@ class AnonymousClass extends DefinedClass {
      * Base interface/class from which this anonymous class is built.
      */
     private final TypeReference base;
-    
+
     AnonymousClass(TypeReference _base) {
         super(_base.owner(), 0, null);
         this.base = _base;
     }
-    
+
     @Override
     public String fullName() {
-    	return base.fullName();
+        return base.fullName();
     }
-    
+
     @Override
     public void generate(Formatter f) {
         f.t(base);
     }
-    
+
 }

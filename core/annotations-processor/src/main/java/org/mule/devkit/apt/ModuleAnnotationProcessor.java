@@ -46,7 +46,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 @SupportedAnnotationTypes(value = {"org.mule.api.annotations.Module",
-                                   "org.mule.api.annotations.Connector"})
+        "org.mule.api.annotations.Connector"})
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class ModuleAnnotationProcessor extends AbstractProcessor {
 

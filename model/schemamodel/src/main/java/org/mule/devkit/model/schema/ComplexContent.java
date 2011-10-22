@@ -34,9 +34,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -51,18 +51,15 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "restriction",
-    "extension"
+        "restriction",
+        "extension"
 })
 @XmlRootElement(name = "complexContent")
 public class ComplexContent
-    extends Annotated
-{
+        extends Annotated {
 
     protected ComplexRestrictionType restriction;
     protected ExtensionType extension;
@@ -71,11 +68,9 @@ public class ComplexContent
 
     /**
      * Gets the value of the restriction property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ComplexRestrictionType }
-     *     
+     *
+     * @return possible object is
+     *         {@link ComplexRestrictionType }
      */
     public ComplexRestrictionType getRestriction() {
         return restriction;
@@ -83,11 +78,9 @@ public class ComplexContent
 
     /**
      * Sets the value of the restriction property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ComplexRestrictionType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link ComplexRestrictionType }
      */
     public void setRestriction(ComplexRestrictionType value) {
         this.restriction = value;
@@ -95,11 +88,9 @@ public class ComplexContent
 
     /**
      * Gets the value of the extension property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ExtensionType }
-     *     
+     *
+     * @return possible object is
+     *         {@link ExtensionType }
      */
     public ExtensionType getExtension() {
         return extension;
@@ -107,11 +98,9 @@ public class ComplexContent
 
     /**
      * Sets the value of the extension property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ExtensionType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link ExtensionType }
      */
     public void setExtension(ExtensionType value) {
         this.extension = value;
@@ -119,11 +108,9 @@ public class ComplexContent
 
     /**
      * Gets the value of the mixed property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     *         {@link Boolean }
      */
     public Boolean isMixed() {
         return mixed;
@@ -131,11 +118,9 @@ public class ComplexContent
 
     /**
      * Sets the value of the mixed property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setMixed(Boolean value) {
         this.mixed = value;

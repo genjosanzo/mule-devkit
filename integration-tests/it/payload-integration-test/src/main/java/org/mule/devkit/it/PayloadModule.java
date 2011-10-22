@@ -23,7 +23,7 @@ import org.mule.api.annotations.param.Payload;
 
 @Module(name = "payload")
 public class PayloadModule {
-	
+
     @Processor
     public Object returnPayload(@Payload Object payload) {
         return payload;

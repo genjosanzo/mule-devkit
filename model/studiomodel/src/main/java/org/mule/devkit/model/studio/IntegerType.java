@@ -33,9 +33,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for IntegerType complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="IntegerType">
  *   &lt;complexContent>
@@ -48,17 +48,14 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "IntegerType")
 @XmlSeeAlso({
-    LongType.class
+        LongType.class
 })
 public class IntegerType
-    extends AttributeType
-{
+        extends AttributeType {
 
     @XmlAttribute(name = "defaultValue")
     protected Integer defaultValue;
@@ -71,11 +68,9 @@ public class IntegerType
 
     /**
      * Gets the value of the defaultValue property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
+     *
+     * @return possible object is
+     *         {@link Integer }
      */
     public Integer getDefaultValue() {
         return defaultValue;
@@ -83,11 +78,9 @@ public class IntegerType
 
     /**
      * Sets the value of the defaultValue property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Integer }
      */
     public void setDefaultValue(Integer value) {
         this.defaultValue = value;
@@ -95,7 +88,6 @@ public class IntegerType
 
     /**
      * Gets the value of the min property.
-     * 
      */
     public int getMin() {
         return min;
@@ -103,7 +95,6 @@ public class IntegerType
 
     /**
      * Sets the value of the min property.
-     * 
      */
     public void setMin(int value) {
         this.min = value;
@@ -111,11 +102,9 @@ public class IntegerType
 
     /**
      * Gets the value of the max property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
+     *
+     * @return possible object is
+     *         {@link Integer }
      */
     public Integer getMax() {
         return max;
@@ -123,11 +112,9 @@ public class IntegerType
 
     /**
      * Sets the value of the max property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Integer }
      */
     public void setMax(Integer value) {
         this.max = value;
@@ -135,7 +122,6 @@ public class IntegerType
 
     /**
      * Gets the value of the step property.
-     * 
      */
     public int getStep() {
         return step;
@@ -143,7 +129,6 @@ public class IntegerType
 
     /**
      * Sets the value of the step property.
-     * 
      */
     public void setStep(int value) {
         this.step = value;

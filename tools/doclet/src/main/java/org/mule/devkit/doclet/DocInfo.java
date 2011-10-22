@@ -22,93 +22,93 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public abstract class DocInfo {
-  public DocInfo(String rawCommentText, SourcePositionInfo sp) {
-    mRawCommentText = rawCommentText;
-    mPosition = sp;
-  }
-
-  /**
-   * Returns true if the class represented by this object is defined
-   * locally, and thus will be included in local documentation.
-   */
-  public abstract boolean isDefinedLocally();
-
-  /**
-   * Returns the relative path that represents this item on a
-   * documentation source.
-   */
-  public abstract String relativePath();
-
-  /**
-   * The path to a web page representing this item. The reference is
-   * a relative path if {@link #isDefinedLocally()} returns true.
-   * Otherwise, it is a fully qualified link.
-   */
-  public final String htmlPage() {
-    if (isDefinedLocally()) {
-      return relativePath();
+    public DocInfo(String rawCommentText, SourcePositionInfo sp) {
+        mRawCommentText = rawCommentText;
+        mPosition = sp;
     }
-    
-    Set<FederatedSite> sites = getFederatedReferences();
-    if (!sites.isEmpty()) {
-      return sites.iterator().next().linkFor(relativePath());
+
+    /**
+     * Returns true if the class represented by this object is defined
+     * locally, and thus will be included in local documentation.
+     */
+    public abstract boolean isDefinedLocally();
+
+    /**
+     * Returns the relative path that represents this item on a
+     * documentation source.
+     */
+    public abstract String relativePath();
+
+    /**
+     * The path to a web page representing this item. The reference is
+     * a relative path if {@link #isDefinedLocally()} returns true.
+     * Otherwise, it is a fully qualified link.
+     */
+    public final String htmlPage() {
+        if (isDefinedLocally()) {
+            return relativePath();
+        }
+
+        Set<FederatedSite> sites = getFederatedReferences();
+        if (!sites.isEmpty()) {
+            return sites.iterator().next().linkFor(relativePath());
+        }
+        return null;
     }
-    return null;
-  }
-  
-  public boolean isHidden() {
-    return comment().isHidden();
-  }
 
-  public boolean isDocOnly() {
-    return comment().isDocOnly();
-  }
-
-  public String getRawCommentText() {
-    return mRawCommentText;
-  }
-
-  public Comment comment() {
-    if (mComment == null) {
-      mComment = new Comment(mRawCommentText, parent(), mPosition);
+    public boolean isHidden() {
+        return comment().isHidden();
     }
-    return mComment;
-  }
 
-  public SourcePositionInfo position() {
-    return mPosition;
-  }
-
-  public abstract ContainerInfo parent();
-
-  public void setSince(String since) {
-    mSince = since;
-  }
-
-  public String getSince() {
-    return mSince;
-  }
-  
-  public final void addFederatedReference(FederatedSite source) {
-    mFederatedReferences.add(source);
-  }
-  
-  public final Set<FederatedSite> getFederatedReferences() {
-    return mFederatedReferences;
-  }
-  
-  public final void setFederatedReferences(Data data, String base) {
-    int pos = 0;
-    for (FederatedSite source : getFederatedReferences()) {
-      data.setValue(base + ".federated." + pos + ".url", source.linkFor(relativePath()));
-      data.setValue(base + ".federated." + pos + ".name", source.name());
-      pos++;
+    public boolean isDocOnly() {
+        return comment().isDocOnly();
     }
-  }
 
-  private String mRawCommentText;
-  Comment mComment;
-  SourcePositionInfo mPosition;
-  private String mSince;
-  private Set<FederatedSite> mFederatedReferences = new LinkedHashSet<FederatedSite>();
+    public String getRawCommentText() {
+        return mRawCommentText;
+    }
+
+    public Comment comment() {
+        if (mComment == null) {
+            mComment = new Comment(mRawCommentText, parent(), mPosition);
+        }
+        return mComment;
+    }
+
+    public SourcePositionInfo position() {
+        return mPosition;
+    }
+
+    public abstract ContainerInfo parent();
+
+    public void setSince(String since) {
+        mSince = since;
+    }
+
+    public String getSince() {
+        return mSince;
+    }
+
+    public final void addFederatedReference(FederatedSite source) {
+        mFederatedReferences.add(source);
+    }
+
+    public final Set<FederatedSite> getFederatedReferences() {
+        return mFederatedReferences;
+    }
+
+    public final void setFederatedReferences(Data data, String base) {
+        int pos = 0;
+        for (FederatedSite source : getFederatedReferences()) {
+            data.setValue(base + ".federated." + pos + ".url", source.linkFor(relativePath()));
+            data.setValue(base + ".federated." + pos + ".name", source.name());
+            pos++;
+        }
+    }
+
+    private String mRawCommentText;
+    Comment mComment;
+    SourcePositionInfo mPosition;
+    private String mSince;
+    private Set<FederatedSite> mFederatedReferences = new LinkedHashSet<FederatedSite>();
 }

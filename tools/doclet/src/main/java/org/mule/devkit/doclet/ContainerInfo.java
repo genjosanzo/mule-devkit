@@ -17,7 +17,7 @@
 package org.mule.devkit.doclet;
 
 public interface ContainerInfo {
-  public String qualifiedName();
+    public String qualifiedName();
 
-  public boolean checkLevel();
+    public boolean checkLevel();
 }

@@ -41,12 +41,10 @@
 package org.mule.devkit.model.code;
 
 
-
 /**
  * Captures the value of the annotation.
  *
- * @author
- *     Bhakti Mehta (bhakti.mehta@sun.com)
+ * @author Bhakti Mehta (bhakti.mehta@sun.com)
  */
 final class AnnotationStringValue extends AnnotationValue {
 

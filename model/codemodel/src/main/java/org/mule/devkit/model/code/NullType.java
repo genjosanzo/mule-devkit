@@ -46,12 +46,11 @@ import java.util.List;
 
 /**
  * Special class object that represents the type of "null".
- * 
- * <p>
+ * <p/>
+ * <p/>
  * Use this class with care.
- * 
- * @author
- * 	Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
+ *
+ * @author Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
  */
 public final class NullType extends TypeReference {
 
@@ -59,19 +58,33 @@ public final class NullType extends TypeReference {
         super(_owner);
     }
 
-    public String name() { return "null"; }
-    public String fullName() { return "null"; }
+    public String name() {
+        return "null";
+    }
 
-    public Package _package() { return owner()._package(""); }
+    public String fullName() {
+        return "null";
+    }
 
-    public TypeReference _extends() { return null; }
+    public Package _package() {
+        return owner()._package("");
+    }
+
+    public TypeReference _extends() {
+        return null;
+    }
 
     public Iterator<TypeReference> _implements() {
         return Collections.<TypeReference>emptyList().iterator();
     }
 
-    public boolean isInterface() { return false; }
-    public boolean isAbstract() { return false; }
+    public boolean isInterface() {
+        return false;
+    }
+
+    public boolean isAbstract() {
+        return false;
+    }
 
     protected TypeReference substituteParams(TypeVariable[] variables, List<TypeReference> bindings) {
         return this;

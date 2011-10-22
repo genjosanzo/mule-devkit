@@ -27,6 +27,6 @@ import java.util.Map;
 public class OutboundHeadersModule {
     @Processor
     public void setOutboundHeader(String key, String value, @OutboundHeaders Map<String, Object> headers) throws Exception {
-		headers.put(key,value);
+        headers.put(key, value);
     }
 }

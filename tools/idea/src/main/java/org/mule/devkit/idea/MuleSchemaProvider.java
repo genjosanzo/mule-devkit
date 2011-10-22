@@ -12,8 +12,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.CachedValue;
-import com.intellij.psi.util.CachedValueProvider;
-import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.xml.XmlSchemaProvider;
 import gnu.trove.THashMap;
@@ -55,28 +53,22 @@ public class MuleSchemaProvider extends XmlSchemaProvider {
 
     @NotNull
     public Map<String, XmlFile> getSupportedSchemasByUrl(@NotNull final Module module) {
-        CachedValuesManager manager = CachedValuesManager.getManager(module.getProject());
-        return manager.getCachedValue(module, SCHEMAS_BUNDLE_KEY, new CachedValueProvider<Map<String, XmlFile>>() {
-                    public CachedValueProvider.Result<Map<String, XmlFile>> compute() {
-                        return computeSchemas(module);
-                    }
-                }
-                , false);
+        return computeSchemas(module);
     }
 
     @NotNull
-    private CachedValueProvider.Result<Map<String, XmlFile>> computeSchemas(@NotNull Module module) {
+    private Map<String, XmlFile> computeSchemas(@NotNull Module module) {
         Project project = module.getProject();
         Map<String, String> schemaUrlsAndFileNames = getSchemasFromSpringSchemas(module.getProject());
         Map<String, VirtualFile> allSchemaFilesByFileName = getAllSchemaFilesInProjectAndDepsByFileName(module);
         Map<String, XmlFile> schemasByUrl = createSupportedSchemasByUrl(schemaUrlsAndFileNames, allSchemaFilesByFileName, project);
-        return new CachedValueProvider.Result<Map<String, XmlFile>>(schemasByUrl);
+        return schemasByUrl;
     }
 
     private Map<String, String> getSchemasFromSpringSchemas(@NotNull Project project) {
         ProjectRootManager projectRootManager = ProjectRootManager.getInstance(project);
         for (VirtualFile virtualFile : projectRootManager.getContentRoots()) {
-            VirtualFile springSchemas = virtualFile.findFileByRelativePath("target/generated-resources/mule/META-INF/spring.schemas");
+            VirtualFile springSchemas = virtualFile.findFileByRelativePath("target/generated-sources/mule/META-INF/spring.schemas");
             if (springSchemas != null) {
                 try {
                     String springSchemasContent = new String(springSchemas.contentsToByteArray());
@@ -86,7 +78,9 @@ public class MuleSchemaProvider extends XmlSchemaProvider {
                 }
             }
         }
-        throw new RuntimeException("Cannot find spring.schemas");
+        LOG.warn("Cannot find spring.schemas");
+
+        return new HashMap<String, String>();
     }
 
     private Map<String, XmlFile> createSupportedSchemasByUrl(Map<String, String> supportedSchemas, Map<String, VirtualFile> allSchemaFilesByFileName, Project project) {
@@ -98,7 +92,7 @@ public class MuleSchemaProvider extends XmlSchemaProvider {
                 String url = supportedSchema.getKey();
                 schemasByUrl.put(url, findOrCreateXmlFile(virtualFile, project));
             } else {
-                LOG.warn("Schema declared in spring.schemas but not available within project files or depedencies: " + supportedSchema);
+                LOG.warn("Schema declared in spring.schemas but not available within project files or dependencies: " + supportedSchema);
             }
         }
         return schemasByUrl;
@@ -116,7 +110,11 @@ public class MuleSchemaProvider extends XmlSchemaProvider {
     private XmlFile findXmlFile(VirtualFile virtualFile, Project project) {
         PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
         if (psiFile != null) {
-            return (XmlFile) psiFile.copy();
+            try {
+                return (XmlFile) psiFile.copy();
+            } catch (Exception e) {
+                LOG.warn("Error copying schema: " + virtualFile.getPath(), e);
+            }
         }
         return null;
     }
