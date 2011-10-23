@@ -22,10 +22,14 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:collection="http://www.mulesoft.org/schema/mule/collection"
+      xmlns:dynamic="http://www.mulesoft.org/schema/mule/dynamic"
       xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
-        http://www.mulesoft.org/schema/mule/collection http://www.mulesoft.org/schema/mule/collection/current/mule-collection.xsd">
+        http://www.mulesoft.org/schema/mule/collection http://www.mulesoft.org/schema/mule/collection/current/mule-collection.xsd
+        http://www.mulesoft.org/schema/mule/dynamic http://www.mulesoft.org/schema/mule/dynamic/current/mule-dynamic.xsd">
+
+    <dynamic:config/>
 
     <spring:bean id="objectA" class="java.lang.String">
         <spring:constructor-arg value="ObjectA"/>
@@ -171,4 +175,15 @@
             </collection:map-strings>
         </collection:retrieve-key>
     </flow>
+
+    <flow name="flowDynamicConfigItems">
+        <dynamic:create namespace="http://www.mulesoft.org/schema/mule/collection" name="dynamicConfigA">
+            <dynamic:attributes>
+                <dynamic:attribute key="items" value-ref="list"/>
+            </dynamic:attributes>
+        </dynamic:create>
+        <collection:count-config-items config-ref="dynamicConfigA"/>
+        <dynamic:destroy namespace="http://www.mulesoft.org/schema/mule/collection" name="dynamicConfigA"/>
+    </flow>
+
 </mule>

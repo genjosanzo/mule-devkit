@@ -591,6 +591,10 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         Variable event = process.param(muleEvent, "event");
         Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage", event.invoke("getMessage"));
 
+        DefinedClass moduleObjectClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey((TypeElement)executableElement.getEnclosingElement()));
+        Variable moduleObject = process.body().decl(moduleObjectClass, "castedModuleObject", ExpressionFactory._null());
+        findConfig(muleContext, object, methodName, process, event, moduleObjectClass, moduleObject);
+
         Variable poolObject = null;
         if (poolObjectClass != null) {
             poolObject = process.body().decl(poolObjectClass, "poolObject", ExpressionFactory._null());
@@ -600,7 +604,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 executableElement.getEnclosingElement().getAnnotation(OAuth2.class) != null) {
             for (VariableElement variable : executableElement.getParameters()) {
                 if (variable.getAnnotation(OAuthAccessToken.class) != null || variable.getAnnotation(OAuthAccessTokenSecret.class) != null) {
-                    addOauth(process, event, object, executableElement);
+                    addOauth(process, event, moduleObject, executableElement);
                     break;
                 }
             }
@@ -651,11 +655,11 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
                 Invocation evaluateAndTransformLocal = ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(getGenericType);
 
-                evaluateAndTransformLocal.arg(object.invoke("get" + StringUtils.capitalize(fieldName)));
+                evaluateAndTransformLocal.arg(moduleObject.invoke("get" + StringUtils.capitalize(fieldName)));
 
                 Cast castLocal = ExpressionFactory.cast(type, evaluateAndTransformLocal);
 
-                Conditional ifConfigAlsoNull = ifNotNull._else()._if(Op.eq(object.invoke("get" + StringUtils.capitalize(fieldName)), ExpressionFactory._null()));
+                Conditional ifConfigAlsoNull = ifNotNull._else()._if(Op.eq(moduleObject.invoke("get" + StringUtils.capitalize(fieldName)), ExpressionFactory._null()));
                 TypeReference coreMessages = ref(CoreMessages.class);
                 Invocation failedToInvoke = coreMessages.staticInvoke("failedToCreate");
                 if (methodName != null) {
@@ -691,11 +695,11 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             } else if (variable.asType().toString().contains(HttpCallback.class.getName())) {
                 parameters.add(fields.get(fieldName).getFieldType());
             } else if (variable.getAnnotation(OAuthAccessToken.class) != null) {
-                Invocation getAccessToken = object.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_ACCESS_TOKEN_FIELD_NAME));
+                Invocation getAccessToken = moduleObject.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_ACCESS_TOKEN_FIELD_NAME));
                 Variable accessToken = callProcessor.body().decl(ref(String.class), "accessToken", getAccessToken);
                 parameters.add(accessToken);
             } else if (variable.getAnnotation(OAuthAccessTokenSecret.class) != null) {
-                Invocation getAccessToken = object.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_ACCESS_TOKEN_SECRET_FIELD_NAME));
+                Invocation getAccessToken = moduleObject.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_ACCESS_TOKEN_SECRET_FIELD_NAME));
                 Variable accessTokenSecret = callProcessor.body().decl(ref(String.class), "accessTokenSecret", getAccessToken);
                 parameters.add(accessTokenSecret);
             } else if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
@@ -812,7 +816,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionKeyRoleKey((TypeElement) executableElement.getEnclosingElement()));
 
             Invocation newKey = ExpressionFactory._new(connectionKey);
-            Invocation createConnection = object.invoke("acquireConnection");
+            Invocation createConnection = moduleObject.invoke("acquireConnection");
             for (String field : connectionParameters.keySet()) {
                 newKey.arg(connectionParameters.get(field));
             }
@@ -839,7 +843,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         if (connectMethod != null) {
             generateMethodCall(callProcessor.body(), connection, methodName, parameters, muleContext, event, returnType, poolObject, interceptCallback, messageProcessorListener);
         } else {
-            generateMethodCall(callProcessor.body(), object, methodName, parameters, muleContext, event, returnType, poolObject, interceptCallback, messageProcessorListener);
+            generateMethodCall(callProcessor.body(), moduleObject, methodName, parameters, muleContext, event, returnType, poolObject, interceptCallback, messageProcessorListener);
         }
 
         for (VariableElement variable : executableElement.getParameters()) {
@@ -883,7 +887,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 newKey.arg(connectionParameters.get(field));
             }
 
-            Invocation destroySession = object.invoke("destroyConnection");
+            Invocation destroySession = moduleObject.invoke("destroyConnection");
             destroySession.arg(newKey);
             destroySession.arg(connection);
 
@@ -914,7 +918,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         if (poolObjectClass != null) {
             Block fin = callProcessor._finally();
             Block poolObjectNotNull = fin._if(Op.ne(poolObject, ExpressionFactory._null()))._then();
-            poolObjectNotNull.add(object.invoke("getLifecyleEnabledObjectPool").invoke("returnObject").arg(poolObject));
+            poolObjectNotNull.add(moduleObject.invoke("getLifecyleEnabledObjectPool").invoke("returnObject").arg(poolObject));
         }
 
         if (connectMethod != null) {
@@ -930,7 +934,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 newKey.arg(connectionParameters.get(field));
             }
 
-            Invocation returnConnection = object.invoke("releaseConnection");
+            Invocation returnConnection = moduleObject.invoke("releaseConnection");
             returnConnection.arg(newKey);
             returnConnection.arg(connection);
 
@@ -942,7 +946,27 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
     }
 
-    private void addOauth(Method process, Variable event, FieldVariable object, ExecutableElement executableElement) {
+    private void findConfig(FieldVariable muleContext, FieldVariable object, String methodName, Method process, Variable event, DefinedClass moduleObjectClass, Variable moduleObject) {
+        Conditional ifObjectIsString = process.body()._if(Op._instanceof(object, ref(String.class)));
+        ifObjectIsString._else().assign(moduleObject, ExpressionFactory.cast(moduleObjectClass, object));
+        ifObjectIsString._then().assign(moduleObject, ExpressionFactory.cast(moduleObjectClass, muleContext.invoke("getRegistry").invoke("lookupObject").arg(ExpressionFactory.cast(ref(String.class), object))));
+
+        TypeReference coreMessages = ref(CoreMessages.class);
+        Invocation failedToInvoke = coreMessages.staticInvoke("failedToCreate");
+        if (methodName != null) {
+            failedToInvoke.arg(ExpressionFactory.lit(methodName));
+        }
+        Invocation messageException = ExpressionFactory._new(ref(MessagingException.class));
+        messageException.arg(failedToInvoke);
+        if (event != null) {
+            messageException.arg(event);
+        }
+        messageException.arg(ExpressionFactory._new(ref(RuntimeException.class)).arg("Cannot find the configuration specified by the config-ref attribute."));
+
+        ifObjectIsString._then()._if(Op.eq(moduleObject, ExpressionFactory._null()))._then()._throw(messageException);
+    }
+
+    private void addOauth(Method process, Variable event, Variable object, ExecutableElement executableElement) {
         OAuth2 oauth2 = executableElement.getEnclosingElement().getAnnotation(OAuth2.class);
         if (oauth2 != null && !StringUtils.isEmpty(oauth2.expirationRegex())) {
             Block ifTokenExpired = process.body()._if(object.invoke(OAuth2AdapterGenerator.HAS_TOKEN_EXPIRED_METHOD_NAME))._then();

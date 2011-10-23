@@ -141,13 +141,14 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         // TODO: replace with a class role
         String namespaceHandlerName = context.getNameUtils().generateClassName(typeElement, ".config.spring", NAMESPACE_HANDLER_SUFFIX);
+        String className = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement)).boxify().fullName();
 
-        SchemaLocation versionedSchemaLocation = new SchemaLocation(schema, schema.getTargetNamespace(), fileName, versionedLocation, namespaceHandlerName);
+        SchemaLocation versionedSchemaLocation = new SchemaLocation(schema, schema.getTargetNamespace(), fileName, versionedLocation, namespaceHandlerName, className);
 
         context.getSchemaModel().addSchemaLocation(versionedSchemaLocation);
 
         if (currentLocation != null) {
-            SchemaLocation currentSchemaLocation = new SchemaLocation(null, schema.getTargetNamespace(), fileName, currentLocation, namespaceHandlerName);
+            SchemaLocation currentSchemaLocation = new SchemaLocation(null, schema.getTargetNamespace(), fileName, currentLocation, namespaceHandlerName, className);
             context.getSchemaModel().addSchemaLocation(currentSchemaLocation);
         }
     }

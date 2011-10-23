@@ -341,8 +341,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         Conditional ifConfigRef = parse.body()._if(Op.cand(Op.ne(configRef, ExpressionFactory._null()),
                 Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(configRef))));
         ifConfigRef._then().add(builder.invoke("addPropertyValue").arg("moduleObject").arg(
-                ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(configRef))
-        );
+                configRef));
 
         Method getAttributeValue = generateGetAttributeValue(beanDefinitionparser);
 

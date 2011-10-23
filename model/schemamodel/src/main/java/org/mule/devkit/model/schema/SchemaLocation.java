@@ -23,13 +23,15 @@ public class SchemaLocation {
     private Schema schema;
     private String namespaceHandler;
     private String targetNamespace;
+    private String className;
 
-    public SchemaLocation(Schema schema, String targetNamespace, String fileName, String location, String namespaceHandler) {
+    public SchemaLocation(Schema schema, String targetNamespace, String fileName, String location, String namespaceHandler, String className) {
         this.fileName = fileName;
         this.location = location;
         this.schema = schema;
         this.namespaceHandler = namespaceHandler;
         this.targetNamespace = targetNamespace;
+        this.className = className;
     }
 
     public String getFileName() {
@@ -51,4 +53,9 @@ public class SchemaLocation {
     public String getTargetNamespace() {
         return targetNamespace;
     }
+
+    public String getClassName() {
+        return className;
+    }
 }
+

@@ -92,8 +92,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected FieldVariable generateFieldForModuleObject(DefinedClass messageProcessorClass, TypeElement typeElement) {
-        DefinedClass moduleObject = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
-        FieldVariable field = messageProcessorClass.field(Modifier.PRIVATE, moduleObject, "moduleObject");
+        FieldVariable field = messageProcessorClass.field(Modifier.PRIVATE, ref(Object.class), "moduleObject");
         field.javadoc().add("Module object");
 
         return field;

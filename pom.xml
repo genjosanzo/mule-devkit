@@ -31,6 +31,7 @@
         <module>model</module>
         <module>core</module>
         <module>tools</module>
+        <module>dynamic</module>
         <module>archetypes</module>
         <module>integration-tests</module>
     </modules>

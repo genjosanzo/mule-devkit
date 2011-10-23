@@ -1,0 +1,12 @@
+<!-- BEGIN_INCLUDE(dynamic:create) -->
+<dynamic:create namespace="http://www.mulesoft.org/schema/mule/sfdc" name="saleforce-config">
+    <dynamic:attributes>
+        <dynamic:attribute key="username">john.doe@mycompany.com</dynamic:attribute>
+        <dynamic:attribute key="password">mypassword</dynamic:attribute>
+        <dynamic:attribute key="securityToken">abc123</dynamic:attribute>
+    </dynamic:attributes>
+</dynamic:create>
+<!-- END_INCLUDE(dynamic:create) -->
+<!-- BEGIN_INCLUDE(dynamic:destroy) -->
+<dynamic:destroy namespace="http://www.mulesoft.org/schema/mule/sfdc" name="saleforce-config"/>
+<!-- END_INCLUDE(dynamic:destroy) -->

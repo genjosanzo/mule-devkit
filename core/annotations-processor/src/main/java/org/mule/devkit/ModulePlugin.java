@@ -61,7 +61,6 @@ public class ModulePlugin implements Plugin {
 
     public ModulePlugin() {
         generators = new ArrayList<Generator>();
-        generators.add(new SchemaGenerator());
         generators.add(new StringToDateTransformerGenerator());
         generators.add(new HttpCallbackGenerator());
         generators.add(new CapabilitiesAdapterGenerator());
@@ -84,6 +83,7 @@ public class ModulePlugin implements Plugin {
         generators.add(new NamespaceHandlerGenerator());
         generators.add(new RegistryBootstrapGenerator());
         generators.add(new MuleStudioXmlGenerator());
+        generators.add(new SchemaGenerator());
         //generators.add(new DSLWrapperGenerator());
 
         validators = new ArrayList<Validator>();
