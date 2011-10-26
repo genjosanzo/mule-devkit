@@ -31,6 +31,7 @@ import java.util.Map;
  * @author MuleSoft, Inc.
  */
 @Module(name = "collection")
+@SuppressWarnings("unchecked")
 public class CollectionModule {
     /**
      * Configurable strings
@@ -78,7 +79,7 @@ public class CollectionModule {
      */
     @Processor
     public int countConfigStrings() {
-        return this.strings.size();
+        return strings.size();
     }
 
     /**
@@ -88,7 +89,7 @@ public class CollectionModule {
      */
     @Processor
     public int countConfigItems() {
-        return this.items.size();
+        return items.size();
     }
 
     @Processor
@@ -108,17 +109,17 @@ public class CollectionModule {
 
     @Processor
     public int countConfigMapStrings() {
-        return this.mapStrings.size();
+        return mapStrings.size();
     }
 
     @Processor
     public String appendConfigMapItems() {
-        String result = "";
-        for (Object part : this.mapItems.keySet()) {
-            result += this.mapItems.get(part);
+        StringBuilder result = new StringBuilder();
+        for (Object part : mapItems.keySet()) {
+            result.append(mapItems.get(part));
         }
 
-        return result;
+        return result.toString();
     }
 
     @Processor
@@ -140,6 +141,11 @@ public class CollectionModule {
     @Processor
     public int countTwoLists(List<String> firstLists, List<String> secondLists) {
         return firstLists.size() + secondLists.size();
+    }
+
+    @Processor
+    public void mapOfLists(Map<String, List<String>> map) {
+
     }
 
     public void setStrings(List strings) {

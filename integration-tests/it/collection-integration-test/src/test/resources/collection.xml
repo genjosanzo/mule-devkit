@@ -171,4 +171,13 @@
             </collection:map-strings>
         </collection:retrieve-key>
     </flow>
+
+    <flow name="flowMapOfLists">
+        <collection:map-of-lists config-ref="configA">
+            <collection:map>
+                <collection:map key="key1" value-ref="list" />
+                <collection:map key="key2" value-ref="list" />
+            </collection:map>
+        </collection:map-of-lists>
+    </flow>
 </mule>

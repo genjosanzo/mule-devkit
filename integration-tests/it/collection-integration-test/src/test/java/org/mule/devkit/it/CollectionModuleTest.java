@@ -71,6 +71,10 @@ public class CollectionModuleTest extends AbstractModuleTest {
         runFlowWithPayload("flowMapOfObjects", 2, "SOFT");
     }
 
+    public void testMapOfLists() throws Exception {
+        runFlow("flowMapOfLists");
+    }
+
     public void testRetrieveKey() throws Exception {
         Map<String, String> a1 = new HashMap<String, String>();
         a1.put("a", "Mule");

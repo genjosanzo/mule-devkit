@@ -33,12 +33,14 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import javax.xml.bind.annotation.XmlType;
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public final class TypeMirrorUtils {
-    private static final List<Class<?>> PARAMETER_TYPES_TO_IGNORE = Arrays.<Class<?>>asList(SourceCallback.class, InterceptCallback.class);
-    private static final List<Class<? extends java.lang.annotation.Annotation>> PARAMETERS_ANNOTATIONS_TO_IGNORE =
+    private static final List<Class<?>> PARAMETER_TYPES_TO_IGNORE = Arrays.asList(SourceCallback.class, InterceptCallback.class);
+    private static final List<Class<? extends Annotation>> PARAMETERS_ANNOTATIONS_TO_IGNORE =
             Arrays.asList(InboundHeaders.class, InvocationHeaders.class, OutboundHeaders.class, Payload.class, OAuthAccessToken.class, OAuthAccessTokenSecret.class);
 
     private Types types;
@@ -70,10 +72,10 @@ public final class TypeMirrorUtils {
             return true;
         }
 
-        if (type.toString().contains(java.util.List.class.getName())) {
+        if (type.toString().contains(List.class.getName())) {
             DeclaredType variableType = (DeclaredType) type;
-            java.util.List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
-            if (variableTypeParameters.size() == 0) {
+            List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
+            if (variableTypeParameters.isEmpty()) {
                 return false;
             }
 
@@ -94,7 +96,7 @@ public final class TypeMirrorUtils {
             return true;
         }
 
-        if (type.toString().contains(java.util.List.class.getName())) {
+        if (type.toString().startsWith(List.class.getName())) {
             return true;
         }
 
@@ -109,7 +111,7 @@ public final class TypeMirrorUtils {
     }
 
     public boolean isMap(TypeMirror type) {
-        if (type.toString().contains(java.util.Map.class.getName())) {
+        if (type.toString().startsWith(Map.class.getName())) {
             return true;
         }
 
@@ -145,7 +147,7 @@ public final class TypeMirrorUtils {
                 return true;
             }
         }
-        for (Class<? extends java.lang.annotation.Annotation> annotationToIgnore : PARAMETERS_ANNOTATIONS_TO_IGNORE) {
+        for (Class<? extends Annotation> annotationToIgnore : PARAMETERS_ANNOTATIONS_TO_IGNORE) {
             if (variable.getAnnotation(annotationToIgnore) != null) {
                 return true;
             }
