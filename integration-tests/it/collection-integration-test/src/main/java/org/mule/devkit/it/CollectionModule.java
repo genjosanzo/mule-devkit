@@ -24,6 +24,7 @@ import org.mule.api.annotations.param.Optional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Collection module
@@ -145,7 +146,14 @@ public class CollectionModule {
 
     @Processor
     public void mapOfLists(Map<String, List<String>> map) {
-
+        if(map.size() != 2) {
+            throw new RuntimeException("Map should have 2 entries");
+        }
+        for(Entry<String, List<String>> entry : map.entrySet()) {
+            if(entry.getValue().size() != 3) {
+                throw new RuntimeException("Map value should be a list containg 3 values");
+            }
+        }
     }
 
     public void setStrings(List strings) {

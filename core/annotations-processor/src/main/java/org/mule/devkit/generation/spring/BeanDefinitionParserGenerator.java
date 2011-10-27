@@ -361,10 +361,10 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         }
 
         for (VariableElement variable : executableElement.getParameters()) {
-            if (variable.asType().toString().contains(SourceCallback.class.getName())) {
+            if (variable.asType().toString().startsWith(SourceCallback.class.getName())) {
                 continue;
             }
-            if (variable.asType().toString().contains(InterceptCallback.class.getName())) {
+            if (variable.asType().toString().startsWith(InterceptCallback.class.getName())) {
                 continue;
             }
 
@@ -407,7 +407,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                 managedMap.getNotRefBlock().add(builder.invoke("addPropertyValue").arg(fieldName).arg(managedMap.getManagedCollection()));
             } else if (context.getTypeMirrorUtils().isEnum(variable.asType())) {
                 generateParseEnum(parse.body(), element, builder, fieldName);
-            } else if (variable.asType().toString().contains(HttpCallback.class.getName())) {
+            } else if (variable.asType().toString().startsWith(HttpCallback.class.getName())) {
                 Variable callbackFlowName = parse.body().decl(ref(String.class), fieldName + "CallbackFlowName", ExpressionFactory.invoke(getAttributeValue).arg(element).arg(context.getNameUtils().uncamel(fieldName) + "-flow-ref"));
                 Block block = parse.body()._if(Op.ne(callbackFlowName, ExpressionFactory._null()))._then();
                 block.invoke(builder, "addPropertyValue").arg(fieldName + "CallbackFlow").arg(ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(callbackFlowName));
@@ -657,17 +657,17 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         ifValueRef._then().assign(valueObject,
                 ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(valueRef));
 
-
+        Block ifNotValueRef = ifValueRef._else();
         if (variableTypeParameters.size() > 1 && context.getTypeMirrorUtils().isArrayOrList(variableTypeParameters.get(1))) {
-            UpperBlockClosure subList = generateParseArrayOrList(forEach.body(), variableTypeParameters.get(1), forEach.var(), builder, "inner-" + childName, patternInfo, parserContext);
+            UpperBlockClosure subList = generateParseArrayOrList(ifNotValueRef, variableTypeParameters.get(1), forEach.var(), builder, "inner-" + childName, patternInfo, parserContext);
 
             subList.getNotRefBlock().assign(valueObject, subList.getManagedCollection());
         } else if (variableTypeParameters.size() > 1 && context.getTypeMirrorUtils().isMap(variableTypeParameters.get(1))) {
-            UpperBlockClosure subMap = generateParseMap(forEach.body(), variableTypeParameters.get(1), forEach.var(), builder, "inner-" + childName, patternInfo, parserContext);
+            UpperBlockClosure subMap = generateParseMap(ifNotValueRef, variableTypeParameters.get(1), forEach.var(), builder, "inner-" + childName, patternInfo, parserContext);
 
             subMap.getNotRefBlock().assign(valueObject, subMap.getManagedCollection());
         } else {
-            ifValueRef._else().assign(valueObject,
+            ifNotValueRef.assign(valueObject,
                     forEach.var().invoke("getTextContent"));
         }
 
