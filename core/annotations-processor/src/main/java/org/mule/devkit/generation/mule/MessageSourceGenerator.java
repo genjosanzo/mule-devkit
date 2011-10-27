@@ -233,7 +233,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
         List<Expression> parameters = new ArrayList<Expression>();
         for (VariableElement variable : executableElement.getParameters()) {
-            if (variable.asType().toString().contains(SourceCallback.class.getName())) {
+            if (variable.asType().toString().startsWith(SourceCallback.class.getName())) {
                 parameters.add(ExpressionFactory._this());
             } else {
                 String fieldName = variable.getSimpleName().toString();

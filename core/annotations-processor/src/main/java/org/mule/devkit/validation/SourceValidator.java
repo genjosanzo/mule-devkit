@@ -55,7 +55,7 @@ public class SourceValidator implements Validator {
             boolean containsSourceCallback = false;
             List<? extends VariableElement> parameters = method.getParameters();
             for (VariableElement parameter : parameters) {
-                if (parameter.asType().toString().contains(SourceCallback.class.getName())) {
+                if (parameter.asType().toString().startsWith(SourceCallback.class.getName())) {
                     containsSourceCallback = true;
                 }
             }

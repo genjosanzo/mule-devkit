@@ -89,7 +89,7 @@ public class ProcessorValidator implements Validator {
             boolean containsInterceptCallback = false;
             List<? extends VariableElement> parameters = method.getParameters();
             for (VariableElement parameter : parameters) {
-                if (parameter.asType().toString().contains(InterceptCallback.class.getName())) {
+                if (parameter.asType().toString().startsWith(InterceptCallback.class.getName())) {
                     containsInterceptCallback = true;
                 }
             }

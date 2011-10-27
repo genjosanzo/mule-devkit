@@ -68,18 +68,18 @@ public final class TypeMirrorUtils {
     }
 
     public boolean isNestedProcessor(TypeMirror type) {
-        if (type.toString().contains(NestedProcessor.class.getName())) {
+        if (type.toString().startsWith(NestedProcessor.class.getName())) {
             return true;
         }
 
-        if (type.toString().contains(List.class.getName())) {
+        if (type.toString().startsWith(List.class.getName())) {
             DeclaredType variableType = (DeclaredType) type;
             List<? extends TypeMirror> variableTypeParameters = variableType.getTypeArguments();
             if (variableTypeParameters.isEmpty()) {
                 return false;
             }
 
-            if (variableTypeParameters.get(0).toString().contains(NestedProcessor.class.getName())) {
+            if (variableTypeParameters.get(0).toString().startsWith(NestedProcessor.class.getName())) {
                 return true;
             }
         }
@@ -126,7 +126,7 @@ public final class TypeMirrorUtils {
     }
 
     public boolean isEnum(TypeMirror type) {
-        if (type.toString().contains(Enum.class.getName())) {
+        if (type.toString().startsWith(Enum.class.getName())) {
             return true;
         }
 
