@@ -108,8 +108,6 @@ public class ClearPage {
 
         String rootPath = getPathToRoot(filename);
 
-        System.out.println("Filename " + filename + " toroot " + rootPath);
-
         data.setValue("toroot", rootPath);
         data.setValue("toassets", rootPath + Doclava.assetsOutputDir + "/");
         data.setValue("filename", filename);
