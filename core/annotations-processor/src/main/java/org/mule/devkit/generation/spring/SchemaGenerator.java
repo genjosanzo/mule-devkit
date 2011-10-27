@@ -30,34 +30,8 @@ import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
-import org.mule.devkit.model.schema.Annotation;
-import org.mule.devkit.model.schema.Any;
-import org.mule.devkit.model.schema.Attribute;
-import org.mule.devkit.model.schema.ComplexContent;
-import org.mule.devkit.model.schema.ComplexType;
-import org.mule.devkit.model.schema.Documentation;
-import org.mule.devkit.model.schema.Element;
-import org.mule.devkit.model.schema.ExplicitGroup;
-import org.mule.devkit.model.schema.ExtensionType;
-import org.mule.devkit.model.schema.FormChoice;
-import org.mule.devkit.model.schema.GroupRef;
-import org.mule.devkit.model.schema.Import;
-import org.mule.devkit.model.schema.LocalComplexType;
-import org.mule.devkit.model.schema.LocalSimpleType;
-import org.mule.devkit.model.schema.NoFixedFacet;
-import org.mule.devkit.model.schema.NumFacet;
-import org.mule.devkit.model.schema.ObjectFactory;
-import org.mule.devkit.model.schema.Pattern;
-import org.mule.devkit.model.schema.Restriction;
-import org.mule.devkit.model.schema.Schema;
-import org.mule.devkit.model.schema.SchemaLocation;
-import org.mule.devkit.model.schema.SimpleContent;
-import org.mule.devkit.model.schema.SimpleExtensionType;
-import org.mule.devkit.model.schema.SimpleType;
-import org.mule.devkit.model.schema.TopLevelComplexType;
-import org.mule.devkit.model.schema.TopLevelElement;
-import org.mule.devkit.model.schema.TopLevelSimpleType;
-import org.mule.devkit.model.schema.Union;
+import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.schema.*;
 import org.mule.util.StringUtils;
 
 import javax.inject.Named;
@@ -69,7 +43,9 @@ import javax.lang.model.type.TypeMirror;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class SchemaGenerator extends AbstractModuleGenerator {
@@ -91,7 +67,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private static final String ATTRIBUTE_NAME_CONFIG_REF = "config-ref";
     private static final String UNBOUNDED = "unbounded";
     private static final String LAX = "lax";
-    private static final String ELEMENT_NAME_CONFIG = "config";
     private static final String ATTRIBUTE_NAME_NAME = "name";
     private static final String REF_SUFFIX = "-ref";
     private static final String DOMAIN_DEFAULT_VALUE = "${fullDomain}";
@@ -123,6 +98,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         importXmlNamespace(schema);
         importSpringFrameworkNamespace(schema);
         importMuleNamespace(schema);
+        importMuleDevKitNamespace(schema);
 
         registerTypes(schema);
         registerConfigElement(schema, targetNamespace, typeElement);
@@ -663,7 +639,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     private void registerConfigElement(Schema schema, String targetNamespace, DevKitTypeElement typeElement) {
 
-        ExtensionType config = registerExtension(schema, ELEMENT_NAME_CONFIG);
+        DefinedClass moduleClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
+        Map<QName, String> otherAttributes = new HashMap<QName, String>();
+        otherAttributes.put(SchemaConstants.MULE_DEVKIT_JAVA_CLASS_TYPE, moduleClass.fullName());
+        ExtensionType config = registerExtension(schema, SchemaConstants.ELEMENT_NAME_CONFIG, otherAttributes);
         Attribute nameAttribute = createAttribute(ATTRIBUTE_NAME_NAME, true, SchemaConstants.STRING, "Give a name to this configuration so it can be later referenced by config-ref.");
         config.getAttributeOrAttributeGroup().add(nameAttribute);
 
@@ -679,7 +658,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
 
         // get the executable typeElement for create connectivity
-        ExecutableElement connectMethod = connectForClass(typeElement);
+        ExecutableElement connectMethod = connectMethodForClass(typeElement);
 
         if (connectMethod != null) {
             // add a configurable argument for each connectivity variable
@@ -899,6 +878,13 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         schema.getIncludeOrImportOrRedefine().add(muleSchemaImport);
     }
 
+    private void importMuleDevKitNamespace(Schema schema) {
+        Import muleSchemaImport = new Import();
+        muleSchemaImport.setNamespace(SchemaConstants.MULE_DEVKIT_NAMESPACE);
+        muleSchemaImport.setSchemaLocation(SchemaConstants.MULE_DEVKIT_SCHEMA_LOCATION);
+        schema.getIncludeOrImportOrRedefine().add(muleSchemaImport);
+    }
+
     private void importSpringFrameworkNamespace(Schema schema) {
         Import springFrameworkImport = new Import();
         springFrameworkImport.setNamespace(SchemaConstants.SPRING_FRAMEWORK_NAMESPACE);
@@ -935,13 +921,15 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         return transformer;
     }
 
-    private ExtensionType registerExtension(Schema schema, String name) {
+    private ExtensionType registerExtension(Schema schema, String name, Map<QName, String> otherAttributes) {
         LocalComplexType complexType = new LocalComplexType();
 
         Element extension = new TopLevelElement();
         extension.setName(name);
         extension.setSubstitutionGroup(SchemaConstants.MULE_ABSTRACT_EXTENSION);
         extension.setComplexType(complexType);
+        
+        extension.getOtherAttributes().putAll(otherAttributes);
 
         ComplexContent complexContent = new ComplexContent();
         complexType.setComplexContent(complexContent);

@@ -29,6 +29,7 @@ import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Package;
+import org.mule.devkit.model.schema.SchemaConstants;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 import javax.lang.model.element.ExecutableElement;

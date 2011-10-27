@@ -55,8 +55,8 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        ExecutableElement connectMethod = connectForClass(typeElement);
-        ExecutableElement disconnectMethod = disconnectForClass(typeElement);
+        ExecutableElement connectMethod = connectMethodForClass(typeElement);
+        ExecutableElement disconnectMethod = disconnectMethodForClass(typeElement);
 
         if (connectMethod == null || disconnectMethod == null) {
             return false;
@@ -67,8 +67,9 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
 
     @Override
     protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
-        ExecutableElement connectMethod = connectForClass(typeElement);
-        ExecutableElement disconnectMethod = disconnectForClass(typeElement);
+        ExecutableElement connectMethod = connectMethodForClass(typeElement);
+        ExecutableElement disconnectMethod = disconnectMethodForClass(typeElement);
+        ExecutableElement validateConnectionMethod = validateConnectionMethodForClass(typeElement);
 
         DefinedClass connectionManagerClass = getConnectionManagerAdapterClass(typeElement);
 
@@ -81,6 +82,9 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
             generateSetter(connectionManagerClass, configField);
             generateGetter(connectionManagerClass, configField);
         }
+        
+        // logger field
+        FieldVariable logger = generateLoggerField(connectionManagerClass);        
 
         // standard fields
         FieldVariable muleContext = generateFieldForMuleContext(connectionManagerClass);
@@ -104,7 +108,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         generateSetFlowConstructMethod(connectionManagerClass, flowConstruct);
         generateSetMuleContextMethod(connectionManagerClass, muleContext);
 
-        DefinedClass connectionKeyClass = getConnectionKeyClass(typeElement, connectionManagerClass);
+        DefinedClass connectionKeyClass = getConnectionParametersClass(typeElement, connectionManagerClass);
 
         // generate key fields
         Map<String, AbstractMessageGenerator.FieldVariableElement> keyFields = generateStandardFieldForEachParameter(connectionKeyClass, connectMethod);
@@ -131,10 +135,10 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         connectionFactoryConstructor.body().assign(ExpressionFactory._this().ref(connectionManagerInFactory),
                 constructorConnectionManager);
 
-        generateMakeObjectMethod(typeElement, connectMethod, connectionFactoryClass, connectionKeyClass, keyFields, connectionManagerInFactory);
+        generateMakeObjectMethod(typeElement, connectMethod, connectionFactoryClass, connectionKeyClass, connectionManagerInFactory);
         generateDestroyObjectMethod(connectMethod, disconnectMethod, connectionKeyClass, connectionFactoryClass);
-        generateValidateObjectMethod(connectionFactoryClass);
-        generateActivateObjectMethod(connectionFactoryClass);
+        generateValidateObjectMethod(connectionFactoryClass, logger, validateConnectionMethod);
+        generateActivateObjectMethod(connectionFactoryClass, validateConnectionMethod, connectMethod, keyFields, connectionKeyClass);
         generatePassivateObjectMethod(connectionFactoryClass);
 
         generateInitialiseMethod(connectionManagerClass, connectionPool, poolingProfile, connectionFactoryClass);
@@ -253,11 +257,34 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         ).arg(config));
     }
 
-    private void generateActivateObjectMethod(DefinedClass connectionFactoryClass) {
+    private void generateActivateObjectMethod(DefinedClass connectionFactoryClass, ExecutableElement validateConnectionMethod, ExecutableElement connect, Map<String, FieldVariableElement> keyFields, DefinedClass connectionKeyClass) {
+        DefinedClass connectorClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey((TypeElement) validateConnectionMethod.getEnclosingElement()));
         Method activateObject = connectionFactoryClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "activateObject");
         activateObject._throws(ref(Exception.class));
-        activateObject.param(Object.class, "key");
-        activateObject.param(Object.class, "obj");
+        Variable key = activateObject.param(Object.class, "key");
+        Variable obj = activateObject.param(Object.class, "obj");
+
+        Conditional ifNotKey = activateObject.body()._if(Op.not(Op._instanceof(key, connectionKeyClass)));
+        ifNotKey._then()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg("Invalid key type"));
+
+        Conditional ifNotObj = activateObject.body()._if(Op.not(Op._instanceof(obj, connectorClass)));
+        ifNotObj._then()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg("Invalid connector type"));
+        
+        Cast casterConnector = ExpressionFactory.cast(connectorClass, obj);
+        TryStatement tryDisconnect = activateObject.body()._try();
+        Conditional ifNotConnected = tryDisconnect.body()._if(Op.not(casterConnector.invoke(validateConnectionMethod.getSimpleName().toString())));
+        Cast castedConnectionKey = ExpressionFactory.cast(connectionKeyClass, key);
+        Invocation connectInvoke = ExpressionFactory.cast(connectorClass, obj).invoke(connect.getSimpleName().toString());
+        for (String fieldName : keyFields.keySet()) {
+            connectInvoke.arg(castedConnectionKey.invoke("get" + StringUtils.capitalize(keyFields.get(fieldName).getField().name())));
+        }
+        ifNotConnected._then().add(connectInvoke);
+
+        
+        CatchBlock catchAndRethrow = tryDisconnect._catch(ref(Exception.class));
+        Variable e = catchAndRethrow.param("e");
+        catchAndRethrow.body()._throw(e);
+        
     }
 
     private void generatePassivateObjectMethod(DefinedClass connectionFactoryClass) {
@@ -267,12 +294,22 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         passivateObject.param(Object.class, "obj");
     }
 
-    private void generateValidateObjectMethod(DefinedClass connectionFactoryClass) {
+    private void generateValidateObjectMethod(DefinedClass connectionFactoryClass, FieldVariable logger, ExecutableElement validateConnectionMethod) {
+        DefinedClass connectorClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey((TypeElement) validateConnectionMethod.getEnclosingElement()));
         Method validateObject = connectionFactoryClass.method(Modifier.PUBLIC, context.getCodeModel().BOOLEAN, "validateObject");
         validateObject.param(Object.class, "key");
-        validateObject.param(Object.class, "obj");
+        Variable obj = validateObject.param(Object.class, "obj");
 
-        validateObject.body()._return(ExpressionFactory.TRUE);
+        Conditional ifNotObj = validateObject.body()._if(Op.not(Op._instanceof(obj, connectorClass)));
+        ifNotObj._then()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg("Invalid connector type"));
+
+        Cast casterConnector = ExpressionFactory.cast(connectorClass, obj);
+        TryStatement tryDisconnect = validateObject.body()._try();
+        tryDisconnect.body()._return(casterConnector.invoke(validateConnectionMethod.getSimpleName().toString()));
+        CatchBlock catchAndRethrow = tryDisconnect._catch(ref(Exception.class));
+        Variable e = catchAndRethrow.param("e");
+        catchAndRethrow.body().add(logger.invoke("error").arg(e.invoke("getMessage")).arg(e));
+        catchAndRethrow.body()._return(ExpressionFactory.FALSE);
     }
 
     private void generateDestroyObjectMethod(ExecutableElement connect, ExecutableElement disconnect, DefinedClass connectionKeyClass, DefinedClass connectionFactoryClass) {
@@ -298,7 +335,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         tryDisconnect._finally()._if(Op._instanceof(casterConnector, ref(Disposable.class)))._then().add(casterConnector.invoke("dispose"));
     }
 
-    private void generateMakeObjectMethod(DevKitTypeElement typeElement, ExecutableElement connect, DefinedClass connectionFactoryClass, DefinedClass connectionKey, Map<String, FieldVariableElement> keyFields, FieldVariable connectionManagerInFactory) {
+    private void generateMakeObjectMethod(DevKitTypeElement typeElement, ExecutableElement connect, DefinedClass connectionFactoryClass, DefinedClass connectionKey, FieldVariable connectionManagerInFactory) {
         DefinedClass connectorClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey((TypeElement) connect.getEnclosingElement()));
         Method makeObject = connectionFactoryClass.method(Modifier.PUBLIC, Object.class, "makeObject");
         makeObject._throws(ref(Exception.class));
@@ -315,13 +352,6 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
 
         makeObject.body()._if(Op._instanceof(connector, ref(Initialisable.class)))._then().add(connector.invoke("initialise"));
         makeObject.body()._if(Op._instanceof(connector, ref(Startable.class)))._then().add(connector.invoke("start"));
-
-        Cast castedConnectionKey = ExpressionFactory.cast(connectionKey, key);
-        Invocation connectInvoke = connector.invoke(connect.getSimpleName().toString());
-        for (String fieldName : keyFields.keySet()) {
-            connectInvoke.arg(castedConnectionKey.invoke("get" + StringUtils.capitalize(keyFields.get(fieldName).getField().name())));
-        }
-        makeObject.body().add(connectInvoke);
 
         makeObject.body()._return(connector);
     }
@@ -352,7 +382,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         DefinedClass connectionManagerClass = pkg._class(context.getNameUtils().getClassName(connectionManagerName));
         connectionManagerClass._implements(ref(Initialisable.class));
         connectionManagerClass._implements(ref(Capabilities.class));
-        connectionManagerClass._implements(ref(ConnectionManager.class).narrow(getConnectionKeyClass(typeElement, connectionManagerClass)).narrow(classToExtend));
+        connectionManagerClass._implements(ref(ConnectionManager.class).narrow(getConnectionParametersClass(typeElement, connectionManagerClass)).narrow(classToExtend));
 
         context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), connectionManagerClass);
 
@@ -363,10 +393,10 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         return connectionManagerClass;
     }
 
-    private DefinedClass getConnectionKeyClass(TypeElement typeElement, DefinedClass connectionManagerClass) {
+    private DefinedClass getConnectionParametersClass(TypeElement typeElement, DefinedClass connectionManagerClass) {
         try {
-            DefinedClass connectionKey = connectionManagerClass._class(Modifier.PUBLIC | Modifier.STATIC, "ConnectionKey");
-            context.setClassRole(context.getNameUtils().generateConnectionKeyRoleKey(typeElement), connectionKey);
+            DefinedClass connectionKey = connectionManagerClass._class(Modifier.PUBLIC | Modifier.STATIC, "ConnectionParameters");
+            context.setClassRole(context.getNameUtils().generateConnectionParametersRoleKey(typeElement), connectionKey);
             return connectionKey;
         } catch (ClassAlreadyExistsException e) {
             return e.getExistingClass();

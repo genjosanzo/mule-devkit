@@ -174,7 +174,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
-        ExecutableElement connect = connectForClass(typeElement);
+        ExecutableElement connect = connectMethodForClass(typeElement);
         if (connect != null) {
             for (VariableElement variable : connect.getParameters()) {
                 String fieldName = variable.getSimpleName().toString();

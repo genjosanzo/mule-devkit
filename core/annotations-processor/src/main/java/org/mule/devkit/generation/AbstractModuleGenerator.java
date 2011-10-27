@@ -22,6 +22,7 @@ import org.mule.api.Capability;
 import org.mule.api.MuleContext;
 import org.mule.api.annotations.Connect;
 import org.mule.api.annotations.Disconnect;
+import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.devkit.model.code.Conditional;
@@ -105,18 +106,23 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
         return null;
     }
 
-    protected ExecutableElement connectForClass(DevKitTypeElement typeElement) {
+    protected ExecutableElement connectMethodForClass(DevKitTypeElement typeElement) {
         List<ExecutableElement> connectMethods = typeElement.getMethodsAnnotatedWith(Connect.class);
         return !connectMethods.isEmpty() ? connectMethods.get(0) : null;
     }
 
-    protected ExecutableElement disconnectForClass(DevKitTypeElement typeElement) {
+    protected ExecutableElement validateConnectionMethodForClass(DevKitTypeElement typeElement) {
+        List<ExecutableElement> connectMethods = typeElement.getMethodsAnnotatedWith(ValidateConnection.class);
+        return !connectMethods.isEmpty() ? connectMethods.get(0) : null;
+    }
+
+    protected ExecutableElement disconnectMethodForClass(DevKitTypeElement typeElement) {
         List<ExecutableElement> disconnectMethods = typeElement.getMethodsAnnotatedWith(Disconnect.class);
         return !disconnectMethods.isEmpty() ? disconnectMethods.get(0) : null;
     }
 
     protected ExecutableElement connectForMethod(ExecutableElement executableElement) {
-        return connectForClass(new DefaultDevKitTypeElement((TypeElement) executableElement.getEnclosingElement()));
+        return connectMethodForClass(new DefaultDevKitTypeElement((TypeElement) executableElement.getEnclosingElement()));
     }
 
     protected void generateIsCapableOf(DevKitTypeElement typeElement, DefinedClass capabilitiesAdapter) {
@@ -138,8 +144,8 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
             addCapability(isCapableOf, capability, ref(Capability.class).staticRef("POOLING_CAPABLE"));
         }
 
-        ExecutableElement connectMethod = connectForClass(typeElement);
-        ExecutableElement disconnectMethod = disconnectForClass(typeElement);
+        ExecutableElement connectMethod = connectMethodForClass(typeElement);
+        ExecutableElement disconnectMethod = disconnectMethodForClass(typeElement);
 
         if (connectMethod != null && disconnectMethod != null) {
             addCapability(isCapableOf, capability, ref(Capability.class).staticRef("CONNECTION_MANAGEMENT_CAPABLE"));

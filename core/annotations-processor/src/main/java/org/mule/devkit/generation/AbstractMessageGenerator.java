@@ -18,7 +18,9 @@
 package org.mule.devkit.generation;
 
 import org.apache.commons.lang.StringUtils;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.NestedProcessor;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
@@ -401,6 +403,28 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return setFlowConstruct;
     }
 
+
+    protected void findConfig(Block block, FieldVariable muleContext, FieldVariable object, String methodName, Variable event, DefinedClass moduleObjectClass, Variable moduleObject) {
+        Conditional ifObjectIsString = block._if(Op._instanceof(object, ref(String.class)));
+        ifObjectIsString._else().assign(moduleObject, ExpressionFactory.cast(moduleObjectClass, object));
+        ifObjectIsString._then().assign(moduleObject, ExpressionFactory.cast(moduleObjectClass, muleContext.invoke("getRegistry").invoke("lookupObject").arg(ExpressionFactory.cast(ref(String.class), object))));
+
+        TypeReference coreMessages = ref(CoreMessages.class);
+        Invocation failedToInvoke = coreMessages.staticInvoke("failedToCreate");
+        if (methodName != null) {
+            failedToInvoke.arg(ExpressionFactory.lit(methodName));
+        }
+        Invocation messageException = ExpressionFactory._new(ref(MessagingException.class));
+        messageException.arg(failedToInvoke);
+        if (event != null) {
+            messageException.arg(event);
+        } else {
+            messageException.arg(ExpressionFactory.cast(ref(MuleEvent.class), ExpressionFactory._null()));
+        }
+        messageException.arg(ExpressionFactory._new(ref(RuntimeException.class)).arg("Cannot find the configuration specified by the config-ref attribute."));
+
+        ifObjectIsString._then()._if(Op.eq(moduleObject, ExpressionFactory._null()))._then()._throw(messageException);
+    }
 
     protected FieldVariable generateFieldForFlowConstruct(DefinedClass messageSourceClass) {
         FieldVariable flowConstruct = messageSourceClass.field(Modifier.PRIVATE, ref(FlowConstruct.class), "flowConstruct");

@@ -177,13 +177,13 @@
     </flow>
 
     <flow name="flowDynamicConfigItems">
-        <dynamic:create namespace="http://www.mulesoft.org/schema/mule/collection" name="dynamicConfigA">
+        <dynamic:create namespace="http://www.mulesoft.org/schema/mule/collection" instanceName="dynamicConfigA">
             <dynamic:attributes>
                 <dynamic:attribute key="items" value-ref="list"/>
             </dynamic:attributes>
         </dynamic:create>
         <collection:count-config-items config-ref="dynamicConfigA"/>
-        <dynamic:destroy namespace="http://www.mulesoft.org/schema/mule/collection" name="dynamicConfigA"/>
+        <!-- <dynamic:destroy namespace="http://www.mulesoft.org/schema/mule/collection" name="dynamicConfigA"/> -->
     </flow>
 
 </mule>

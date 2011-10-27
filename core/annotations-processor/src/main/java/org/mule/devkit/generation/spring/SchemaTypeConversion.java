@@ -17,6 +17,8 @@
 
 package org.mule.devkit.generation.spring;
 
+import org.mule.devkit.model.schema.SchemaConstants;
+
 import javax.xml.namespace.QName;
 
 public final class SchemaTypeConversion {

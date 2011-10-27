@@ -56,7 +56,6 @@ public final class SchemaModel {
                 }
                 buildSpringHandlersFile();
                 buildSpringSchemasFile();
-                buildSpringClassesFile();
             }
         } catch (JAXBException e) {
             throw new IOException(e);
@@ -113,25 +112,6 @@ public final class SchemaModel {
             for (SchemaLocation schemaLocation : schemaLocations) {
                 if (schemaLocation.getFileName() != null && schemaLocation.getLocation() != null) {
                     outputStreamWriter.write(schemaLocation.getLocation().replace("://", "\\://") + "=" + schemaLocation.getFileName() + "\n");
-                }
-            }
-
-            outputStreamWriter.flush();
-        } finally {
-            IOUtils.closeQuietly(outputStreamWriter);
-        }
-    }
-
-    private void buildSpringClassesFile() throws IOException {
-        OutputStreamWriter outputStreamWriter = null;
-        try {
-            OutputStream outputStream = codeWriter.openBinary(null, "META-INF/spring.classes");
-            outputStreamWriter = new OutputStreamWriter(outputStream, "UTF-8");
-
-            for (SchemaLocation schemaLocation : schemaLocations) {
-                if (schemaLocation.getFileName() != null && schemaLocation.getLocation() != null) {
-                    String targetNamespace = schemaLocation.getTargetNamespace().replace("://", "\\://");
-                    outputStreamWriter.write(targetNamespace + "=" + schemaLocation.getClassName() + "\n");
                 }
             }
 

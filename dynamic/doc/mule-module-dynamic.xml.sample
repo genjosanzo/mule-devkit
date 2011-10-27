@@ -7,6 +7,3 @@
     </dynamic:attributes>
 </dynamic:create>
 <!-- END_INCLUDE(dynamic:create) -->
-<!-- BEGIN_INCLUDE(dynamic:destroy) -->
-<dynamic:destroy namespace="http://www.mulesoft.org/schema/mule/sfdc" name="saleforce-config"/>
-<!-- END_INCLUDE(dynamic:destroy) -->

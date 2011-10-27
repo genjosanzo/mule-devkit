@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/devkit"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.mulesoft.org/schema/mule/devkit"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:annotation>
+        <xsd:documentation>This schema provides a devkit extensions that can be embedded in Mule schemas. These
+            elements will be used by the Meta Model module to reflectively acquire information about a Mule
+            module.
+        </xsd:documentation>
+        <xsd:appinfo>
+            <page-title>DevKit Reference</page-title>
+        </xsd:appinfo>
+    </xsd:annotation>
+
+    <xsd:element name="java-class" type="xsd:string">
+        <xsd:annotation>
+            <xsd:documentation>The Java class that backs up this module.</xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+
+</xsd:schema>

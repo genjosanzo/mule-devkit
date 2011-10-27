@@ -126,7 +126,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         Map<String, AbstractMessageGenerator.FieldVariableElement> fields = generateProcessorFieldForEachParameter(messageProcessorClass, executableElement);
 
         // add fields for connectivity if required
-        ExecutableElement connectMethod = connectForClass(typeElement);
+        ExecutableElement connectMethod = connectMethodForClass(typeElement);
         Map<String, AbstractMessageGenerator.FieldVariableElement> connectFields = null;
         if (connectMethod != null) {
             connectFields = generateProcessorFieldForEachParameter(messageProcessorClass, connectMethod);
@@ -593,7 +593,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         DefinedClass moduleObjectClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey((TypeElement)executableElement.getEnclosingElement()));
         Variable moduleObject = process.body().decl(moduleObjectClass, "castedModuleObject", ExpressionFactory._null());
-        findConfig(muleContext, object, methodName, process, event, moduleObjectClass, moduleObject);
+        findConfig(process.body(), muleContext, object, methodName, event, moduleObjectClass, moduleObject);
 
         Variable poolObject = null;
         if (poolObjectClass != null) {
@@ -813,7 +813,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
 
         if (connectMethod != null) {
-            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionKeyRoleKey((TypeElement) executableElement.getEnclosingElement()));
+            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey((TypeElement) executableElement.getEnclosingElement()));
 
             Invocation newKey = ExpressionFactory._new(connectionKey);
             Invocation createConnection = moduleObject.invoke("acquireConnection");
@@ -881,7 +881,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
             TryStatement innerTry = catchBlock.body()._try();
 
-            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionKeyRoleKey((TypeElement) executableElement.getEnclosingElement()));
+            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey((TypeElement) executableElement.getEnclosingElement()));
             Invocation newKey = ExpressionFactory._new(connectionKey);
             for (String field : connectionParameters.keySet()) {
                 newKey.arg(connectionParameters.get(field));
@@ -928,7 +928,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
             Conditional ifConnectionNotNull = tryToReleaseConnection.body()._if(Op.ne(connection, ExpressionFactory._null()));
 
-            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionKeyRoleKey((TypeElement) executableElement.getEnclosingElement()));
+            DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey((TypeElement) executableElement.getEnclosingElement()));
             Invocation newKey = ExpressionFactory._new(connectionKey);
             for (String field : connectionParameters.keySet()) {
                 newKey.arg(connectionParameters.get(field));
@@ -944,26 +944,6 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                     tryToReleaseConnection._catch(ref(Exception.class)), event, methodName);
         }
 
-    }
-
-    private void findConfig(FieldVariable muleContext, FieldVariable object, String methodName, Method process, Variable event, DefinedClass moduleObjectClass, Variable moduleObject) {
-        Conditional ifObjectIsString = process.body()._if(Op._instanceof(object, ref(String.class)));
-        ifObjectIsString._else().assign(moduleObject, ExpressionFactory.cast(moduleObjectClass, object));
-        ifObjectIsString._then().assign(moduleObject, ExpressionFactory.cast(moduleObjectClass, muleContext.invoke("getRegistry").invoke("lookupObject").arg(ExpressionFactory.cast(ref(String.class), object))));
-
-        TypeReference coreMessages = ref(CoreMessages.class);
-        Invocation failedToInvoke = coreMessages.staticInvoke("failedToCreate");
-        if (methodName != null) {
-            failedToInvoke.arg(ExpressionFactory.lit(methodName));
-        }
-        Invocation messageException = ExpressionFactory._new(ref(MessagingException.class));
-        messageException.arg(failedToInvoke);
-        if (event != null) {
-            messageException.arg(event);
-        }
-        messageException.arg(ExpressionFactory._new(ref(RuntimeException.class)).arg("Cannot find the configuration specified by the config-ref attribute."));
-
-        ifObjectIsString._then()._if(Op.eq(moduleObject, ExpressionFactory._null()))._then()._throw(messageException);
     }
 
     private void addOauth(Method process, Variable event, Variable object, ExecutableElement executableElement) {

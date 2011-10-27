@@ -20,6 +20,7 @@ package org.mule.devkit.validation;
 import org.mule.api.annotations.Connect;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Disconnect;
+import org.mule.api.annotations.ValidateConnection;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 
@@ -52,13 +53,22 @@ public class ConnectorValidator implements Validator {
             throw new ValidationException(typeElement, "You must provide at least one method with @Disconnect");
         }
 
-        if (connectMethods.isEmpty() || disconnectMethods.isEmpty()) {
-            throw new ValidationException(typeElement, "You need have exactly one method annotated with @Connect and one with @Disconnect");
+        List<ExecutableElement> validateConnectionMethods = typeElement.getMethodsAnnotatedWith(ValidateConnection.class);
+        if (disconnectMethods.size() > 1) {
+            throw new ValidationException(typeElement, "You cannot annotate more than one method with @ValidateConnection");
+        }
+        if (disconnectMethods.size() < 1) {
+            throw new ValidationException(typeElement, "You must provide at least one method with @ValidateConnection");
+        }
+
+        if (connectMethods.isEmpty() || disconnectMethods.isEmpty() || validateConnectionMethods.isEmpty()) {
+            throw new ValidationException(typeElement, "You need have exactly one method annotated with @Connect, one with @Disconnect and one with @ValidateConnection.");
         }
 
         if (typeElement.usesConnectionManager()) {
             ExecutableElement connectMethod = connectMethods.get(0);
             ExecutableElement disconnectMethod = disconnectMethods.get(0);
+            ExecutableElement validateConnectionMethod = validateConnectionMethods.get(0);
 
             if (connectMethod.getThrownTypes().size() != 1) {
                 throw new ValidationException(typeElement, "A @Connect method can only throw a single type of exception. That exception must be ConnectionException.");
@@ -72,9 +82,19 @@ public class ConnectorValidator implements Validator {
                 throw new ValidationException(typeElement, "A @Connect method cannot return anything.");
             }
 
+            if (!validateConnectionMethod.getReturnType().toString().equals("boolean") &&
+                    !validateConnectionMethod.getReturnType().toString().equals("java.lang.Boolean")) {
+                throw new ValidationException(typeElement, "A @ValidateConnection method must return a boolean.");
+            }
+
             if (disconnectMethod.getParameters().size() != 0) {
                 throw new ValidationException(typeElement, "The @Disconnect method cannot receive any arguments");
             }
+
+            if (validateConnectionMethod.getParameters().size() != 0) {
+                throw new ValidationException(typeElement, "The @ValidateConnection method cannot receive any arguments");
+            }
+
 
             if (!disconnectMethod.getReturnType().toString().equals("void")) {
                 throw new ValidationException(typeElement, "A @Disconnect method cannot return anything.");

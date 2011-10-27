@@ -258,7 +258,7 @@ public class NameUtils {
         return pkg + "." + className + "Connector";
     }
 
-    public String generateConnectionKeyRoleKey(TypeElement typeElement) {
+    public String generateConnectionParametersRoleKey(TypeElement typeElement) {
         String typeFullName = getBinaryName(typeElement);
         String pkg = getPackageName(typeFullName);
         String className = getClassName(typeFullName);
