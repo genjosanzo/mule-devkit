@@ -27,8 +27,6 @@ import org.mule.api.callback.SourceCallback;
 
 import java.util.Random;
 
-//import org.mule.api.annotations.ReconnectOn;
-
 @Connector(name = "connector")
 public class ConnectorModule {
     @Configurable
@@ -40,7 +38,7 @@ public class ConnectorModule {
     private Integer sessionId;
     private String username;
     private String password;
-    private int retryCount = 0;
+    private static int retryCount = 0;
 
     @Source
     public void stream(SourceCallback callback) {
@@ -56,7 +54,7 @@ public class ConnectorModule {
     @Processor
     @InvalidateConnectionOn(exception = RuntimeException.class)
     public boolean invalidateConnectionUntilThirdRetry() {
-        if( retryCount < 3 ) {
+        if( retryCount < 2 ) {
             retryCount++;
             throw new RuntimeException("API failed");
         }
@@ -106,6 +104,11 @@ public class ConnectorModule {
     @Disconnect
     public void disconnect() {
         this.sessionId = null;
+    }
+    
+    @ConnectionIdentifier
+    public String connectionId() {
+        return Integer.toHexString(this.sessionId);
     }
 
     @ValidateConnection

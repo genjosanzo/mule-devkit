@@ -18,6 +18,7 @@
 package org.mule.devkit.validation;
 
 import org.mule.api.annotations.Connect;
+import org.mule.api.annotations.ConnectionIdentifier;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.ValidateConnection;
@@ -54,15 +55,23 @@ public class ConnectorValidator implements Validator {
         }
 
         List<ExecutableElement> validateConnectionMethods = typeElement.getMethodsAnnotatedWith(ValidateConnection.class);
-        if (disconnectMethods.size() > 1) {
+        if (validateConnectionMethods.size() > 1) {
             throw new ValidationException(typeElement, "You cannot annotate more than one method with @ValidateConnection");
         }
-        if (disconnectMethods.size() < 1) {
+        if (validateConnectionMethods.size() < 1) {
             throw new ValidationException(typeElement, "You must provide at least one method with @ValidateConnection");
         }
 
-        if (connectMethods.isEmpty() || disconnectMethods.isEmpty() || validateConnectionMethods.isEmpty()) {
-            throw new ValidationException(typeElement, "You need have exactly one method annotated with @Connect, one with @Disconnect and one with @ValidateConnection.");
+        List<ExecutableElement> connectionIdentifierMethods = typeElement.getMethodsAnnotatedWith(ConnectionIdentifier.class);
+        if (connectionIdentifierMethods.size() > 1) {
+            throw new ValidationException(typeElement, "You cannot annotate more than one method with @ConnectionIdentifier");
+        }
+        if (connectionIdentifierMethods.size() < 1) {
+            throw new ValidationException(typeElement, "You must provide at least one method with @ConnectionIdentifier");
+        }
+
+        if (connectMethods.isEmpty() || disconnectMethods.isEmpty() || validateConnectionMethods.isEmpty() || connectionIdentifierMethods.isEmpty()) {
+            throw new ValidationException(typeElement, "You need have exactly one method annotated with @Connect, one with @Disconnect, one with @ValidateConnection and one with @ConnectionIdentifier.");
         }
 
         if (typeElement.usesConnectionManager()) {

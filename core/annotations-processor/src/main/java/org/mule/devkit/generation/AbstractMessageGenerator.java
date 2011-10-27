@@ -73,6 +73,7 @@ import javax.lang.model.type.TypeMirror;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
@@ -254,7 +255,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return fields;
     }
 
-    protected Method generateInitialiseMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, TypeElement typeElement, FieldVariable muleContext, FieldVariable expressionManager, FieldVariable patternInfo, FieldVariable object) {
+    protected Method generateInitialiseMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, TypeElement typeElement, FieldVariable muleContext, FieldVariable expressionManager, FieldVariable patternInfo, FieldVariable object, FieldVariable retryCount, FieldVariable retryMax) {
         DefinedClass pojoClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
 
         Method initialise = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "initialise");
@@ -262,6 +263,13 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         initialise.javadoc().add(" has not been set already it will search the Mule registry for a default one.");
         initialise.javadoc().addThrows(ref(InitialisationException.class));
         initialise._throws(InitialisationException.class);
+
+        if( retryMax != null ) {
+            initialise.body().assign(retryMax, ExpressionFactory.lit(3));
+        }
+        if( retryCount != null ) {
+            initialise.body().assign(retryCount, ExpressionFactory._new(ref(AtomicInteger.class)));
+        }
 
         if (expressionManager != null) {
             initialise.body().assign(expressionManager, muleContext.invoke("getExpressionManager"));
@@ -433,9 +441,15 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected FieldVariable generateRetryCountField(DefinedClass messageSourceClass) {
-        FieldVariable retryCount = messageSourceClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "retryCount");
+        FieldVariable retryCount = messageSourceClass.field(Modifier.PRIVATE, ref(AtomicInteger.class), "retryCount");
         retryCount.javadoc().add("Variable used to track how many retries we have attempted on this message processor");
         return retryCount;
+    }
+
+    protected FieldVariable generateRetryMaxField(DefinedClass messageSourceClass) {
+        FieldVariable retryMax = messageSourceClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "retryMax");
+        retryMax.javadoc().add("Maximum number of retries that can be attempted.");
+        return retryMax;
     }
 
 

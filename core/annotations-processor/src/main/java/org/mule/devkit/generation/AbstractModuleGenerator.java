@@ -21,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.mule.api.Capability;
 import org.mule.api.MuleContext;
 import org.mule.api.annotations.Connect;
+import org.mule.api.annotations.ConnectionIdentifier;
 import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.oauth.OAuth;
@@ -121,8 +122,17 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
         return !disconnectMethods.isEmpty() ? disconnectMethods.get(0) : null;
     }
 
+    protected ExecutableElement connectionIdentifierMethodForClass(DevKitTypeElement typeElement) {
+        List<ExecutableElement> connectionIdentifierMethods = typeElement.getMethodsAnnotatedWith(ConnectionIdentifier.class);
+        return !connectionIdentifierMethods.isEmpty() ? connectionIdentifierMethods.get(0) : null;
+    }
+
     protected ExecutableElement connectForMethod(ExecutableElement executableElement) {
         return connectMethodForClass(new DefaultDevKitTypeElement((TypeElement) executableElement.getEnclosingElement()));
+    }
+
+    protected ExecutableElement connectionIdentifierForMethod(ExecutableElement executableElement) {
+        return connectionIdentifierMethodForClass(new DefaultDevKitTypeElement((TypeElement) executableElement.getEnclosingElement()));
     }
 
     protected void generateIsCapableOf(DevKitTypeElement typeElement, DefinedClass capabilitiesAdapter) {
