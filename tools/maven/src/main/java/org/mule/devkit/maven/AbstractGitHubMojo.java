@@ -24,22 +24,12 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
 
-import java.io.IOException;
 import java.text.MessageFormat;
 
 /**
  * Based on Maven plugin by Kevin Sawicki (kevin@github.com)
  */
 public abstract class AbstractGitHubMojo extends AbstractMojo {
-    /**
-     * Get formatted exception message for {@link java.io.IOException}
-     *
-     * @param e
-     * @return message
-     */
-    public static String getExceptionMessage(IOException e) {
-        return e.getMessage();
-    }
 
     /**
      * Is debug logging enabled?
@@ -47,7 +37,7 @@ public abstract class AbstractGitHubMojo extends AbstractMojo {
      * @return true if enabled, false otherwise
      */
     protected boolean isDebug() {
-        final Log log = getLog();
+        Log log = getLog();
         return log != null ? log.isDebugEnabled() : false;
     }
 
@@ -57,7 +47,7 @@ public abstract class AbstractGitHubMojo extends AbstractMojo {
      * @return true if enabled, false otherwise
      */
     protected boolean isInfo() {
-        final Log log = getLog();
+        Log log = getLog();
         return log != null ? log.isInfoEnabled() : false;
     }
 
@@ -67,7 +57,7 @@ public abstract class AbstractGitHubMojo extends AbstractMojo {
      * @param message
      */
     protected void debug(String message) {
-        final Log log = getLog();
+        Log log = getLog();
         if (log != null) {
             log.debug(message);
         }
@@ -80,7 +70,7 @@ public abstract class AbstractGitHubMojo extends AbstractMojo {
      * @param throwable
      */
     protected void debug(String message, Throwable throwable) {
-        final Log log = getLog();
+        Log log = getLog();
         if (log != null) {
             log.debug(message, throwable);
         }
@@ -92,7 +82,7 @@ public abstract class AbstractGitHubMojo extends AbstractMojo {
      * @param message
      */
     protected void info(String message) {
-        final Log log = getLog();
+        Log log = getLog();
         if (log != null) {
             log.info(message);
         }
@@ -105,7 +95,7 @@ public abstract class AbstractGitHubMojo extends AbstractMojo {
      * @param throwable
      */
     protected void info(String message, Throwable throwable) {
-        final Log log = getLog();
+        Log log = getLog();
         if (log != null) {
             log.info(message, throwable);
         }
@@ -117,7 +107,7 @@ public abstract class AbstractGitHubMojo extends AbstractMojo {
      * @param message
      */
     protected void warn(String message) {
-        final Log log = getLog();
+        Log log = getLog();
         if (log != null) {
             log.warn(message);
         }
@@ -130,9 +120,34 @@ public abstract class AbstractGitHubMojo extends AbstractMojo {
      * @param throwable
      */
     protected void warn(String message, Throwable throwable) {
-        final Log log = getLog();
+        Log log = getLog();
         if (log != null) {
             log.warn(message, throwable);
+        }
+    }
+
+    /**
+     * Log given message at error level
+     *
+     * @param message
+     */
+    protected void error(String message) {
+        Log log = getLog();
+        if (log != null) {
+            log.error(message);
+        }
+    }
+
+    /**
+     * Log given message and throwable at error level
+     *
+     * @param message
+     * @param throwable
+     */
+    protected void error(String message, Throwable throwable) {
+        Log log = getLog();
+        if (log != null) {
+            log.error(message, throwable);
         }
     }
 
@@ -165,8 +180,7 @@ public abstract class AbstractGitHubMojo extends AbstractMojo {
             }
             client.setOAuth2Token(oauth2Token);
         } else {
-            throw new MojoExecutionException(
-                    "No authentication credentials configured");
+            throw new MojoExecutionException("No authentication credentials configured");
         }
         return client;
     }
@@ -182,15 +196,12 @@ public abstract class AbstractGitHubMojo extends AbstractMojo {
      */
     protected RepositoryId getRepository(MavenProject project, String owner,
                                          String name) throws MojoExecutionException {
-        RepositoryId repository = RepositoryUtils.getRepository(project, owner,
-                name);
+        RepositoryId repository = RepositoryUtils.getRepository(project, owner, name);
         if (repository == null) {
-            throw new MojoExecutionException(
-                    "No GitHub repository (owner and name) configured");
+            throw new MojoExecutionException("No GitHub repository (owner and name) configured");
         }
         if (isDebug()) {
-            debug(MessageFormat.format("Using GitHub repository {0}",
-                    repository.generateId()));
+            debug(MessageFormat.format("Using GitHub repository {0}", repository.generateId()));
         }
         return repository;
     }

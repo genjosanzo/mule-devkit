@@ -166,8 +166,25 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
     /**
      * The number of milliseconds to wait before retrying.
      */
-    @MojoParameter(expression = "${github.sleep.time}", defaultValue = "1000")
+    @MojoParameter(expression = "${github.sleep.time}", defaultValue = "10000")
     private int sleepTime;
+
+    @Override
+    public void execute() throws MojoExecutionException {
+        try {
+            if (retryCount-- > 0) {
+                executeMojo();
+            }
+        } catch (MojoExecutionException e) {
+            warn(String.format("Exception caught while uploading the documentation to GitHub, %s retries left", retryCount), e);
+            if (retryCount == 0) {
+                error("Cannot upload documentation to GitHub after retrying");
+                throw e;
+            }
+            sleep(sleepTime);
+            execute();
+        }
+    }
 
     /**
      * Create blob
@@ -194,7 +211,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
                 output.write(buffer, 0, read);
             }
         } catch (IOException e) {
-            throw new MojoExecutionException("Error reading file: " + getExceptionMessage(e), e);
+            throw new MojoExecutionException("Error reading file: " + e.getMessage(), e);
         } finally {
             IOUtils.closeQuietly(stream);
         }
@@ -205,7 +222,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
             byte[] encoded = EncodingUtils.toBase64(output.toByteArray());
             blob.setContent(new String(encoded, IGitHubConstants.CHARSET_UTF8));
         } catch (UnsupportedEncodingException e) {
-            throw new MojoExecutionException("Error encoding blob contents: " + getExceptionMessage(e), e);
+            throw new MojoExecutionException("Error encoding blob contents: " + e.getMessage(), e);
         }
 
         try {
@@ -219,7 +236,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
                 return null;
             }
         } catch (IOException e) {
-            throw new MojoExecutionException("Error creating blob: " + getExceptionMessage(e), e);
+            throw new MojoExecutionException("Error creating blob: " + e.getMessage(), e);
         }
     }
 
@@ -229,7 +246,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
      * @param values
      * @return non-null but possibly empty array of non-null/non-empty strings
      */
-    public static String[] removeEmpties(final String... values) {
+    public static String[] removeEmpties(String... values) {
         if (values == null || values.length == 0) {
             return new String[0];
         }
@@ -262,19 +279,6 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
         }
         scanner.scan();
         return scanner.getIncludedFiles();
-    }
-
-    @Override
-    public void execute() throws MojoExecutionException {
-        try {
-            if (retryCount-- > 0) {
-                executeMojo();
-            }
-        } catch (MojoExecutionException e) {
-            warn(String.format("Exception caught while uploading the documentation to GitHub, %s retries left", retryCount), e);
-            sleep(sleepTime);
-            execute();
-        }
     }
 
     private void executeMojo() throws MojoExecutionException {
@@ -337,10 +341,10 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
             ref = service.getReference(repository, branch);
         } catch (RequestException e) {
             if (404 != e.getStatus()) {
-                throw new MojoExecutionException("Error getting reference: " + getExceptionMessage(e), e);
+                throw new MojoExecutionException("Error getting reference: " + e.getMessage(), e);
             }
         } catch (IOException e) {
-            throw new MojoExecutionException("Error getting reference: " + getExceptionMessage(e), e);
+            throw new MojoExecutionException("Error getting reference: " + e.getMessage(), e);
         }
 
         if (ref != null && !TypedResource.TYPE_COMMIT.equals(ref.getObject().getType())) {
@@ -375,7 +379,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
                 tree = new Tree();
             }
         } catch (IOException e) {
-            throw new MojoExecutionException("Error creating tree: " + getExceptionMessage(e), e);
+            throw new MojoExecutionException("Error creating tree: " + e.getMessage(), e);
         }
 
         // Build commit
@@ -397,8 +401,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
             }
             info(MessageFormat.format("Creating commit with SHA-1: {0}", created.getSha()));
         } catch (IOException e) {
-            throw new MojoExecutionException("Error creating commit: "
-                    + getExceptionMessage(e), e);
+            throw new MojoExecutionException("Error creating commit: " + e.getMessage(), e);
         }
 
         TypedResource object = new TypedResource();
@@ -414,7 +417,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
                     service.editReference(repository, ref, force);
                 }
             } catch (IOException e) {
-                throw new MojoExecutionException("Error editing reference: " + getExceptionMessage(e), e);
+                throw new MojoExecutionException("Error editing reference: " + e.getMessage(), e);
             }
         } else {
             // Create new reference
@@ -427,7 +430,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
                     service.createReference(repository, ref);
                 }
             } catch (IOException e) {
-                throw new MojoExecutionException("Error creating reference: " + getExceptionMessage(e), e);
+                throw new MojoExecutionException("Error creating reference: " + e.getMessage(), e);
             }
         }
     }
