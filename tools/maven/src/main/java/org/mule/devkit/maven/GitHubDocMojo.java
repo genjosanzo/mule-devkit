@@ -26,11 +26,13 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.Tree;
 import org.eclipse.egit.github.core.TreeEntry;
 import org.eclipse.egit.github.core.TypedResource;
+import org.eclipse.egit.github.core.client.IGitHubConstants;
 import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.service.DataService;
 import org.eclipse.egit.github.core.util.EncodingUtils;
 import org.jfrog.maven.annomojo.annotations.MojoGoal;
 import org.jfrog.maven.annomojo.annotations.MojoParameter;
+import org.mule.util.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -52,6 +54,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
      * BRANCH_DEFAULT
      */
     public static final String BRANCH_DEFAULT = "refs/heads/gh-pages";
+    private static final int BUFFER_LENGTH = 8192;
 
     /**
      * Branch to update
@@ -155,6 +158,18 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
     private boolean dryRun;
 
     /**
+     * In case of failure of the mojo, how many times retry the execution
+     */
+    @MojoParameter(expression = "${github.retry.count}", defaultValue = "3")
+    private int retryCount;
+
+    /**
+     * The number of milliseconds to wait before retrying.
+     */
+    @MojoParameter(expression = "${github.sleep.time}", defaultValue = "1000")
+    private int sleepTime;
+
+    /**
      * Create blob
      *
      * @param service
@@ -167,44 +182,35 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
     protected String createBlob(DataService service, RepositoryId repository,
                                 String path) throws MojoExecutionException {
         File file = new File(outputDirectory, path);
-        final long length = file.length();
-        final int size = length > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) length;
+        long length = file.length();
+        int size = length > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) length;
         ByteArrayOutputStream output = new ByteArrayOutputStream(size);
         FileInputStream stream = null;
         try {
             stream = new FileInputStream(file);
-            final byte[] buffer = new byte[8192];
+            byte[] buffer = new byte[BUFFER_LENGTH];
             int read;
             while ((read = stream.read(buffer)) != -1) {
                 output.write(buffer, 0, read);
             }
         } catch (IOException e) {
-            throw new MojoExecutionException("Error reading file: "
-                    + getExceptionMessage(e), e);
+            throw new MojoExecutionException("Error reading file: " + getExceptionMessage(e), e);
         } finally {
-            if (stream != null) {
-                try {
-                    stream.close();
-                } catch (IOException e) {
-                    debug("Exception closing stream", e);
-                }
-            }
+            IOUtils.closeQuietly(stream);
         }
 
         Blob blob = new Blob().setEncoding(Blob.ENCODING_BASE64);
 
         try {
             byte[] encoded = EncodingUtils.toBase64(output.toByteArray());
-            blob.setContent(new String(encoded, org.eclipse.egit.github.core.client.IGitHubConstants.CHARSET_UTF8));
+            blob.setContent(new String(encoded, IGitHubConstants.CHARSET_UTF8));
         } catch (UnsupportedEncodingException e) {
-            throw new MojoExecutionException("Error encoding blob contents: "
-                    + getExceptionMessage(e), e);
+            throw new MojoExecutionException("Error encoding blob contents: " + getExceptionMessage(e), e);
         }
 
         try {
             if (isDebug()) {
-                debug(MessageFormat.format("Creating blob from {0}",
-                        file.getAbsolutePath()));
+                debug(MessageFormat.format("Creating blob from {0}", file.getAbsolutePath()));
             }
 
             if (!dryRun) {
@@ -213,8 +219,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
                 return null;
             }
         } catch (IOException e) {
-            throw new MojoExecutionException("Error creating blob: "
-                    + getExceptionMessage(e), e);
+            throw new MojoExecutionException("Error creating blob: " + getExceptionMessage(e), e);
         }
     }
 
@@ -246,9 +251,8 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
      * @return non-null but possibly empty array of string paths relative to the
      *         base directory
      */
-    public static String[] getMatchingPaths(final String[] includes,
-                                            final String[] excludes, final String baseDir) {
-        final DirectoryScanner scanner = new DirectoryScanner();
+    public static String[] getMatchingPaths(String[] includes, String[] excludes, String baseDir) {
+        DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir(baseDir);
         if (includes != null && includes.length > 0) {
             scanner.setIncludes(includes);
@@ -260,9 +264,21 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
         return scanner.getIncludedFiles();
     }
 
+    @Override
     public void execute() throws MojoExecutionException {
-        RepositoryId repository = getRepository(project, repositoryOwner,
-                repositoryName);
+        try {
+            if (retryCount-- > 0) {
+                executeMojo();
+            }
+        } catch (MojoExecutionException e) {
+            warn(String.format("Exception caught while uploading the documentation to GitHub, %s retries left", retryCount), e);
+            sleep(sleepTime);
+            execute();
+        }
+    }
+
+    private void executeMojo() throws MojoExecutionException {
+        RepositoryId repository = getRepository(project, repositoryOwner, repositoryName);
 
         if (dryRun) {
             info("Dry run mode, repository will not be modified");
@@ -278,20 +294,17 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
                     Arrays.toString(includePaths),
                     Arrays.toString(excludePaths)));
         }
-        String[] paths = getMatchingPaths(includePaths, excludePaths,
-                baseDir);
+        String[] paths = getMatchingPaths(includePaths, excludePaths, baseDir);
         if (paths.length != 1) {
             info(MessageFormat.format("Creating {0} blobs", paths.length));
         } else {
             info("Creating 1 blob");
         }
         if (isDebug()) {
-            debug(MessageFormat.format("Scanned files to include: {0}",
-                    Arrays.toString(paths)));
+            debug(MessageFormat.format("Scanned files to include: {0}", Arrays.toString(paths)));
         }
 
-        DataService service = new DataService(createClient(host, userName,
-                password, oauth2Token));
+        DataService service = new DataService(createClient(host, userName, password, oauth2Token));
 
         // Write blobs and build tree entries
         List<TreeEntry> entries = new ArrayList<TreeEntry>(paths.length);
@@ -313,8 +326,8 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
         for (String path : paths) {
             TreeEntry entry = new TreeEntry();
             entry.setPath(prefix + path);
-            entry.setType(org.eclipse.egit.github.core.TreeEntry.TYPE_BLOB);
-            entry.setMode(org.eclipse.egit.github.core.TreeEntry.MODE_BLOB);
+            entry.setType(TreeEntry.TYPE_BLOB);
+            entry.setMode(TreeEntry.MODE_BLOB);
             entry.setSha(createBlob(service, repository, path));
             entries.add(entry);
         }
@@ -324,15 +337,13 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
             ref = service.getReference(repository, branch);
         } catch (RequestException e) {
             if (404 != e.getStatus()) {
-                throw new MojoExecutionException("Error getting reference: "
-                        + getExceptionMessage(e), e);
+                throw new MojoExecutionException("Error getting reference: " + getExceptionMessage(e), e);
             }
         } catch (IOException e) {
-            throw new MojoExecutionException("Error getting reference: "
-                    + getExceptionMessage(e), e);
+            throw new MojoExecutionException("Error getting reference: " + getExceptionMessage(e), e);
         }
 
-        if (ref != null && !org.eclipse.egit.github.core.TypedResource.TYPE_COMMIT.equals(ref.getObject().getType())) {
+        if (ref != null && !TypedResource.TYPE_COMMIT.equals(ref.getObject().getType())) {
             throw new MojoExecutionException(
                     MessageFormat
                             .format("Existing ref {0} points to a {1} ({2}) instead of a commmit",
@@ -345,8 +356,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
         try {
             int size = entries.size();
             if (size != 1) {
-                info(MessageFormat.format(
-                        "Creating tree with {0} blob entries", size));
+                info(MessageFormat.format("Creating tree with {0} blob entries", size));
             } else {
                 info("Creating tree with 1 blob entry");
             }
@@ -365,8 +375,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
                 tree = new Tree();
             }
         } catch (IOException e) {
-            throw new MojoExecutionException("Error creating tree: "
-                    + getExceptionMessage(e), e);
+            throw new MojoExecutionException("Error creating tree: " + getExceptionMessage(e), e);
         }
 
         // Build commit
@@ -376,8 +385,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
 
         // Set parent commit SHA-1 if reference exists
         if (ref != null) {
-            commit.setParents(Collections.singletonList(new Commit().setSha(ref
-                    .getObject().getSha())));
+            commit.setParents(Collections.singletonList(new Commit().setSha(ref.getObject().getSha())));
         }
 
         Commit created;
@@ -387,15 +395,14 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
             } else {
                 created = new Commit();
             }
-            info(MessageFormat.format("Creating commit with SHA-1: {0}",
-                    created.getSha()));
+            info(MessageFormat.format("Creating commit with SHA-1: {0}", created.getSha()));
         } catch (IOException e) {
             throw new MojoExecutionException("Error creating commit: "
                     + getExceptionMessage(e), e);
         }
 
         TypedResource object = new TypedResource();
-        object.setType(org.eclipse.egit.github.core.TypedResource.TYPE_COMMIT).setSha(created.getSha());
+        object.setType(TypedResource.TYPE_COMMIT).setSha(created.getSha());
         if (ref != null) {
             // Update existing reference
             ref.setObject(object);
@@ -407,8 +414,7 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
                     service.editReference(repository, ref, force);
                 }
             } catch (IOException e) {
-                throw new MojoExecutionException("Error editing reference: "
-                        + getExceptionMessage(e), e);
+                throw new MojoExecutionException("Error editing reference: " + getExceptionMessage(e), e);
             }
         } else {
             // Create new reference
@@ -421,9 +427,16 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
                     service.createReference(repository, ref);
                 }
             } catch (IOException e) {
-                throw new MojoExecutionException("Error creating reference: "
-                        + getExceptionMessage(e), e);
+                throw new MojoExecutionException("Error creating reference: " + getExceptionMessage(e), e);
             }
+        }
+    }
+
+    private void sleep(int sleepTime) {
+        try {
+            Thread.sleep(sleepTime);
+        } catch (InterruptedException e) {
+            // ignore
         }
     }
 }

@@ -112,6 +112,31 @@ public abstract class AbstractGitHubMojo extends AbstractMojo {
     }
 
     /**
+     * Log given message at warn level
+     *
+     * @param message
+     */
+    protected void warn(String message) {
+        final Log log = getLog();
+        if (log != null) {
+            log.warn(message);
+        }
+    }
+
+    /**
+     * Log given message and throwable at warn level
+     *
+     * @param message
+     * @param throwable
+     */
+    protected void warn(String message, Throwable throwable) {
+        final Log log = getLog();
+        if (log != null) {
+            log.warn(message, throwable);
+        }
+    }
+
+    /**
      * Create client
      *
      * @param host
