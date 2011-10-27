@@ -843,7 +843,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             attribute.setName(name);
             javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(variable.asType());
             attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + ENUM_TYPE_SUFFIX));
-        } else if (variable.asType().toString().contains(HttpCallback.class.getName())) {
+        } else if (variable.asType().toString().startsWith(HttpCallback.class.getName())) {
             attribute.setName(context.getNameUtils().uncamel(name) + "-flow-ref");
             attribute.setType(SchemaConstants.STRING);
         } else {

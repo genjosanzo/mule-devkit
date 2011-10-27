@@ -24,6 +24,7 @@ import org.mule.api.annotations.param.Optional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Collection module
@@ -31,6 +32,7 @@ import java.util.Map;
  * @author MuleSoft, Inc.
  */
 @Module(name = "collection")
+@SuppressWarnings("unchecked")
 public class CollectionModule {
     /**
      * Configurable strings
@@ -78,7 +80,7 @@ public class CollectionModule {
      */
     @Processor
     public int countConfigStrings() {
-        return this.strings.size();
+        return strings.size();
     }
 
     /**
@@ -88,7 +90,7 @@ public class CollectionModule {
      */
     @Processor
     public int countConfigItems() {
-        return this.items.size();
+        return items.size();
     }
 
     @Processor
@@ -108,17 +110,17 @@ public class CollectionModule {
 
     @Processor
     public int countConfigMapStrings() {
-        return this.mapStrings.size();
+        return mapStrings.size();
     }
 
     @Processor
     public String appendConfigMapItems() {
-        String result = "";
-        for (Object part : this.mapItems.keySet()) {
-            result += this.mapItems.get(part);
+        StringBuilder result = new StringBuilder();
+        for (Object part : mapItems.keySet()) {
+            result.append(mapItems.get(part));
         }
 
-        return result;
+        return result.toString();
     }
 
     @Processor
@@ -140,6 +142,18 @@ public class CollectionModule {
     @Processor
     public int countTwoLists(List<String> firstLists, List<String> secondLists) {
         return firstLists.size() + secondLists.size();
+    }
+
+    @Processor
+    public void mapOfLists(Map<String, List<String>> map) {
+        if(map.size() != 2) {
+            throw new RuntimeException("Map should have 2 entries");
+        }
+        for(Entry<String, List<String>> entry : map.entrySet()) {
+            if(entry.getValue().size() != 3) {
+                throw new RuntimeException("Map value should be a list containg 3 values");
+            }
+        }
     }
 
     public void setStrings(List strings) {

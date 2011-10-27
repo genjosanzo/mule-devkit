@@ -227,7 +227,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                             ExpressionFactory.cast(ref(Startable.class), forEachProcessor.var()).invoke("start")
                     );
                 }
-            } else if (variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
+            } else if (variableElement.getVariableElement().asType().toString().startsWith(HttpCallback.class.getName())) {
                 startMethod.body()._if(Op.ne(variableElement.getFieldType(), ExpressionFactory._null()))._then().invoke(variableElement.getFieldType(), "start");
             }
         }
@@ -257,7 +257,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                             ExpressionFactory.cast(ref(Stoppable.class), forEachProcessor.var()).invoke("stop")
                     );
                 }
-            } else if (variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
+            } else if (variableElement.getVariableElement().asType().toString().startsWith(HttpCallback.class.getName())) {
                 stopMethod.body()._if(Op.ne(variableElement.getFieldType(), ExpressionFactory._null()))._then().invoke(variableElement.getFieldType(), "stop");
             }
         }
@@ -684,7 +684,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         for (VariableElement variable : executableElement.getParameters()) {
             String fieldName = variable.getSimpleName().toString();
 
-            if (variable.asType().toString().contains(InterceptCallback.class.getName())) {
+            if (variable.asType().toString().startsWith(InterceptCallback.class.getName())) {
 
                 DefinedClass callbackClass = context.getClassForRole(InterceptCallbackGenerator.ROLE);
 
@@ -692,7 +692,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                         ExpressionFactory._new(callbackClass));
 
                 parameters.add(interceptCallback);
-            } else if (variable.asType().toString().contains(HttpCallback.class.getName())) {
+            } else if (variable.asType().toString().startsWith(HttpCallback.class.getName())) {
                 parameters.add(fields.get(fieldName).getFieldType());
             } else if (variable.getAnnotation(OAuthAccessToken.class) != null) {
                 Invocation getAccessToken = moduleObject.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_ACCESS_TOKEN_FIELD_NAME));

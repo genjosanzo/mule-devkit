@@ -43,7 +43,7 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
     public boolean hasProcessorMethodWithParameter(Class<?> parameterType) {
         for (ExecutableElement method : getMethodsAnnotatedWith(Processor.class)) {
             for (VariableElement parameter : method.getParameters()) {
-                if (parameter.asType().toString().contains(parameterType.getName())) {
+                if (parameter.asType().toString().startsWith(parameterType.getName())) {
                     return true;
                 }
             }

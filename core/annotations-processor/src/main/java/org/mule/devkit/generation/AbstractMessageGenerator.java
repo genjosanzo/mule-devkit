@@ -178,7 +178,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     protected Map<String, FieldVariableElement> generateProcessorFieldForEachParameter(DefinedClass messageProcessorClass, ExecutableElement processorMethod, Class annotatedWith) {
         Map<String, AbstractMessageGenerator.FieldVariableElement> fields = new HashMap<String, FieldVariableElement>();
         for (VariableElement variable : processorMethod.getParameters()) {
-            if (variable.asType().toString().contains(SourceCallback.class.getName())) {
+            if (variable.asType().toString().startsWith(SourceCallback.class.getName())) {
                 continue;
             }
 
@@ -190,7 +190,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
             FieldVariable field;
             FieldVariable fieldType;
-            if (variable.asType().toString().contains(NestedProcessor.class.getName())) {
+            if (variable.asType().toString().startsWith(NestedProcessor.class.getName())) {
                 field = new FieldBuilder(messageProcessorClass).
                         privateVisibility().
                         type(Object.class).
@@ -201,7 +201,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                         type(ref(variable.asType())).
                         name("_" + fieldName + "Type").
                         build();
-            } else if (variable.asType().toString().contains(HttpCallback.class.getName())) {
+            } else if (variable.asType().toString().startsWith(HttpCallback.class.getName())) {
                 // for each parameter of type HttpCallback we need two fields: one that will hold a reference to the flow
                 // that is going to be executed upon the callback and the other one to hold the HttpCallback object itself
                 field = new FieldBuilder(messageProcessorClass).
@@ -310,7 +310,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                                 ExpressionFactory.cast(ref(Initialisable.class), forEachProcessor.var()).invoke("initialise")
                         );
                     }
-                } else if (variableElement.getVariableElement().asType().toString().contains(HttpCallback.class.getName())) {
+                } else if (variableElement.getVariableElement().asType().toString().startsWith(HttpCallback.class.getName())) {
                     FieldVariable callbackFlowName = fields.get(fieldName).getField();
                     Block ifCallbackFlowNameIsNull = initialise.body()._if(Op.ne(callbackFlowName, ExpressionFactory._null()))._then();
                     Invocation domain = object.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.DOMAIN_FIELD_NAME));
