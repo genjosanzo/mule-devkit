@@ -20,6 +20,8 @@ package org.mule.devkit.it;
 import org.mule.api.ConnectionException;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connect;
+import org.mule.api.annotations.ValidateConnection;
+import org.mule.api.annotations.ConnectionIdentifier;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.Processor;
@@ -139,6 +141,22 @@ public class MyModule {
      */
     @Disconnect
     public void disconnect() {
+    }
+
+    /**
+     * Is Connected
+     */
+    @ValidateConnection
+    public boolean isConnected() {
+        return true;
+    }
+
+    /**
+     * Is Connected
+     */
+    @ConnectionIdentifier
+    public String connectionId() {
+        return "001";
     }
 
     public void setConfigurableString(String configurableString) {

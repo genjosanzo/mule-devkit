@@ -21,7 +21,6 @@ import org.apache.commons.lang.StringUtils;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.NestedProcessor;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
 import org.mule.api.construct.FlowConstruct;
@@ -264,7 +263,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         initialise.javadoc().addThrows(ref(InitialisationException.class));
         initialise._throws(InitialisationException.class);
 
-        if( retryCount != null ) {
+        if (retryCount != null) {
             initialise.body().assign(retryCount, ExpressionFactory._new(ref(AtomicInteger.class)));
         }
 
@@ -318,10 +317,10 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                 } else if (variableElement.getVariableElement().asType().toString().startsWith(HttpCallback.class.getName())) {
                     FieldVariable callbackFlowName = fields.get(fieldName).getField();
                     Block ifCallbackFlowNameIsNull = initialise.body()._if(Op.ne(callbackFlowName, ExpressionFactory._null()))._then();
-                    Invocation domain = object.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.DOMAIN_FIELD_NAME));
-                    Invocation localPort = object.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.LOCAL_PORT_FIELD_NAME));
-                    Invocation remotePort = object.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.REMOTE_PORT_FIELD_NAME));
-                    Invocation async = object.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.ASYNC_FIELD_NAME));
+                    Invocation domain = ExpressionFactory.cast(pojoClass,object).invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.DOMAIN_FIELD_NAME));
+                    Invocation localPort = ExpressionFactory.cast(pojoClass,object).invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.LOCAL_PORT_FIELD_NAME));
+                    Invocation remotePort = ExpressionFactory.cast(pojoClass,object).invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.REMOTE_PORT_FIELD_NAME));
+                    Invocation async = ExpressionFactory.cast(pojoClass,object).invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.ASYNC_FIELD_NAME));
                     ifCallbackFlowNameIsNull.assign(variableElement.getFieldType(), ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
                             arg(callbackFlowName).arg(muleContext).arg(domain).arg(localPort).arg(remotePort).arg(async));
                 }

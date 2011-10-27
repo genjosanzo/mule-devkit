@@ -657,6 +657,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
         data.setValue(base + ".elementName", elementName());
         data.setValue(base + ".href", htmlPage());
         data.setValue(base + ".modhref", relativeModulePath());
+        data.setValue(base + ".modhref", relativeModulePath());
         data.setValue(base + ".anchor", anchor());
 
         if (mReturnType != null) {

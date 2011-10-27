@@ -25,6 +25,8 @@ package ${package};
 
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Connect;
+import org.mule.api.annotations.ValidateConnection;
+import org.mule.api.annotations.ConnectionIdentifier;
 import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.ConnectionException;
@@ -78,6 +80,22 @@ public class ${muleModuleName}Module
         /*
          * CODE FOR CLOSING A CONNECTION GOES IN HERE
          */
+    }
+
+    /**
+     * Are we connected
+     */
+    @ValidateConnection
+    public boolean isConnected() {
+        return true;
+    }
+
+    /**
+     * Are we connected
+     */
+    @ConnectionIdentifier
+    public String connectionId() {
+        return "001";
     }
 
     /**
