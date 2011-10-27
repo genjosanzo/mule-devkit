@@ -432,6 +432,13 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return flowConstruct;
     }
 
+    protected FieldVariable generateRetryCountField(DefinedClass messageSourceClass) {
+        FieldVariable retryCount = messageSourceClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "retryCount");
+        retryCount.javadoc().add("Variable used to track how many retries we have attempted on this message processor");
+        return retryCount;
+    }
+
+
     protected Method generateSetModuleObjectMethod(DefinedClass messageProcessorClass, FieldVariable object) {
         Method setObject = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setModuleObject");
         setObject.javadoc().add("Sets the instance of the object under which the processor will execute");

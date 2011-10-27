@@ -133,11 +133,13 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
 
         // add standard fields
+        FieldVariable logger = generateLoggerField(messageProcessorClass);
         FieldVariable object = generateFieldForModuleObject(messageProcessorClass, typeElement);
         FieldVariable muleContext = generateFieldForMuleContext(messageProcessorClass);
         FieldVariable expressionManager = generateFieldForExpressionManager(messageProcessorClass);
         FieldVariable patternInfo = generateFieldForPatternInfo(messageProcessorClass);
         FieldVariable flowConstruct = generateFieldForFlowConstruct(messageProcessorClass);
+        FieldVariable retryCount = generateRetryCountField(messageProcessorClass);
 
         FieldVariable messageProcessorListener = null;
         if (intercepting) {
@@ -197,10 +199,10 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey(typeElement));
 
             // add process method
-            generateProcessMethod(executableElement, messageProcessorClass, fields, connectFields, messageProcessorListener, muleContext, object, poolObjectClass);
+            generateProcessMethod(executableElement, messageProcessorClass, fields, connectFields, messageProcessorListener, muleContext, object, poolObjectClass, logger);
         } else {
             // add process method
-            generateProcessMethod(executableElement, messageProcessorClass, fields, connectFields, messageProcessorListener, muleContext, object);
+            generateProcessMethod(executableElement, messageProcessorClass, fields, connectFields, messageProcessorListener, muleContext, object, logger);
         }
     }
 
@@ -574,11 +576,11 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         return defaultMuleEvent;
     }
 
-    private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectionFields, FieldVariable messageProcessorListener, FieldVariable muleContext, FieldVariable object) {
-        generateProcessMethod(executableElement, messageProcessorClass, fields, connectionFields, messageProcessorListener, muleContext, object, null);
+    private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectionFields, FieldVariable messageProcessorListener, FieldVariable muleContext, FieldVariable object, FieldVariable logger) {
+        generateProcessMethod(executableElement, messageProcessorClass, fields, connectionFields, messageProcessorListener, muleContext, object, null, logger);
     }
 
-    private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectionFields, FieldVariable messageProcessorListener, FieldVariable muleContext, FieldVariable object, DefinedClass poolObjectClass) {
+    private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectionFields, FieldVariable messageProcessorListener, FieldVariable muleContext, FieldVariable object, DefinedClass poolObjectClass, FieldVariable logger) {
         String methodName = executableElement.getSimpleName().toString();
         Type muleEvent = ref(MuleEvent.class);
 
@@ -595,40 +597,14 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         Variable moduleObject = process.body().decl(moduleObjectClass, "castedModuleObject", ExpressionFactory._null());
         findConfig(process.body(), muleContext, object, methodName, event, moduleObjectClass, moduleObject);
 
-        Variable poolObject = null;
-        if (poolObjectClass != null) {
-            poolObject = process.body().decl(poolObjectClass, "poolObject", ExpressionFactory._null());
-        }
+        Variable poolObject = declarePoolObjectIfClassNotNull(poolObjectClass, process);
 
-        if (executableElement.getEnclosingElement().getAnnotation(OAuth.class) != null ||
-                executableElement.getEnclosingElement().getAnnotation(OAuth2.class) != null) {
-            for (VariableElement variable : executableElement.getParameters()) {
-                if (variable.getAnnotation(OAuthAccessToken.class) != null || variable.getAnnotation(OAuthAccessTokenSecret.class) != null) {
-                    addOauth(process, event, moduleObject, executableElement);
-                    break;
-                }
-            }
-        }
+        addOAuthFieldIfNeeded(executableElement, process, event, moduleObject);
 
-        // add connection field declarations
-        Map<String, Expression> connectionParameters = new HashMap<String, Expression>();
+        Map<String, Expression> connectionParameters = declareConnectionParametersVariables(executableElement, connectionFields, process);
+        Variable connection = addConnectionVariableIfNeeded(executableElement, process);
+
         ExecutableElement connectMethod = connectForMethod(executableElement);
-        Variable connection = null;
-        if (connectMethod != null) {
-            DefinedClass connectionClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey((TypeElement) connectMethod.getEnclosingElement()));
-            connection = process.body().decl(connectionClass, "connection", ExpressionFactory._null());
-
-            for (VariableElement variable : connectMethod.getParameters()) {
-                String fieldName = variable.getSimpleName().toString();
-
-                Type type = ref(connectionFields.get(fieldName).getVariableElement().asType()).boxify();
-                String name = "transformed" + StringUtils.capitalize(fieldName);
-
-                Variable transformed = process.body().decl(type, name, ExpressionFactory._null());
-                connectionParameters.put(fieldName, transformed);
-            }
-        }
-
         TryStatement callProcessor = process.body()._try();
 
         if (connectMethod != null) {
@@ -685,136 +661,26 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             String fieldName = variable.getSimpleName().toString();
 
             if (variable.asType().toString().startsWith(InterceptCallback.class.getName())) {
-
-                DefinedClass callbackClass = context.getClassForRole(InterceptCallbackGenerator.ROLE);
-
-                interceptCallback = callProcessor.body().decl(callbackClass, "transformed" + StringUtils.capitalize(fieldName),
-                        ExpressionFactory._new(callbackClass));
-
-                parameters.add(interceptCallback);
+                interceptCallback = declareInterceptCallbackParameter(callProcessor, fieldName, parameters);
             } else if (variable.asType().toString().startsWith(HttpCallback.class.getName())) {
                 parameters.add(fields.get(fieldName).getFieldType());
             } else if (variable.getAnnotation(OAuthAccessToken.class) != null) {
-                Invocation getAccessToken = moduleObject.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_ACCESS_TOKEN_FIELD_NAME));
-                Variable accessToken = callProcessor.body().decl(ref(String.class), "accessToken", getAccessToken);
-                parameters.add(accessToken);
+                declareOAuthAccessTokenParameter(callProcessor, moduleObject, parameters);
             } else if (variable.getAnnotation(OAuthAccessTokenSecret.class) != null) {
-                Invocation getAccessToken = moduleObject.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_ACCESS_TOKEN_SECRET_FIELD_NAME));
-                Variable accessTokenSecret = callProcessor.body().decl(ref(String.class), "accessTokenSecret", getAccessToken);
-                parameters.add(accessTokenSecret);
+                declareOAuthAccessTokenSecretParameter(callProcessor, moduleObject, parameters);
             } else if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
-                DefinedClass callbackClass = context.getClassForRole(NestedProcessorChainGenerator.ROLE);
-                DefinedClass stringCallbackClass = context.getClassForRole(NestedProcessorStringGenerator.ROLE);
-
-                boolean isList = context.getTypeMirrorUtils().isArrayOrList(variable.asType());
-
-                if (!isList) {
-                    Variable transformed = callProcessor.body().decl(ref(NestedProcessor.class), "transformed" + StringUtils.capitalize(fieldName),
-                            ExpressionFactory._null());
-
-                    Conditional ifMessageProcessor = callProcessor.body()._if(Op.cand(
-                            Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()),
-                            Op._instanceof(fields.get(fieldName).getField(), ref(MessageProcessor.class))));
-
-                    ifMessageProcessor._then()
-                            .assign(transformed,
-                                    ExpressionFactory._new(callbackClass).arg(event).arg(muleContext).arg(
-                                            ExpressionFactory.cast(ref(MessageProcessor.class), fields.get(fieldName).getField())));
-
-                    Conditional ifString = ifMessageProcessor._elseif(Op.cand(
-                            Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()),
-                            Op._instanceof(fields.get(fieldName).getField(), ref(String.class))));
-
-                    ifString._then()
-                            .assign(transformed,
-                                    ExpressionFactory._new(stringCallbackClass).arg(
-                                            ExpressionFactory.cast(ref(String.class), fields.get(fieldName).getField())
-                                    ));
-
-                    parameters.add(transformed);
-                } else {
-                    Variable transformed = callProcessor.body().decl(ref(List.class).narrow(NestedProcessor.class), "transformed" + StringUtils.capitalize(fieldName),
-                            ExpressionFactory._new(ref(ArrayList.class).narrow(NestedProcessor.class)));
-
-                    Conditional ifMessageProcessor = callProcessor.body()._if(Op.cand(
-                            Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()),
-                            Op._instanceof(fields.get(fieldName).getField(), ref(List.class))));
-
-                    ForEach forEachProcessor = ifMessageProcessor._then().forEach(ref(MessageProcessor.class),
-                            "messageProcessor",
-                            ExpressionFactory.cast(ref(List.class).narrow(MessageProcessor.class),
-                                    fields.get(fieldName).getField()));
-                    forEachProcessor.body().add(transformed.invoke("add").arg(
-                            ExpressionFactory._new(callbackClass).arg(event).arg(muleContext).arg(
-                                    forEachProcessor.var())
-                    ));
-
-                    Conditional ifString = ifMessageProcessor._elseif(Op.cand(
-                            Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()),
-                            Op._instanceof(fields.get(fieldName).getField(), ref(String.class))));
-
-                    ifString._then()
-                            .add(transformed.invoke("add").arg(
-                                    ExpressionFactory._new(stringCallbackClass).arg(
-                                            ExpressionFactory.cast(ref(String.class), fields.get(fieldName).getField())
-                                    )));
-
-                    parameters.add(transformed);
-                }
-
+                declareNestedProcessorParameter(fields, muleContext, event, callProcessor, parameters, variable, fieldName);
             } else {
-                InboundHeaders inboundHeaders = variable.getAnnotation(InboundHeaders.class);
-                OutboundHeaders outboundHeaders = variable.getAnnotation(OutboundHeaders.class);
-                InvocationHeaders invocationHeaders = variable.getAnnotation(InvocationHeaders.class);
-                Payload payload = variable.getAnnotation(Payload.class);
-
-                if (outboundHeaders == null) {
-                    Type type = ref(fields.get(fieldName).getVariableElement().asType()).boxify();
-                    String name = "transformed" + StringUtils.capitalize(fieldName);
-                    Invocation getGenericType = messageProcessorClass.dotclass().invoke("getDeclaredField").arg(
-                            ExpressionFactory.lit(fields.get(fieldName).getFieldType().name())
-                    ).invoke("getGenericType");
-                    Invocation evaluateAndTransform = ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(getGenericType);
-
-                    if (inboundHeaders != null) {
-                        if (context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
-                            evaluateAndTransform.arg("#[" + MessageHeadersListExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
-                        } else if (context.getTypeMirrorUtils().isMap(fields.get(fieldName).getVariableElement().asType())) {
-                            evaluateAndTransform.arg("#[" + MessageHeadersExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
-                        } else {
-                            evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
-                        }
-                    } else if (invocationHeaders != null) {
-                        if (context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
-                            evaluateAndTransform.arg("#[" + MessageHeadersListExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
-                        } else if (context.getTypeMirrorUtils().isMap(fields.get(fieldName).getVariableElement().asType())) {
-                            evaluateAndTransform.arg("#[" + MessageHeadersExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
-                        } else {
-                            evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
-                        }
-                    } else if (payload != null) {
-                        evaluateAndTransform.arg("#[payload]");
-                    } else {
-                        evaluateAndTransform.arg(fields.get(fieldName).getField());
-                    }
-
-                    Cast cast = ExpressionFactory.cast(type, evaluateAndTransform);
-
-                    Variable transformed = callProcessor.body().decl(type, name, cast);
-                    parameters.add(transformed);
-                } else {
-                    Type type = ref(HashMap.class).narrow(ref(String.class), ref(Object.class));
-                    String name = "transformed" + StringUtils.capitalize(fieldName);
-
-                    outboundHeadersMap = callProcessor.body().decl(type, name, ExpressionFactory._new(type));
-                    parameters.add(outboundHeadersMap);
-                }
+                outboundHeadersMap = declareStandardParameter(messageProcessorClass, fields, muleMessage, callProcessor, parameters, outboundHeadersMap, variable, fieldName);
             }
         }
-
+        
         if (connectMethod != null) {
             DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey((TypeElement) executableElement.getEnclosingElement()));
 
+            Conditional ifDebugEnabled = callProcessor.body()._if(logger.invoke("isDebugEnabled"));
+            ifDebugEnabled._then().add(logger.invoke("debug").arg("Attempting to acquire a connection"));
+    
             Invocation newKey = ExpressionFactory._new(connectionKey);
             Invocation createConnection = moduleObject.invoke("acquireConnection");
             for (String field : connectionParameters.keySet()) {
@@ -946,7 +812,185 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
     }
 
-    private void addOauth(Method process, Variable event, Variable object, ExecutableElement executableElement) {
+    private Variable declareStandardParameter(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, Variable muleMessage, TryStatement callProcessor, List<Expression> parameters, Variable outboundHeadersMap, VariableElement variable, String fieldName) {
+        InboundHeaders inboundHeaders = variable.getAnnotation(InboundHeaders.class);
+        OutboundHeaders outboundHeaders = variable.getAnnotation(OutboundHeaders.class);
+        InvocationHeaders invocationHeaders = variable.getAnnotation(InvocationHeaders.class);
+        Payload payload = variable.getAnnotation(Payload.class);
+
+        if (outboundHeaders == null) {
+            Type type = ref(fields.get(fieldName).getVariableElement().asType()).boxify();
+            String name = "transformed" + StringUtils.capitalize(fieldName);
+            Invocation getGenericType = messageProcessorClass.dotclass().invoke("getDeclaredField").arg(
+                    ExpressionFactory.lit(fields.get(fieldName).getFieldType().name())
+            ).invoke("getGenericType");
+            Invocation evaluateAndTransform = ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(getGenericType);
+
+            if (inboundHeaders != null) {
+                if (context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
+                    evaluateAndTransform.arg("#[" + MessageHeadersListExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
+                } else if (context.getTypeMirrorUtils().isMap(fields.get(fieldName).getVariableElement().asType())) {
+                    evaluateAndTransform.arg("#[" + MessageHeadersExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
+                } else {
+                    evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":INBOUND:" + inboundHeaders.value() + "]");
+                }
+            } else if (invocationHeaders != null) {
+                if (context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
+                    evaluateAndTransform.arg("#[" + MessageHeadersListExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
+                } else if (context.getTypeMirrorUtils().isMap(fields.get(fieldName).getVariableElement().asType())) {
+                    evaluateAndTransform.arg("#[" + MessageHeadersExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
+                } else {
+                    evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
+                }
+            } else if (payload != null) {
+                evaluateAndTransform.arg("#[payload]");
+            } else {
+                evaluateAndTransform.arg(fields.get(fieldName).getField());
+            }
+
+            Cast cast = ExpressionFactory.cast(type, evaluateAndTransform);
+
+            Variable transformed = callProcessor.body().decl(type, name, cast);
+            parameters.add(transformed);
+        } else {
+            Type type = ref(HashMap.class).narrow(ref(String.class), ref(Object.class));
+            String name = "transformed" + StringUtils.capitalize(fieldName);
+
+            outboundHeadersMap = callProcessor.body().decl(type, name, ExpressionFactory._new(type));
+            parameters.add(outboundHeadersMap);
+        }
+        return outboundHeadersMap;
+    }
+
+    private void declareNestedProcessorParameter(Map<String, FieldVariableElement> fields, FieldVariable muleContext, Variable event, TryStatement callProcessor, List<Expression> parameters, VariableElement variable, String fieldName) {
+        DefinedClass callbackClass = context.getClassForRole(NestedProcessorChainGenerator.ROLE);
+        DefinedClass stringCallbackClass = context.getClassForRole(NestedProcessorStringGenerator.ROLE);
+
+        boolean isList = context.getTypeMirrorUtils().isArrayOrList(variable.asType());
+
+        if (!isList) {
+            Variable transformed = callProcessor.body().decl(ref(NestedProcessor.class), "transformed" + StringUtils.capitalize(fieldName),
+                    ExpressionFactory._null());
+
+            Conditional ifMessageProcessor = callProcessor.body()._if(Op.cand(
+                    Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()),
+                    Op._instanceof(fields.get(fieldName).getField(), ref(MessageProcessor.class))));
+
+            ifMessageProcessor._then()
+                    .assign(transformed,
+                            ExpressionFactory._new(callbackClass).arg(event).arg(muleContext).arg(
+                                    ExpressionFactory.cast(ref(MessageProcessor.class), fields.get(fieldName).getField())));
+
+            Conditional ifString = ifMessageProcessor._elseif(Op.cand(
+                    Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()),
+                    Op._instanceof(fields.get(fieldName).getField(), ref(String.class))));
+
+            ifString._then()
+                    .assign(transformed,
+                            ExpressionFactory._new(stringCallbackClass).arg(
+                                    ExpressionFactory.cast(ref(String.class), fields.get(fieldName).getField())
+                            ));
+
+            parameters.add(transformed);
+        } else {
+            Variable transformed = callProcessor.body().decl(ref(List.class).narrow(NestedProcessor.class), "transformed" + StringUtils.capitalize(fieldName),
+                    ExpressionFactory._new(ref(ArrayList.class).narrow(NestedProcessor.class)));
+
+            Conditional ifMessageProcessor = callProcessor.body()._if(Op.cand(
+                    Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()),
+                    Op._instanceof(fields.get(fieldName).getField(), ref(List.class))));
+
+            ForEach forEachProcessor = ifMessageProcessor._then().forEach(ref(MessageProcessor.class),
+                    "messageProcessor",
+                    ExpressionFactory.cast(ref(List.class).narrow(MessageProcessor.class),
+                            fields.get(fieldName).getField()));
+            forEachProcessor.body().add(transformed.invoke("add").arg(
+                    ExpressionFactory._new(callbackClass).arg(event).arg(muleContext).arg(
+                            forEachProcessor.var())
+            ));
+
+            Conditional ifString = ifMessageProcessor._elseif(Op.cand(
+                    Op.ne(fields.get(fieldName).getField(), ExpressionFactory._null()),
+                    Op._instanceof(fields.get(fieldName).getField(), ref(String.class))));
+
+            ifString._then()
+                    .add(transformed.invoke("add").arg(
+                            ExpressionFactory._new(stringCallbackClass).arg(
+                                    ExpressionFactory.cast(ref(String.class), fields.get(fieldName).getField())
+                            )));
+
+            parameters.add(transformed);
+        }
+    }
+
+    private void declareOAuthAccessTokenSecretParameter(TryStatement callProcessor, Variable moduleObject, List<Expression> parameters) {
+        Invocation getAccessToken = moduleObject.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_ACCESS_TOKEN_SECRET_FIELD_NAME));
+        Variable accessTokenSecret = callProcessor.body().decl(ref(String.class), "accessTokenSecret", getAccessToken);
+        parameters.add(accessTokenSecret);
+    }
+
+    private void declareOAuthAccessTokenParameter(TryStatement callProcessor, Variable moduleObject, List<Expression> parameters) {
+        Invocation getAccessToken = moduleObject.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_ACCESS_TOKEN_FIELD_NAME));
+        Variable accessToken = callProcessor.body().decl(ref(String.class), "accessToken", getAccessToken);
+        parameters.add(accessToken);
+    }
+
+    private Variable declareInterceptCallbackParameter(TryStatement callProcessor, String fieldName, List<Expression> parameters) {
+        Variable interceptCallback;DefinedClass callbackClass = context.getClassForRole(InterceptCallbackGenerator.ROLE);
+
+        interceptCallback = callProcessor.body().decl(callbackClass, "transformed" + StringUtils.capitalize(fieldName),
+                ExpressionFactory._new(callbackClass));
+
+        parameters.add(interceptCallback);
+        return interceptCallback;
+    }
+
+    private Map<String, Expression> declareConnectionParametersVariables(ExecutableElement executableElement, Map<String, FieldVariableElement> connectionFields, Method process) {
+        Map<String, Expression> connectionParameters = new HashMap<String, Expression>();
+        ExecutableElement connectMethod = connectForMethod(executableElement);
+        if (connectMethod != null) {
+            for (VariableElement variable : connectMethod.getParameters()) {
+                String fieldName = variable.getSimpleName().toString();
+
+                Type type = ref(connectionFields.get(fieldName).getVariableElement().asType()).boxify();
+                String name = "transformed" + StringUtils.capitalize(fieldName);
+
+                Variable transformed = process.body().decl(type, name, ExpressionFactory._null());
+                connectionParameters.put(fieldName, transformed);
+            }
+        }
+        return connectionParameters;
+    }
+
+    private Variable addConnectionVariableIfNeeded(ExecutableElement executableElement, Method process) {
+        ExecutableElement connectMethod = connectForMethod(executableElement);
+        if (connectForMethod(executableElement) != null) {
+            DefinedClass connectionClass = context.getClassForRole(context.getNameUtils().generateConnectorObjectRoleKey((TypeElement) connectMethod.getEnclosingElement()));
+            return process.body().decl(connectionClass, "connection", ExpressionFactory._null());
+        }
+        return null;
+    }
+
+    private void addOAuthFieldIfNeeded(ExecutableElement executableElement, Method process, Variable event, Variable moduleObject) {
+        if (executableElement.getEnclosingElement().getAnnotation(OAuth.class) != null ||
+                executableElement.getEnclosingElement().getAnnotation(OAuth2.class) != null) {
+            for (VariableElement variable : executableElement.getParameters()) {
+                if (variable.getAnnotation(OAuthAccessToken.class) != null || variable.getAnnotation(OAuthAccessTokenSecret.class) != null) {
+                    addOAuth(process, event, moduleObject, executableElement);
+                    break;
+                }
+            }
+        }
+    }
+
+    private Variable declarePoolObjectIfClassNotNull(DefinedClass poolObjectClass, Method process) {
+        if (poolObjectClass != null) {
+            return process.body().decl(poolObjectClass, "poolObject", ExpressionFactory._null());
+        }
+        return null;
+    }
+
+    private void addOAuth(Method process, Variable event, Variable object, ExecutableElement executableElement) {
         OAuth2 oauth2 = executableElement.getEnclosingElement().getAnnotation(OAuth2.class);
         if (oauth2 != null && !StringUtils.isEmpty(oauth2.expirationRegex())) {
             Block ifTokenExpired = process.body()._if(object.invoke(OAuth2AdapterGenerator.HAS_TOKEN_EXPIRED_METHOD_NAME))._then();

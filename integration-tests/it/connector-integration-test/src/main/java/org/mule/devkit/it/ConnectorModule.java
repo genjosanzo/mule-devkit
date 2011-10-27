@@ -40,6 +40,7 @@ public class ConnectorModule {
     private Integer sessionId;
     private String username;
     private String password;
+    private int retryCount = 0;
 
     @Source
     public void stream(SourceCallback callback) {
@@ -51,6 +52,17 @@ public class ConnectorModule {
             }
         }
     }
+    
+    @Processor
+    @InvalidateConnectionOn(exception = RuntimeException.class)
+    public boolean invalidateConnectionUntilThirdRetry() {
+        if( retryCount < 3 ) {
+            retryCount++;
+            throw new RuntimeException("API failed");
+        }
+
+        return this.sessionId != null;
+    }    
 
     @Processor
     public boolean verifySession() {

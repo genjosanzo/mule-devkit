@@ -80,6 +80,10 @@ public class ConnectorModuleTest extends AbstractModuleTest {
         assertEquals(sessionIdA, sessionIdB);
     }
 
+    public void testInvalidateConnectionUntilThirdRetry() throws Exception {
+        runFlow("testInvalidateConnectionUntilThirdRetry", true);
+    }
+
     public void testVerifyDifferentSession() throws Exception {
         Integer sessionIdA = runFlow("testGetSessionId");
         try {

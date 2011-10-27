@@ -49,6 +49,10 @@
         <connector:invalidate-connection-on-exception config-ref="configB"/>
     </flow>
 
+    <flow name="testInvalidateConnectionUntilThirdRetry">
+        <connector:invalidate-connection-until-third-retry config-ref="configB"/>
+    </flow>
+
     <flow name="testSessionWithCredentials">
         <connector:verify-session username="#[map-payload:username]" password="#[map-payload:password]"
                                   config-ref="configB"/>
