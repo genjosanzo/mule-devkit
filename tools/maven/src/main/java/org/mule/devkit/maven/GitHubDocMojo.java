@@ -169,119 +169,10 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
     @MojoParameter(expression = "${github.sleep.time}", defaultValue = "10000")
     private int sleepTime;
 
+
+
     @Override
     public void execute() throws MojoExecutionException {
-        try {
-            if (retryCount-- > 0) {
-                executeMojo();
-            }
-        } catch (MojoExecutionException e) {
-            warn(String.format("Exception caught while uploading the documentation to GitHub, %s retries left", retryCount), e);
-            if (retryCount == 0) {
-                error("Cannot upload documentation to GitHub after retrying");
-                throw e;
-            }
-            sleep(sleepTime);
-            execute();
-        }
-    }
-
-    /**
-     * Create blob
-     *
-     * @param service
-     * @param repository
-     * @param path
-     * @return blob SHA-1
-     * @throws org.apache.maven.plugin.MojoExecutionException
-     *
-     */
-    protected String createBlob(DataService service, RepositoryId repository,
-                                String path) throws MojoExecutionException {
-        File file = new File(outputDirectory, path);
-        long length = file.length();
-        int size = length > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) length;
-        ByteArrayOutputStream output = new ByteArrayOutputStream(size);
-        FileInputStream stream = null;
-        try {
-            stream = new FileInputStream(file);
-            byte[] buffer = new byte[BUFFER_LENGTH];
-            int read;
-            while ((read = stream.read(buffer)) != -1) {
-                output.write(buffer, 0, read);
-            }
-        } catch (IOException e) {
-            throw new MojoExecutionException("Error reading file: " + e.getMessage(), e);
-        } finally {
-            IOUtils.closeQuietly(stream);
-        }
-
-        Blob blob = new Blob().setEncoding(Blob.ENCODING_BASE64);
-
-        try {
-            byte[] encoded = EncodingUtils.toBase64(output.toByteArray());
-            blob.setContent(new String(encoded, IGitHubConstants.CHARSET_UTF8));
-        } catch (UnsupportedEncodingException e) {
-            throw new MojoExecutionException("Error encoding blob contents: " + e.getMessage(), e);
-        }
-
-        try {
-            if (isDebug()) {
-                debug(MessageFormat.format("Creating blob from {0}", file.getAbsolutePath()));
-            }
-
-            if (!dryRun) {
-                return service.createBlob(repository, blob);
-            } else {
-                return null;
-            }
-        } catch (IOException e) {
-            throw new MojoExecutionException("Error creating blob: " + e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Create an array with only the non-null and non-empty values
-     *
-     * @param values
-     * @return non-null but possibly empty array of non-null/non-empty strings
-     */
-    public static String[] removeEmpties(String... values) {
-        if (values == null || values.length == 0) {
-            return new String[0];
-        }
-        List<String> validValues = new ArrayList<String>();
-        for (String value : values) {
-            if (value != null && value.length() > 0) {
-                validValues.add(value);
-            }
-        }
-        return validValues.toArray(new String[validValues.size()]);
-    }
-
-    /**
-     * Get matching paths found in given base directory
-     *
-     * @param includes
-     * @param excludes
-     * @param baseDir
-     * @return non-null but possibly empty array of string paths relative to the
-     *         base directory
-     */
-    public static String[] getMatchingPaths(String[] includes, String[] excludes, String baseDir) {
-        DirectoryScanner scanner = new DirectoryScanner();
-        scanner.setBasedir(baseDir);
-        if (includes != null && includes.length > 0) {
-            scanner.setIncludes(includes);
-        }
-        if (excludes != null && excludes.length > 0) {
-            scanner.setExcludes(excludes);
-        }
-        scanner.scan();
-        return scanner.getIncludedFiles();
-    }
-
-    private void executeMojo() throws MojoExecutionException {
         RepositoryId repository = getRepository(project, repositoryOwner, repositoryName);
 
         if (dryRun) {
@@ -433,6 +324,104 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
                 throw new MojoExecutionException("Error creating reference: " + e.getMessage(), e);
             }
         }
+    }
+
+    private String createBlob(DataService service, RepositoryId repository, String path) throws MojoExecutionException {
+        File file = new File(outputDirectory, path);
+        long length = file.length();
+        int size = length > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) length;
+        ByteArrayOutputStream output = new ByteArrayOutputStream(size);
+        FileInputStream stream = null;
+        try {
+            stream = new FileInputStream(file);
+            byte[] buffer = new byte[BUFFER_LENGTH];
+            int read;
+            while ((read = stream.read(buffer)) != -1) {
+                output.write(buffer, 0, read);
+            }
+        } catch (IOException e) {
+            throw new MojoExecutionException("Error reading file: " + e.getMessage(), e);
+        } finally {
+            IOUtils.closeQuietly(stream);
+        }
+
+        Blob blob = new Blob().setEncoding(Blob.ENCODING_BASE64);
+
+        try {
+            byte[] encoded = EncodingUtils.toBase64(output.toByteArray());
+            blob.setContent(new String(encoded, IGitHubConstants.CHARSET_UTF8));
+        } catch (UnsupportedEncodingException e) {
+            throw new MojoExecutionException("Error encoding blob contents: " + e.getMessage(), e);
+        }
+
+        try {
+            if (isDebug()) {
+                debug(MessageFormat.format("Creating blob from {0}", file.getAbsolutePath()));
+            }
+
+            if (!dryRun) {
+                return uploadBlobRetryIfError(service, repository, blob);
+            } else {
+                return null;
+            }
+        } catch (IOException e) {
+            throw new MojoExecutionException("Error creating blob: " + e.getMessage(), e);
+        }
+    }
+
+    private String uploadBlobRetryIfError(DataService service, RepositoryId repository, Blob blob) throws IOException, MojoExecutionException {
+        for(int i = 0; i < retryCount; i++) {
+            try {
+                return service.createBlob(repository, blob);
+            } catch (IOException e) {
+                warn(String.format("Exception caught while uploading the documentation to GitHub, %s retries left", retryCount - i -1), e);
+                sleep(sleepTime);
+            }
+        }
+
+        error("Cannot upload documentation to GitHub after retrying");
+        throw new MojoExecutionException("Cannot upload documentation to GitHub after retrying");
+    }
+
+    /**
+     * Create an array with only the non-null and non-empty values
+     *
+     * @param values
+     * @return non-null but possibly empty array of non-null/non-empty strings
+     */
+    public static String[] removeEmpties(String... values) {
+        if (values == null || values.length == 0) {
+            return new String[0];
+        }
+        List<String> validValues = new ArrayList<String>();
+        for (String value : values) {
+            if (value != null && value.length() > 0) {
+                validValues.add(value);
+            }
+        }
+        return validValues.toArray(new String[validValues.size()]);
+    }
+
+    /**
+     * Get matching paths found in given base directory
+     *
+     * @param includes
+     * @param excludes
+     * @param baseDir
+     * @return non-null but possibly empty array of string paths relative to the
+     *         base directory
+     */
+    public static String[] getMatchingPaths(String[] includes, String[] excludes, String baseDir) {
+        DirectoryScanner scanner = new DirectoryScanner();
+        scanner.setBasedir(baseDir);
+        if (includes != null && includes.length > 0) {
+            scanner.setIncludes(includes);
+        }
+        if (excludes != null && excludes.length > 0) {
+            scanner.setExcludes(excludes);
+        }
+        scanner.scan();
+        return scanner.getIncludedFiles();
     }
 
     private void sleep(int sleepTime) {
