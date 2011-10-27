@@ -290,7 +290,7 @@ def:op_description(obj) ?><?cs
                 <?cs set:count = count + #1 ?>
                 <?cs /if ?>
           <?cs /each ?>
-          <?cs if:obj.hasConnectionManager ?>
+          <?cs if:((obj.hasConnectionManager) && (obj.isProcessor)) ?>
             <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
                 <td class="jd-linkcol"><nobr>retryMax</nobr></td>
                 <td class="jd-descrcol">1</td>
