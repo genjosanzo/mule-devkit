@@ -255,7 +255,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return fields;
     }
 
-    protected Method generateInitialiseMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, TypeElement typeElement, FieldVariable muleContext, FieldVariable expressionManager, FieldVariable patternInfo, FieldVariable object, FieldVariable retryCount, FieldVariable retryMax) {
+    protected Method generateInitialiseMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, TypeElement typeElement, FieldVariable muleContext, FieldVariable expressionManager, FieldVariable patternInfo, FieldVariable object, FieldVariable retryCount) {
         DefinedClass pojoClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
 
         Method initialise = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "initialise");
@@ -264,9 +264,6 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         initialise.javadoc().addThrows(ref(InitialisationException.class));
         initialise._throws(InitialisationException.class);
 
-        if( retryMax != null ) {
-            initialise.body().assign(retryMax, ExpressionFactory.lit(3));
-        }
         if( retryCount != null ) {
             initialise.body().assign(retryCount, ExpressionFactory._new(ref(AtomicInteger.class)));
         }

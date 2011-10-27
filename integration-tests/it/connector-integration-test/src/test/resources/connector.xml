@@ -50,7 +50,7 @@
     </flow>
 
     <flow name="testInvalidateConnectionUntilThirdRetry">
-        <connector:invalidate-connection-until-third-retry config-ref="configB"/>
+        <connector:invalidate-connection-until-third-retry config-ref="configB" retryMax="10"/>
     </flow>
 
     <flow name="testSessionWithCredentials">

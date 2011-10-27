@@ -148,7 +148,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
 
         // add initialise
-        generateInitialiseMethod(messageProcessorClass, fields, typeElement, muleContext, expressionManager, patternInfo, object, retryCount, retryMax);
+        generateInitialiseMethod(messageProcessorClass, fields, typeElement, muleContext, expressionManager, patternInfo, object, retryCount);
 
         // add start
         generateStartMethod(messageProcessorClass, fields);
@@ -172,6 +172,9 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         // add setobject
         generateSetModuleObjectMethod(messageProcessorClass, object);
+
+        // add setRetryMax
+        generateSetter(messageProcessorClass, retryMax);
 
         // generate setters for all parameters
         for (String fieldName : fields.keySet()) {
@@ -800,6 +803,15 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                     innerTry._catch(ref(Exception.class)), event, methodName);
             
             Conditional ifRetryMaxNotReached = catchBlock.body()._if(Op.lt(retryCount.invoke("get"), retryMax));
+            ifDebugEnabled = ifRetryMaxNotReached._then()._if(logger.invoke("isDebugEnabled"));
+            messageStringBuffer = ifDebugEnabled._then().decl(ref(StringBuffer.class), "messageStringBuffer", ExpressionFactory._new(ref(StringBuffer.class)));
+            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg("Forcing a retry [time="));
+            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg(retryCount));
+            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg(" out of  "));
+            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg(retryMax));
+            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg("]."));
+            ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuffer.invoke("toString")));
+
             ifRetryMaxNotReached._then()._return(ExpressionFactory.invoke("process").arg(event));
 
             Variable invalidConnection = catchBlock.param("invalidConnection");

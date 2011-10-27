@@ -678,6 +678,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
         if (containingClass().hasConnectionManager()) {
             ParamTagInfo.makeHDF(data, base + ".connectionTags", containingClass().connectionTags());
         }
+        data.setValue(base + ".hasConnectionManager", Boolean.toString(containingClass().hasConnectionManager()));
         AttrTagInfo.makeReferenceHDF(data, base + ".attrRefs", comment().attrTags());
         ThrowsTagInfo.makeHDF(data, base + ".throws", throwsTags());
         ParameterInfo.makeHDF(data, base + ".params", parameters(), isVarArgs(), typeVariables());

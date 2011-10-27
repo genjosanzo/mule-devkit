@@ -59,6 +59,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private static final String ATTRIBUTE_NAME_REF = "ref";
     private static final String ATTRIBUTE_NAME_VALUE_REF = "value-ref";
     private static final String ATTRIBUTE_NAME_KEY_REF = "key-ref";
+    private static final String ATTRIBUTE_RETRY_MAX = "retryMax";
     private static final String XSD_EXTENSION = ".xsd";
     private static final String NAMESPACE_HANDLER_SUFFIX = "NamespaceHandler";
     private static final String ENUM_TYPE_SUFFIX = "EnumType";
@@ -351,6 +352,12 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
             ExecutableElement connectExecutableElement = connectForMethod(element);
             if (connectExecutableElement != null) {
+                if( element.getAnnotation(Processor.class) != null ) {
+                    Attribute retryMaxAttr = createAttribute(ATTRIBUTE_RETRY_MAX, true, SchemaConstants.STRING, "Specify how many times this operation can be retried automatically.");
+                    retryMaxAttr.setDefault("1");
+                    complexContentExtension.getAttributeOrAttributeGroup().add(retryMaxAttr);
+                }
+
                 for (VariableElement connectVariable : connectExecutableElement.getParameters()) {
                     if (context.getTypeMirrorUtils().isCollection(connectVariable.asType())) {
                         generateCollectionElement(schema, targetNamespace, all, connectVariable, true);

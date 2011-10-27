@@ -290,6 +290,14 @@ def:op_description(obj) ?><?cs
                 <?cs set:count = count + #1 ?>
                 <?cs /if ?>
           <?cs /each ?>
+          <?cs if:obj.hasConnectionManager ?>
+            <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
+                <td class="jd-linkcol"><nobr>retryMax</nobr></td>
+                <td class="jd-descrcol">1</td>
+                <td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i>Specify how many times this operation can be retried automatically</td>
+            </tr>
+            <?cs set:count = count + #1 ?>
+          <?cs /if ?>
         <?cs each:attribute=obj.connectionTags ?>
             <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
                 <td class="jd-linkcol"><nobr><?cs var:attribute.attributeName ?></nobr></td>

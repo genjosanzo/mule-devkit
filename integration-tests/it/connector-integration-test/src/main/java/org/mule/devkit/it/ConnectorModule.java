@@ -54,7 +54,7 @@ public class ConnectorModule {
     @Processor
     @InvalidateConnectionOn(exception = RuntimeException.class)
     public boolean invalidateConnectionUntilThirdRetry() {
-        if( retryCount < 2 ) {
+        if( retryCount < 9 ) {
             retryCount++;
             throw new RuntimeException("API failed");
         }

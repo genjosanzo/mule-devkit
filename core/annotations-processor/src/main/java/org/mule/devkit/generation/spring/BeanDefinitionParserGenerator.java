@@ -427,6 +427,8 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         ExecutableElement connectMethod = connectForMethod(executableElement);
         if (connectMethod != null) {
+            generateParseSupportedType(parse.body(), element, builder, "retryMax");
+
             for (VariableElement variable : connectMethod.getParameters()) {
                 String fieldName = variable.getSimpleName().toString();
 
