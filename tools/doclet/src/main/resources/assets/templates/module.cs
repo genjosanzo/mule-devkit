@@ -224,6 +224,13 @@ resolution.</p>
       <?cs set:count = count + #1 ?>
     <?cs /each ?>
 </table>
+<p>Also this connector offers automatic retry for certain operations. There are a couple of situations in which a retry may solve the problem at hand, like for example if the system is
+currently busy or if the session has expired. Those kind of situations are solvable by reacquiring a connection and retrying the operation.</p>
+<p>By default, the connector will automatically attempt to retry the operation only once. You can at your choosing specify a greater ammount of retries by using the <i>retryMax</i>
+attribute on each operation.</p>
+<pre>
+    ... retryMax="3"/&gt;
+</pre>
 <?cs /if ?>
 
 <?cs def:write_op_details(methods) ?>

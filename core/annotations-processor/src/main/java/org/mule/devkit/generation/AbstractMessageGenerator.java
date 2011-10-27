@@ -191,7 +191,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
             FieldVariable field;
             FieldVariable fieldType;
-            if (variable.asType().toString().startsWith(NestedProcessor.class.getName())) {
+            if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
                 field = new FieldBuilder(messageProcessorClass).
                         privateVisibility().
                         type(Object.class).

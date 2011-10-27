@@ -98,6 +98,11 @@ public class FieldVariable extends Variable implements DocCommentable {
         super.declare(f);
     }
 
-
+    @Override
+    public String toString() {
+        return "FieldVariable{" +
+                "jdoc=" + jdoc +
+                ", owner=" + owner +
+                '}';
+    }
 }
-
