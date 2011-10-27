@@ -71,7 +71,7 @@ public class DefinedClass
     /**
      * Name of this class. Null if anonymous.
      */
-    private String name = null;
+    private String name;
 
     /**
      * Modifiers for the class declaration
@@ -96,12 +96,12 @@ public class DefinedClass
     /**
      * Static initializer, if this class has one
      */
-    private Block init = null;
+    private Block init;
 
     /**
      * class javadoc
      */
-    private DocComment jdoc = null;
+    private DocComment jdoc;
 
     /**
      * Set of constructors for this class, if any
@@ -132,7 +132,7 @@ public class DefinedClass
      * without actually generating the code of X.
      * This flag is used to surpress X.java file in the output.
      */
-    private boolean hideFile = false;
+    private boolean hideFile;
 
     /**
      * Client-app spcific metadata associated with this user-created class.
@@ -150,7 +150,7 @@ public class DefinedClass
      * If this is a nested class, this is {@link DefinedClass}.
      * If this is an anonymous class, this constructor shouldn't be used.
      */
-    private ClassContainer outer = null;
+    private ClassContainer outer;
 
 
     /**
@@ -175,7 +175,7 @@ public class DefinedClass
     /**
      * Annotations on this variable. Lazily created.
      */
-    private List<AnnotationUse> annotations = null;
+    private List<AnnotationUse> annotations;
 
 
     /**
@@ -927,5 +927,12 @@ public class DefinedClass
      */
     public Modifiers mods() {
         return mods;
+    }
+
+    @Override
+    public String toString() {
+        return "DefinedClass{" +
+                "name='" + name + '\'' +
+                '}';
     }
 }

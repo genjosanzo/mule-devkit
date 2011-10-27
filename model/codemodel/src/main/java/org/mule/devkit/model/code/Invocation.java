@@ -65,7 +65,7 @@ public final class Invocation extends AbstractExpression implements Statement {
 
     private Method method;
 
-    private boolean isConstructor = false;
+    private boolean isConstructor;
 
     /**
      * List of argument expressions for this method invocation
@@ -75,7 +75,7 @@ public final class Invocation extends AbstractExpression implements Statement {
     /**
      * If isConstructor==true, this field keeps the type to be created.
      */
-    private Type type = null;
+    private Type type;
 
     /**
      * Invokes a method on an object.
@@ -163,6 +163,9 @@ public final class Invocation extends AbstractExpression implements Statement {
     }
 
     public void generate(Formatter f) {
+        if(isConstructor && type == null) {
+            throw new IllegalStateException("Cannot generate this invocation: " + this);
+        }
         if (isConstructor && type.isArray()) {
             // [RESULT] new T[]{arg1,arg2,arg3,...};
             f.p("new").g(type).p('{');
@@ -200,4 +203,15 @@ public final class Invocation extends AbstractExpression implements Statement {
         f.g(this).p(';').nl();
     }
 
+    @Override
+    public String toString() {
+        return "Invocation{" +
+                "object=" + object +
+                ", name='" + name + '\'' +
+                ", method=" + method +
+                ", isConstructor=" + isConstructor +
+                ", args=" + args +
+                ", type=" + type +
+                '}';
+    }
 }

@@ -28,6 +28,8 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -45,6 +47,21 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
             for (VariableElement parameter : method.getParameters()) {
                 if (parameter.asType().toString().startsWith(parameterType.getName())) {
                     return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hasProcessorMethodWithParameterListOf(Class<?> listGenericType) {
+        for (ExecutableElement method : getMethodsAnnotatedWith(Processor.class)) {
+            for (VariableElement parameter : method.getParameters()) {
+                if (parameter.asType().toString().startsWith(List.class.getName())) {
+                    List<? extends TypeMirror> typeArguments = ((DeclaredType) parameter.asType()).getTypeArguments();
+                    if(!typeArguments.isEmpty() && typeArguments.get(0).toString().equals(listGenericType.getName())) {
+                        return true;
+                    }
                 }
             }
         }

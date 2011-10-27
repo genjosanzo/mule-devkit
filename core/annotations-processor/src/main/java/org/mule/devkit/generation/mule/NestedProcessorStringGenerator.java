@@ -37,7 +37,8 @@ public class NestedProcessorStringGenerator extends AbstractModuleGenerator {
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.hasProcessorMethodWithParameter(NestedProcessor.class);
+        return typeElement.hasProcessorMethodWithParameter(NestedProcessor.class) ||
+               typeElement.hasProcessorMethodWithParameterListOf(NestedProcessor.class);
     }
 
     @Override

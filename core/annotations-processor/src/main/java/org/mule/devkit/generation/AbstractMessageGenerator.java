@@ -19,7 +19,6 @@ package org.mule.devkit.generation;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleContext;
-import org.mule.api.NestedProcessor;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
 import org.mule.api.construct.FlowConstruct;
@@ -189,7 +188,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
             FieldVariable field;
             FieldVariable fieldType;
-            if (variable.asType().toString().startsWith(NestedProcessor.class.getName())) {
+            if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
                 field = new FieldBuilder(messageProcessorClass).
                         privateVisibility().
                         type(Object.class).
