@@ -28,7 +28,7 @@
         <requiredProperty key="groupId">
             <defaultValue>org.mule.modules</defaultValue>
         </requiredProperty>
-        <requiredProperty key="muleModuleName"/>
+        <requiredProperty key="muleConnectorName"/>
     </requiredProperties>
 
     <fileSets>
