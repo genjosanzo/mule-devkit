@@ -417,10 +417,16 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                         Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(
                                 getAttribute
                         ))));
-                ifNotNull._then().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
+                Conditional ifNotExpression = ifNotNull._then()._if(getAttribute.invoke("startsWith").arg("#"));
+
+                ifNotExpression._else().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
                         Op.plus(Op.plus(ExpressionFactory.lit("#[registry:"),
                                 element.invoke("getAttribute").arg(fieldName + "-ref")),
                                 ExpressionFactory.lit("]"))
+                ));
+
+                ifNotExpression._then().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
+                        element.invoke("getAttribute").arg(fieldName + "-ref")
                 ));
             }
         }
