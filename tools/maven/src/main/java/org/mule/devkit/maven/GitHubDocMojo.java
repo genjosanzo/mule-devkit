@@ -50,10 +50,8 @@ import java.util.List;
  */
 @MojoGoal("github-upload-doc")
 public class GitHubDocMojo extends AbstractGitHubMojo {
-    /**
-     * BRANCH_DEFAULT
-     */
-    public static final String BRANCH_DEFAULT = "refs/heads/gh-pages";
+
+    private static final String BRANCH_DEFAULT = "refs/heads/gh-pages";
     private static final int BUFFER_LENGTH = 8192;
 
     /**
@@ -125,15 +123,13 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
     /**
      * Base directory to commit files from
      */
-    @MojoParameter(expression = "${siteOutputDirectory}", defaultValue = "${project.build.directory}/apidocs",
-            required = true)
+    @MojoParameter(expression = "${siteOutputDirectory}", defaultValue = "${project.build.directory}/apidocs", required = true)
     private File outputDirectory;
 
     /**
      * Project being built
      */
-    @MojoParameter(expression = "${project}",
-            required = true)
+    @MojoParameter(expression = "${project}", required = true)
     private MavenProject project;
 
     /**
@@ -169,7 +165,11 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
     @MojoParameter(expression = "${github.sleep.time}", defaultValue = "10000")
     private int sleepTime;
 
-
+    /**
+     * Whether to fail this mojo when it is not possible to upload the blob to GitHub
+     */
+    @MojoParameter(expression = "${github.fail.build}", defaultValue = "false")
+    private boolean failBuild;
 
     @Override
     public void execute() throws MojoExecutionException {
@@ -223,7 +223,18 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
             entry.setPath(prefix + path);
             entry.setType(TreeEntry.TYPE_BLOB);
             entry.setMode(TreeEntry.MODE_BLOB);
-            entry.setSha(createBlob(service, repository, path));
+
+            try {
+                String blob = createBlob(service, repository, path);
+                entry.setSha(blob);
+            } catch (MojoExecutionException e) {
+                if(failBuild) {
+                    throw e;
+                } else {
+                    return;
+                }
+            }
+
             entries.add(entry);
         }
 
@@ -370,11 +381,11 @@ public class GitHubDocMojo extends AbstractGitHubMojo {
     }
 
     private String uploadBlobRetryIfError(DataService service, RepositoryId repository, Blob blob) throws IOException, MojoExecutionException {
-        for(int i = 0; i < retryCount; i++) {
+        for (int i = 0; i < retryCount; i++) {
             try {
                 return service.createBlob(repository, blob);
             } catch (IOException e) {
-                warn(String.format("Exception caught while uploading the documentation to GitHub, %s retries left", retryCount - i -1), e);
+                warn(String.format("Exception caught while uploading the documentation to GitHub, %s retries left", retryCount - i - 1), e);
                 sleep(sleepTime);
             }
         }
