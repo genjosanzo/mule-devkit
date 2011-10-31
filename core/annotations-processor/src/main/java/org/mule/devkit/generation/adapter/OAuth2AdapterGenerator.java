@@ -82,7 +82,8 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
         generateStopMethod(oauthAdapter);
         generateInitialiseMethod(oauthAdapter, messageProcessor, oauth2.callbackPath());
 
-        generateGetAuthorizationUrlMethod(oauthAdapter, typeElement, oauth2);
+        FieldVariable logger = FieldBuilder.newLoggerField(oauthAdapter);
+        generateGetAuthorizationUrlMethod(oauthAdapter, typeElement, oauth2, logger);
         generateFetchAccessTokenMethod(oauthAdapter, typeElement, oauth2);
         generateHasTokenExpiredMethod(oauthAdapter, oauth2);
         generateResetMethod(oauthAdapter, oauth2);
@@ -106,7 +107,7 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
         }
     }
 
-    private void generateGetAuthorizationUrlMethod(DefinedClass oauthAdapter, DevKitTypeElement typeElement, OAuth2 oauth2) {
+    private void generateGetAuthorizationUrlMethod(DefinedClass oauthAdapter, DevKitTypeElement typeElement, OAuth2 oauth2, FieldVariable logger) {
         Method getAuthorizationUrl = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, GET_AUTHORIZATION_URL_METHOD_NAME);
         getAuthorizationUrl.type(ref(String.class));
 
@@ -126,6 +127,8 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
             ifScopeNotNull.invoke(urlBuilder, "append").arg(scope);
         }
 
+
+        getAuthorizationUrl.body().invoke(logger, "info").arg(ExpressionFactory.direct("\"OAUth 2 authorization url: \" + urlBuilder"));
         getAuthorizationUrl.body()._return(urlBuilder.invoke("toString"));
     }
 
