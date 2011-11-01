@@ -3,10 +3,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.mule.devkit.it</groupId>
-    <artifactId>lifecycle-integration-test</artifactId>
+    <artifactId>pojo-integration-test</artifactId>
     <version>1.0</version>
     <packaging>mule-module</packaging>
-    <name>Mule DevKit Source Integration Tests</name>
+    <name>Mule DevKit Pojo Integration Tests</name>
 
     <build>
         <pluginManagement>
