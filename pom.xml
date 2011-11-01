@@ -20,7 +20,7 @@
 
     <groupId>org.mule.tools.devkit</groupId>
     <artifactId>mule-devkit</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>3.0</version>
     <packaging>pom</packaging>
 
     <properties>
