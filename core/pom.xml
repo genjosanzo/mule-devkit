@@ -6,14 +6,14 @@
     <parent>
         <groupId>org.mule.tools.devkit</groupId>
         <artifactId>mule-devkit</artifactId>
-        <version>3.0-SNAPSHOT</version>
+        <version>3.0.1-SNAPSHOT</version>
     </parent>
 
     <name>Mule DevKit Core</name>
 
     <groupId>org.mule.tools.devkit</groupId>
     <artifactId>mule-devkit-core</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>3.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
