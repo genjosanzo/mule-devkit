@@ -109,11 +109,6 @@
             <version>@project.version@</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-dynamic</artifactId>
-            <version>@project.version@</version>
-        </dependency>
-        <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
             <version>@mule.version@</version>
