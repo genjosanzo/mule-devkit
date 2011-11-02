@@ -39,10 +39,6 @@ public class CollectionModuleTest extends AbstractModuleTest {
         runFlow("flowConfigItems", 2);
     }
 
-    public void testDynamicConfigItems() throws Exception {
-        runFlow("flowDynamicConfigItems", 3);
-    }
-
     public void testMap() throws Exception {
         runFlow("flowMap", 2);
     }
