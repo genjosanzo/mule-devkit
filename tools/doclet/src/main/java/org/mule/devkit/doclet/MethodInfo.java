@@ -88,18 +88,6 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
         return null;
     }
 
-    private static void addRealInterfaces(ClassInfo[] ifaces, ArrayList<ClassInfo> queue) {
-        for (ClassInfo i : ifaces) {
-            queue.add(i);
-            if (i.realSuperclass() != null && i.realSuperclass().isAbstract()) {
-                queue.add(i.superclass());
-            }
-        }
-        for (ClassInfo i : ifaces) {
-            addInterfaces(i.realInterfaces(), queue);
-        }
-    }
-
     public MethodInfo findRealOverriddenMethod(MethodInfo other, HashSet<ClassInfo> notStrippable) {
         String name = other.name();
         String signature = other.signature();

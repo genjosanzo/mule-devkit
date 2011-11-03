@@ -246,27 +246,6 @@ public final class DoclavaDiff {
     }
 
     /**
-     * Returns true if the list of sites all completely agree on the given
-     * package. All sites must possess the package, all classes it contains, and
-     * all methods of each class.
-     */
-    private boolean agreeOnPackage(String pkg, List<FederatedSite> sites) {
-        for (FederatedSite site : sites) {
-            if (site.apiInfo().getPackages().get(pkg) == null) {
-                return false;
-            }
-        }
-
-        List<String> classes = knownClassesForPackage(pkg, sites);
-        for (String clazz : classes) {
-            if (!agreeOnClass(clazz, sites)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
      * Returns true if the list of sites all agree on the given class. Each site
      * must have the class and agree on its methods.
      */

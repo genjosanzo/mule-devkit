@@ -32,11 +32,9 @@ import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.Type;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Array;
@@ -48,7 +46,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -757,20 +754,6 @@ public class Doclava {
         }
     }
 
-    private static void makeTocHDF(Map<String, List<TocInfo>> toc, Data data) {
-        int i = 0;
-        for (String topic : toc.keySet()) {
-            data.setValue("topics." + i + ".title", topic == null ? "Root" : topic);
-            int j = 0;
-            for (TocInfo page : toc.get(topic)) {
-                data.setValue("topics." + i + ".topics." + j + ".title", page.getTitle());
-                data.setValue("topics." + i + ".topics." + j + ".link", "../" + page.getFilename());
-                j++;
-            }
-            i++;
-        }
-    }
-
     public static void writeHTMLPages(File dir) {
         if (!dir.isDirectory()) {
             throw new IllegalArgumentException("Not a directory: " + dir);
@@ -1428,263 +1411,6 @@ public class Doclava {
             }
             return proxy;
         }
-    }
-
-    /**
-     * Collect the values used by the Dev tools and write them in files packaged with the SDK
-     *
-     * @param output the ouput directory for the files.
-     */
-    private static void writeSdkValues(String output) {
-        ArrayList<String> activityActions = new ArrayList<String>();
-        ArrayList<String> broadcastActions = new ArrayList<String>();
-        ArrayList<String> serviceActions = new ArrayList<String>();
-        ArrayList<String> categories = new ArrayList<String>();
-        ArrayList<String> features = new ArrayList<String>();
-
-        ArrayList<ClassInfo> layouts = new ArrayList<ClassInfo>();
-        ArrayList<ClassInfo> widgets = new ArrayList<ClassInfo>();
-        ArrayList<ClassInfo> layoutParams = new ArrayList<ClassInfo>();
-
-        ClassInfo[] classes = Converter.allClasses();
-
-        // Go through all the fields of all the classes, looking SDK stuff.
-        for (ClassInfo clazz : classes) {
-
-            // first check constant fields for the SdkConstant annotation.
-            FieldInfo[] fields = clazz.allSelfFields();
-            for (FieldInfo field : fields) {
-                Object cValue = field.constantValue();
-                if (cValue != null) {
-                    AnnotationInstanceInfo[] annotations = field.annotations();
-                    if (annotations.length > 0) {
-                        for (AnnotationInstanceInfo annotation : annotations) {
-                            if (SDK_CONSTANT_ANNOTATION.equals(annotation.type().qualifiedName())) {
-                                AnnotationValueInfo[] values = annotation.elementValues();
-                                if (values.length > 0) {
-                                    String type = values[0].valueString();
-                                    if (SDK_CONSTANT_TYPE_ACTIVITY_ACTION.equals(type)) {
-                                        activityActions.add(cValue.toString());
-                                    } else if (SDK_CONSTANT_TYPE_BROADCAST_ACTION.equals(type)) {
-                                        broadcastActions.add(cValue.toString());
-                                    } else if (SDK_CONSTANT_TYPE_SERVICE_ACTION.equals(type)) {
-                                        serviceActions.add(cValue.toString());
-                                    } else if (SDK_CONSTANT_TYPE_CATEGORY.equals(type)) {
-                                        categories.add(cValue.toString());
-                                    } else if (SDK_CONSTANT_TYPE_FEATURE.equals(type)) {
-                                        features.add(cValue.toString());
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Now check the class for @Widget or if its in the android.widget package
-            // (unless the class is hidden or abstract, or non public)
-            if (clazz.isHidden() == false && clazz.isPublic() && clazz.isAbstract() == false) {
-                boolean annotated = false;
-                AnnotationInstanceInfo[] annotations = clazz.annotations();
-                if (annotations.length > 0) {
-                    for (AnnotationInstanceInfo annotation : annotations) {
-                        if (SDK_WIDGET_ANNOTATION.equals(annotation.type().qualifiedName())) {
-                            widgets.add(clazz);
-                            annotated = true;
-                            break;
-                        } else if (SDK_LAYOUT_ANNOTATION.equals(annotation.type().qualifiedName())) {
-                            layouts.add(clazz);
-                            annotated = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (annotated == false) {
-                    // lets check if this is inside android.widget
-                    PackageInfo pckg = clazz.containingPackage();
-                    String packageName = pckg.name();
-                    if ("android.widget".equals(packageName) || "android.view".equals(packageName)) {
-                        // now we check what this class inherits either from android.view.ViewGroup
-                        // or android.view.View, or android.view.ViewGroup.LayoutParams
-                        int type = checkInheritance(clazz);
-                        switch (type) {
-                            case TYPE_WIDGET:
-                                widgets.add(clazz);
-                                break;
-                            case TYPE_LAYOUT:
-                                layouts.add(clazz);
-                                break;
-                            case TYPE_LAYOUT_PARAM:
-                                layoutParams.add(clazz);
-                                break;
-                        }
-                    }
-                }
-            }
-        }
-
-        // now write the files, whether or not the list are empty.
-        // the SDK built requires those files to be present.
-
-        Collections.sort(activityActions);
-        writeValues(output + "/activity_actions.txt", activityActions);
-
-        Collections.sort(broadcastActions);
-        writeValues(output + "/broadcast_actions.txt", broadcastActions);
-
-        Collections.sort(serviceActions);
-        writeValues(output + "/service_actions.txt", serviceActions);
-
-        Collections.sort(categories);
-        writeValues(output + "/categories.txt", categories);
-
-        Collections.sort(features);
-        writeValues(output + "/features.txt", features);
-
-        // before writing the list of classes, we do some checks, to make sure the layout params
-        // are enclosed by a layout class (and not one that has been declared as a widget)
-        for (int i = 0; i < layoutParams.size(); ) {
-            ClassInfo layoutParamClass = layoutParams.get(i);
-            ClassInfo containingClass = layoutParamClass.containingClass();
-            if (containingClass == null || layouts.indexOf(containingClass) == -1) {
-                layoutParams.remove(i);
-            } else {
-                i++;
-            }
-        }
-
-        writeClasses(output + "/widgets.txt", widgets, layouts, layoutParams);
-    }
-
-    /**
-     * Writes a list of values into a text files.
-     *
-     * @param pathname the absolute os path of the output file.
-     * @param values   the list of values to write.
-     */
-    private static void writeValues(String pathname, ArrayList<String> values) {
-        FileWriter fw = null;
-        BufferedWriter bw = null;
-        try {
-            fw = new FileWriter(pathname, false);
-            bw = new BufferedWriter(fw);
-
-            for (String value : values) {
-                bw.append(value).append('\n');
-            }
-        } catch (IOException e) {
-            // pass for now
-        } finally {
-            try {
-                if (bw != null) {
-                    bw.close();
-                }
-            } catch (IOException e) {
-                // pass for now
-            }
-            try {
-                if (fw != null) {
-                    fw.close();
-                }
-            } catch (IOException e) {
-                // pass for now
-            }
-        }
-    }
-
-    /**
-     * Writes the widget/layout/layout param classes into a text files.
-     *
-     * @param pathname     the absolute os path of the output file.
-     * @param widgets      the list of widget classes to write.
-     * @param layouts      the list of layout classes to write.
-     * @param layoutParams the list of layout param classes to write.
-     */
-    private static void writeClasses(String pathname, ArrayList<ClassInfo> widgets,
-                                     ArrayList<ClassInfo> layouts, ArrayList<ClassInfo> layoutParams) {
-        FileWriter fw = null;
-        BufferedWriter bw = null;
-        try {
-            fw = new FileWriter(pathname, false);
-            bw = new BufferedWriter(fw);
-
-            // write the 3 types of classes.
-            for (ClassInfo clazz : widgets) {
-                writeClass(bw, clazz, 'W');
-            }
-            for (ClassInfo clazz : layoutParams) {
-                writeClass(bw, clazz, 'P');
-            }
-            for (ClassInfo clazz : layouts) {
-                writeClass(bw, clazz, 'L');
-            }
-        } catch (IOException e) {
-            // pass for now
-        } finally {
-            try {
-                if (bw != null) {
-                    bw.close();
-                }
-            } catch (IOException e) {
-                // pass for now
-            }
-            try {
-                if (fw != null) {
-                    fw.close();
-                }
-            } catch (IOException e) {
-                // pass for now
-            }
-        }
-    }
-
-    /**
-     * Writes a class name and its super class names into a {@link BufferedWriter}.
-     *
-     * @param writer the BufferedWriter to write into
-     * @param clazz  the class to write
-     * @param prefix the prefix to put at the beginning of the line.
-     * @throws IOException
-     */
-    private static void writeClass(BufferedWriter writer, ClassInfo clazz, char prefix)
-            throws IOException {
-        writer.append(prefix).append(clazz.qualifiedName());
-        ClassInfo superClass = clazz;
-        while ((superClass = superClass.superclass()) != null) {
-            writer.append(' ').append(superClass.qualifiedName());
-        }
-        writer.append('\n');
-    }
-
-    /**
-     * Checks the inheritance of {@link ClassInfo} objects. This method return
-     * <ul>
-     * <li>{@link #TYPE_LAYOUT}: if the class extends <code>android.view.ViewGroup</code></li>
-     * <li>{@link #TYPE_WIDGET}: if the class extends <code>android.view.View</code></li>
-     * <li>{@link #TYPE_LAYOUT_PARAM}: if the class extends
-     * <code>android.view.ViewGroup$LayoutParams</code></li>
-     * <li>{@link #TYPE_NONE}: in all other cases</li>
-     * </ul>
-     *
-     * @param clazz the {@link ClassInfo} to check.
-     */
-    private static int checkInheritance(ClassInfo clazz) {
-        if ("android.view.ViewGroup".equals(clazz.qualifiedName())) {
-            return TYPE_LAYOUT;
-        } else if ("android.view.View".equals(clazz.qualifiedName())) {
-            return TYPE_WIDGET;
-        } else if ("android.view.ViewGroup.LayoutParams".equals(clazz.qualifiedName())) {
-            return TYPE_LAYOUT_PARAM;
-        }
-
-        ClassInfo parent = clazz.superclass();
-        if (parent != null) {
-            return checkInheritance(parent);
-        }
-
-        return TYPE_NONE;
     }
 
     /**
