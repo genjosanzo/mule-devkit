@@ -71,8 +71,6 @@ public class GenericArchetypeIT {
         verifier.setSystemProperties(archetypeProperties);
         verifier.setVerifierProperties(verifierProperties);
         verifier.setAutoclean(false);
-        verifier.setMavenDebug(true);
-        verifier.setDebug(true);
 
         verifier.executeGoal("archetype:generate");
 
