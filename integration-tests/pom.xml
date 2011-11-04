@@ -98,6 +98,8 @@
                     <systemPropertyVariables>
                         <archetypeVersion>${project.version}</archetypeVersion>
                     </systemPropertyVariables>
+                    <parallel>classes</parallel>
+                    <useUnlimitedThreads>true</useUnlimitedThreads>
                 </configuration>
                 <executions>
                     <execution>
