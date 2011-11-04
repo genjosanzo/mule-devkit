@@ -80,7 +80,6 @@ public class TransformerArchetypeIT {
 
         verifier = new Verifier(ROOT.getAbsolutePath() + "/" + getArtifactId());
         verifier.setAutoclean(true);
-        verifier.getCliOptions().add("-Ddevkit.javadoc.check.skip");
         verifier.executeGoal("package");
 
         verifier.verifyErrorFreeLog();
