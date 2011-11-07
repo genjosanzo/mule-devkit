@@ -799,9 +799,10 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             innerTry.body().add(destroySession);
             innerTry.body().assign(connection, ExpressionFactory._null());
 
-            generateThrow("failedToInvoke", MessagingException.class,
-                    innerTry._catch(ref(Exception.class)), event, methodName);
-            
+            CatchBlock logException = innerTry._catch(ref(Expression.class));
+            Variable destroyException = logException.param("e");
+            logException.body().add(logger.invoke("error").arg(destroyException.invoke("getMessage")).arg(destroyException));
+
             Conditional ifRetryMaxNotReached = catchBlock.body()._if(Op.lt(retryCount.invoke("get"), retryMax));
             ifDebugEnabled = ifRetryMaxNotReached._then()._if(logger.invoke("isDebugEnabled"));
             messageStringBuffer = ifDebugEnabled._then().decl(ref(StringBuffer.class), "messageStringBuffer", ExpressionFactory._new(ref(StringBuffer.class)));
