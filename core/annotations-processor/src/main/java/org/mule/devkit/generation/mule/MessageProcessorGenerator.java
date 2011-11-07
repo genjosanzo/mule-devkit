@@ -803,7 +803,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             Variable destroyException = logException.param("e");
             logException.body().add(logger.invoke("error").arg(destroyException.invoke("getMessage")).arg(destroyException));
 
-            Conditional ifRetryMaxNotReached = catchBlock.body()._if(Op.lt(retryCount.invoke("get"), retryMax));
+            Conditional ifRetryMaxNotReached = catchBlock.body()._if(Op.lte(retryCount.invoke("get"), retryMax));
             ifDebugEnabled = ifRetryMaxNotReached._then()._if(logger.invoke("isDebugEnabled"));
             messageStringBuffer = ifDebugEnabled._then().decl(ref(StringBuffer.class), "messageStringBuffer", ExpressionFactory._new(ref(StringBuffer.class)));
             ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg("Forcing a retry [time="));
