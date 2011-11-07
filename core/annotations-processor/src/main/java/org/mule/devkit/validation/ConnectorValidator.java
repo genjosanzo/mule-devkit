@@ -26,6 +26,7 @@ import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import java.util.List;
 
 public class ConnectorValidator implements Validator {
@@ -59,38 +60,20 @@ public class ConnectorValidator implements Validator {
             return;
         }
 
-        if (connectMethods.size() > 1) {
-            throw new ValidationException(typeElement, "You cannot annotate more than one method with @Connect");
-        }
-        if (connectMethods.size() < 1) {
-            throw new ValidationException(typeElement, "You must provide at least one method with @Connect");
-        }
+        checkConnectMethod(typeElement, connectMethods);
+        checkDisconnetcMethod(typeElement, disconnectMethods);
+        checkConnectionIdentifierMethod(typeElement, connectionIdentifierMethods);
+        checkValidateConnectionMethod(typeElement, validateConnectionMethods);
+    }
 
-        if (disconnectMethods.size() > 1) {
-            throw new ValidationException(typeElement, "You cannot annotate more than one method with @Disconnect");
+    private void checkConnectMethod(DevKitTypeElement typeElement, List<ExecutableElement> connectMethods) throws ValidationException {
+        if (connectMethods.size() != 1) {
+            throw new ValidationException(typeElement, "You must have exactly one method annotated with @Connect");
         }
-        if (disconnectMethods.size() < 1) {
-            throw new ValidationException(typeElement, "You must provide at least one method with @Disconnect");
-        }
-
-        if (validateConnectionMethods.size() > 1) {
-            throw new ValidationException(typeElement, "You cannot annotate more than one method with @ValidateConnection");
-        }
-        if (validateConnectionMethods.size() < 1) {
-            throw new ValidationException(typeElement, "You must provide at least one method with @ValidateConnection");
-        }
-
-        if (connectionIdentifierMethods.size() > 1) {
-            throw new ValidationException(typeElement, "You cannot annotate more than one method with @ConnectionIdentifier");
-        }
-        if (connectionIdentifierMethods.size() < 1) {
-            throw new ValidationException(typeElement, "You must provide at least one method with @ConnectionIdentifier");
-        }
-
         ExecutableElement connectMethod = connectMethods.get(0);
-        ExecutableElement disconnectMethod = disconnectMethods.get(0);
-        ExecutableElement validateConnectionMethod = validateConnectionMethods.get(0);
-
+        if (!connectMethod.getModifiers().contains(Modifier.PUBLIC)) {
+            throw new ValidationException(typeElement, "A @Connect method must be public.");
+        }
         if (connectMethod.getThrownTypes().size() != 1) {
             throw new ValidationException(typeElement, "A @Connect method can only throw a single type of exception. That exception must be ConnectionException.");
         }
@@ -102,23 +85,57 @@ public class ConnectorValidator implements Validator {
         if (!connectMethod.getReturnType().toString().equals("void")) {
             throw new ValidationException(typeElement, "A @Connect method cannot return anything.");
         }
+    }
 
+    private void checkDisconnetcMethod(DevKitTypeElement typeElement, List<ExecutableElement> disconnectMethods) throws ValidationException {
+        if (disconnectMethods.size() != 1) {
+            throw new ValidationException(typeElement, "You must have exactly one method annotated with @Disconnect");
+        }
+        ExecutableElement disconnectMethod = disconnectMethods.get(0);
+        if (!disconnectMethod.getModifiers().contains(Modifier.PUBLIC)) {
+            throw new ValidationException(typeElement, "A @Disconnect method must be public.");
+        }
+        if (!disconnectMethod.getParameters().isEmpty()) {
+            throw new ValidationException(typeElement, "The @Disconnect method cannot receive any arguments");
+        }
+        if (!disconnectMethod.getReturnType().toString().equals("void")) {
+            throw new ValidationException(typeElement, "A @Disconnect method cannot return anything.");
+        }
+    }
+
+    private void checkValidateConnectionMethod(DevKitTypeElement typeElement, List<ExecutableElement> validateConnectionMethods) throws ValidationException {
+        if (validateConnectionMethods.size() != 1) {
+            throw new ValidationException(typeElement, "You must have exactly one method annotated with @ValidateConnection");
+        }
+        ExecutableElement validateConnectionMethod = validateConnectionMethods.get(0);
+        if (!validateConnectionMethod.getModifiers().contains(Modifier.PUBLIC)) {
+            throw new ValidationException(typeElement, "A @ValidateConnection method must be public.");
+        }
         if (!validateConnectionMethod.getReturnType().toString().equals("boolean") &&
                 !validateConnectionMethod.getReturnType().toString().equals("java.lang.Boolean")) {
             throw new ValidationException(typeElement, "A @ValidateConnection method must return a boolean.");
         }
-
-        if (!disconnectMethod.getParameters().isEmpty()) {
-            throw new ValidationException(typeElement, "The @Disconnect method cannot receive any arguments");
-        }
-
         if (!validateConnectionMethod.getParameters().isEmpty()) {
             throw new ValidationException(typeElement, "The @ValidateConnection method cannot receive any arguments");
         }
+    }
 
-
-        if (!disconnectMethod.getReturnType().toString().equals("void")) {
-            throw new ValidationException(typeElement, "A @Disconnect method cannot return anything.");
+    private void checkConnectionIdentifierMethod(DevKitTypeElement typeElement, List<ExecutableElement> connectionIdentifierMethods) throws ValidationException {
+        if (connectionIdentifierMethods.size() != 1) {
+            throw new ValidationException(typeElement, "You must have exactly one method annotated with @ConnectionIdentifier");
+        }
+        ExecutableElement connectionIdentifierMethod = connectionIdentifierMethods.get(0);
+        if (!connectionIdentifierMethod.getReturnType().toString().equals("java.lang.String")) {
+            throw new ValidationException(typeElement, "A @ConnectionIdentifier must return java.lang.String.");
+        }
+        if (!connectionIdentifierMethod.getModifiers().contains(Modifier.PUBLIC)) {
+            throw new ValidationException(typeElement, "A @ConnectionIdentifier method must be public.");
+        }
+        if (connectionIdentifierMethod.getModifiers().contains(Modifier.STATIC)) {
+            throw new ValidationException(typeElement, "A @ConnectionIdentifier cannot be static.");
+        }
+        if (!connectionIdentifierMethod.getParameters().isEmpty()) {
+            throw new ValidationException(typeElement, "The @ConnectionIdentifier method cannot receive any arguments");
         }
     }
 }

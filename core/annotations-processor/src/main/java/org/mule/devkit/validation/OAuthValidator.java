@@ -39,22 +39,48 @@ public class OAuthValidator implements Validator {
 
     @Override
     public void validate(DevKitTypeElement typeElement, GeneratorContext context) throws ValidationException {
-        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
-            checkClassHasFieldWithAnnotation(typeElement, OAuthConsumerKey.class, "@OAuth class must contain a field annotated with @OAuthConsumerKey");
-            checkClassHasFieldWithAnnotation(typeElement, OAuthConsumerSecret.class, "@OAuth class must contain a field annotated with @OAuthConsumerSecret");
+        if (typeElement.hasAnnotation(OAuth.class)) {
+            validateOAuth1Class(typeElement);
+        } else if (typeElement.hasAnnotation(OAuth2.class)) {
+            validateOAuth2Class(typeElement);
         } else {
-            if (classHasMethodWithParameterAnnotated(typeElement, OAuthAccessToken.class)) {
-                throw new ValidationException(typeElement, "Cannot annotate parameter with @OAuthAccessToken without annotating the class with @OAuth");
-            }
-            if (classHasMethodWithParameterAnnotated(typeElement, OAuthAccessTokenSecret.class)) {
-                throw new ValidationException(typeElement, "Cannot annotate parameter with @OAuthAccessTokenSecret without annotating the class with @OAuth");
-            }
+            validateNonOAuthClass(typeElement);
         }
     }
 
-    private void checkClassHasFieldWithAnnotation(DevKitTypeElement typeElement, Class<? extends Annotation> annotation, String errorMessage) throws ValidationException {
-        if (typeElement.getFieldsAnnotatedWith(annotation).isEmpty()) {
-            throw new ValidationException(typeElement, errorMessage);
+    private void validateOAuth1Class(DevKitTypeElement typeElement) throws ValidationException {
+        if (!typeElement.hasFieldAnnotatedWith(OAuthConsumerKey.class)) {
+            throw new ValidationException(typeElement, "@OAuth class must contain a field annotated with @OAuthConsumerKey");
+        }
+        if (!typeElement.hasFieldAnnotatedWith(OAuthConsumerSecret.class)) {
+            throw new ValidationException(typeElement, "@OAuth class must contain a field annotated with @OAuthConsumerSecret");
+        }
+        if (!classHasMethodWithParameterAnnotated(typeElement, OAuthAccessToken.class)) {
+            throw new ValidationException(typeElement, "@OAuth class must have at least one method parameter annotated with @OAuthAccessToken");
+        }
+    }
+
+    private void validateOAuth2Class(DevKitTypeElement typeElement) throws ValidationException {
+        if (!typeElement.hasFieldAnnotatedWith(OAuthConsumerKey.class)) {
+            throw new ValidationException(typeElement, "@OAuth2 class must contain a field annotated with @OAuthConsumerKey");
+        }
+        if (!typeElement.hasFieldAnnotatedWith(OAuthConsumerSecret.class)) {
+            throw new ValidationException(typeElement, "@OAuth2 class must contain a field annotated with @OAuthConsumerSecret");
+        }
+        if (!classHasMethodWithParameterAnnotated(typeElement, OAuthAccessToken.class)) {
+            throw new ValidationException(typeElement, "@OAuth2 class must have at least one method parameter annotated with @OAuthAccessToken");
+        }
+        if(classHasMethodWithParameterAnnotated(typeElement, OAuthAccessTokenSecret.class)) {
+            throw new ValidationException(typeElement, "@OAuth2 class cannot have method parameters annotated with @OAuthAccessTokenSecret");
+        }
+    }
+
+    private void validateNonOAuthClass(DevKitTypeElement typeElement) throws ValidationException {
+        if (classHasMethodWithParameterAnnotated(typeElement, OAuthAccessToken.class)) {
+            throw new ValidationException(typeElement, "Cannot annotate parameter with @OAuthAccessToken without annotating the class with @OAuth or @OAuth2");
+        }
+        if (classHasMethodWithParameterAnnotated(typeElement, OAuthAccessTokenSecret.class)) {
+            throw new ValidationException(typeElement, "Cannot annotate parameter with @OAuthAccessTokenSecret without annotating the class with @OAuth");
         }
     }
 

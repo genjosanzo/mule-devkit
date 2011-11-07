@@ -71,8 +71,6 @@ public class TransformerArchetypeIT {
         verifier.setSystemProperties(archetypeProperties);
         verifier.setVerifierProperties(verifierProperties);
         verifier.setAutoclean(false);
-        verifier.setMavenDebug(true);
-        verifier.setDebug(true);
 
         verifier.executeGoal("archetype:generate");
 
@@ -80,7 +78,6 @@ public class TransformerArchetypeIT {
 
         verifier = new Verifier(ROOT.getAbsolutePath() + "/" + getArtifactId());
         verifier.setAutoclean(true);
-        verifier.getCliOptions().add("-Ddevkit.javadoc.check.skip");
         verifier.executeGoal("package");
 
         verifier.verifyErrorFreeLog();

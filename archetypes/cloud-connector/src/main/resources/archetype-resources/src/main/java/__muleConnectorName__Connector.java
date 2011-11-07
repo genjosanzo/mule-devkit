@@ -101,7 +101,7 @@ public class ${muleConnectorName}Connector
     /**
      * Custom processor
      *
-     * {@sample.xml ../../../doc/${muleConnectorName}-connector.xml.sample ${ConnectorNameLower}:my-processor}
+     * {@sample.xml ../../../doc/${muleConnectorName}-connector.xml.sample ${connectorNameLower}:my-processor}
      *
      * @param content Content to be processed
      * @return Some string

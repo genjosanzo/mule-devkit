@@ -30,6 +30,8 @@ import java.util.Properties;
 
 public abstract class AbstractMavenIT {
 
+    private static final boolean DEBUG = false;
+
     protected abstract String getArtifactVersion();
 
     protected abstract String getArtifactId();
@@ -53,10 +55,8 @@ public abstract class AbstractMavenIT {
     @SuppressWarnings("unchecked")
     public void buildExecutable() throws VerificationException {
         try {
-            Verifier verifier = new Verifier(getRoot().getAbsolutePath(), null, true);
+            Verifier verifier = new Verifier(getRoot().getAbsolutePath(), null, DEBUG);
             verifier.setAutoclean(false);
-            verifier.setMavenDebug(true);
-            verifier.setDebug(true);
 
             setSystemProperties(verifier);
             verifier.executeGoal("clean");

@@ -11,7 +11,7 @@
 
     <properties>
         <mule.version>3.2.0</mule.version>
-        <mule.devkit.version>3.0.1-SNAPSHOT</mule.devkit.version>
+        <mule.devkit.version>3.0.2-SNAPSHOT</mule.devkit.version>
         <junit.version>4.8.2</junit.version>
         <mockito.version>1.8.2</mockito.version>
     </properties>
@@ -111,7 +111,7 @@
                     <docletArtifact>
                         <groupId>org.mule.tools.devkit</groupId>
                         <artifactId>mule-devkit-doclet</artifactId>
-                        <version>3.0.1-SNAPSHOT</version>
+                        <version>3.0.2-SNAPSHOT</version>
                     </docletArtifact>
                     <doclet>org.mule.devkit.doclet.Doclava</doclet>
                     <bootclasspath>${sun.boot.class.path}</bootclasspath>
