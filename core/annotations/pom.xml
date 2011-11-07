@@ -5,14 +5,14 @@
     <parent>
         <groupId>org.mule.tools.devkit</groupId>
         <artifactId>mule-devkit-core</artifactId>
-        <version>3.0.1</version>
+        <version>3.0.2-SNAPSHOT</version>
     </parent>
 
     <name>Mule DevKit Annotations</name>
 
     <groupId>org.mule.tools.devkit</groupId>
     <artifactId>mule-devkit-annotations</artifactId>
-    <version>3.0.1</version>
+    <version>3.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
