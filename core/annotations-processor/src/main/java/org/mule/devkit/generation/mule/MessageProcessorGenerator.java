@@ -799,7 +799,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             innerTry.body().add(destroySession);
             innerTry.body().assign(connection, ExpressionFactory._null());
 
-            CatchBlock logException = innerTry._catch(ref(Expression.class));
+            CatchBlock logException = innerTry._catch(ref(Exception.class));
             Variable destroyException = logException.param("e");
             logException.body().add(logger.invoke("error").arg(destroyException.invoke("getMessage")).arg(destroyException));
 
