@@ -25,6 +25,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.util.Elements;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 public class JavaDocUtilsTest {
@@ -67,5 +68,61 @@ public class JavaDocUtilsTest {
         JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
         String sample = javaDocUtils.getTagContent("sample.xml", executableElement);
         assertEquals("../../../doc/magento-connector.xml.sample magento:updateCustomerAddress", sample);
+    }
+
+    @Test
+    public void getParameterSummary() throws Exception {
+         when(elements.getDocComment(executableElement)).thenReturn("\n" +
+                "     Bla bla bla\n" +
+                "     \n" +
+                "     @param name the name\n" +
+                "     @param content the content");
+        JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
+        assertEquals("the content", javaDocUtils.getParameterSummary("content", executableElement));
+    }
+
+    @Test
+    public void getParameterSummaryMultiline() throws Exception {
+         when(elements.getDocComment(executableElement)).thenReturn("\n" +
+                "     Bla bla bla\n" +
+                "     \n" +
+                "     @param name the name\n" +
+                "     @param content the \n" +
+                "content");
+        JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
+        assertEquals("the content", javaDocUtils.getParameterSummary("content", executableElement));
+    }
+
+    @Test
+    public void getParameterSummaryParameterNamesDontMatch() throws Exception {
+         when(elements.getDocComment(executableElement)).thenReturn("\n" +
+                "     Bla bla bla\n" +
+                "     \n" +
+                "     @param name the name\n" +
+                "     @param content the content");
+        JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
+        assertNull(javaDocUtils.getParameterSummary("cont", executableElement));
+    }
+
+    @Test
+    public void getParameterSummaryParameterNotDocumented() throws Exception {
+         when(elements.getDocComment(executableElement)).thenReturn("\n" +
+                "     Bla bla bla\n" +
+                "     \n" +
+                "     @param name the name\n" +
+                "     @param content the content");
+        JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
+        assertNull(javaDocUtils.getParameterSummary("value", executableElement));
+    }
+
+    @Test
+    public void getParameterSummaryParameterWithEmptyComment() throws Exception {
+         when(elements.getDocComment(executableElement)).thenReturn("\n" +
+                "     Bla bla bla\n" +
+                "     \n" +
+                "     @param name the name\n" +
+                "     @param content");
+        JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
+        assertNull(javaDocUtils.getParameterSummary("content", executableElement));
     }
 }
