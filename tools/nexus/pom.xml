@@ -10,9 +10,7 @@
 
     <name>Mule DevKit Nexus Plugin</name>
 
-    <groupId>org.mule.tools.devkit</groupId>
     <artifactId>mule-devkit-nexus-plugin</artifactId>
-    <version>3.0.2-SNAPSHOT</version>
     <packaging>nexus-plugin</packaging>
 
     <properties>

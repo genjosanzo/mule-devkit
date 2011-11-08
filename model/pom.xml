@@ -10,9 +10,7 @@
 
     <name>Mule DevKit Model</name>
 
-    <groupId>org.mule.tools.devkit</groupId>
     <artifactId>mule-devkit-model</artifactId>
-    <version>3.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>

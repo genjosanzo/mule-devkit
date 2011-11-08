@@ -10,9 +10,7 @@
 
     <name>Mule DevKit Code Model</name>
 
-    <groupId>org.mule.tools.devkit</groupId>
     <artifactId>mule-devkit-codemodel</artifactId>
-    <version>3.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>

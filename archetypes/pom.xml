@@ -10,9 +10,7 @@
 
     <name>Mule DevKit Archetypes</name>
 
-    <groupId>org.mule.tools.devkit</groupId>
     <artifactId>mule-devkit-archetypes</artifactId>
-    <version>3.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>

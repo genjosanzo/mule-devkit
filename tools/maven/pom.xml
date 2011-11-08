@@ -10,9 +10,7 @@
 
     <name>Mule DevKit Maven Plugin</name>
 
-    <groupId>org.mule.tools.devkit</groupId>
     <artifactId>mule-devkit-maven-plugin</artifactId>
-    <version>3.0.2-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
     <dependencies>

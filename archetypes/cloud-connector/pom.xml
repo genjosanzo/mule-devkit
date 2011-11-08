@@ -9,9 +9,7 @@
 
     <name>Mule DevKit Archetype for Cloud Connector</name>
 
-    <groupId>org.mule.tools.devkit</groupId>
     <artifactId>mule-devkit-archetype-cloud-connector</artifactId>
-    <version>3.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <build>

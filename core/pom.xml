@@ -10,9 +10,7 @@
 
     <name>Mule DevKit Core</name>
 
-    <groupId>org.mule.tools.devkit</groupId>
     <artifactId>mule-devkit-core</artifactId>
-    <version>3.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
