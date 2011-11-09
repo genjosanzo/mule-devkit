@@ -18,8 +18,6 @@
 package org.mule.devkit.generation.mule;
 
 import org.apache.commons.lang.StringUtils;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -568,18 +566,6 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         messageProcessorClass.javadoc().add(" where possible to the expected argument type.");
     }
 
-    private Invocation generateNullPayload(FieldVariable muleContext, Variable event) {
-        Invocation defaultMuleEvent = ExpressionFactory._new(ref(DefaultMuleEvent.class));
-        Invocation defaultMuleMessage = ExpressionFactory._new(ref(DefaultMuleMessage.class));
-        Invocation nullPayload = ref(NullPayload.class).staticInvoke("getInstance");
-        defaultMuleMessage.arg(nullPayload);
-        defaultMuleMessage.arg(muleContext);
-        defaultMuleEvent.arg(defaultMuleMessage);
-        defaultMuleEvent.arg(event);
-
-        return defaultMuleEvent;
-    }
-
     private void generateProcessMethod(ExecutableElement executableElement, DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectionFields, FieldVariable messageProcessorListener, FieldVariable muleContext, FieldVariable object, FieldVariable logger, FieldVariable retryCount, FieldVariable retryMax) {
         generateProcessMethod(executableElement, messageProcessorClass, fields, connectionFields, messageProcessorListener, muleContext, object, null, logger, retryCount, retryMax);
     }
@@ -727,15 +713,15 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
 
         Type returnType = ref(executableElement.getReturnType());
-        
+
         callProcessor.body().add(retryCount.invoke("getAndIncrement"));
 
         if (connectMethod != null) {
-            generateMethodCall(callProcessor.body(), connection, methodName, parameters, muleContext, event, returnType, poolObject, interceptCallback, messageProcessorListener);
+            generateMethodCall(callProcessor.body(), connection, methodName, parameters, event, returnType, poolObject, interceptCallback, messageProcessorListener);
         } else {
-            generateMethodCall(callProcessor.body(), moduleObject, methodName, parameters, muleContext, event, returnType, poolObject, interceptCallback, messageProcessorListener);
+            generateMethodCall(callProcessor.body(), moduleObject, methodName, parameters, event, returnType, poolObject, interceptCallback, messageProcessorListener);
         }
-        
+
         callProcessor.body().add(retryCount.invoke("set").arg(ExpressionFactory.lit(0)));
 
         for (VariableElement variable : executableElement.getParameters()) {
@@ -770,7 +756,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             }
 
             CatchBlock catchBlock = callProcessor._catch(ref(exception).boxify());
-            
+
             Conditional ifDebugEnabled = catchBlock.body()._if(logger.invoke("isDebugEnabled"));
             Variable messageStringBuffer = ifDebugEnabled._then().decl(ref(StringBuffer.class), "messageStringBuffer", ExpressionFactory._new(ref(StringBuffer.class)));
             ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg("An exception ("));
@@ -845,8 +831,8 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             TryStatement tryToReleaseConnection = fin._try();
 
             Conditional ifConnectionNotNull = tryToReleaseConnection.body()._if(Op.ne(connection, ExpressionFactory._null()));
-            
-            
+
+
             Conditional ifDebugEnabled = ifConnectionNotNull._then()._if(logger.invoke("isDebugEnabled"));
             Variable messageStringBuffer = ifDebugEnabled._then().decl(ref(StringBuffer.class), "messageStringBuffer", ExpressionFactory._new(ref(StringBuffer.class)));
             ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg("Releasing the connection back into the pool [id="));
@@ -855,7 +841,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             ));
             ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg("]."));
             ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuffer.invoke("toString")));
-            
+
 
             DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey((TypeElement) executableElement.getEnclosingElement()));
             Invocation newKey = ExpressionFactory._new(connectionKey);
@@ -1073,7 +1059,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         ifAccessTokenIsNull.invoke(object, OAuth1AdapterGenerator.FETCH_ACCESS_TOKEN_METHOD_NAME);
     }
 
-    private Variable generateMethodCall(Block body, Variable object, String methodName, List<Expression> parameters, FieldVariable muleContext, Variable event, Type returnType, Variable poolObject, Variable interceptCallback, FieldVariable messageProcessorListener) {
+    private Variable generateMethodCall(Block body, Variable object, String methodName, List<Expression> parameters, Variable event, Type returnType, Variable poolObject, Variable interceptCallback, FieldVariable messageProcessorListener) {
         Variable resultPayload = null;
         if (returnType != context.getCodeModel().VOID) {
             resultPayload = body.decl(ref(Object.class), "resultPayload");
@@ -1108,9 +1094,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
 
         if (returnType != context.getCodeModel().VOID) {
-            Conditional ifPayloadIsNull = scope._if(resultPayload.eq(ExpressionFactory._null()));
-            ifPayloadIsNull._then().assign(event, generateNullPayload(muleContext, event));
-            generatePayloadOverwrite(ifPayloadIsNull._else(), event, resultPayload);
+            generatePayloadOverwrite(scope, event, resultPayload);
         }
 
         return resultPayload;
@@ -1120,9 +1104,19 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         Invocation applyTransformers = event.invoke("getMessage").invoke("applyTransformers");
         applyTransformers.arg(event);
         Invocation newTransformerTemplate = ExpressionFactory._new(ref(TransformerTemplate.class));
+
+        Variable overwritePayloadCallback = block.decl(ref(TransformerTemplate.OverwitePayloadCallback.class), "overwritePayloadCallback", ExpressionFactory._null());
+
+        Conditional ifPayloadIsNull = block._if(resultPayload.eq(ExpressionFactory._null()));
+
         Invocation newOverwritePayloadCallback = ExpressionFactory._new(ref(TransformerTemplate.OverwitePayloadCallback.class));
         newOverwritePayloadCallback.arg(resultPayload);
-        newTransformerTemplate.arg(newOverwritePayloadCallback);
+        Invocation newOverwritePayloadCallbackWithNull = ExpressionFactory._new(ref(TransformerTemplate.OverwitePayloadCallback.class));
+        newOverwritePayloadCallbackWithNull.arg(ref(NullPayload.class).staticInvoke("getInstance"));
+        ifPayloadIsNull._else().assign(overwritePayloadCallback, newOverwritePayloadCallback);
+        ifPayloadIsNull._then().assign(overwritePayloadCallback, newOverwritePayloadCallbackWithNull);
+
+        newTransformerTemplate.arg(overwritePayloadCallback);
 
         Variable transformerList = block.decl(ref(List.class).narrow(Transformer.class), "transformerList");
         block.assign(transformerList, ExpressionFactory._new(ref(ArrayList.class).narrow(Transformer.class)));
