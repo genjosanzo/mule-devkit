@@ -17,6 +17,7 @@
 
 package org.mule.devkit.validation;
 
+import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.annotations.oauth.OAuthAccessToken;
@@ -49,6 +50,9 @@ public class OAuthValidator implements Validator {
     }
 
     private void validateOAuth1Class(DevKitTypeElement typeElement) throws ValidationException {
+        if (typeElement.hasAnnotation(Connector.class)) {
+            throw new ValidationException(typeElement, "It is not possible to use OAuth support in @Connector annotated classes, use @Module instead");
+        }
         if (!typeElement.hasFieldAnnotatedWith(OAuthConsumerKey.class)) {
             throw new ValidationException(typeElement, "@OAuth class must contain a field annotated with @OAuthConsumerKey");
         }
@@ -61,6 +65,9 @@ public class OAuthValidator implements Validator {
     }
 
     private void validateOAuth2Class(DevKitTypeElement typeElement) throws ValidationException {
+        if (typeElement.hasAnnotation(Connector.class)) {
+            throw new ValidationException(typeElement, "It is not possible to use OAuth support in @Connector annotated classes, use @Module instead");
+        }
         if (!typeElement.hasFieldAnnotatedWith(OAuthConsumerKey.class)) {
             throw new ValidationException(typeElement, "@OAuth2 class must contain a field annotated with @OAuthConsumerKey");
         }
@@ -70,7 +77,7 @@ public class OAuthValidator implements Validator {
         if (!classHasMethodWithParameterAnnotated(typeElement, OAuthAccessToken.class)) {
             throw new ValidationException(typeElement, "@OAuth2 class must have at least one method parameter annotated with @OAuthAccessToken");
         }
-        if(classHasMethodWithParameterAnnotated(typeElement, OAuthAccessTokenSecret.class)) {
+        if (classHasMethodWithParameterAnnotated(typeElement, OAuthAccessTokenSecret.class)) {
             throw new ValidationException(typeElement, "@OAuth2 class cannot have method parameters annotated with @OAuthAccessTokenSecret");
         }
     }

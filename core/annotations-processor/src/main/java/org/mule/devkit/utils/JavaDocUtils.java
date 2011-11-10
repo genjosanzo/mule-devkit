@@ -132,35 +132,35 @@ public class JavaDocUtils {
 
     public String getParameterSummary(String paramName, Element element) {
         String comment = elements.getDocComment(element);
-        if (comment == null || StringUtils.isBlank(comment)) {
+        if (StringUtils.isBlank(comment)) {
             return null;
         }
 
         comment = comment.trim();
 
-        String parameterComment = "";
+        StringBuilder parameterCommentBuilder = new StringBuilder();
         boolean insideParameter = false;
         StringTokenizer st = new StringTokenizer(comment, "\n\r");
         while (st.hasMoreTokens()) {
             String nextToken = st.nextToken().trim();
-            if (nextToken.startsWith("@param " + paramName)) {
+            if (nextToken.startsWith("@param " + paramName + " ")) {
                 insideParameter = true;
             } else if (nextToken.startsWith("@")) {
                 insideParameter = false;
             }
             if (insideParameter) {
-                parameterComment += nextToken + " ";
+                parameterCommentBuilder.append(nextToken).append(" ");
             }
         }
 
         int startIndex = 7 + paramName.length() + 1;
-        if (parameterComment.length() < startIndex) {
+        if (parameterCommentBuilder.length() < startIndex) {
             return null;
         }
 
-        parameterComment = parameterComment.substring(startIndex);
+        String parameterComment = parameterCommentBuilder.substring(startIndex);
 
-        String strippedComments = "";
+        StringBuilder strippedCommentBuilder = new StringBuilder();
         boolean insideTag = false;
         for (int i = 0; i < parameterComment.length(); i++) {
             if (parameterComment.charAt(i) == '{' &&
@@ -170,17 +170,16 @@ public class JavaDocUtils {
                 insideTag = false;
             } else {
                 if (!insideTag) {
-                    strippedComments += parameterComment.charAt(i);
+                    strippedCommentBuilder.append(parameterComment.charAt(i));
                 }
             }
         }
 
-        strippedComments = strippedComments.trim();
-        while (strippedComments.length() > 0 &&
-                strippedComments.charAt(strippedComments.length() - 1) == '\n') {
-            strippedComments = StringUtils.chomp(strippedComments);
+        String strippedComment = strippedCommentBuilder.toString().trim();
+        while (strippedComment.length() > 0 && strippedComment.charAt(strippedComment.length() - 1) == '\n') {
+            strippedComment = StringUtils.chomp(strippedComment);
         }
 
-        return strippedComments;
+        return strippedComment;
     }
 }
