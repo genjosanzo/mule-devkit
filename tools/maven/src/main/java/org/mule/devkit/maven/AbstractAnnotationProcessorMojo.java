@@ -36,8 +36,10 @@ import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public abstract class AbstractAnnotationProcessorMojo extends AbstractMojo {
@@ -45,7 +47,7 @@ public abstract class AbstractAnnotationProcessorMojo extends AbstractMojo {
     protected MavenProject project;
 
     @MojoParameter(expression = "${plugin.artifacts}", readonly = true)
-    private java.util.List<Artifact> pluginArtifacts;
+    private List<Artifact> pluginArtifacts;
 
     @MojoParameter(required = false, description = "Specify the directory where to place generated source files (same behaviour of -s option)")
     private File outputDirectory;
@@ -64,18 +66,24 @@ public abstract class AbstractAnnotationProcessorMojo extends AbstractMojo {
 
     @SuppressWarnings("rawtypes")
     @MojoParameter(required = false, description = "System properties set before processor invocation.")
-    private java.util.Map systemProperties;
+    private Map systemProperties;
 
     @MojoParameter(description = "includes pattern")
     private String[] includes;
     @MojoParameter(description = "excludes pattern")
     private String[] excludes;
 
+    public abstract File getDefaultOutputDirectory();
+
     protected abstract File getSourceDirectory();
 
     protected abstract File getOutputClassDirectory();
 
     protected abstract String[] getProcessors();
+
+    protected abstract void addCompileSourceRoot(MavenProject project, String dir);
+
+    protected abstract Set<String> getClasspathElements(Set<String> result);
 
     private String buildProcessor() {
         if (getProcessors() == null || getProcessors().length == 0) {
@@ -84,41 +92,31 @@ public abstract class AbstractAnnotationProcessorMojo extends AbstractMojo {
 
         StringBuilder result = new StringBuilder();
 
-        int i = 0;
-
+        int i;
         for (i = 0; i < getProcessors().length - 1; ++i) {
             result.append(getProcessors()[i]).append(',');
         }
 
         result.append(getProcessors()[i]);
-
         return result.toString();
     }
 
-    protected abstract java.util.Set<String> getClasspathElements(java.util.Set<String> result);
 
     private String buildCompileClasspath() {
 
-        java.util.Set<String> pathElements = new java.util.HashSet<String>();
-
+        Set<String> pathElements = new HashSet<String>();
         if (pluginArtifacts != null) {
-
             for (Artifact a : pluginArtifacts) {
-
                 if ("compile".equalsIgnoreCase(a.getScope()) || "runtime".equalsIgnoreCase(a.getScope())) {
-
-                    java.io.File f = a.getFile();
-
+                    File f = a.getFile();
                     if (f != null) {
                         pathElements.add(a.getFile().getAbsolutePath());
                     }
                 }
-
             }
         }
 
         getClasspathElements(pathElements);
-
         StringBuilder result = new StringBuilder();
 
         for (String elem : pathElements) {
@@ -127,25 +125,22 @@ public abstract class AbstractAnnotationProcessorMojo extends AbstractMojo {
         return result.toString();
     }
 
-
     /**
      *
      */
     public void execute() throws MojoExecutionException {
-        if ("pom".equalsIgnoreCase(project.getPackaging())) // Issue 17
-        {
+        if ("pom".equalsIgnoreCase(project.getPackaging())) {
             return;
         }
 
         try {
             executeWithExceptionsHandled();
         } catch (Exception e1) {
-            super.getLog().error("error on execute: " + e1.getMessage());
+            getLog().error("error on execute: " + e1.getMessage());
             if (failOnError) {
                 throw new MojoExecutionException(e1.getMessage());
             }
         }
-
     }
 
     @SuppressWarnings("unchecked")
@@ -207,24 +202,7 @@ public abstract class AbstractAnnotationProcessorMojo extends AbstractMojo {
             getLog().debug("javac option: " + option);
         }
 
-        DiagnosticListener<JavaFileObject> dl = null;
-        if (outputDiagnostics) {
-            dl = new DiagnosticListener<JavaFileObject>() {
-
-                public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
-                    getLog().info(diagnostic.toString());
-
-                }
-
-            };
-        } else {
-            dl = new DiagnosticListener<JavaFileObject>() {
-
-                public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
-                }
-
-            };
-        }
+        DiagnosticListener<JavaFileObject> dl = createDiagnosticListener();
 
         if (systemProperties != null) {
             java.util.Set<Map.Entry<String, String>> pSet = systemProperties.entrySet();
@@ -244,19 +222,39 @@ public abstract class AbstractAnnotationProcessorMojo extends AbstractMojo {
                 null,
                 compilationUnits1);
 
-        /*
-         * //Create a list to hold annotation processors LinkedList<Processor> processors = new
-         * LinkedList<Processor>();
-         * 
-         * //Add an annotation processor to the list processors.add(p);
-         * 
-         * //Set the annotation processor to the compiler task task.setProcessors(processors);
-         */
-
         // Perform the compilation task.
         if (!task.call()) {
+            throw new Exception("An error ocurred while the DevKit was generating Java code. Check the logs for further details.");
+        }
+    }
 
-            throw new Exception("error during compilation");
+    private DiagnosticListener<JavaFileObject> createDiagnosticListener() {
+        if (outputDiagnostics) {
+            return new DiagnosticListener<JavaFileObject>() {
+                @Override
+                public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
+                    switch (diagnostic.getKind()) {
+                        case ERROR:
+                            getLog().error(diagnostic.toString());
+                            break;
+                        case WARNING:
+                        case MANDATORY_WARNING:
+                            getLog().warn(diagnostic.toString());
+                            break;
+                        case NOTE:
+                        case OTHER:
+                            getLog().info(diagnostic.toString());
+                            break;
+                    }
+                }
+            };
+        } else {
+            return new DiagnosticListener<JavaFileObject>() {
+                @Override
+                public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
+                    // don't do anything since output diagnostics are disabled
+                }
+            };
         }
     }
 
@@ -285,10 +283,6 @@ public abstract class AbstractAnnotationProcessorMojo extends AbstractMojo {
         }
     }
 
-    protected abstract void addCompileSourceRoot(MavenProject project, String dir);
-
-    public abstract File getDefaultOutputDirectory();
-
     private void ensureOutputDirectoryExists() {
         final File f = outputDirectory;
         if (!f.exists()) {
@@ -298,6 +292,4 @@ public abstract class AbstractAnnotationProcessorMojo extends AbstractMojo {
             getOutputClassDirectory().mkdirs();
         }
     }
-
-
 }
