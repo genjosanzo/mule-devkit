@@ -43,7 +43,8 @@ public class Comment {
             "@sdkCurrent",
             "@inheritDoc",
             "@more",
-            "@sample",
+            "@sample.xml",
+            "@sample.java",
             "@include",
             "@serial",
     };
@@ -120,6 +121,8 @@ public class Comment {
             mSeeTagsList.add(new SeeTagInfo("@see", "@see", text, mBase, pos));
         } else if (name.equals("@link") || name.equals("@linkplain")) {
             mInlineTagsList.add(new SeeTagInfo(name, "@see", text, mBase, pos));
+        } else if (name.equals("@api.doc")) {
+            mAPITagsList.add(new SeeTagInfo(name, "@api.doc", text, mBase, pos));
         } else if (name.equals("@throws") || name.equals("@exception")) {
             mThrowsTagsList.add(new ThrowsTagInfo("@throws", "@throws", text, mBase, pos));
         } else if (name.equals("@return")) {
@@ -245,6 +248,11 @@ public class Comment {
         return mReturnTags;
     }
 
+    public TagInfo[] apiTags() {
+        init();
+        return mAPITags;
+    }
+
     public TagInfo[] deprecatedTags() {
         init();
         return mDeprecatedTags;
@@ -329,6 +337,8 @@ public class Comment {
         mThrowsTags = mThrowsTagsList.toArray(new ThrowsTagInfo[mThrowsTagsList.size()]);
         mReturnTags =
                 ParsedTagInfo.joinTags(mReturnTagsList.toArray(new ParsedTagInfo[mReturnTagsList.size()]));
+        mAPITags =
+                mAPITagsList.toArray(new SeeTagInfo[mAPITagsList.size()]);
         mDeprecatedTags =
                 ParsedTagInfo.joinTags(mDeprecatedTagsList.toArray(new ParsedTagInfo[mDeprecatedTagsList
                         .size()]));
@@ -339,6 +349,7 @@ public class Comment {
         mParamTagsList = null;
         mSeeTagsList = null;
         mThrowsTagsList = null;
+        mAPITagsList = null;
         mReturnTagsList = null;
         mDeprecatedTagsList = null;
         mUndeprecateTagsList = null;
@@ -362,12 +373,14 @@ public class Comment {
     ThrowsTagInfo[] mThrowsTags;
     TagInfo[] mBriefTags;
     TagInfo[] mReturnTags;
+    SeeTagInfo[] mAPITags;
     TagInfo[] mDeprecatedTags;
     TagInfo[] mUndeprecateTags;
     AttrTagInfo[] mAttrTags;
 
     ArrayList<TagInfo> mInlineTagsList = new ArrayList<TagInfo>();
     ArrayList<TagInfo> mTagsList = new ArrayList<TagInfo>();
+    ArrayList<SeeTagInfo> mAPITagsList = new ArrayList<SeeTagInfo>();
     ArrayList<ParamTagInfo> mParamTagsList = new ArrayList<ParamTagInfo>();
     ArrayList<SeeTagInfo> mSeeTagsList = new ArrayList<SeeTagInfo>();
     ArrayList<ThrowsTagInfo> mThrowsTagsList = new ArrayList<ThrowsTagInfo>();

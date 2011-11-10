@@ -206,6 +206,22 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
         }
     }
 
+    private class APITags implements InheritedTags {
+        public TagInfo[] tags() {
+            return comment().apiTags();
+        }
+
+        public InheritedTags inherited() {
+            MethodInfo m = findOverriddenMethod(name(), signature());
+            if (m != null) {
+                return m.apiTags();
+            } else {
+                return null;
+            }
+        }
+    }
+
+
     public boolean isDeprecated() {
         if (!mDeprecatedKnown) {
             boolean commentDeprecated = comment().isDeprecated();
@@ -393,6 +409,10 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
 
     public InheritedTags returnTags() {
         return new ReturnTags();
+    }
+
+    public InheritedTags apiTags() {
+        return new APITags();
     }
 
     public TypeInfo returnType() {
@@ -678,6 +698,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
             data.setValue(base + ".scope", "public");
         }
         TagInfo.makeHDF(data, base + ".returns", returnTags());
+        TagInfo.makeHDF(data, base + ".api", apiTags());
 
         if (mTypeParameters != null) {
             TypeInfo.makeHDF(data, base + ".generic.typeArguments", mTypeParameters, false);

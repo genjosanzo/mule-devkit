@@ -107,7 +107,7 @@ def:tag_list(tags) ?><?cs
 <?cs # Print a list of tags (e.g. description text ?><?cs
 def:op_tag_list(tags) ?><?cs
   each:tag = tags ?><?cs
-      if:tag.name == "Text" ?><?cs var:tag.text?><br/><?cs
+      if:tag.name == "Text" ?><?cs var:tag.text?><?cs
       elif:tag.kind == "@more" ?><p><?cs
       elif:tag.kind == "@see" ?><code><a href="<?cs
         if:tag.isLocal?><?cs var:toroot ?>java/<?cs /if ?><?cs
@@ -275,10 +275,12 @@ def:op_description(obj) ?><?cs
   <div class="jd-tagdata">
       <h5 class="jd-tagtitle">Attributes</h5>
 
-      <table class="jd-tagtable">
-      <td class="jd-linkcol"><nobr>config-ref</nobr></td>
-      <td class="jd-descrcol"></td>
-      <td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i>Specify which configuration to use.</td></tr>
+        <table id="lconfig" class="jd-sumtable">
+        <tr><th>Name</th><th>Default Value</th><th>Description</th></tr>
+        <tr>
+          <td class="jd-linkcol"><nobr>config-ref</nobr></td>
+          <td class="jd-descrcol"></td>
+          <td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i>Specify which configuration to use.</td></tr>
           <?cs set:count = #2 ?>
           <?cs each:attribute=obj.paramTags ?>
                 <?cs if:attribute.isNestedProcessor=="0" ?>
@@ -298,19 +300,18 @@ def:op_description(obj) ?><?cs
             </tr>
             <?cs set:count = count + #1 ?>
           <?cs /if ?>
-        <?cs each:attribute=obj.connectionTags ?>
-            <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
-                <td class="jd-linkcol"><nobr><?cs var:attribute.attributeName ?></nobr></td>
-                <td class="jd-descrcol"><?cs var:attribute.defaultValue ?></td>
-                <td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i><?cs call:op_tag_list(attribute.comment) ?></td>
-            </tr>
-        <?cs set:count = count + #1 ?>
-        <?cs /each ?>
-      </table>
+            <?cs each:attribute=obj.connectionTags ?>
+                <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
+                    <td class="jd-linkcol"><nobr><?cs var:attribute.attributeName ?></nobr></td>
+                    <td class="jd-descrcol"><?cs var:attribute.defaultValue ?></td>
+                    <td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i><?cs call:op_tag_list(attribute.comment) ?></td>
+                </tr>
+                <?cs set:count = count + #1 ?>
+            <?cs /each ?>
+        </table>
   </div>
   <div class="jd-tagdata">
       <h5 class="jd-tagtitle">Child Elements</h5>
-
       <table class="jd-tagtable">
           <?cs set:count = #2 ?>
           <?cs each:attribute=obj.paramTags ?>
@@ -330,7 +331,14 @@ def:op_description(obj) ?><?cs
       <h5 class="jd-tagtitle">Return Payload</h5>
       <ul class="nolist"><li><?cs call:op_tag_list(obj.returns) ?></li></ul>
   </div><?cs
-  /if ?><?cs
+  /if ?>
+    <?cs if:subcount(obj.api) ?>
+    <div class="jd-tagdata">
+        <h5 class="jd-tagtitle">API Information</h5>
+        <ul class="nolist"><li><?cs call:op_tag_list(obj.api) ?></li></ul>
+    </div><?cs
+    /if ?>
+  <?cs
   if:subcount(obj.throws) ?>
   <div class="jd-tagdata">
       <h5 class="jd-tagtitle">Exception Payload</h5>
