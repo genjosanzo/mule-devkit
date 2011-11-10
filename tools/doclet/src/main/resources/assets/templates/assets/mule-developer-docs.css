@@ -694,7 +694,7 @@ h4.jd-tagtitle {
 /* API reference: heading for "Parameters", "See Also", etc.,
 in details sections */
 h5.jd-tagtitle {
-    margin: 0 0 .25em 0;
+    margin: 0 0 1em 0;
     font-size: 1em;
 }
 

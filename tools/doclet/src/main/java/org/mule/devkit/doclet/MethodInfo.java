@@ -512,6 +512,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
             String[] names = new String[N];
             boolean[] optional = new boolean[N];
             boolean[] nestedProcessor = new boolean[N];
+            boolean[] collection = new boolean[N];
             String[] defaultValue = new String[N];
             String[] attributeName = new String[N];
             String[] comments = new String[N];
@@ -522,6 +523,17 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
             for (int i = 0; i < N; i++) {
                 attributeName[i] = mParameters[i].name();
                 nestedProcessor[i] = false;
+                collection[i] = false;
+                if (mParameters[i].typeName().startsWith("List") ||
+                        mParameters[i].typeName().startsWith("java.util.List") ||
+                        mParameters[i].typeName().startsWith("ArrayList") ||
+                        mParameters[i].typeName().startsWith("java.util.ArrayList") ||
+                        mParameters[i].typeName().startsWith("Map") ||
+                        mParameters[i].typeName().startsWith("java.util.Map") ||
+                        mParameters[i].typeName().startsWith("HashMap") ||
+                        mParameters[i].typeName().startsWith("java.util.HashMap")) {
+                    collection[i] = true;
+                }
                 if (mParameters[i].typeName().contains("HttpCallback")) {
                     attributeName[i] = uncamel(attributeName[i]) + "-flow-ref";
                 }
@@ -581,7 +593,7 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
             for (int i = 0; i < N; i++) {
                 mParamTags[i] =
                         new ParamTagInfo("@param", "@param", names[i] + " " + comments[i], attributeName[i],
-                                optional[i], defaultValue[i], nestedProcessor[i], parent(), positions[i]);
+                                optional[i], defaultValue[i], nestedProcessor[i], collection[i], parent(), positions[i]);
 
                 // while we're here, if we find any parameters that are still undocumented at this
                 // point, complain. (this warning is off by default, because it's really, really
@@ -683,12 +695,13 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
         TagInfo.makeHDF(data, base + ".seeAlso", seeTags());
         data.setValue(base + ".since.key", SinceTagger.keyForName(getSince()));
         data.setValue(base + ".since.name", getSince());
+        data.setValue(base + ".moduleName", containingClass().moduleName());
         ParamTagInfo.makeHDF(data, base + ".paramTags", paramTags());
         if (containingClass().hasConnectionManager()) {
             ParamTagInfo.makeHDF(data, base + ".connectionTags", containingClass().connectionTags());
         }
-        data.setValue(base + ".hasConnectionManager", Boolean.toString(containingClass().hasConnectionManager()));
-        data.setValue(base + ".isProcessor", Boolean.toString(isProcessor()));
+        data.setValue(base + ".hasConnectionManager", containingClass().hasConnectionManager() ? "1" : "0");
+        data.setValue(base + ".isProcessor", isProcessor() ? "1" : "0");
         AttrTagInfo.makeReferenceHDF(data, base + ".attrRefs", comment().attrTags());
         ThrowsTagInfo.makeHDF(data, base + ".throws", throwsTags());
         ParameterInfo.makeHDF(data, base + ".params", parameters(), isVarArgs(), typeVariables());

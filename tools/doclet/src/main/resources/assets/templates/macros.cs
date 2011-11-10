@@ -283,7 +283,7 @@ def:op_description(obj) ?><?cs
           <td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i>Specify which configuration to use.</td></tr>
           <?cs set:count = #2 ?>
           <?cs each:attribute=obj.paramTags ?>
-                <?cs if:attribute.isNestedProcessor=="0" ?>
+                <?cs if:((attribute.isNestedProcessor=="0") && (attribute.isCollection=="0"))?>
                 <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
                     <td class="jd-linkcol"><nobr><?cs var:attribute.attributeName ?></nobr></td>
                     <td class="jd-descrcol"><?cs var:attribute.defaultValue ?></td>
@@ -292,14 +292,8 @@ def:op_description(obj) ?><?cs
                 <?cs set:count = count + #1 ?>
                 <?cs /if ?>
           <?cs /each ?>
-          <?cs if:((obj.hasConnectionManager) && (obj.isProcessor)) ?>
-            <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
-                <td class="jd-linkcol"><nobr>retryMax</nobr></td>
-                <td class="jd-descrcol">1</td>
-                <td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i>Specify how many times this operation can be retried automatically</td>
-            </tr>
-            <?cs set:count = count + #1 ?>
-          <?cs /if ?>
+          <?cs if:(obj.hasConnectionManager=="1") ?>
+          <tr><th colspan="12">Connection Parameters<br/><span style="font-weight: 200;">This are only required if you didn't specified them at the configuration element. They are also useful for overriding the values of the configurations or even if you need to extract them from the Mule message since they support expression evaluation.</span></th></tr>
             <?cs each:attribute=obj.connectionTags ?>
                 <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
                     <td class="jd-linkcol"><nobr><?cs var:attribute.attributeName ?></nobr></td>
@@ -308,19 +302,25 @@ def:op_description(obj) ?><?cs
                 </tr>
                 <?cs set:count = count + #1 ?>
             <?cs /each ?>
+          <?cs /if ?>
+          <?cs if:((obj.hasConnectionManager=="1") && (obj.isProcessor=="1")) ?>
+            <tr><th colspan="12">Retry and Reconnect<br/><span style="font-weight: 200;">This message processor supports automatic retry and reconnect. If the API call fail for a known error then the API will be automatically retried. This does not happen on every type of error, only a few that has been selected and are known to be recoverable from.</span></th></tr>
+            <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
+                <td class="jd-linkcol"><nobr>retryMax</nobr></td>
+                <td class="jd-descrcol">1</td>
+                <td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i>Specify how many times this operation can be retried automatically</td>
+            </tr>
+            <?cs set:count = count + #1 ?>
+          <?cs /if ?>
         </table>
   </div>
   <div class="jd-tagdata">
       <h5 class="jd-tagtitle">Child Elements</h5>
-      <table class="jd-tagtable">
+        <table id="lconfig" class="jd-sumtable">
           <?cs set:count = #2 ?>
           <?cs each:attribute=obj.paramTags ?>
-            <?cs if:attribute.isNestedProcessor=="1" ?>
-            <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
-                <td class="jd-linkcol"><nobr><?cs var:attribute.attributeName ?></nobr></td>
-                <td class="jd-descrcol"><?cs var:attribute.defaultValue ?></td>
-                <td class="jd-descrcol" width="100%"><?cs if:attribute.optional=="true" ?><i>Optional.&nbsp;</i><?cs /if ?><?cs call:op_tag_list(attribute.comment) ?></td>
-            </tr>
+            <?cs if:((attribute.isNestedProcessor=="1") || (attribute.isCollection=="1")) ?>
+            <tr><th colspan="12"><nobr>&lt;<?cs var:obj.moduleName ?>:<?cs var:attribute.attributeName ?>&gt;</nobr></br><span style="font-weight: normal;"><?cs if:attribute.optional=="true" ?><i>Optional.&nbsp;</i><?cs /if ?><?cs call:op_tag_list(attribute.comment) ?></span></th></tr>
             <?cs set:count = count + #1 ?>
             <?cs /if ?>
           <?cs /each ?>
