@@ -27,7 +27,6 @@ import org.mule.devkit.generation.adapter.OAuth1AdapterGenerator;
 import org.mule.devkit.generation.adapter.OAuth2AdapterGenerator;
 import org.mule.devkit.generation.adapter.PoolAdapterGenerator;
 import org.mule.devkit.generation.callback.HttpCallbackGenerator;
-import org.mule.devkit.generation.callback.InterceptCallbackGenerator;
 import org.mule.devkit.generation.mule.MessageProcessorGenerator;
 import org.mule.devkit.generation.mule.MessageSourceGenerator;
 import org.mule.devkit.generation.mule.NestedProcessorChainGenerator;
@@ -76,7 +75,6 @@ public class ModulePlugin implements Plugin {
         generators.add(new EnumTransformerGenerator());
         generators.add(new NestedProcessorChainGenerator());
         generators.add(new NestedProcessorStringGenerator());
-        generators.add(new InterceptCallbackGenerator());
         generators.add(new BeanDefinitionParserGenerator());
         generators.add(new MessageSourceGenerator());
         generators.add(new MessageProcessorGenerator());

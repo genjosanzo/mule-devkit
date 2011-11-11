@@ -22,7 +22,7 @@ import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
-import org.mule.api.callback.InterceptCallback;
+import org.mule.api.callback.SourceCallback;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 
@@ -78,7 +78,7 @@ public class ProcessorValidator implements Validator {
                 }
 
                 if (parameter.getAnnotation(Payload.class) == null && parameter.asType().getKind() == TypeKind.ARRAY) {
-                    throw new ValidationException(parameter, "@Processor parameted cannot be arrays, use List instead");
+                    throw new ValidationException(parameter, "@Processor parameter cannot be arrays, use List instead");
                 }
             }
         }
@@ -86,16 +86,16 @@ public class ProcessorValidator implements Validator {
 
     private void validateIntercepting(ExecutableElement method) throws ValidationException {
         if (method.getAnnotation(Processor.class).intercepting()) {
-            boolean containsInterceptCallback = false;
+            boolean containsSourceCallback = false;
             List<? extends VariableElement> parameters = method.getParameters();
             for (VariableElement parameter : parameters) {
-                if (parameter.asType().toString().startsWith(InterceptCallback.class.getName())) {
-                    containsInterceptCallback = true;
+                if (parameter.asType().toString().startsWith(SourceCallback.class.getName())) {
+                    containsSourceCallback = true;
                 }
             }
 
-            if (!containsInterceptCallback) {
-                throw new ValidationException(method, "An intercepting method method must contain a InterceptCallback as one of its parameters");
+            if (!containsSourceCallback) {
+                throw new ValidationException(method, "An intercepting method method must contain a SourceCallback as one of its parameters");
             }
         }
     }

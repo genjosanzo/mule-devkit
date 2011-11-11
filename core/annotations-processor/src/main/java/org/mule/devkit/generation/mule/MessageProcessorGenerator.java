@@ -34,7 +34,7 @@ import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.callback.HttpCallback;
-import org.mule.api.callback.InterceptCallback;
+import org.mule.api.callback.SourceCallback;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
@@ -48,7 +48,6 @@ import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.adapter.OAuth1AdapterGenerator;
 import org.mule.devkit.generation.adapter.OAuth2AdapterGenerator;
-import org.mule.devkit.generation.callback.InterceptCallbackGenerator;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.CatchBlock;
@@ -166,6 +165,11 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         if (intercepting) {
             // add setlistener
             generateSetListenerMethod(messageProcessorClass, messageProcessorListener);
+
+            // add process method
+            generateSourceCallbackProcessMethod(messageProcessorClass, messageProcessorListener, muleContext, flowConstruct);
+            generateSourceCallbackProcessWithPropertiesMethod(messageProcessorClass, messageProcessorListener, muleContext, flowConstruct);
+            generateSourceCallbackProcessMethodWithNoPayload(messageProcessorClass, messageProcessorListener, muleContext, flowConstruct);
         }
 
         // add setobject
@@ -651,10 +655,10 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         for (VariableElement variable : executableElement.getParameters()) {
             String fieldName = variable.getSimpleName().toString();
 
-            if (variable.asType().toString().startsWith(InterceptCallback.class.getName())) {
-                interceptCallback = declareInterceptCallbackParameter(callProcessor, fieldName, parameters);
-            } else if (variable.asType().toString().startsWith(HttpCallback.class.getName())) {
+            if (variable.asType().toString().startsWith(HttpCallback.class.getName())) {
                 parameters.add(fields.get(fieldName).getFieldType());
+            } else if (variable.asType().toString().startsWith(SourceCallback.class.getName())) {
+                parameters.add(ExpressionFactory._this());
             } else if (variable.getAnnotation(OAuthAccessToken.class) != null) {
                 declareOAuthAccessTokenParameter(callProcessor, moduleObject, parameters);
             } else if (variable.getAnnotation(OAuthAccessTokenSecret.class) != null) {
@@ -982,17 +986,6 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         Invocation getAccessToken = moduleObject.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_ACCESS_TOKEN_FIELD_NAME));
         Variable accessToken = callProcessor.body().decl(ref(String.class), "accessToken", getAccessToken);
         parameters.add(accessToken);
-    }
-
-    private Variable declareInterceptCallbackParameter(TryStatement callProcessor, String fieldName, List<Expression> parameters) {
-        Variable interceptCallback;
-        DefinedClass callbackClass = context.getClassForRole(InterceptCallbackGenerator.ROLE);
-
-        interceptCallback = callProcessor.body().decl(callbackClass, "transformed" + StringUtils.capitalize(fieldName),
-                ExpressionFactory._new(callbackClass));
-
-        parameters.add(interceptCallback);
-        return interceptCallback;
     }
 
     private Map<String, Expression> declareConnectionParametersVariables(ExecutableElement executableElement, Map<String, FieldVariableElement> connectionFields, Method process) {

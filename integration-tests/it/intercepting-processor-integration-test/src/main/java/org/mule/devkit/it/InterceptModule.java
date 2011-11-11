@@ -19,14 +19,14 @@ package org.mule.devkit.it;
 
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
-import org.mule.api.callback.InterceptCallback;
+import org.mule.api.callback.SourceCallback;
 
 @Module(name = "intercept")
 public class InterceptModule {
     @Processor(intercepting = true)
-    public Object shouldContinue(boolean cont, InterceptCallback afterChain) throws Exception {
-        if (!cont) {
-            afterChain.doNotContinue();
+    public Object shouldContinue(boolean cont, SourceCallback afterChain) throws Exception {
+        if (cont) {
+            return afterChain.process();
         }
 
         return null;

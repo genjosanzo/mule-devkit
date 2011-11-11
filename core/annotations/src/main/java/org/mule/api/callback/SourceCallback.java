@@ -24,6 +24,13 @@ import java.util.Map;
  */
 public interface SourceCallback {
     /**
+     * Dispatch the current event to the flow
+     *
+     * @return The response of the flow
+     */
+    Object process() throws Exception;
+
+    /**
      * Dispatch message to the flow
      *
      * @param payload The payload of the message

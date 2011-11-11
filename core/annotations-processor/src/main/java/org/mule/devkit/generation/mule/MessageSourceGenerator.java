@@ -18,14 +18,9 @@
 package org.mule.devkit.generation.mule;
 
 import org.apache.commons.lang.StringUtils;
-import org.mule.DefaultMuleEvent;
-import org.mule.DefaultMuleMessage;
-import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
 import org.mule.api.annotations.Source;
 import org.mule.api.callback.SourceCallback;
 import org.mule.config.i18n.CoreMessages;
@@ -48,7 +43,6 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Type;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
-import org.mule.session.DefaultMuleSession;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -142,6 +136,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         // add process method
         generateSourceCallbackProcessMethod(messageSourceClass, messageProcessor, muleContext, flowConstruct);
         generateSourceCallbackProcessWithPropertiesMethod(messageSourceClass, messageProcessor, muleContext, flowConstruct);
+        generateSourceCallbackProcessMethodWithNoPayload(messageSourceClass, messageProcessor, muleContext, flowConstruct);
 
         // add start method
         generateStartMethod(messageSourceClass, thread);
@@ -349,88 +344,5 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         stop.body().add(thread.invoke("interrupt"));
     }
 
-    private void generateSourceCallbackProcessMethod(DefinedClass messageSourceClass, FieldVariable messageProcessor, FieldVariable muleContext, FieldVariable flowConstruct) {
-        Method process = messageSourceClass.method(Modifier.PUBLIC, ref(Object.class), "process");
-        process.javadoc().add("Implements {@link SourceCallback#process(org.mule.api.MuleEvent)}. This message source will be passed on to ");
-        process.javadoc().add("the actual pojo's method as a callback mechanism.");
-        Variable message = process.param(ref(Object.class), "message");
-
-        Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage");
-        Invocation newMuleMessage = ExpressionFactory._new(ref(DefaultMuleMessage.class));
-        newMuleMessage.arg(message);
-        newMuleMessage.arg(muleContext);
-        process.body().assign(muleMessage, newMuleMessage);
-
-        Variable muleSession = process.body().decl(ref(MuleSession.class), "muleSession");
-        Invocation newMuleSession = ExpressionFactory._new(ref(DefaultMuleSession.class));
-        newMuleSession.arg(flowConstruct);
-        newMuleSession.arg(muleContext);
-        process.body().assign(muleSession, newMuleSession);
-
-        Variable muleEvent = process.body().decl(ref(MuleEvent.class), "muleEvent");
-        Invocation newMuleEvent = ExpressionFactory._new(ref(DefaultMuleEvent.class));
-        newMuleEvent.arg(muleMessage);
-        newMuleEvent.arg(ref(MessageExchangePattern.class).staticRef("ONE_WAY"));
-        newMuleEvent.arg(muleSession);
-        process.body().assign(muleEvent, newMuleEvent);
-
-        TryStatement tryBlock = process.body()._try();
-        Variable responseEvent = tryBlock.body().decl(ref(MuleEvent.class), "responseEvent");
-        Invocation messageProcess = messageProcessor.invoke("process");
-        messageProcess.arg(muleEvent);
-        tryBlock.body().assign(responseEvent, messageProcess);
-        Conditional ifResponse = tryBlock.body()._if(
-                Op.cand(Op.ne(responseEvent, ExpressionFactory._null()),
-                        Op.ne(responseEvent.invoke("getMessage"), ExpressionFactory._null()))
-        );
-        ifResponse._then()._return(responseEvent.invoke("getMessage").invoke("getPayload"));
-
-        tryBlock._catch(ref(MuleException.class));
-        process.body()._return(ExpressionFactory._null());
-    }
-
-    private void generateSourceCallbackProcessWithPropertiesMethod(DefinedClass messageSourceClass, FieldVariable messageProcessor, FieldVariable muleContext, FieldVariable flowConstruct) {
-        Method process = messageSourceClass.method(Modifier.PUBLIC, ref(Object.class), "process");
-        process.javadoc().add("Implements {@link SourceCallback#process(org.mule.api.MuleEvent)}. This message source will be passed on to ");
-        process.javadoc().add("the actual pojo's method as a callback mechanism.");
-        Variable message = process.param(ref(Object.class), "message");
-        Variable properties = process.param(ref(Map.class).narrow(String.class).narrow(Object.class), "properties");
-
-        Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage");
-        Invocation newMuleMessage = ExpressionFactory._new(ref(DefaultMuleMessage.class));
-        newMuleMessage.arg(message);
-        newMuleMessage.arg(properties);
-        newMuleMessage.arg(ExpressionFactory._null());
-        newMuleMessage.arg(ExpressionFactory._null());
-        newMuleMessage.arg(muleContext);
-        process.body().assign(muleMessage, newMuleMessage);
-
-        Variable muleSession = process.body().decl(ref(MuleSession.class), "muleSession");
-        Invocation newMuleSession = ExpressionFactory._new(ref(DefaultMuleSession.class));
-        newMuleSession.arg(flowConstruct);
-        newMuleSession.arg(muleContext);
-        process.body().assign(muleSession, newMuleSession);
-
-        Variable muleEvent = process.body().decl(ref(MuleEvent.class), "muleEvent");
-        Invocation newMuleEvent = ExpressionFactory._new(ref(DefaultMuleEvent.class));
-        newMuleEvent.arg(muleMessage);
-        newMuleEvent.arg(ref(MessageExchangePattern.class).staticRef("ONE_WAY"));
-        newMuleEvent.arg(muleSession);
-        process.body().assign(muleEvent, newMuleEvent);
-
-        TryStatement tryBlock = process.body()._try();
-        Variable responseEvent = tryBlock.body().decl(ref(MuleEvent.class), "responseEvent");
-        Invocation messageProcess = messageProcessor.invoke("process");
-        messageProcess.arg(muleEvent);
-        tryBlock.body().assign(responseEvent, messageProcess);
-        Conditional ifResponse = tryBlock.body()._if(
-                Op.cand(Op.ne(responseEvent, ExpressionFactory._null()),
-                        Op.ne(responseEvent.invoke("getMessage"), ExpressionFactory._null()))
-        );
-        ifResponse._then()._return(responseEvent.invoke("getMessage").invoke("getPayload"));
-
-        tryBlock._catch(ref(MuleException.class));
-        process.body()._return(ExpressionFactory._null());
-    }
 
 }
