@@ -128,7 +128,7 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
         }
 
 
-        getAuthorizationUrl.body().invoke(logger, "info").arg(ExpressionFactory.direct("\"OAUth 2 authorization url: \" + urlBuilder"));
+        getAuthorizationUrl.body().invoke(logger, "debug").arg(ExpressionFactory.direct("\"OAUth 2 authorization url: \" + urlBuilder"));
         getAuthorizationUrl.body()._return(urlBuilder.invoke("toString"));
     }
 
