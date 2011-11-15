@@ -58,7 +58,7 @@ public @interface OAuth {
     String authorizationUrl();
 
     /**
-     * A Java regular expression used to extract the verifer from the Service Provider response as a result
+     * A Java regular expression used to extract the verifier from the Service Provider response as a result
      * of the Resource Owner authorizing the Consumer.
      */
     String verifierRegex() default "oauth_verifier=([^&]+)";
