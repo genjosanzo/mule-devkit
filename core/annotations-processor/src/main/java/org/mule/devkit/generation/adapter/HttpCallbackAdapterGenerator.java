@@ -44,6 +44,8 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
     public static final String REMOTE_PORT_FIELD_NAME = "remotePort";
     public static final String DOMAIN_FIELD_NAME = "domain";
     public static final String ASYNC_FIELD_NAME = "async";
+    private static final int DEFAULT_LOCAL_PORT = 8080;
+    private static final int DEFAULT_REMOTE_PORT = 80;
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
@@ -70,22 +72,23 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
         }
 
         Block ifLocalPortIsNull = initialise.body()._if(Op.eq(localPort, ExpressionFactory._null()))._then();
-        assignHttpPortSystemVariable(localPort, logger, ifLocalPortIsNull);
+        initialiseLocalPort(localPort, logger, ifLocalPortIsNull);
 
         Block ifRemotePortIsNull = initialise.body()._if(Op.eq(remotePort, ExpressionFactory._null()))._then();
-        assignHttpPortSystemVariable(remotePort, logger, ifRemotePortIsNull);
+        ifRemotePortIsNull.invoke(logger, "info").arg(ExpressionFactory.lit("Using default remotePort: 80"));
+        ifRemotePortIsNull.assign(remotePort, ExpressionFactory.lit(DEFAULT_REMOTE_PORT));
 
         Block ifDomainIsNull = initialise.body()._if(Op.eq(domain, ExpressionFactory._null()))._then();
         assignDomainSystemVariable(domain, logger, ifDomainIsNull);
     }
 
-    private void assignHttpPortSystemVariable(FieldVariable port, FieldVariable logger, Block ifPortIsNull) {
-        Variable portSystemVar = ifPortIsNull.decl(ref(String.class), "portSystemVar", ref(System.class).staticInvoke("getProperty").arg("http.port"));
+    private void initialiseLocalPort(FieldVariable localPort, FieldVariable logger, Block ifPortIsNull) {
+        Variable portSystemVar = ifPortIsNull.decl(ref(String.class), "portSystemVar", ref(System.class).staticInvoke("getProperty").arg("http.localPort"));
         Conditional conditional = ifPortIsNull._if(ref(NumberUtils.class).staticInvoke("isDigits").arg(portSystemVar));
-        conditional._then().block().assign(port, ref(Integer.class).staticInvoke("parseInt").arg(portSystemVar));
+        conditional._then().block().assign(localPort, ref(Integer.class).staticInvoke("parseInt").arg(portSystemVar));
         Block thenBlock = conditional._else().block();
-        thenBlock.invoke(logger, "warn").arg(ExpressionFactory.lit("Environment variable 'http.port' not found, using default port: 8080"));
-        thenBlock.assign(port, ExpressionFactory.lit(8080));
+        thenBlock.invoke(logger, "warn").arg(ExpressionFactory.lit("Environment variable 'http.localPort' not found, using default localPort: 8080"));
+        thenBlock.assign(localPort, ExpressionFactory.lit(DEFAULT_LOCAL_PORT));
     }
 
     private void assignDomainSystemVariable(FieldVariable domain, FieldVariable logger, Block ifDomainIsNull) {

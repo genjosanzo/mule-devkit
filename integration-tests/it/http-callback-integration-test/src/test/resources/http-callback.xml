@@ -24,7 +24,9 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
         http://www.mulesoft.org/schema/mule/callback http://www.mulesoft.org/schema/mule/callback/current/mule-callback.xsd">
 
-    <callback:config/>
+    <callback:config>
+        <callback:http-callback-config remotePort="${http.port}" />
+    </callback:config>
 
     <flow name="doA">
         <callback:do-a on-event-x-flow-ref="flowToExecuteOnEventX" on-event-y-flow-ref="flowToExecuteOnEventY"/>
