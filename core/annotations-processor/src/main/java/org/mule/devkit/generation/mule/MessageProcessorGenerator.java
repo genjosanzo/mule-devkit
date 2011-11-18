@@ -674,14 +674,14 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey((TypeElement) executableElement.getEnclosingElement()));
 
             Conditional ifDebugEnabled = callProcessor.body()._if(logger.invoke("isDebugEnabled"));
-            Variable messageStringBuffer = ifDebugEnabled._then().decl(ref(StringBuffer.class), "messageStringBuffer", ExpressionFactory._new(ref(StringBuffer.class)));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg("Attempting to acquire a connection using "));
+            Variable messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Attempting to acquire a connection using "));
             for (String field : connectionParameters.keySet()) {
-                ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg(ExpressionFactory.lit("[" + field + " = ")));
-                ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg(connectionParameters.get(field)));
-                ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg(ExpressionFactory.lit("] ")));
+                ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("[" + field + " = ")));
+                ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(connectionParameters.get(field)));
+                ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("] ")));
             }
-            ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuffer.invoke("toString")));
+            ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuilder.invoke("toString")));
 
             Invocation newKey = ExpressionFactory._new(connectionKey);
             Invocation createConnection = moduleObject.invoke("acquireConnection");
@@ -706,14 +706,14 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             ifConnectionIsNull._then()._throw(messageException);
 
             ifDebugEnabled = ifConnectionIsNull._else()._if(logger.invoke("isDebugEnabled"));
-            messageStringBuffer = ifDebugEnabled._then().decl(ref(StringBuffer.class), "messageStringBuffer", ExpressionFactory._new(ref(StringBuffer.class)));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg("Connection has been acquired with "));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg(ExpressionFactory.lit("[id = ")));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg(
+            messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Connection has been acquired with "));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("[id = ")));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(
                     connection.invoke(connectionIdentifierMethod.getSimpleName().toString())
             ));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg(ExpressionFactory.lit("] ")));
-            ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuffer.invoke("toString")));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("] ")));
+            ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuilder.invoke("toString")));
         }
 
         Type returnType = ref(executableElement.getReturnType());
@@ -762,17 +762,17 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             CatchBlock catchBlock = callProcessor._catch(ref(exception).boxify());
 
             Conditional ifDebugEnabled = catchBlock.body()._if(logger.invoke("isDebugEnabled"));
-            Variable messageStringBuffer = ifDebugEnabled._then().decl(ref(StringBuffer.class), "messageStringBuffer", ExpressionFactory._new(ref(StringBuffer.class)));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg("An exception ("));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg(ref(exception).boxify().fullName()));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg(") has been thrown while executing "));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg(ExpressionFactory.lit(methodName)));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg(". Destroying the connection with [id = "));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg(
+            Variable messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("An exception ("));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ref(exception).boxify().fullName()));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(") has been thrown while executing "));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit(methodName)));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(". Destroying the connection with [id = "));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(
                     connection.invoke(connectionIdentifierMethod.getSimpleName().toString())
             ));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg("]."));
-            ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuffer.invoke("toString")));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("]."));
+            ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuilder.invoke("toString")));
 
             TryStatement innerTry = catchBlock.body()._try();
 
@@ -795,13 +795,13 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
             Conditional ifRetryMaxNotReached = catchBlock.body()._if(Op.lte(retryCount.invoke("get"), retryMax));
             ifDebugEnabled = ifRetryMaxNotReached._then()._if(logger.invoke("isDebugEnabled"));
-            messageStringBuffer = ifDebugEnabled._then().decl(ref(StringBuffer.class), "messageStringBuffer", ExpressionFactory._new(ref(StringBuffer.class)));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg("Forcing a retry [time="));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg(retryCount));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg(" out of  "));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg(retryMax));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg("]."));
-            ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuffer.invoke("toString")));
+            messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Forcing a retry [time="));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(retryCount));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(" out of  "));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(retryMax));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("]."));
+            ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuilder.invoke("toString")));
 
             ifRetryMaxNotReached._then()._return(ExpressionFactory.invoke("process").arg(event));
 
@@ -838,13 +838,13 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
 
             Conditional ifDebugEnabled = ifConnectionNotNull._then()._if(logger.invoke("isDebugEnabled"));
-            Variable messageStringBuffer = ifDebugEnabled._then().decl(ref(StringBuffer.class), "messageStringBuffer", ExpressionFactory._new(ref(StringBuffer.class)));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg("Releasing the connection back into the pool [id="));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg(
+            Variable messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Releasing the connection back into the pool [id="));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(
                     connection.invoke(connectionIdentifierMethod.getSimpleName().toString())
             ));
-            ifDebugEnabled._then().add(messageStringBuffer.invoke("append").arg("]."));
-            ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuffer.invoke("toString")));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("]."));
+            ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuilder.invoke("toString")));
 
 
             DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey((TypeElement) executableElement.getEnclosingElement()));
