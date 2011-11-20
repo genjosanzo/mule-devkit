@@ -162,6 +162,10 @@ public class ModuleAnnotationProcessor extends AbstractProcessor {
         return true;
     }
 
+    public void setPlugins(List<Plugin> plugins) {
+        this.plugins = plugins;
+    }
+
     private void createContext() {
         context = new GeneratorContext(processingEnv);
     }

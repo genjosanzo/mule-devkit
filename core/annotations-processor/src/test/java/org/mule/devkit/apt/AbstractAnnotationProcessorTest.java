@@ -29,6 +29,7 @@ import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,8 +37,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -45,8 +47,10 @@ import static org.junit.Assert.assertTrue;
  * attempts to compile source test cases that can be found on the classpath.
  */
 public abstract class AbstractAnnotationProcessorTest {
+
     private static final String SOURCE_FILE_SUFFIX = ".java";
     private static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
+    protected DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<JavaFileObject>();
 
     /**
      * @return the processor instances that should be tested
@@ -61,22 +65,22 @@ public abstract class AbstractAnnotationProcessorTest {
      * the classpath.
      *
      * @param compilationUnits the classes to compile
-     * @return the {@link Diagnostic diagnostics} returned by the compilation,
-     *         as demonstrated in the documentation for {@link JavaCompiler}
-     * @see #compileTestCase(String...)
      */
-    protected List<Diagnostic<? extends JavaFileObject>> compileTestCase(
-            Class<?>... compilationUnits) {
-        assert (compilationUnits != null);
+    protected void compileTestCase(Class<?>... compilationUnits) {
+        if (compilationUnits == null || compilationUnits.length == 0) {
+            throw new IllegalArgumentException("No compilation units specified");
+        }
 
         String[] compilationUnitPaths = new String[compilationUnits.length];
 
         for (int i = 0; i < compilationUnitPaths.length; i++) {
-            assert (compilationUnits[i] != null);
+            if (compilationUnits[i] == null) {
+                throw new IllegalArgumentException("Compilation unit cannot be null");
+            }
             compilationUnitPaths[i] = toResourcePath(compilationUnits[i]);
         }
 
-        return compileTestCase(compilationUnitPaths);
+        compileTestCase(compilationUnitPaths);
     }
 
     private static String toResourcePath(Class<?> clazz) {
@@ -94,25 +98,21 @@ public abstract class AbstractAnnotationProcessorTest {
      *         as demonstrated in the documentation for {@link JavaCompiler}
      * @see #compileTestCase(Class...)
      */
-    protected List<Diagnostic<? extends JavaFileObject>> compileTestCase(
-            String... compilationUnitPaths) {
-        assert (compilationUnitPaths != null);
+    protected void compileTestCase(String... compilationUnitPaths) {
+        if (compilationUnitPaths == null || compilationUnitPaths.length == 0) {
+            throw new IllegalArgumentException("No compilation unit path specified");
+        }
 
         Collection<File> compilationUnits;
 
         try {
             compilationUnits = findClasspathFiles(compilationUnitPaths);
         } catch (IOException exception) {
-            throw new IllegalArgumentException(
-                    "Unable to resolve compilation units " + Arrays.toString(compilationUnitPaths)
-                            + " due to: " + exception.getMessage(),
-                    exception);
+            throw new IllegalArgumentException("Unable to resolve compilation units " + Arrays.toString(compilationUnitPaths) +
+                    " due to: " + exception.getMessage(), exception);
         }
 
-        DiagnosticCollector<JavaFileObject> diagnosticCollector =
-                new DiagnosticCollector<JavaFileObject>();
-        StandardJavaFileManager fileManager =
-                COMPILER.getStandardFileManager(diagnosticCollector, null, null);
+        StandardJavaFileManager fileManager = COMPILER.getStandardFileManager(diagnosticCollector, null, null);
 
         /*
          * Call the compiler with the "-proc:only" option. The "class names"
@@ -130,12 +130,7 @@ public abstract class AbstractAnnotationProcessorTest {
         task.setProcessors(getProcessors());
         task.call();
 
-        try {
-            fileManager.close();
-        } catch (IOException exception) {
-        }
-
-        return diagnosticCollector.getDiagnostics();
+        closeQuietly(fileManager);
     }
 
     private static Collection<File> findClasspathFiles(String[] filenames) throws IOException {
@@ -152,18 +147,23 @@ public abstract class AbstractAnnotationProcessorTest {
      * Asserts that the compilation produced no errors, i.e. no diagnostics of
      * type {@link Kind#ERROR}.
      *
-     * @param diagnostics the result of the compilation
-     * @see #assertCompilationReturned(Kind, long, List)
-     * @see #assertCompilationReturned(Kind[], long[], List)
      */
-    protected static void assertCompilationSuccessful(
-            List<Diagnostic<? extends JavaFileObject>> diagnostics) {
-        assert (diagnostics != null);
-
-        for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics) {
-            assertFalse("Expected no errors", diagnostic.getKind().equals(Kind.ERROR));
+    protected void assertCompilationSuccessful() {
+        for (Diagnostic<? extends JavaFileObject> diagnostic : diagnosticCollector.getDiagnostics()) {
+            assertNotSame("Error not expected at line: " + diagnostic.getLineNumber(), Kind.ERROR, diagnostic.getKind());
         }
+    }
 
+    /**
+     * Asserts that the compilation produced at least one error.
+     */
+    protected void assertCompilationFailed() {
+        for (Diagnostic<? extends JavaFileObject> diagnostic : diagnosticCollector.getDiagnostics()) {
+            if (diagnostic.getKind() == Kind.ERROR) {
+                return;
+            }
+        }
+        fail("No error found in compilation");
     }
 
     /**
@@ -176,7 +176,6 @@ public abstract class AbstractAnnotationProcessorTest {
      * @param expectedDiagnosticKinds the kinds of diagnostic expected
      * @param expectedLineNumbers     the line numbers at which the diagnostics are expected
      * @param diagnostics             the result of the compilation
-     * @see #assertCompilationSuccessful(List)
      * @see #assertCompilationReturned(Kind, long, List)
      */
     protected static void assertCompilationReturned(
@@ -201,26 +200,32 @@ public abstract class AbstractAnnotationProcessorTest {
      * @param expectedDiagnosticKind the kind of diagnostic expected
      * @param expectedLineNumber     the line number at which the diagnostic is expected
      * @param diagnostics            the result of the compilation
-     * @see #assertCompilationSuccessful(List)
      * @see #assertCompilationReturned(Kind[], long[], List)
      */
-    protected static void assertCompilationReturned(
-            Kind expectedDiagnosticKind, long expectedLineNumber,
-            List<Diagnostic<? extends JavaFileObject>> diagnostics) {
-        assert ((expectedDiagnosticKind != null) && (diagnostics != null));
+    protected static void assertCompilationReturned(Kind expectedDiagnosticKind, long expectedLineNumber, List<Diagnostic<? extends JavaFileObject>> diagnostics) {
+        if (expectedDiagnosticKind == null || diagnostics == null) {
+            throw new IllegalArgumentException("Diagnostic kind and diagnostics must be specified");
+        }
         boolean expectedDiagnosticFound = false;
 
         for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics) {
 
-            if (diagnostic.getKind().equals(expectedDiagnosticKind)
-                    && (diagnostic.getLineNumber() == expectedLineNumber)) {
+            if (diagnostic.getKind() == expectedDiagnosticKind && diagnostic.getLineNumber() == expectedLineNumber) {
                 expectedDiagnosticFound = true;
             }
 
         }
 
-        assertTrue("Expected a result of kind " + expectedDiagnosticKind
-                + " at line " + expectedLineNumber, expectedDiagnosticFound);
+        assertTrue(diagnostics.toString(), expectedDiagnosticFound);
     }
 
+    private void closeQuietly(Closeable closeable) {
+        try {
+            if (closeable != null) {
+                closeable.close();
+            }
+        } catch (IOException e) {
+            // ignore
+        }
+    }
 }
