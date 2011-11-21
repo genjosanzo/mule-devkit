@@ -18,7 +18,6 @@ package org.mule.devkit.tests;
 
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
-import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 
 /**

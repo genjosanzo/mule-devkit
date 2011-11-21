@@ -33,7 +33,6 @@ import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.Type;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import sun.misc.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -608,7 +607,7 @@ public class Doclava {
         data.setValue("tabs." + i + ".id", "mule");
         data.setValue("tabs." + i + ".title", "Mule API Reference");
         data.setValue("tabs." + i + ".link", muleXmlDir + "modules.html");
-        
+
 
         return data;
     }
@@ -1012,10 +1011,10 @@ public class Doclava {
 
         Proofread.writePackages(filename, Converter.convertTags(root.inlineTags(), null));
     }
-    
+
     public static void writeMarkdowns() {
         MarkdownProcessor markdown = new MarkdownProcessor();
-        for( String[] m : mMarkdown) {
+        for (String[] m : mMarkdown) {
             try {
                 String mdContent = FileUtils.readFileToString(new File(m[1]));
                 String htmlContent = markdown.markdown(mdContent);
@@ -1028,7 +1027,7 @@ public class Doclava {
                 System.err.println("Cannot read " + m[1] + " file: " + e.getMessage());
             }
         }
-    }    
+    }
 
     public static void writeModules(String filename) {
         Data data = makeHDF();
