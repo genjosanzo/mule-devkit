@@ -689,34 +689,6 @@ public class Doclava {
         return data;
     }
 
-    private static Map<String, List<TocInfo>> generateToc(File dir, String relative, String out) {
-        Map<String, List<TocInfo>> toc = new HashMap<String, List<TocInfo>>();
-        File[] files = dir.listFiles();
-        int i, count = files.length;
-        for (i = 0; i < count; i++) {
-            File f = files[i];
-            if (f.isFile()) {
-                String templ = ensureSlash(relative) + f.getName();
-                int len = templ.length();
-                if (len > 3 && ".jd".equals(templ.substring(len - 3))) {
-                    String filename = out + templ.substring(0, len - 3) + htmlExtension;
-                    String topic = DocFile.getProperty(f.getAbsolutePath(), "page.group");
-                    String title = DocFile.getProperty(f.getAbsolutePath(), "page.title");
-
-                    if (!toc.containsKey(topic)) {
-                        toc.put(topic, new ArrayList<TocInfo>());
-                    }
-
-                    toc.get(topic).add(new TocInfo(title, filename));
-                }
-            } else if (f.isDirectory()) {
-                toc.putAll(generateToc(f, ensureSlash(relative) + f.getName() + "/", out));
-            }
-        }
-
-        return toc;
-    }
-
     private static void writeDirectory(Map<String, List<TocInfo>> toc, File dir, String relative, JSilver js, String out) {
         File[] files = dir.listFiles();
         int i, count = files.length;
