@@ -23,6 +23,7 @@ import com.google.clearsilver.jsilver.resourceloader.ClassResourceLoader;
 import com.google.clearsilver.jsilver.resourceloader.CompositeResourceLoader;
 import com.google.clearsilver.jsilver.resourceloader.FileSystemResourceLoader;
 import com.google.clearsilver.jsilver.resourceloader.ResourceLoader;
+import com.petebevin.markdown.MarkdownProcessor;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.Doc;
 import com.sun.javadoc.DocErrorReporter;
@@ -30,6 +31,8 @@ import com.sun.javadoc.LanguageVersion;
 import com.sun.javadoc.MemberDoc;
 import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.Type;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -55,25 +58,6 @@ import java.util.TreeMap;
 import java.util.jar.JarFile;
 
 public class Doclava {
-    private static final String SDK_CONSTANT_ANNOTATION = "android.annotation.SdkConstant";
-    private static final String SDK_CONSTANT_TYPE_ACTIVITY_ACTION =
-            "android.annotation.SdkConstant.SdkConstantType.ACTIVITY_INTENT_ACTION";
-    private static final String SDK_CONSTANT_TYPE_BROADCAST_ACTION =
-            "android.annotation.SdkConstant.SdkConstantType.BROADCAST_INTENT_ACTION";
-    private static final String SDK_CONSTANT_TYPE_SERVICE_ACTION =
-            "android.annotation.SdkConstant.SdkConstantType.SERVICE_INTENT_ACTION";
-    private static final String SDK_CONSTANT_TYPE_CATEGORY =
-            "android.annotation.SdkConstant.SdkConstantType.INTENT_CATEGORY";
-    private static final String SDK_CONSTANT_TYPE_FEATURE =
-            "android.annotation.SdkConstant.SdkConstantType.FEATURE";
-    private static final String SDK_WIDGET_ANNOTATION = "android.annotation.Widget";
-    private static final String SDK_LAYOUT_ANNOTATION = "android.annotation.Layout";
-
-    private static final int TYPE_NONE = 0;
-    private static final int TYPE_WIDGET = 1;
-    private static final int TYPE_LAYOUT = 2;
-    private static final int TYPE_LAYOUT_PARAM = 3;
-
     public static final int SHOW_PUBLIC = 0x00000001;
     public static final int SHOW_PROTECTED = 0x00000003;
     public static final int SHOW_PACKAGE = 0x00000007;
@@ -90,6 +74,7 @@ public class Doclava {
 
     public static RootDoc root;
     public static ArrayList<String[]> mHDFData = new ArrayList<String[]>();
+    public static ArrayList<String[]> mMarkdown = new ArrayList<String[]>();
     public static Map<Character, String> escapeChars = new HashMap<Character, String>();
     public static String title = "";
     public static SinceTagger sinceTagger = new SinceTagger();
@@ -158,12 +143,12 @@ public class Doclava {
                 ClearPage.addTemplateDir(a[1]);
             } else if (a[0].equals("-hdf")) {
                 mHDFData.add(new String[]{a[1], a[2]});
+            } else if (a[0].equals("-markdown")) {
+                mMarkdown.add(new String[]{a[1], a[2], a[3]});
             } else if (a[0].equals("-knowntags")) {
                 knownTagsFiles.add(a[1]);
             } else if (a[0].equals("-toroot")) {
                 ClearPage.toroot = a[1];
-            } else if (a[0].equals("-htmldir")) {
-                ClearPage.htmlDirs.add(a[1]);
             } else if (a[0].equals("-title")) {
                 Doclava.title = a[1];
             } else if (a[0].equals("-werror")) {
@@ -304,34 +289,13 @@ public class Doclava {
                 TodoFile.writeTodoFile(todoFile);
             }
 
-            // HTML Pages
-            /*
-            if (!ClearPage.htmlDirs.isEmpty()) {
-                for (String htmlDir : ClearPage.htmlDirs) {
-                    File f = new File(htmlDir);
-                    writeHTMLPages(f);
-                }
-            } else {
-                // Generate a simple index.html file
-                JarFile thisJar = JarUtils.jarForClass(Doclava.class, null);
-                if (thisJar != null) {
-                    try {
-                        JarUtils.copyResourcesToDirectory(thisJar, "assets/html", ClearPage.outputDir);
-                    } catch (IOException e) {
-                        System.err.println("Failed to copy html resources.");
-                    }
-                }
-            }
-            */
-
             writeAssets();
 
             // Navigation tree
             NavTree.writeNavTree(assetsOutputDir);
 
-            // Write Guide Index
-            //writeGuideIndex(guideDir + "/index" + htmlExtension);
-            //writeGuideInstallation(guideDir + "/installation" + htmlExtension);
+            // Write Markdown files
+            writeMarkdowns();
 
             // Mule
             writeModules(muleXmlDir + "modules" + htmlExtension);
@@ -506,6 +470,9 @@ public class Doclava {
         if (option.equals("-hdf")) {
             return 3;
         }
+        if (option.equals("-markdown")) {
+            return 4;
+        }
         if (option.equals("-knowntags")) {
             return 2;
         }
@@ -514,9 +481,6 @@ public class Doclava {
         }
         if (option.equals("-samplecode")) {
             return 4;
-        }
-        if (option.equals("-htmldir")) {
-            return 2;
         }
         if (option.equals("-title")) {
             return 2;
@@ -621,6 +585,30 @@ public class Doclava {
             data.setValue(p[0], p[1]);
         }
 
+        data.setValue("tabs.0.id", "guide");
+        data.setValue("tabs.0.title", "Install Guide");
+        data.setValue("tabs.0.link", guideDir + "install.html");
+
+        int i = 0;
+        for (String[] p : mMarkdown) {
+            i++;
+            data.setValue("tabs." + i + ".id", p[0]);
+            data.setValue("tabs." + i + ".title", p[2]);
+            String outFile = FilenameUtils.getName(p[1]).replaceAll(".md", ".html").toLowerCase();
+            data.setValue("tabs." + i + ".link", outFile);
+        }
+
+        i++;
+        data.setValue("tabs." + i + ".id", "java");
+        data.setValue("tabs." + i + ".title", "Java API Reference");
+        data.setValue("tabs." + i + ".link", javadocDir + "packages.html");
+
+        i++;
+        data.setValue("tabs." + i + ".id", "mule");
+        data.setValue("tabs." + i + ".title", "Mule API Reference");
+        data.setValue("tabs." + i + ".link", muleXmlDir + "modules.html");
+
+
         return data;
     }
 
@@ -701,34 +689,6 @@ public class Doclava {
         return data;
     }
 
-    private static Map<String, List<TocInfo>> generateToc(File dir, String relative, String out) {
-        Map<String, List<TocInfo>> toc = new HashMap<String, List<TocInfo>>();
-        File[] files = dir.listFiles();
-        int i, count = files.length;
-        for (i = 0; i < count; i++) {
-            File f = files[i];
-            if (f.isFile()) {
-                String templ = ensureSlash(relative) + f.getName();
-                int len = templ.length();
-                if (len > 3 && ".jd".equals(templ.substring(len - 3))) {
-                    String filename = out + templ.substring(0, len - 3) + htmlExtension;
-                    String topic = DocFile.getProperty(f.getAbsolutePath(), "page.group");
-                    String title = DocFile.getProperty(f.getAbsolutePath(), "page.title");
-
-                    if (!toc.containsKey(topic)) {
-                        toc.put(topic, new ArrayList<TocInfo>());
-                    }
-
-                    toc.get(topic).add(new TocInfo(title, filename));
-                }
-            } else if (f.isDirectory()) {
-                toc.putAll(generateToc(f, ensureSlash(relative) + f.getName() + "/", out));
-            }
-        }
-
-        return toc;
-    }
-
     private static void writeDirectory(Map<String, List<TocInfo>> toc, File dir, String relative, JSilver js, String out) {
         File[] files = dir.listFiles();
         int i, count = files.length;
@@ -754,17 +714,6 @@ public class Doclava {
         }
     }
 
-    public static void writeHTMLPages(File dir) {
-        if (!dir.isDirectory()) {
-            throw new IllegalArgumentException("Not a directory: " + dir);
-        }
-
-        ResourceLoader loader = new FileSystemResourceLoader(dir);
-        JSilver js = new JSilver(loader);
-        Map<String, List<TocInfo>> toc = generateToc(dir, "", guideDir);
-        writeDirectory(toc, dir, "", js, guideDir);
-    }
-
     public static void writeAssets() {
         JarFile thisJar = JarUtils.jarForClass(Doclava.class, null);
         if (thisJar != null) {
@@ -775,6 +724,10 @@ public class Doclava {
                     JarUtils.copyResourcesToDirectory(thisJar, assetsDir,
                             ensureSlash(ClearPage.outputDir) + assetsOutputDir);
                 }
+
+                // write mule-developer-core.css
+                Data data = makeHDF();
+                ClearPage.write(data, "mule-developer-core.cs", assetsOutputDir + "/mule-developer-core.css");
             } catch (IOException e) {
                 System.err.println("Error copying assets directory.");
                 e.printStackTrace();
@@ -1029,6 +982,23 @@ public class Doclava {
         ClearPage.write(data, "package-list.cs", javadocDir + "package-list");
 
         Proofread.writePackages(filename, Converter.convertTags(root.inlineTags(), null));
+    }
+
+    public static void writeMarkdowns() {
+        MarkdownProcessor markdown = new MarkdownProcessor();
+        for (String[] m : mMarkdown) {
+            try {
+                String mdContent = FileUtils.readFileToString(new File(m[1]));
+                String htmlContent = markdown.markdown(mdContent);
+                String outFile = FilenameUtils.getName(m[1]).replaceAll(".md", ".html").toLowerCase();
+                Data data = makeHDF();
+                data.setValue("content", htmlContent);
+                data.setValue("section", m[0]);
+                ClearPage.write(data, "markdown.cs", outFile);
+            } catch (IOException e) {
+                System.err.println("Cannot read " + m[1] + " file: " + e.getMessage());
+            }
+        }
     }
 
     public static void writeModules(String filename) {

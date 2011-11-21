@@ -17,7 +17,6 @@
 package org.mule.devkit.tests;
 
 import org.mule.api.annotations.Module;
-import org.mule.api.annotations.Processor;
 
 /**
  * Interfaces cannot be annotated with @Module

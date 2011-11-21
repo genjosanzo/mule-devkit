@@ -5,15 +5,11 @@
       <span id="masthead-title"><?cs var:project.name ?></span>
     <?cs /if ?>
     <ul id="header-tabs" class="<?cs var:section ?>">
-    	<li id="guide"><a href="<?cs var:toroot ?>guide/install.html">
-	    	<span class="en">Install Guide</span>
+    <?cs each:tab=tabs ?>
+    	<li id="<?cs var:tab.id ?>"><a href="<?cs var:toroot ?><?cs var:tab.link ?>">
+	    	<span class="en"><?cs var:tab.title ?></span>
     	</a></li>
-    	<li id="java"><a href="<?cs var:toroot ?>java/packages.html">
-	    	<span class="en">Java API</span>
-    	</a></li>
-    	<li id="mule"><a href="<?cs var:toroot ?>mule/modules.html">
-	    	<span class="en">Mule API</span>
-    	</a></li>
+    <?cs /each ?>
     </ul>
     </div>
     <div id="headerRight">

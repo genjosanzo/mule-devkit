@@ -21,7 +21,6 @@ import org.mule.api.annotations.Connect;
 import org.mule.api.annotations.ConnectionIdentifier;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Disconnect;
-import org.mule.api.annotations.Module;
 import org.mule.api.annotations.ValidateConnection;
 
 /**

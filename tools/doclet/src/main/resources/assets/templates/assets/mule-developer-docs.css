@@ -2,7 +2,7 @@
    info: developer doc styles
 */
 
-@import url("mule-developer-core.css");
+@import url("../assets/mule-developer-core.css");
 
 #title {
     border-bottom: 4px solid #ccc;
@@ -547,8 +547,10 @@ hr {
 
 #jd-content h1 {
     /*sdk page*/
+    font-family: Ubuntu, Arial, Helvetica;
     font-size: 1.6em;
-    color: #336666;
+    font-weight: bold;
+    color: #111;
     margin: 0 0 .5em;
 }
 
@@ -562,7 +564,9 @@ hr {
 }
 
 #jd-content h3 {
+    font-family: Ubuntu, Arial, Helvetica;
     font-size: 1.2em;
+    font-weight: bolder;
     color: #222;
     padding: .75em 0 .65em 0;
     margin: 0;
