@@ -25,7 +25,7 @@ body {
     color: #000;
     font-size: 13px;
     color: #333;
-    background-image: url(images/bg_fade.jpg);
+    background-image: url(assets/images/bg_fade.jpg);
     background-repeat: repeat-x;
 }
 
@@ -255,22 +255,75 @@ background:transparent url(images/preliminary.png) repeat scroll 0 0;  */
     font-family: "Ubuntu", Arial, Helvetica;
     text-decoration: none;
     display: block;
-    background-image: url(images/bg_images_sprite.png);
+    /* background-image: url(images/bg_images_sprite.png);
     background-position: 0 -58px;
-    background-repeat: no-repeat;
+    background-repeat: no-repeat; */
     color: #666;
     font-size: 13px;
     font-weight: normal;
-    width: 94px;
+	padding-left: 10px;
+	padding-right: 10px;
+    /* width: 94px; */
     height: 29px;
     text-align: center;
     margin: 0px;
+	border-top: 1px solid #b5d0e8;
+	border-left: 1px solid #b5d0e8;
+	border-right: 1px solid #b5d0e8;
+	border-top-right-radius: 7px;
+	border-top-left-radius: 7px;
+	
+	/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fdfeff), to(#ecf3f9));
+
+	/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #ecf3f9, #fdfeff);
+
+	/* Firefox 3.6+ */
+	background: -moz-linear-gradient(top, #ecf3f9, #fdfeff);
+
+	/* IE 10 */
+	background: -ms-linear-gradient(top, #ecf3f9, #fdfeff);
+
+	/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #ecf3f9, #fdfeff);
 }
 
 #header li a:hover {
+	/*
     background-image: url(images/bg_images_sprite.png);
     background-position: 0 -29px;
     background-repeat: no-repeat;
+ 	*/
+
+	border-top: 1px solid #9dc1e0;
+	border-left: 1px solid #9dc1e0;
+	border-right: 1px solid #9dc1e0;
+	border-top-right-radius: 7px;
+	border-top-left-radius: 7px;
+	
+	/* Safari 4-5, Chrome 1-9 */cfe1f0
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#deeaf5), to(#cfe1f0));
+
+	/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #cfe1f0, #deeaf5);
+
+	/* Firefox 3.6+ */
+	background: -moz-linear-gradient(top, #cfe1f0, #deeaf5);
+
+	/* IE 10 */
+	background: -ms-linear-gradient(top, #cfe1f0, #deeaf5);
+
+	/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #cfe1f0, #deeaf5);
+}
+
+#header li a:active {
+	/*
+    background-image: url(images/bg_images_sprite.png);
+    background-position: 0 -29px;
+    background-repeat: no-repeat;
+ 	*/
 }
 
 #header li a span {
@@ -285,32 +338,74 @@ background:transparent url(images/preliminary.png) repeat scroll 0 0;  */
 /* tab highlighting */
 
 .home #home-link a,
-.java #java a,
-.mule #mule a,
-.guide #guide a,
+<?cs each:tab=tabs ?>.<?cs var:tab.id ?> #<?cs var:tab.id ?> a,<?cs /each ?>
 .reference #reference-link a,
 .sdk #sdk-link a,
 .resources #resources-link a,
 .videos #videos-link a {
     font-family: "Ubuntu", Arial, Helvetica;
+	/*
     background-image: url(images/bg_images_sprite.png);
     background-position: 0 0;
     background-repeat: no-repeat;
+	*/
     color: #fff;
     font-weight: normal;
     cursor: default;
+
+	border-top: 1px solid #3777ae;
+	border-left: 1px solid #3777ae;
+	border-right: 1px solid #3777ae;
+	border-top-right-radius: 7px;
+	border-top-left-radius: 7px;
+	
+	/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#3572a6), to(#5191c8));
+
+	/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #5191c8, #3572a6);
+
+	/* Firefox 3.6+ */
+	background: -moz-linear-gradient(top, #5191c8, #3572a6);
+
+	/* IE 10 */
+	background: -ms-linear-gradient(top, #5191c8, #3572a6);
+
+	/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #5191c8, #3572a6);
 }
 
 .home #home-link a:hover,
-.guide #guide a:hover,
 .reference #reference-link a:hover,
-.java #java a:hover,
-.mule #mule a:hover,
+<?cs each:tab=tabs ?>.<?cs var:tab.id ?> #<?cs var:tab.id ?> a:hover,<?cs /each ?>
 .sdk #sdk-link a:hover,
 .resources #resources-link a:hover,
 .videos #videos-link  a:hover {
+	/*
     background-image: url(images/bg_images_sprite.png);
     background-position: 0 0;
+	*/
+	
+	border-top: 1px solid #3777ae;
+	border-left: 1px solid #3777ae;
+	border-right: 1px solid #3777ae;
+	border-top-right-radius: 7px;
+	border-top-left-radius: 7px;
+	
+	/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#3572a6), to(#5191c8));
+
+	/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #5191c8, #3572a6);
+
+	/* Firefox 3.6+ */
+	background: -moz-linear-gradient(top, #5191c8, #3572a6);
+
+	/* IE 10 */
+	background: -ms-linear-gradient(top, #5191c8, #3572a6);
+
+	/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #5191c8, #3572a6);	
 }
 
 #headerLinks {
@@ -447,7 +542,7 @@ div.indent {
 }
 
 #mainBodyFixed .seperator {
-    background-image: url(images/hr_gray_side.jpg);
+    background-image: url(assets/images/hr_gray_side.jpg);
     background-repeat: no-repeat;
     width: 100%;
     float: left;
@@ -462,7 +557,7 @@ div.indent {
 }
 
 #mainBodyBottom .seperator {
-    background-image: url(images/hr_gray_main.jpg);
+    background-image: url(assets/images/hr_gray_main.jpg);
     background-repeat: no-repeat;
     width: 100%;
     float: left;
