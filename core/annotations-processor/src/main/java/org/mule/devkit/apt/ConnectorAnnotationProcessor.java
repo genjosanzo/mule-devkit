@@ -18,12 +18,12 @@ package org.mule.devkit.apt;
 
 import org.mule.devkit.generation.Generator;
 import org.mule.devkit.generation.adapter.CapabilitiesAdapterGenerator;
+import org.mule.devkit.generation.adapter.ConnectionManagerGenerator;
 import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
 import org.mule.devkit.generation.adapter.LifecycleAdapterFactoryGenerator;
 import org.mule.devkit.generation.adapter.LifecycleAdapterGenerator;
 import org.mule.devkit.generation.adapter.OAuth1AdapterGenerator;
 import org.mule.devkit.generation.adapter.OAuth2AdapterGenerator;
-import org.mule.devkit.generation.adapter.PoolAdapterGenerator;
 import org.mule.devkit.generation.callback.HttpCallbackGenerator;
 import org.mule.devkit.generation.mule.MessageProcessorGenerator;
 import org.mule.devkit.generation.mule.MessageSourceGenerator;
@@ -39,6 +39,7 @@ import org.mule.devkit.generation.spring.BeanDefinitionParserGenerator;
 import org.mule.devkit.generation.spring.NamespaceHandlerGenerator;
 import org.mule.devkit.generation.spring.SchemaGenerator;
 import org.mule.devkit.validation.BasicValidator;
+import org.mule.devkit.validation.ConnectorValidator;
 import org.mule.devkit.validation.JavaDocValidator;
 import org.mule.devkit.validation.OAuthValidator;
 import org.mule.devkit.validation.ProcessorValidator;
@@ -53,13 +54,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@SupportedAnnotationTypes(value = {"org.mule.api.annotations.Module"})
+@SupportedAnnotationTypes(value = {"org.mule.api.annotations.Connector"})
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
-public class ModuleAnnotationProcessor extends AbstractAnnotationProcessor {
+public class ConnectorAnnotationProcessor extends AbstractAnnotationProcessor {
     private List<Validator> validators;
     private List<Generator> generators;
 
-    public ModuleAnnotationProcessor() {
+    public ConnectorAnnotationProcessor() {
         generators = new ArrayList<Generator>();
         generators.add(new StringToDateTransformerGenerator());
         generators.add(new HttpCallbackGenerator());
@@ -69,7 +70,7 @@ public class ModuleAnnotationProcessor extends AbstractAnnotationProcessor {
         generators.add(new OAuth1AdapterGenerator());
         generators.add(new OAuth2AdapterGenerator());
         generators.add(new LifecycleAdapterFactoryGenerator());
-        generators.add(new PoolAdapterGenerator());
+        generators.add(new ConnectionManagerGenerator()); // this should be the last on the chain of adapters
         generators.add(new JaxbTransformerGenerator());
         generators.add(new TransformerGenerator());
         generators.add(new EnumTransformerGenerator());
@@ -88,10 +89,12 @@ public class ModuleAnnotationProcessor extends AbstractAnnotationProcessor {
         validators.add(new BasicValidator());
         validators.add(new OAuthValidator());
         validators.add(new ProcessorValidator());
+        validators.add(new ConnectorValidator());
         validators.add(new SourceValidator());
         validators.add(new TransformerValidator());
 
     }
+
 
     @Override
     public List<Validator> getValidators() {
