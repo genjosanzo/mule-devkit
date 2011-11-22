@@ -17,9 +17,7 @@
 package org.mule.devkit.model.meta;
 
 import org.mule.api.Capabilities;
-import org.mule.api.Capability;
 import org.mule.api.ConnectionException;
-import org.mule.api.ConnectionManager;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.registry.RegistrationException;
