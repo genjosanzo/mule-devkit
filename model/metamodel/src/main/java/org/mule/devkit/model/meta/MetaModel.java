@@ -30,6 +30,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,6 +69,15 @@ public class MetaModel implements Initialisable, Disposable {
     }
 
     /**
+     * Retrieve all modules available on the classpath
+     * 
+     * @return An iterator of {@link MetaModule}
+     */
+    public Iterator<MetaModule> getAll() {
+        return modules.values().iterator();        
+    }
+
+    /**
      * Remove a module for this model
      *
      * @param name The name of the module to be removed
@@ -76,6 +86,12 @@ public class MetaModel implements Initialisable, Disposable {
         this.modules.remove(name);
     }
 
+    /**
+     * Retrieve a module by its namespace
+     * 
+     * @param namespace The namespace of the module
+     * @return A {@link MetaModule}
+     */
     public MetaModule getModule(String namespace) {
         if (!this.modules.containsKey(namespace)) {
             throw new IllegalArgumentException("Unable to find a module for namespace " + namespace);

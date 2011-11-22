@@ -16,6 +16,10 @@
  */
 package org.mule.devkit.model.meta;
 
+import org.mule.api.Capabilities;
+import org.mule.api.Capability;
+import org.mule.api.ConnectionException;
+import org.mule.api.ConnectionManager;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.registry.RegistrationException;
@@ -122,6 +126,32 @@ public class MetaModule {
         }
 
         return null;
+    }
+
+    /**
+     * Test whenever or not the connector can actually connect using defaults.
+     *
+     * @throws ConnectionException If a connection cannot be established
+     */
+    public void testConnectivity(String name) throws ConnectionException {
+        testConnectivity(name, null);
+    }
+
+    /**
+     * Test whenever or not the connector can actually connect using either the defaults
+     * or a custom list of arguments.
+     *
+     * @param name                Name of the connector instance
+     * @param connectionArguments A map representing connections arguments
+     * @throws ConnectionException If a connection cannot be established
+     */
+    public void testConnectivity(String name, Map<String, Object> connectionArguments) throws ConnectionException {
+        Capabilities connectorCapabilities = (Capabilities) parentModel.getMetaRegistry().lookupObject(name);
+        if (connectorCapabilities == null) {
+            throw new IllegalArgumentException("Cannot find a module named " + name);
+        }
+
+        // DO SOMETHING with the connector
     }
 
     public void newInstance(String name, Map<String, Object> configuration) throws InstantiationException {

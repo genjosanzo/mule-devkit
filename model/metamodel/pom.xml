@@ -26,6 +26,11 @@
             <version>3.0.3-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>org.mule.tools.devkit</groupId>
+            <artifactId>mule-devkit-annotations</artifactId>
+            <version>3.0.3-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${mule.version}</version>
