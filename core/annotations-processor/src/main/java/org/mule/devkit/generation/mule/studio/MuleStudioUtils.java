@@ -19,6 +19,7 @@ package org.mule.devkit.generation.mule.studio;
 import org.apache.commons.lang.WordUtils;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
+import org.mule.api.annotations.param.Payload;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.Booleantype;
@@ -35,7 +36,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.xml.bind.JAXBElement;
-import java.util.List;
 
 public class MuleStudioUtils {
 
@@ -110,17 +110,18 @@ public class MuleStudioUtils {
             integerType.setMin(0);
             integerType.setStep(1);
             return integerType;
+        } else if(context.getTypeMirrorUtils().isCollection(variableElement.asType()) || variableElement.getAnnotation(Payload.class) != null || context.getTypeMirrorUtils().isEnum(variableElement.asType())) {
+            return null;
         }
-        return null;
+        throw new RuntimeException("Failed to create Studio XML, type not recognized: type=" + parameterClassName + " name=" + variableElement.getSimpleName().toString());
     }
 
-    public void setAttributeTypeInfo(ExecutableElement executableElement, List<AttributeType> parameters, VariableElement variableElement, AttributeType parameter, String parameterName) {
+    public void setAttributeTypeInfo(ExecutableElement executableElement, VariableElement variableElement, AttributeType parameter, String parameterName) {
         parameter.setCaption(formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameterName)));
         parameter.setDescription(formatDescription(context.getJavaDocUtils().getParameterSummary(parameterName, executableElement)));
         parameter.setName(parameterName);
         parameter.setRequired(variableElement.getAnnotation(Optional.class) == null);
         setDefaultValueIfAvailable(variableElement, parameter);
-        parameters.add(parameter);
     }
 
     public void setDefaultValueIfAvailable(VariableElement variableElement, AttributeType parameter) {

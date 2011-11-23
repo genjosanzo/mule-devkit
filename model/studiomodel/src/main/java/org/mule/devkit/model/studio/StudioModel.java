@@ -32,7 +32,7 @@ public class StudioModel {
     private static final String XML_FILE_NAME = "META-INF/%s-studio.xml";
     private CodeWriter codeWriter;
     private String moduleName;
-    private Module module;
+    private NamespaceType namespaceType;
 
     public StudioModel(CodeWriter codeWriter) {
         this.codeWriter = codeWriter;
@@ -40,7 +40,7 @@ public class StudioModel {
 
     public void build() throws IOException {
         try {
-            if (module != null) {
+            if (namespaceType != null) {
                 serializeXml();
             }
         } catch (JAXBException e) {
@@ -51,7 +51,7 @@ public class StudioModel {
     }
 
     private void serializeXml() throws JAXBException, IOException {
-        JAXBContext jaxbContext = JAXBContext.newInstance(Module.class);
+        JAXBContext jaxbContext = JAXBContext.newInstance(NamespaceType.class);
         Marshaller marshaller = jaxbContext.createMarshaller();
         NamespaceFilter outFilter = new NamespaceFilter("mule", "http://www.mulesoft.org/schema/mule/core", true);
         OutputFormat format = new OutputFormat();
@@ -60,14 +60,14 @@ public class StudioModel {
         OutputStream schemaStream = codeWriter.openBinary(null, String.format(XML_FILE_NAME, moduleName));
         XMLWriter writer = new XMLWriter(schemaStream, format);
         outFilter.setContentHandler(writer);
-        marshaller.marshal(module, outFilter);
+        marshaller.marshal(namespaceType, outFilter);
     }
 
     public void setModuleName(String moduleName) {
         this.moduleName = moduleName;
     }
 
-    public void setModule(Module module) {
-        this.module = module;
+    public void setNamespaceType(NamespaceType namespaceType) {
+        this.namespaceType = namespaceType;
     }
 }

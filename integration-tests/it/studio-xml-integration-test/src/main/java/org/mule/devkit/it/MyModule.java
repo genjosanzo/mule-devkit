@@ -20,14 +20,15 @@ package org.mule.devkit.it;
 import org.mule.api.ConnectionException;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connect;
-import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.ConnectionIdentifier;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
+import org.mule.api.annotations.param.Payload;
 
 import java.util.List;
 import java.util.Map;
@@ -122,6 +123,26 @@ public class MyModule {
      */
     @Processor
     public void operation6(Map<String, String> stringStringMap, Map<String, Object> stringObjectMap) {
+    }
+
+    /**
+     * operation7 method description
+     *
+     * @param payload the payload
+     */
+    @Processor
+    public void operation7(@Payload Object payload) {
+    }
+
+    /**
+     * operation8 method description
+     *
+     * @param siNoEnum                represents the siNoEnum
+     * @param siNoEnumOptional        represents the siNoEnumOptional
+     * @param siNoEnumOptionalDefault represents the siNoEnumOptionalDefault
+     */
+    @Processor
+    public void operation8(SiNoEnum siNoEnum, @Optional SiNoEnum siNoEnumOptional, @Optional @Default("NO") SiNoEnum siNoEnumOptionalDefault) {
     }
 
     /**

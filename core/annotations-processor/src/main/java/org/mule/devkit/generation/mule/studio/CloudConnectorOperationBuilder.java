@@ -22,11 +22,15 @@ import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.AttributeType;
+import org.mule.devkit.model.studio.EnumElement;
+import org.mule.devkit.model.studio.EnumType;
 import org.mule.devkit.model.studio.Group;
 import org.mule.devkit.model.studio.NestedElementReference;
 import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.model.studio.PatternType;
 
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
@@ -53,22 +57,13 @@ public class CloudConnectorOperationBuilder {
     }
 
     public JAXBElement<PatternType> build() {
-        List<AttributeType> simpleTypeAttributeTypes = getSimpleTypeAttributeTypes(executableElement, typeElement);
-
-        List<NestedElementReference> childElementAttributeTypes = getChildElementsAttributeTypes(executableElement);
 
         Group group = new Group();
         group.setCaption(helper.formatCaption("General"));
         group.setDescription(helper.formatDescription(context.getJavaDocUtils().getSummary(executableElement).replaceAll("\\n|<p/>", "")));
         group.setId("general");
 
-        for (AttributeType attributeType : simpleTypeAttributeTypes) {
-            group.getRegexpOrEncodingOrModeSwitch().add(helper.createJAXBElement(attributeType));
-        }
-
-        for (NestedElementReference childElement : childElementAttributeTypes) {
-            group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupChildElement(childElement));
-        }
+        addMethodParametersToGroup(group);
 
         AttributeCategory attributeCategory = new AttributeCategory();
         attributeCategory.setCaption(helper.formatCaption("General"));
@@ -77,6 +72,23 @@ public class CloudConnectorOperationBuilder {
 
         PatternType cloudConnector = createCloudConnectorElement(attributeCategory);
         return objectFactory.createNamespaceTypeCloudConnector(cloudConnector);
+    }
+
+    private void addMethodParametersToGroup(Group group) {
+        List<AttributeType> simpleTypeAttributeTypes = getSimpleTypeAttributeTypes(executableElement, typeElement);
+        for (AttributeType attributeType : simpleTypeAttributeTypes) {
+            group.getRegexpOrEncodingOrModeSwitch().add(helper.createJAXBElement(attributeType));
+        }
+
+        List<EnumType> enumAttributeTypes = getEnumAttributeTypes(executableElement);
+        for (EnumType enumType : enumAttributeTypes) {
+            group.getRegexpOrEncodingOrModeSwitch().add(helper.createJAXBElement(enumType));
+        }
+
+        List<NestedElementReference> childElementAttributeTypes = getChildElementsAttributeTypes(executableElement);
+        for (NestedElementReference childElement : childElementAttributeTypes) {
+            group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupChildElement(childElement));
+        }
     }
 
     private PatternType createCloudConnectorElement(AttributeCategory attributeCategory) {
@@ -97,7 +109,8 @@ public class CloudConnectorOperationBuilder {
             AttributeType parameter = helper.createAttributeType(variableElement);
             String parameterName = variableElement.getSimpleName().toString();
             if (parameter != null) {
-                helper.setAttributeTypeInfo(executableElement, parameters, variableElement, parameter, parameterName);
+                helper.setAttributeTypeInfo(executableElement, variableElement, parameter, parameterName);
+                parameters.add(parameter);
             }
         }
         if (typeElement.usesConnectionManager()) {
@@ -111,8 +124,9 @@ public class CloudConnectorOperationBuilder {
         for (VariableElement connectAttributeType : connectMethod.getParameters()) {
             AttributeType parameter = helper.createAttributeType(connectAttributeType);
             String parameterName = connectAttributeType.getSimpleName().toString();
-            helper.setAttributeTypeInfo(connectMethod, parameters, connectAttributeType, parameter, parameterName);
+            helper.setAttributeTypeInfo(connectMethod, connectAttributeType, parameter, parameterName);
             parameter.setRequired(false);
+            parameters.add(parameter);
         }
     }
 
@@ -121,7 +135,7 @@ public class CloudConnectorOperationBuilder {
         for (VariableElement variableElement : executableElement.getParameters()) {
             if (context.getTypeMirrorUtils().isCollection(variableElement.asType())) {
                 NestedElementReference childElement = new NestedElementReference();
-                if(isNestedCollection(variableElement)) {
+                if (isNestedCollection(variableElement)) {
                     childElement.setAllowMultiple(true);
                     childElement.setName(URI_PREFIX + typeElement.name() + "/" + context.getNameUtils().uncamel(executableElement.getSimpleName().toString()) + '-' + context.getNameUtils().uncamel(variableElement.getSimpleName().toString()));
                 } else {
@@ -135,6 +149,30 @@ public class CloudConnectorOperationBuilder {
             }
         }
         return parameters;
+    }
+
+    private List<EnumType> getEnumAttributeTypes(ExecutableElement executableElement) {
+        List<EnumType> enumTypes = new ArrayList<EnumType>();
+        for (VariableElement variableElement : executableElement.getParameters()) {
+            if (context.getTypeMirrorUtils().isEnum(variableElement.asType())) {
+                EnumType enumType = new EnumType();
+                enumType.setSupportsExpressions(true);
+                enumType.setAllowsCustom(true);
+                String parameterName = variableElement.getSimpleName().toString();
+                helper.setAttributeTypeInfo(executableElement, variableElement, enumType, parameterName);
+                for (Element enumMember : context.getTypeUtils().asElement(variableElement.asType()).getEnclosedElements()) {
+                    if (enumMember.getKind() == ElementKind.ENUM_CONSTANT) {
+                        String enumConstant = enumMember.getSimpleName().toString();
+                        EnumElement enumElement = new EnumElement();
+                        enumElement.setCaption(helper.formatCaption(context.getJavaDocUtils().getSummary(enumMember)));
+                        enumElement.setValue(enumConstant);
+                        enumType.getOption().add(enumElement);
+                    }
+                }
+                enumTypes.add(enumType);
+            }
+        }
+        return enumTypes;
     }
 
     private boolean isNestedCollection(VariableElement variableElement) {
