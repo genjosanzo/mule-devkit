@@ -1,0 +1,27 @@
+<cloud-connector extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
+                 abstract="true" image="icons/large/mymodule-connector-48x32.png" localId="operation8"
+                 icon="icons/small/mymodule-connector-24x16.png" caption="Operation8">
+    <attribute-category description="General properties." caption="General">
+        <group caption="General" description="Operation8 method description." id="general">
+            <string required="false" description="The user name to use." caption="User" name="user"></string>
+            <string required="false" description="The password to use." caption="Password" name="password"></string>
+            <enum allowsCustom="true" required="true" supportsExpressions="true"
+                  description="Represents the siNoEnum." caption="Si No Enum" name="siNoEnum">
+                <option value="SI" caption="Si"></option>
+                <option value="NO" caption="No"></option>
+            </enum>
+            <enum allowsCustom="true" required="false" supportsExpressions="true"
+                  description="Represents the siNoEnumOptional." caption="Si No Enum Optional"
+                  name="siNoEnumOptional">
+                <option value="SI" caption="Si"></option>
+                <option value="NO" caption="No"></option>
+            </enum>
+            <enum allowsCustom="true" defaultValue="NO" required="false" supportsExpressions="true"
+                  description="Represents the siNoEnumOptionalDefault." caption="Si No Enum Optional Default"
+                  name="siNoEnumOptionalDefault">
+                <option value="SI" caption="Si"></option>
+                <option value="NO" caption="No"></option>
+            </enum>
+        </group>
+    </attribute-category>
+</cloud-connector>

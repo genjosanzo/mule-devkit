@@ -1,0 +1,17 @@
+<cloud-connector extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
+                 abstract="true" image="icons/large/mymodule-connector-48x32.png" localId="operation6"
+                 icon="icons/small/mymodule-connector-24x16.png" caption="Operation6">
+    <attribute-category description="General properties." caption="General">
+        <group caption="General" description="Operation6 method description." id="general">
+            <string required="false" description="The user name to use." caption="User" name="user"></string>
+            <string required="false" description="The password to use." caption="Password"
+                    name="password"></string>
+            <childElement allowMultiple="false" inplace="true" description="Represents the stringObjectMap."
+                          caption="String Object Map"
+                          name="http://www.mulesoft.org/schema/mule/mymodule/string-object-map"></childElement>
+            <childElement allowMultiple="false" inplace="true" description="Represents the stringStringMap."
+                          caption="String String Map"
+                          name="http://www.mulesoft.org/schema/mule/mymodule/string-string-map"></childElement>
+        </group>
+    </attribute-category>
+</cloud-connector>

@@ -31,12 +31,14 @@ import org.mule.util.StringUtils;
 import javax.lang.model.element.ExecutableElement;
 import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CloudConnectorOperationsBuilder {
 
     private static final String URI_PREFIX = "http://www.mulesoft.org/schema/mule/";
     private static final String ALIAS_ID_PREFIX = "org.mule.tooling.ui.modules.core.pattern.";
+    private static final MethodComparator METHOD_COMPARATOR = new MethodComparator();
     private ObjectFactory objectFactory;
     private GeneratorContext context;
     private MuleStudioUtils helper;
@@ -51,7 +53,7 @@ public class CloudConnectorOperationsBuilder {
 
     public JAXBElement<PatternType> build() {
         List<ModeElementType> modes = new ArrayList<ModeElementType>();
-        for (ExecutableElement processorMethod : typeElement.getMethodsAnnotatedWith(Processor.class)) {
+        for (ExecutableElement processorMethod : getProcessorMethodsSorted()) {
             ModeElementType mode = new ModeElementType();
             String methodName = processorMethod.getSimpleName().toString();
             mode.setModeId(URI_PREFIX + typeElement.name() + '/' + context.getNameUtils().uncamel(methodName));
@@ -86,5 +88,11 @@ public class CloudConnectorOperationsBuilder {
         cloudConnector.setImage(helper.getImage(typeElement.name()));
 
         return objectFactory.createNamespaceTypeCloudConnector(cloudConnector);
+    }
+
+    private List<ExecutableElement> getProcessorMethodsSorted() {
+        List<ExecutableElement> processorMethods = typeElement.getMethodsAnnotatedWith(Processor.class);
+        Collections.sort(processorMethods, METHOD_COMPARATOR);
+        return processorMethods;
     }
 }

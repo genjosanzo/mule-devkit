@@ -1,0 +1,23 @@
+<global-cloud-connector extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
+                        image="icons/large/mymodule-connector-48x32.png" localId="config"
+                        icon="icons/small/mymodule-connector-24x16.png"
+                        description="Global Mymodule configuration information." caption="Mymodule">
+    <attribute-category description="Mymodule configuration properties." caption="Mymodule">
+        <group caption="Generic" id="mymoduleGenericProperties">
+            <name required="false"
+                  description="Give a name to this configuration so it can be later referenced by config-ref."
+                  caption="Name" name="name"></name>
+            <string required="true" description="Configurable String." caption="Configurable String"
+                    name="configurableString"></string>
+            <string required="false" description="Configurable optional String."
+                    caption="Optional Configurable String" name="optionalConfigurableString"></string>
+            <string defaultValue="a default" required="false"
+                    description="Configurable optional String with default value."
+                    caption="Optional With Default Configurable String"
+                    name="optionalWithDefaultConfigurableString"></string>
+            <string required="false" description="The user name to use." caption="User" name="user"></string>
+            <string required="false" description="The password to use." caption="Password"
+                    name="password"></string>
+        </group>
+    </attribute-category>
+</global-cloud-connector>

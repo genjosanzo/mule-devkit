@@ -37,6 +37,7 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CloudConnectorOperationBuilder {
@@ -75,20 +76,27 @@ public class CloudConnectorOperationBuilder {
     }
 
     private void addMethodParametersToGroup(Group group) {
-        List<AttributeType> simpleTypeAttributeTypes = getSimpleTypeAttributeTypes(executableElement, typeElement);
+        List<? extends VariableElement> parameters = getParametersSorted();
+        List<AttributeType> simpleTypeAttributeTypes = getSimpleTypeAttributeTypes(executableElement, typeElement, parameters);
         for (AttributeType attributeType : simpleTypeAttributeTypes) {
             group.getRegexpOrEncodingOrModeSwitch().add(helper.createJAXBElement(attributeType));
         }
 
-        List<EnumType> enumAttributeTypes = getEnumAttributeTypes(executableElement);
+        List<EnumType> enumAttributeTypes = getEnumAttributeTypes(executableElement, parameters);
         for (EnumType enumType : enumAttributeTypes) {
             group.getRegexpOrEncodingOrModeSwitch().add(helper.createJAXBElement(enumType));
         }
 
-        List<NestedElementReference> childElementAttributeTypes = getChildElementsAttributeTypes(executableElement);
+        List<NestedElementReference> childElementAttributeTypes = getChildElementsAttributeTypes(executableElement, parameters);
         for (NestedElementReference childElement : childElementAttributeTypes) {
             group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupChildElement(childElement));
         }
+    }
+
+    private List<? extends VariableElement> getParametersSorted() {
+        List<? extends VariableElement> parameters = new ArrayList<VariableElement>(executableElement.getParameters());
+        Collections.sort(parameters, new VariableComparator(context.getTypeMirrorUtils()));
+        return parameters;
     }
 
     private PatternType createCloudConnectorElement(AttributeCategory attributeCategory) {
@@ -103,20 +111,20 @@ public class CloudConnectorOperationBuilder {
         return cloudConnector;
     }
 
-    private List<AttributeType> getSimpleTypeAttributeTypes(ExecutableElement executableElement, DevKitTypeElement typeElement) {
-        List<AttributeType> parameters = new ArrayList<AttributeType>();
-        for (VariableElement variableElement : executableElement.getParameters()) {
-            AttributeType parameter = helper.createAttributeType(variableElement);
-            String parameterName = variableElement.getSimpleName().toString();
-            if (parameter != null) {
-                helper.setAttributeTypeInfo(executableElement, variableElement, parameter, parameterName);
-                parameters.add(parameter);
+    private List<AttributeType> getSimpleTypeAttributeTypes(ExecutableElement executableElement, DevKitTypeElement typeElement, List<? extends VariableElement> parameters) {
+        List<AttributeType> attributeTypes = new ArrayList<AttributeType>();
+        if (typeElement.usesConnectionManager()) {
+            addConnectionAttributeTypes(typeElement, attributeTypes);
+        }
+        for (VariableElement parameter : parameters) {
+            AttributeType attributeType = helper.createAttributeType(parameter);
+            String parameterName = parameter.getSimpleName().toString();
+            if (attributeType != null) {
+                helper.setAttributeTypeInfo(executableElement, parameter, attributeType, parameterName);
+                attributeTypes.add(attributeType);
             }
         }
-        if (typeElement.usesConnectionManager()) {
-            addConnectionAttributeTypes(typeElement, parameters);
-        }
-        return parameters;
+        return attributeTypes;
     }
 
     private void addConnectionAttributeTypes(DevKitTypeElement typeElement, List<AttributeType> parameters) {
@@ -130,37 +138,37 @@ public class CloudConnectorOperationBuilder {
         }
     }
 
-    private List<NestedElementReference> getChildElementsAttributeTypes(ExecutableElement executableElement) {
-        List<NestedElementReference> parameters = new ArrayList<NestedElementReference>();
-        for (VariableElement variableElement : executableElement.getParameters()) {
-            if (context.getTypeMirrorUtils().isCollection(variableElement.asType())) {
+    private List<NestedElementReference> getChildElementsAttributeTypes(ExecutableElement executableElement, List<? extends VariableElement> parameters) {
+        List<NestedElementReference> nestedElementReferences = new ArrayList<NestedElementReference>();
+        for (VariableElement parameter : parameters) {
+            if (context.getTypeMirrorUtils().isCollection(parameter.asType())) {
                 NestedElementReference childElement = new NestedElementReference();
-                if (isNestedCollection(variableElement)) {
+                if (isNestedCollection(parameter)) {
                     childElement.setAllowMultiple(true);
-                    childElement.setName(URI_PREFIX + typeElement.name() + "/" + context.getNameUtils().uncamel(executableElement.getSimpleName().toString()) + '-' + context.getNameUtils().uncamel(variableElement.getSimpleName().toString()));
+                    childElement.setName(URI_PREFIX + typeElement.name() + "/" + context.getNameUtils().uncamel(executableElement.getSimpleName().toString()) + '-' + context.getNameUtils().uncamel(parameter.getSimpleName().toString()));
                 } else {
                     childElement.setAllowMultiple(false);
-                    childElement.setName(URI_PREFIX + typeElement.name() + "/" + context.getNameUtils().uncamel(variableElement.getSimpleName().toString()));
+                    childElement.setName(URI_PREFIX + typeElement.name() + "/" + context.getNameUtils().uncamel(parameter.getSimpleName().toString()));
                 }
-                childElement.setDescription(helper.formatDescription(context.getJavaDocUtils().getParameterSummary(variableElement.getSimpleName().toString(), executableElement)));
-                childElement.setCaption(helper.formatCaption(context.getNameUtils().friendlyNameFromCamelCase(variableElement.getSimpleName().toString())));
+                childElement.setDescription(helper.formatDescription(context.getJavaDocUtils().getParameterSummary(parameter.getSimpleName().toString(), executableElement)));
+                childElement.setCaption(helper.formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
                 childElement.setInplace(true);
-                parameters.add(childElement);
+                nestedElementReferences.add(childElement);
             }
         }
-        return parameters;
+        return nestedElementReferences;
     }
 
-    private List<EnumType> getEnumAttributeTypes(ExecutableElement executableElement) {
+    private List<EnumType> getEnumAttributeTypes(ExecutableElement executableElement, List<? extends VariableElement> parameters) {
         List<EnumType> enumTypes = new ArrayList<EnumType>();
-        for (VariableElement variableElement : executableElement.getParameters()) {
-            if (context.getTypeMirrorUtils().isEnum(variableElement.asType())) {
+        for (VariableElement parameter : parameters) {
+            if (context.getTypeMirrorUtils().isEnum(parameter.asType())) {
                 EnumType enumType = new EnumType();
                 enumType.setSupportsExpressions(true);
                 enumType.setAllowsCustom(true);
-                String parameterName = variableElement.getSimpleName().toString();
-                helper.setAttributeTypeInfo(executableElement, variableElement, enumType, parameterName);
-                for (Element enumMember : context.getTypeUtils().asElement(variableElement.asType()).getEnclosedElements()) {
+                String parameterName = parameter.getSimpleName().toString();
+                helper.setAttributeTypeInfo(executableElement, parameter, enumType, parameterName);
+                for (Element enumMember : context.getTypeUtils().asElement(parameter.asType()).getEnclosedElements()) {
                     if (enumMember.getKind() == ElementKind.ENUM_CONSTANT) {
                         String enumConstant = enumMember.getSimpleName().toString();
                         EnumElement enumElement = new EnumElement();

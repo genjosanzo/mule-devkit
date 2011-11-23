@@ -30,6 +30,9 @@ import org.mule.devkit.model.studio.NestedElementReference;
 import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.model.studio.StringAttributeType;
 import org.mule.devkit.model.studio.TextType;
+import org.mule.devkit.utils.JavaDocUtils;
+import org.mule.devkit.utils.NameUtils;
+import org.mule.devkit.utils.TypeMirrorUtils;
 import org.mule.util.StringUtils;
 
 import javax.lang.model.element.Element;
@@ -41,10 +44,14 @@ public class MuleStudioUtils {
 
     private static final String IMAGE = "icons/large/%s-connector-48x32.png";
     private static final String ICON = "icons/small/%s-connector-24x16.png";
-    private GeneratorContext context;
+    private NameUtils nameUtils;
+    private JavaDocUtils javaDocUtils;
+    private TypeMirrorUtils typeMirrorUtils;
 
     public MuleStudioUtils(GeneratorContext context) {
-        this.context = context;
+        nameUtils = context.getNameUtils();
+        javaDocUtils = context.getJavaDocUtils();
+        typeMirrorUtils = context.getTypeMirrorUtils();
     }
 
     public String formatCaption(String caption) {
@@ -99,26 +106,25 @@ public class MuleStudioUtils {
         return null;
     }
 
-    public AttributeType createAttributeType(Element variableElement) {
-        String parameterClassName = variableElement.asType().toString();
-        if (parameterClassName.equals(String.class.getName())) {
+    public AttributeType createAttributeType(Element element) {
+        if (typeMirrorUtils.isString(element)) {
             return new StringAttributeType();
-        } else if (parameterClassName.equals("boolean") || parameterClassName.equals(Boolean.class.getName())) {
+        } else if (typeMirrorUtils.isBoolean(element)) {
             return new Booleantype();
-        } else if (parameterClassName.equals("int") || parameterClassName.equals(Integer.class.getName())) {
+        } else if (typeMirrorUtils.isInteger(element)) {
             IntegerType integerType = new IntegerType();
             integerType.setMin(0);
             integerType.setStep(1);
             return integerType;
-        } else if(context.getTypeMirrorUtils().isCollection(variableElement.asType()) || variableElement.getAnnotation(Payload.class) != null || context.getTypeMirrorUtils().isEnum(variableElement.asType())) {
+        } else if (typeMirrorUtils.isCollection(element.asType()) || element.getAnnotation(Payload.class) != null || typeMirrorUtils.isEnum(element.asType())) {
             return null;
         }
-        throw new RuntimeException("Failed to create Studio XML, type not recognized: type=" + parameterClassName + " name=" + variableElement.getSimpleName().toString());
+        throw new RuntimeException("Failed to create Studio XML, type not recognized: type=" + element.getSimpleName().toString() + " name=" + element.getSimpleName().toString());
     }
 
     public void setAttributeTypeInfo(ExecutableElement executableElement, VariableElement variableElement, AttributeType parameter, String parameterName) {
-        parameter.setCaption(formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameterName)));
-        parameter.setDescription(formatDescription(context.getJavaDocUtils().getParameterSummary(parameterName, executableElement)));
+        parameter.setCaption(formatCaption(nameUtils.friendlyNameFromCamelCase(parameterName)));
+        parameter.setDescription(formatDescription(javaDocUtils.getParameterSummary(parameterName, executableElement)));
         parameter.setName(parameterName);
         parameter.setRequired(variableElement.getAnnotation(Optional.class) == null);
         setDefaultValueIfAvailable(variableElement, parameter);
