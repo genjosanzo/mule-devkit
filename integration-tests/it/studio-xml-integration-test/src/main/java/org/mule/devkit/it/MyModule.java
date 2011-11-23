@@ -146,6 +146,16 @@ public class MyModule {
     }
 
     /**
+     * operation9 method description
+     *
+     * @param object         represents the object
+     * @param customObject represents the customObject
+     */
+    @Processor
+    public void operation9(Object object, @Optional CustomObject customObject) {
+    }
+
+    /**
      * Create a connection
      *
      * @param user     the user name to use

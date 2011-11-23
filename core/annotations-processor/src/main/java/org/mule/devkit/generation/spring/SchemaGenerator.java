@@ -83,6 +83,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     public static final String REMOTE_PORT_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.REMOTE_PORT_FIELD_NAME;
     public static final String ASYNC_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.ASYNC_FIELD_NAME;
     public static final String HTTP_CALLBACK_CONFIG_ELEMENT_NAME = "http-callback-config";
+    public static final String REF_SUFFIX = "-ref";
     private static final String ATTRIBUTE_NAME_KEY = "key";
     private static final String ATTRIBUTE_NAME_REF = "ref";
     private static final String ATTRIBUTE_NAME_VALUE_REF = "value-ref";
@@ -97,7 +98,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private static final String UNBOUNDED = "unbounded";
     private static final String LAX = "lax";
     private static final String ATTRIBUTE_NAME_NAME = "name";
-    private static final String REF_SUFFIX = "-ref";
     private static final String DOMAIN_DEFAULT_VALUE = "${fullDomain}";
     private static final String PORT_DEFAULT_VALUE = "${http.port}";
     private static final String ASYNC_DEFAULT_VALUE = "true";

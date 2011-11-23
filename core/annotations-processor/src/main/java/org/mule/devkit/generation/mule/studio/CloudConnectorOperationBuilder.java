@@ -117,7 +117,7 @@ public class CloudConnectorOperationBuilder {
             addConnectionAttributeTypes(typeElement, attributeTypes);
         }
         for (VariableElement parameter : parameters) {
-            AttributeType attributeType = helper.createAttributeType(parameter);
+            AttributeType attributeType = helper.createAttributeTypeIgnoreEnumsAndCollections(parameter);
             String parameterName = parameter.getSimpleName().toString();
             if (attributeType != null) {
                 helper.setAttributeTypeInfo(executableElement, parameter, attributeType, parameterName);
@@ -130,7 +130,7 @@ public class CloudConnectorOperationBuilder {
     private void addConnectionAttributeTypes(DevKitTypeElement typeElement, List<AttributeType> parameters) {
         ExecutableElement connectMethod = typeElement.getMethodsAnnotatedWith(Connect.class).get(0);
         for (VariableElement connectAttributeType : connectMethod.getParameters()) {
-            AttributeType parameter = helper.createAttributeType(connectAttributeType);
+            AttributeType parameter = helper.createAttributeTypeIgnoreEnumsAndCollections(connectAttributeType);
             String parameterName = connectAttributeType.getSimpleName().toString();
             helper.setAttributeTypeInfo(connectMethod, connectAttributeType, parameter, parameterName);
             parameter.setRequired(false);

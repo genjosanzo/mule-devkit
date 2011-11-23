@@ -21,6 +21,8 @@ import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.api.annotations.param.Payload;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.generation.spring.SchemaGenerator;
+import org.mule.devkit.generation.spring.SchemaTypeConversion;
 import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.Booleantype;
 import org.mule.devkit.model.studio.EnumType;
@@ -106,7 +108,21 @@ public class MuleStudioUtils {
         return null;
     }
 
-    public AttributeType createAttributeType(Element element) {
+    public AttributeType createAttributeTypeIgnoreEnumsAndCollections(Element element) {
+        if (SchemaTypeConversion.isSupported(element.asType().toString())) {
+            return createAttributeTypeOfSupportedType(element);
+        } else if (skipAttributeTypeGeneration(element)) {
+            return null;
+        } else {
+           return new StringAttributeType();
+        }
+    }
+
+    private boolean skipAttributeTypeGeneration(Element element) {
+        return typeMirrorUtils.isCollection(element.asType()) || element.getAnnotation(Payload.class) != null || typeMirrorUtils.isEnum(element.asType());
+    }
+
+    private AttributeType createAttributeTypeOfSupportedType(Element element) {
         if (typeMirrorUtils.isString(element)) {
             return new StringAttributeType();
         } else if (typeMirrorUtils.isBoolean(element)) {
@@ -116,16 +132,19 @@ public class MuleStudioUtils {
             integerType.setMin(0);
             integerType.setStep(1);
             return integerType;
-        } else if (typeMirrorUtils.isCollection(element.asType()) || element.getAnnotation(Payload.class) != null || typeMirrorUtils.isEnum(element.asType())) {
-            return null;
+        } else {
+            throw new RuntimeException("Failed to create Studio XML, type not recognized: type=" + element.getSimpleName().toString() + " name=" + element.getSimpleName().toString());
         }
-        throw new RuntimeException("Failed to create Studio XML, type not recognized: type=" + element.getSimpleName().toString() + " name=" + element.getSimpleName().toString());
     }
 
     public void setAttributeTypeInfo(ExecutableElement executableElement, VariableElement variableElement, AttributeType parameter, String parameterName) {
         parameter.setCaption(formatCaption(nameUtils.friendlyNameFromCamelCase(parameterName)));
         parameter.setDescription(formatDescription(javaDocUtils.getParameterSummary(parameterName, executableElement)));
-        parameter.setName(parameterName);
+        if(parameter instanceof StringAttributeType && !SchemaTypeConversion.isSupported(variableElement.asType().toString())) {
+            parameter.setName(parameterName + SchemaGenerator.REF_SUFFIX);
+        } else {
+            parameter.setName(parameterName);
+        }
         parameter.setRequired(variableElement.getAnnotation(Optional.class) == null);
         setDefaultValueIfAvailable(variableElement, parameter);
     }

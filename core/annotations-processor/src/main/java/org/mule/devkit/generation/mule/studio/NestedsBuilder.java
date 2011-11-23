@@ -87,7 +87,7 @@ public class NestedsBuilder {
                     key = new StringAttributeType();
                 } else {
                     TypeMirror typeMirror = ((DeclaredType) parameter.asType()).getTypeArguments().get(0);
-                    key = helper.createAttributeType(context.getTypeUtils().asElement(typeMirror));
+                    key = helper.createAttributeTypeIgnoreEnumsAndCollections(context.getTypeUtils().asElement(typeMirror));
                 }
 
                 if (context.getTypeMirrorUtils().isMap(parameter.asType())) {

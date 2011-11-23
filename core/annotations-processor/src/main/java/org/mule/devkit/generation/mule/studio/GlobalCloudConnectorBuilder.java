@@ -58,11 +58,11 @@ public class GlobalCloudConnectorBuilder {
         javaDocUtils = context.getJavaDocUtils();
     }
 
+    // TODO: handle collection, map and enum configurable fields
     public JAXBElement<GlobalType> build() {
-
         List<AttributeType> fields = new ArrayList<AttributeType>();
         for (VariableElement field : getConfigurableFieldsSorted()) {
-            AttributeType parameter = helper.createAttributeType(field);
+            AttributeType parameter = helper.createAttributeTypeIgnoreEnumsAndCollections(field);
             if (parameter != null) {
                 String parameterName = field.getSimpleName().toString();
                 parameter.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameterName)));
@@ -118,7 +118,7 @@ public class GlobalCloudConnectorBuilder {
     private void addConnectionAttributeTypes(DevKitTypeElement typeElement, List<AttributeType> parameters) {
         ExecutableElement connectMethod = typeElement.getMethodsAnnotatedWith(Connect.class).get(0);
         for (VariableElement connectAttributeType : connectMethod.getParameters()) {
-            AttributeType parameter = helper.createAttributeType(connectAttributeType);
+            AttributeType parameter = helper.createAttributeTypeIgnoreEnumsAndCollections(connectAttributeType);
             String parameterName = connectAttributeType.getSimpleName().toString();
             helper.setAttributeTypeInfo(connectMethod, connectAttributeType, parameter, parameterName);
             parameter.setRequired(false);
