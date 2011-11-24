@@ -103,6 +103,9 @@ public class MuleStudioUtils {
         if (attributeType instanceof TextType) {
             return objectFactory.createGroupText((TextType) attributeType);
         }
+        if (attributeType instanceof FlowRefType) {
+            return objectFactory.createGroupFlowRef((FlowRefType) attributeType);
+        }
         if (attributeType instanceof NestedElementReference) {
             return objectFactory.createNestedElementTypeChildElement((NestedElementReference) attributeType);
         }
@@ -112,16 +115,15 @@ public class MuleStudioUtils {
     public AttributeType createAttributeTypeIgnoreEnumsAndCollections(Element element) {
         if (SchemaTypeConversion.isSupported(element.asType().toString())) {
             return createAttributeTypeOfSupportedType(element);
-        } else if(typeMirrorUtils.isHttpCallback(element)) {
+        } else if (typeMirrorUtils.isHttpCallback(element)) {
             FlowRefType flowRefType = new FlowRefType();
             flowRefType.setSupportFlow(true);
             flowRefType.setSupportSubflow(true);
             return flowRefType;
-        }
-        else if (skipAttributeTypeGeneration(element)) {
+        } else if (skipAttributeTypeGeneration(element)) {
             return null;
         } else {
-           return new StringAttributeType();
+            return new StringAttributeType();
         }
     }
 
@@ -148,10 +150,10 @@ public class MuleStudioUtils {
         String parameterName = variableElement.getSimpleName().toString();
         parameter.setCaption(formatCaption(nameUtils.friendlyNameFromCamelCase(parameterName)));
         parameter.setDescription(formatDescription(javaDocUtils.getParameterSummary(parameterName, executableElement)));
-        if(parameter instanceof StringAttributeType && !SchemaTypeConversion.isSupported(variableElement.asType().toString())) {
+        if (parameter instanceof StringAttributeType && !SchemaTypeConversion.isSupported(variableElement.asType().toString())) {
             parameter.setName(parameterName + SchemaGenerator.REF_SUFFIX);
-        } else if(parameter instanceof FlowRefType){
-            parameter.setName(parameter + SchemaGenerator.FLOW_REF_SUFFIX);
+        } else if (parameter instanceof FlowRefType) {
+            parameter.setName(nameUtils.uncamel(parameterName) + SchemaGenerator.FLOW_REF_SUFFIX);
         } else {
             parameter.setName(parameterName);
         }
