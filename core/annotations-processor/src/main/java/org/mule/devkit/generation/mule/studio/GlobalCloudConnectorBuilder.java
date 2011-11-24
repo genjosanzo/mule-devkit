@@ -119,8 +119,7 @@ public class GlobalCloudConnectorBuilder {
         ExecutableElement connectMethod = typeElement.getMethodsAnnotatedWith(Connect.class).get(0);
         for (VariableElement connectAttributeType : connectMethod.getParameters()) {
             AttributeType parameter = helper.createAttributeTypeIgnoreEnumsAndCollections(connectAttributeType);
-            String parameterName = connectAttributeType.getSimpleName().toString();
-            helper.setAttributeTypeInfo(connectMethod, connectAttributeType, parameter, parameterName);
+            helper.setAttributeTypeInfo(connectMethod, connectAttributeType, parameter);
             parameter.setRequired(false);
             parameters.add(parameter);
         }

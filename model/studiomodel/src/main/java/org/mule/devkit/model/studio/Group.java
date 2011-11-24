@@ -55,6 +55,7 @@ import java.util.List;
  *           &lt;element name="globalRef" type="{http://www.mulesoft.org/schema/mule/tooling.attributes}NewType"/>
  *           &lt;element name="long" type="{http://www.mulesoft.org/schema/mule/tooling.attributes}LongType"/>
  *           &lt;element name="list" type="{http://www.mulesoft.org/schema/mule/tooling.attributes}AttributeType"/>
+ *           &lt;element name="flowRef" type="{http://www.mulesoft.org/schema/mule/tooling.attributes}FlowReftype"/>
  *           &lt;element name="integer" type="{http://www.mulesoft.org/schema/mule/tooling.attributes}IntegerType"/>
  *           &lt;element name="boolean" type="{http://www.mulesoft.org/schema/mule/tooling.attributes}Booleantype"/>
  *           &lt;element name="transientBoolean" type="{http://www.mulesoft.org/schema/mule/tooling.attributes}Booleantype"/>
@@ -90,6 +91,7 @@ public class Group {
     @XmlElementRefs({
             @XmlElementRef(name = "string", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
             @XmlElementRef(name = "list", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "flowRef", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
             @XmlElementRef(name = "classname", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
             @XmlElementRef(name = "integer", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
             @XmlElementRef(name = "url", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),

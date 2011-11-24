@@ -118,9 +118,8 @@ public class CloudConnectorOperationBuilder {
         }
         for (VariableElement parameter : parameters) {
             AttributeType attributeType = helper.createAttributeTypeIgnoreEnumsAndCollections(parameter);
-            String parameterName = parameter.getSimpleName().toString();
             if (attributeType != null) {
-                helper.setAttributeTypeInfo(executableElement, parameter, attributeType, parameterName);
+                helper.setAttributeTypeInfo(executableElement, parameter, attributeType);
                 attributeTypes.add(attributeType);
             }
         }
@@ -131,8 +130,7 @@ public class CloudConnectorOperationBuilder {
         ExecutableElement connectMethod = typeElement.getMethodsAnnotatedWith(Connect.class).get(0);
         for (VariableElement connectAttributeType : connectMethod.getParameters()) {
             AttributeType parameter = helper.createAttributeTypeIgnoreEnumsAndCollections(connectAttributeType);
-            String parameterName = connectAttributeType.getSimpleName().toString();
-            helper.setAttributeTypeInfo(connectMethod, connectAttributeType, parameter, parameterName);
+            helper.setAttributeTypeInfo(connectMethod, connectAttributeType, parameter);
             parameter.setRequired(false);
             parameters.add(parameter);
         }
@@ -166,8 +164,7 @@ public class CloudConnectorOperationBuilder {
                 EnumType enumType = new EnumType();
                 enumType.setSupportsExpressions(true);
                 enumType.setAllowsCustom(true);
-                String parameterName = parameter.getSimpleName().toString();
-                helper.setAttributeTypeInfo(executableElement, parameter, enumType, parameterName);
+                helper.setAttributeTypeInfo(executableElement, parameter, enumType);
                 for (Element enumMember : context.getTypeUtils().asElement(parameter.asType()).getEnclosedElements()) {
                     if (enumMember.getKind() == ElementKind.ENUM_CONSTANT) {
                         String enumConstant = enumMember.getSimpleName().toString();

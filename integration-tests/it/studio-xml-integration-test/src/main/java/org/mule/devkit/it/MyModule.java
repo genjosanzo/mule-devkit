@@ -155,6 +155,15 @@ public class MyModule {
     public void operation9(Object object, @Optional CustomObject customObject) {
     }
 
+//    /**
+//     * operation10 method description
+//     *
+//     * @param httpCallback represents the httpCallback
+//     */
+//    @Processor
+//    public void operation10(HttpCallback httpCallback) {
+//    }
+
     /**
      * Create a connection
      *

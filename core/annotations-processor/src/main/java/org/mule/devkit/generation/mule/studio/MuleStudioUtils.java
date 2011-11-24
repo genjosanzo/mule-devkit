@@ -26,6 +26,7 @@ import org.mule.devkit.generation.spring.SchemaTypeConversion;
 import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.Booleantype;
 import org.mule.devkit.model.studio.EnumType;
+import org.mule.devkit.model.studio.FlowRefType;
 import org.mule.devkit.model.studio.IntegerType;
 import org.mule.devkit.model.studio.LongType;
 import org.mule.devkit.model.studio.NestedElementReference;
@@ -111,7 +112,13 @@ public class MuleStudioUtils {
     public AttributeType createAttributeTypeIgnoreEnumsAndCollections(Element element) {
         if (SchemaTypeConversion.isSupported(element.asType().toString())) {
             return createAttributeTypeOfSupportedType(element);
-        } else if (skipAttributeTypeGeneration(element)) {
+        } else if(typeMirrorUtils.isHttpCallback(element)) {
+            FlowRefType flowRefType = new FlowRefType();
+            flowRefType.setSupportFlow(true);
+            flowRefType.setSupportSubflow(true);
+            return flowRefType;
+        }
+        else if (skipAttributeTypeGeneration(element)) {
             return null;
         } else {
            return new StringAttributeType();
@@ -137,11 +144,14 @@ public class MuleStudioUtils {
         }
     }
 
-    public void setAttributeTypeInfo(ExecutableElement executableElement, VariableElement variableElement, AttributeType parameter, String parameterName) {
+    public void setAttributeTypeInfo(ExecutableElement executableElement, VariableElement variableElement, AttributeType parameter) {
+        String parameterName = variableElement.getSimpleName().toString();
         parameter.setCaption(formatCaption(nameUtils.friendlyNameFromCamelCase(parameterName)));
         parameter.setDescription(formatDescription(javaDocUtils.getParameterSummary(parameterName, executableElement)));
         if(parameter instanceof StringAttributeType && !SchemaTypeConversion.isSupported(variableElement.asType().toString())) {
             parameter.setName(parameterName + SchemaGenerator.REF_SUFFIX);
+        } else if(parameter instanceof FlowRefType){
+            parameter.setName(parameter + SchemaGenerator.FLOW_REF_SUFFIX);
         } else {
             parameter.setName(parameterName);
         }

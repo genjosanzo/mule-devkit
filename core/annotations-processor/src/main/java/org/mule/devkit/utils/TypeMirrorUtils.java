@@ -24,6 +24,7 @@ import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
+import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
 
 import javax.lang.model.element.Element;
@@ -176,5 +177,9 @@ public class TypeMirrorUtils {
 
     public boolean isCollection(Element element) {
         return isCollection(element.asType());
+    }
+
+    public boolean isHttpCallback(Element element) {
+        return element.asType().toString().startsWith(HttpCallback.class.getName());
     }
 }
