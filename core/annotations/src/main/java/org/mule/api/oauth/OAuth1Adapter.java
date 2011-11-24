@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mule.api.adapter;
+package org.mule.api.oauth;
 
 /**
  * Adds OAuth 1.0a capabilities to the pojo
@@ -67,5 +67,28 @@ public interface OAuth1Adapter {
     /**
      * Retrieve authorization url
      */
-    String getAuthorizationUrl();
+    String getAuthorizationUrl() throws UnableToAcquireRequestTokenException;
+
+
+    /**
+     * Acquire access token and secret
+     *
+     * @throws UnableToAcquireAccessTokenException
+     */
+    void fetchAccessToken() throws UnableToAcquireAccessTokenException;
+
+    /**
+     * Set the callback to be called when the access token and secret need to be saved for
+     * later restoration
+     *
+     * @param saveCallback Callback to be called
+     */
+    void setSaveAccessTokenCallback(SaveAccessTokenCallback saveCallback);
+
+    /**
+     * Set the callback to be called when the access token and secret need to be restored
+     *
+     * @param restoreCallback Callback to be called
+     */
+    void setRestoreAccessTokenCallback(RestoreAccessTokenCallback restoreCallback);
 }

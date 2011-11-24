@@ -16,8 +16,10 @@
  */
 package org.mule.devkit.it;
 
+import org.junit.Test;
 import org.mule.api.Capabilities;
 import org.mule.api.Capability;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.construct.Flow;
@@ -46,8 +48,14 @@ public class OAuthModuleTest extends FunctionalTestCase {
         assertEquals(OAuthModule.NON_PROTECTED_RESOURCE, responseEvent.getMessageAsString());
     }
 
-    public void testProtectedResource() throws Exception {
+    @Test(expected = MessagingException.class)
+    public void testProtectedResourceWithoutAuthorization() throws Exception {
         MuleEvent responseEvent = runFlow("protectedResource");
+    }
+
+    @Test
+    public void testProtectedResource() throws Exception {
+        MuleEvent responseEvent = runFlow("authorize");
         String url = verifyUserIsRedirectedToAuthorizationUrl(responseEvent);
         simulateCallbackUponUserAuthorizingConsumer(url);
         responseEvent = runFlow("protectedResource");

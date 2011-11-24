@@ -25,6 +25,11 @@ import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.oauth.OAuthConsumerKey;
 import org.mule.api.annotations.oauth.OAuthConsumerSecret;
 
+/**
+ * This an OAuth test module
+ *
+ * @author MuleSoft, Inc.
+ */
 @Module(name = "oauth")
 @OAuth(requestTokenUrl = OAuthModule.REQUEST_TOKEN_URL,
         authorizationUrl = OAuthModule.AUTHORIZATION_URL,
@@ -38,13 +43,27 @@ public class OAuthModule {
     public static final String PROTECTED_RESOURCE = "protected resource";
     public static final String NON_PROTECTED_RESOURCE = "non protected resource";
 
+    /**
+     * Consumer Key
+     */
     @Configurable
     @OAuthConsumerKey
     private String consumerKey;
+
+    /**
+     * Consumer Secret
+     */
     @Configurable
     @OAuthConsumerSecret
     private String consumerSecret;
 
+    /**
+     * Access protected resource
+     *
+     * @param accessToken Access token
+     * @param accessTokenSecret Access token secret
+     * @return
+     */
     @Processor
     public String protectedResource(@OAuthAccessToken String accessToken, @OAuthAccessTokenSecret String accessTokenSecret) {
         if (!accessToken.equals(Constants.ACCESS_TOKEN) || !accessTokenSecret.equals(Constants.ACCESS_TOKEN_SECRET)) {
@@ -53,6 +72,11 @@ public class OAuthModule {
         return PROTECTED_RESOURCE;
     }
 
+    /**
+     * Access a non-protected resource
+     *
+     * @return
+     */
     @Processor
     public String nonProtectedResource() {
         return NON_PROTECTED_RESOURCE;

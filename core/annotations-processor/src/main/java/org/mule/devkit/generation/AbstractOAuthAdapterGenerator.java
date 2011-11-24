@@ -21,6 +21,8 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.oauth.RestoreAccessTokenCallback;
+import org.mule.api.oauth.SaveAccessTokenCallback;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
@@ -99,6 +101,14 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
         return new FieldBuilder(oauthAdapter).type(String.class).name(OAUTH_VERIFIER_FIELD_NAME).getterAndSetter().build();
     }
 
+    protected FieldVariable saveAccessTokenCallbackField(DefinedClass oauthAdapter) {
+        return new FieldBuilder(oauthAdapter).type(SaveAccessTokenCallback.class).name("saveAccessTokenCallback").getterAndSetter().build();
+    }
+
+    protected FieldVariable restoreAccessTokenCallbackField(DefinedClass oauthAdapter) {
+        return new FieldBuilder(oauthAdapter).type(RestoreAccessTokenCallback.class).name("restoreAccessTokenCallback").getterAndSetter().build();
+    }
+
     protected FieldVariable redirectUrlField(DefinedClass oauthAdapter) {
         return new FieldBuilder(oauthAdapter).type(String.class).name(REDIRECT_URL_FIELD_NAME).getter().build();
     }
@@ -160,6 +170,8 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
 
         TryStatement tryToExtractVerifier = processMethod.body()._try();
         tryToExtractVerifier.body().assign(oauthAdapter.fields().get(VERIFIER_FIELD_NAME), ExpressionFactory.invoke("extractAuthorizationCode").arg(event.invoke("getMessageAsString")));
+        tryToExtractVerifier.body().add(ExpressionFactory.invoke("fetchAccessToken"));
+
         CatchBlock catchBlock = tryToExtractVerifier._catch(ref(Exception.class));
         Variable exceptionCaught = catchBlock.param("e");
         catchBlock.body()._throw(ExpressionFactory._new(

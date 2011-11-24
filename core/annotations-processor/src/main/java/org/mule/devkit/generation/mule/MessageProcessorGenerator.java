@@ -23,6 +23,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NestedProcessor;
+import org.mule.api.oauth.NotAuthorizedException;
 import org.mule.api.annotations.InvalidateConnectionOn;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.oauth.OAuth;
@@ -38,6 +39,7 @@ import org.mule.api.callback.SourceCallback;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.oauth.NotAuthorizedException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
@@ -89,9 +91,6 @@ import java.util.Map;
 
 public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
-    private static final String HTTP_STATUS_PROPERTY = "http.status";
-    private static final String REDIRECT_HTTP_STATUS = "302";
-    private static final String LOCATION_PROPERTY = "Location";
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
@@ -209,91 +208,6 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         } else {
             // add process method
             generateProcessMethod(executableElement, messageProcessorClass, fields, connectFields, messageProcessorListener, muleContext, object, logger, retryCount, retryMax);
-        }
-    }
-
-    private void generateStartMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields) {
-        Method startMethod = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
-        startMethod._throws(ref(MuleException.class));
-
-        for (String fieldName : fields.keySet()) {
-            FieldVariableElement variableElement = fields.get(fieldName);
-
-            if (context.getTypeMirrorUtils().isNestedProcessor(variableElement.getVariableElement().asType())) {
-                boolean isList = context.getTypeMirrorUtils().isArrayOrList(variableElement.getVariableElement().asType());
-
-                if (!isList) {
-                    Conditional ifStartable = startMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Startable.class)));
-                    ifStartable._then().add(
-                            ExpressionFactory.cast(ref(Startable.class), variableElement.getField()).invoke("start")
-                    );
-                } else {
-                    Conditional ifIsList = startMethod.body()._if(Op._instanceof(variableElement.getField(), ref(List.class)));
-                    ForEach forEachProcessor = ifIsList._then().forEach(ref(MessageProcessor.class), "messageProcessor", ExpressionFactory.cast(ref(List.class).narrow(MessageProcessor.class), fields.get(fieldName).getField()));
-                    Conditional ifStartable = forEachProcessor.body()._if(Op._instanceof(forEachProcessor.var(), ref(Startable.class)));
-                    ifStartable._then().add(
-                            ExpressionFactory.cast(ref(Startable.class), forEachProcessor.var()).invoke("start")
-                    );
-                }
-            } else if (variableElement.getVariableElement().asType().toString().startsWith(HttpCallback.class.getName())) {
-                startMethod.body()._if(Op.ne(variableElement.getFieldType(), ExpressionFactory._null()))._then().invoke(variableElement.getFieldType(), "start");
-            }
-        }
-    }
-
-    private void generateStopMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields) {
-        Method stopMethod = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "stop");
-        stopMethod._throws(ref(MuleException.class));
-
-        for (String fieldName : fields.keySet()) {
-            FieldVariableElement variableElement = fields.get(fieldName);
-
-            if (context.getTypeMirrorUtils().isNestedProcessor(variableElement.getVariableElement().asType())) {
-                boolean isList = context.getTypeMirrorUtils().isArrayOrList(variableElement.getVariableElement().asType());
-
-                if (!isList) {
-                    Conditional ifStoppable = stopMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Stoppable.class)));
-                    ifStoppable._then().add(
-                            ExpressionFactory.cast(ref(Stoppable.class), variableElement.getField()).invoke("stop")
-                    );
-                } else {
-                    Conditional ifIsList = stopMethod.body()._if(Op._instanceof(variableElement.getField(), ref(List.class)));
-                    ForEach forEachProcessor = ifIsList._then().forEach(ref(MessageProcessor.class), "messageProcessor",
-                            ExpressionFactory.cast(ref(List.class).narrow(MessageProcessor.class), fields.get(fieldName).getField()));
-                    Conditional ifStoppable = forEachProcessor.body()._if(Op._instanceof(forEachProcessor.var(), ref(Stoppable.class)));
-                    ifStoppable._then().add(
-                            ExpressionFactory.cast(ref(Stoppable.class), forEachProcessor.var()).invoke("stop")
-                    );
-                }
-            } else if (variableElement.getVariableElement().asType().toString().startsWith(HttpCallback.class.getName())) {
-                stopMethod.body()._if(Op.ne(variableElement.getFieldType(), ExpressionFactory._null()))._then().invoke(variableElement.getFieldType(), "stop");
-            }
-        }
-    }
-
-    private void generateDiposeMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields) {
-        Method diposeMethod = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "dispose");
-
-        for (String fieldName : fields.keySet()) {
-            FieldVariableElement variableElement = fields.get(fieldName);
-
-            if (context.getTypeMirrorUtils().isNestedProcessor(variableElement.getVariableElement().asType())) {
-                boolean isList = context.getTypeMirrorUtils().isArrayOrList(variableElement.getVariableElement().asType());
-
-                if (!isList) {
-                    Conditional ifDisposable = diposeMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Disposable.class)));
-                    ifDisposable._then().add(
-                            ExpressionFactory.cast(ref(Disposable.class), variableElement.getField()).invoke("dispose")
-                    );
-                } else {
-                    Conditional ifIsList = diposeMethod.body()._if(Op._instanceof(variableElement.getField(), ref(List.class)));
-                    ForEach forEachProcessor = ifIsList._then().forEach(ref(MessageProcessor.class), "messageProcessor", ExpressionFactory.cast(ref(List.class).narrow(MessageProcessor.class), fields.get(fieldName).getField()));
-                    Conditional ifDisposable = forEachProcessor.body()._if(Op._instanceof(forEachProcessor.var(), ref(Disposable.class)));
-                    ifDisposable._then().add(
-                            ExpressionFactory.cast(ref(Disposable.class), forEachProcessor.var()).invoke("dispose")
-                    );
-                }
-            }
         }
     }
 
@@ -1034,22 +948,18 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
     }
 
     private void addOAuth(Method process, Variable event, Variable object, ExecutableElement executableElement) {
-        OAuth2 oauth2 = executableElement.getEnclosingElement().getAnnotation(OAuth2.class);
-        if (oauth2 != null && !StringUtils.isEmpty(oauth2.expirationRegex())) {
-            Block ifTokenExpired = process.body()._if(object.invoke(OAuth2AdapterGenerator.HAS_TOKEN_EXPIRED_METHOD_NAME))._then();
-            ifTokenExpired.invoke(object, OAuth2AdapterGenerator.RESET_METHOD_NAME);
-        }
-
-        Invocation oauthVerifier = object.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_VERIFIER_FIELD_NAME));
-        Block ifOauthVerifierIsNull = process.body()._if(isNull(oauthVerifier))._then();
-        Variable authorizationUrl = ifOauthVerifierIsNull.decl(ref(String.class), "authorizationUrl", ExpressionFactory.invoke(object, OAuth1AdapterGenerator.GET_AUTHORIZATION_URL_METHOD_NAME));
-        ifOauthVerifierIsNull.invoke(event.invoke("getMessage"), "setOutboundProperty").arg(HTTP_STATUS_PROPERTY).arg(REDIRECT_HTTP_STATUS);
-        ifOauthVerifierIsNull.invoke(event.invoke("getMessage"), "setOutboundProperty").arg(LOCATION_PROPERTY).arg(authorizationUrl);
-        ifOauthVerifierIsNull._return(event);
-
         Invocation accessToken = object.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_ACCESS_TOKEN_FIELD_NAME));
         Block ifAccessTokenIsNull = process.body()._if(isNull(accessToken))._then();
-        ifAccessTokenIsNull.invoke(object, OAuth1AdapterGenerator.FETCH_ACCESS_TOKEN_METHOD_NAME);
+
+        Invocation failedToInvoke = ref(CoreMessages.class).staticInvoke("failedToInvoke").arg(executableElement.getSimpleName().toString());
+        Invocation newNotAuthorizedException = ExpressionFactory._new(ref(NotAuthorizedException.class));
+        newNotAuthorizedException.arg("This connector has not yet been authorized, please authorize by calling \"authorize\".");
+        Invocation messagingException = ExpressionFactory._new(ref(MessagingException.class));
+        messagingException.arg(failedToInvoke);
+        messagingException.arg(event);
+        messagingException.arg(newNotAuthorizedException);
+
+        ifAccessTokenIsNull._throw(messagingException);
     }
 
     private Variable generateMethodCall(Block body, Variable object, String methodName, List<Expression> parameters, Variable event, Type returnType, Variable poolObject, Variable interceptCallback, FieldVariable messageProcessorListener) {

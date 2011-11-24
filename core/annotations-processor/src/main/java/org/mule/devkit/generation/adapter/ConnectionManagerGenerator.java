@@ -239,8 +239,6 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
     private void generateInitialiseMethod(DefinedClass connectionManagerClass, FieldVariable connectionPool, FieldVariable connectionPoolingProfile, DefinedClass connectionFactoryClass) {
         Method initialisableMethod = connectionManagerClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "initialise");
 
-        //initialisableMethod.body().add(ExpressionFactory.ref("super").invoke("initialise"));
-
         Variable config = initialisableMethod.body().decl(ref(GenericKeyedObjectPool.Config.class), "config",
                 ExpressionFactory._new(ref(GenericKeyedObjectPool.Config.class)));
 
