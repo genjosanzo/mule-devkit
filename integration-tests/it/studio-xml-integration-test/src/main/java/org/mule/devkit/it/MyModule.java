@@ -30,6 +30,7 @@ import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.api.annotations.param.Payload;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -59,6 +60,14 @@ public class MyModule {
     @Optional
     @Default("a default")
     private String optionalWithDefaultConfigurableString;
+
+    /**
+     * Configurable URL
+     */
+    @Configurable
+    @Optional
+    @Default("http://myUrl:9999")
+    private URL url;
 
     /**
      * operation1 method description
@@ -148,21 +157,12 @@ public class MyModule {
     /**
      * operation9 method description
      *
-     * @param object         represents the object
+     * @param object       represents the object
      * @param customObject represents the customObject
      */
     @Processor
     public void operation9(Object object, @Optional CustomObject customObject) {
     }
-
-//    /**
-//     * operation10 method description
-//     *
-//     * @param httpCallback represents the httpCallback
-//     */
-//    @Processor
-//    public void operation10(HttpCallback httpCallback) {
-//    }
 
     /**
      * Create a connection
@@ -209,5 +209,9 @@ public class MyModule {
 
     public void setOptionalWithDefaultConfigurableString(String optionalWithDefaultConfigurableString) {
         this.optionalWithDefaultConfigurableString = optionalWithDefaultConfigurableString;
+    }
+
+    public void setUrl(URL url) {
+        this.url = url;
     }
 }

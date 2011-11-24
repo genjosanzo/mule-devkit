@@ -76,7 +76,9 @@ import javax.xml.bind.annotation.XmlType;
         Booleantype.class,
         StringAttributeType.class,
         NewType.class,
-        ModeType.class
+        ModeType.class,
+        FlowRefType.class,
+        UrlType.class
 })
 public class AttributeType {
 

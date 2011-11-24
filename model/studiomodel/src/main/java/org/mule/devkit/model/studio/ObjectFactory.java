@@ -489,11 +489,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link UrlType }{@code >}}
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "url", scope = Group.class)
-    public JAXBElement<AttributeType> createGroupUrl(AttributeType value) {
-        return new JAXBElement<AttributeType>(_GroupUrl_QNAME, AttributeType.class, Group.class, value);
+    public JAXBElement<UrlType> createGroupUrl(UrlType value) {
+        return new JAXBElement<UrlType>(_GroupUrl_QNAME, UrlType.class, Group.class, value);
     }
 
     /**

@@ -33,6 +33,7 @@ import org.mule.devkit.model.studio.NestedElementReference;
 import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.model.studio.StringAttributeType;
 import org.mule.devkit.model.studio.TextType;
+import org.mule.devkit.model.studio.UrlType;
 import org.mule.devkit.utils.JavaDocUtils;
 import org.mule.devkit.utils.NameUtils;
 import org.mule.devkit.utils.TypeMirrorUtils;
@@ -106,6 +107,9 @@ public class MuleStudioUtils {
         if (attributeType instanceof FlowRefType) {
             return objectFactory.createGroupFlowRef((FlowRefType) attributeType);
         }
+        if (attributeType instanceof UrlType) {
+            return objectFactory.createGroupUrl((UrlType) attributeType);
+        }
         if (attributeType instanceof NestedElementReference) {
             return objectFactory.createNestedElementTypeChildElement((NestedElementReference) attributeType);
         }
@@ -141,6 +145,8 @@ public class MuleStudioUtils {
             integerType.setMin(0);
             integerType.setStep(1);
             return integerType;
+        } else if(typeMirrorUtils.isURL(element)) {
+             return new UrlType();
         } else {
             throw new RuntimeException("Failed to create Studio XML, type not recognized: type=" + element.getSimpleName().toString() + " name=" + element.getSimpleName().toString());
         }

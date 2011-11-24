@@ -25,11 +25,15 @@ import org.mule.devkit.model.studio.NestedElementType;
 import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.model.studio.StringAttributeType;
 import org.mule.devkit.model.studio.TextType;
+import org.mule.devkit.utils.JavaDocUtils;
+import org.mule.devkit.utils.NameUtils;
+import org.mule.devkit.utils.TypeMirrorUtils;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,47 +42,52 @@ public class NestedsBuilder {
 
     private static final String URI_PREFIX = "http://www.mulesoft.org/schema/mule/";
     private ObjectFactory objectFactory;
-    private GeneratorContext context;
     private MuleStudioUtils helper;
     private ExecutableElement executableElement;
     private String moduleName;
     private List<String> parsedLocalIds;
+    private NameUtils nameUtils;
+    private Types typeUtils;
+    private TypeMirrorUtils typeMirrorUtils;
+    private JavaDocUtils javaDocUtils;
 
     public NestedsBuilder(GeneratorContext context, ExecutableElement executableElement, String moduleName, List<String> parsedLocalIds) {
-        this.context = context;
         this.executableElement = executableElement;
         this.moduleName = moduleName;
         this.parsedLocalIds = parsedLocalIds;
-        objectFactory = new ObjectFactory();
         helper = new MuleStudioUtils(context);
+        this.nameUtils = nameUtils;
+        this.typeUtils = typeUtils;
+        this.typeMirrorUtils = typeMirrorUtils;
+        javaDocUtils = context.getJavaDocUtils();
     }
 
     public List<JAXBElement<? extends AbstractElementType>> build() {
         List<JAXBElement<? extends AbstractElementType>> nesteds = new ArrayList<JAXBElement<? extends AbstractElementType>>();
         for (VariableElement parameter : executableElement.getParameters()) {
-            String localId = context.getNameUtils().uncamel(parameter.getSimpleName().toString());
+            String localId = nameUtils.uncamel(parameter.getSimpleName().toString());
             if (isNested(parameter) && !parsedLocalIds.contains(localId)) {
 
                 parsedLocalIds.add(localId);
 
                 NestedElementType nested = new NestedElementType();
                 nested.setLocalId(localId);
-                nested.setCaption(helper.formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
-                nested.setDescription(helper.formatDescription(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+                nested.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+                nested.setDescription(helper.formatDescription(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
                 nested.setIcon(helper.getIcon(moduleName));
                 nested.setImage(helper.getImage(moduleName));
 
                 NestedElementReference childElement = new NestedElementReference();
-                childElement.setName(URI_PREFIX + moduleName + '/' + context.getNameUtils().singularize(localId));
-                childElement.setDescription(helper.formatDescription(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
-                childElement.setCaption(helper.formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+                childElement.setName(URI_PREFIX + moduleName + '/' + nameUtils.singularize(localId));
+                childElement.setDescription(helper.formatDescription(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+                childElement.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
                 childElement.setAllowMultiple(true);
                 nested.getRegexpOrEncodingOrString().add(helper.createJAXBElement(childElement));
 
                 NestedElementType nested1 = new NestedElementType();
-                nested1.setCaption(helper.formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+                nested1.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
                 nested1.setLocalId(childElement.getName().substring(childElement.getName().lastIndexOf("/") + 1));
-                nested1.setDescription(helper.formatDescription(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+                nested1.setDescription(helper.formatDescription(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
                 nested1.setIcon(helper.getIcon(moduleName));
                 nested1.setImage(helper.getImage(moduleName));
 
@@ -87,21 +96,21 @@ public class NestedsBuilder {
                     key = new StringAttributeType();
                 } else {
                     TypeMirror typeMirror = ((DeclaredType) parameter.asType()).getTypeArguments().get(0);
-                    key = helper.createAttributeTypeIgnoreEnumsAndCollections(context.getTypeUtils().asElement(typeMirror));
+                    key = helper.createAttributeTypeIgnoreEnumsAndCollections(typeUtils.asElement(typeMirror));
                 }
 
-                if (context.getTypeMirrorUtils().isMap(parameter.asType())) {
+                if (typeMirrorUtils.isMap(parameter.asType())) {
                     key.setName("key");
                     key.setDescription(helper.formatDescription("Key."));
                     key.setCaption(helper.formatCaption("Key"));
                 } else {
-                    key.setName(context.getNameUtils().singularize(localId));
-                    key.setCaption(helper.formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
-                    key.setDescription(helper.formatDescription(context.getJavaDocUtils().getParameterSummary(parameter.getSimpleName().toString(), executableElement)));
+                    key.setName(nameUtils.singularize(localId));
+                    key.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+                    key.setDescription(helper.formatDescription(javaDocUtils.getParameterSummary(parameter.getSimpleName().toString(), executableElement)));
                 }
                 nested1.getRegexpOrEncodingOrString().add(helper.createJAXBElement(key));
 
-                if (context.getTypeMirrorUtils().isMap(parameter.asType())) {
+                if (typeMirrorUtils.isMap(parameter.asType())) {
                     TextType textAttributeType = new TextType();
                     textAttributeType.setName("value");
                     textAttributeType.setDescription(helper.formatDescription("Value."));
@@ -118,7 +127,7 @@ public class NestedsBuilder {
     }
 
     private boolean isNested(VariableElement parameter) {
-        return context.getTypeMirrorUtils().isMap(parameter.asType()) ||
-                context.getTypeMirrorUtils().isArrayOrList(parameter.asType());
+        return typeMirrorUtils.isMap(parameter.asType()) ||
+                typeMirrorUtils.isArrayOrList(parameter.asType());
     }
 }

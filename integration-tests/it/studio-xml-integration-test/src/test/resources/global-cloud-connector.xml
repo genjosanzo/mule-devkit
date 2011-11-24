@@ -15,6 +15,7 @@
                     description="Configurable optional String with default value."
                     caption="Optional With Default Configurable String"
                     name="optionalWithDefaultConfigurableString"></string>
+            <url required="false" description="Configurable URL." caption="Url" name="url"></url>
             <string required="false" description="The user name to use." caption="User" name="user"></string>
             <string required="false" description="The password to use." caption="Password"
                     name="password"></string>

@@ -35,6 +35,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import javax.xml.bind.annotation.XmlType;
 import java.lang.annotation.Annotation;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -181,5 +182,9 @@ public class TypeMirrorUtils {
 
     public boolean isHttpCallback(Element element) {
         return element.asType().toString().startsWith(HttpCallback.class.getName());
+    }
+
+    public boolean isURL(Element element) {
+        return element.asType().toString().startsWith(URL.class.getName());
     }
 }
