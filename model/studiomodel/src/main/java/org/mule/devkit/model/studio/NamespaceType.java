@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +78,7 @@ import java.util.List;
 @XmlType(name = "NamespaceType", propOrder = {
         "connectorOrEndpointOrGlobal"
 })
+@XmlRootElement(name = "namespace")
 public class NamespaceType {
 
     @XmlElementRefs({

@@ -1,0 +1,29 @@
+<cloud-connector extends="http://www.mulesoft.org/schema/mule/mymodule/abstractMymoduleConnectorGeneric"
+                 image="icons/large/mymodule-connector-48x32.png" localId="mymodule-connector"
+                 icon="icons/small/mymodule-connector-24x16.png" description="Mymodule Integration."
+                 caption="Mymodule" aliasId="org.mule.tooling.ui.modules.core.pattern.mymodule">
+    <attribute-category description="General properties." caption="General">
+        <group caption="Generic" id="mymoduleConnectorGeneric">
+            <modeSwitch description="Operation." caption="Operation" name="Mymodule operations to execute">
+                <mode modeLabel="Operation1"
+                      modeId="http://www.mulesoft.org/schema/mule/mymodule/operation1"></mode>
+                <mode modeLabel="Operation2"
+                      modeId="http://www.mulesoft.org/schema/mule/mymodule/operation2"></mode>
+                <mode modeLabel="Operation3"
+                      modeId="http://www.mulesoft.org/schema/mule/mymodule/operation3"></mode>
+                <mode modeLabel="Operation4"
+                      modeId="http://www.mulesoft.org/schema/mule/mymodule/operation4"></mode>
+                <mode modeLabel="Operation5"
+                      modeId="http://www.mulesoft.org/schema/mule/mymodule/operation5"></mode>
+                <mode modeLabel="Operation6"
+                      modeId="http://www.mulesoft.org/schema/mule/mymodule/operation6"></mode>
+                <mode modeLabel="Operation7"
+                      modeId="http://www.mulesoft.org/schema/mule/mymodule/operation7"></mode>
+                <mode modeLabel="Operation8"
+                      modeId="http://www.mulesoft.org/schema/mule/mymodule/operation8"></mode>
+                <mode modeLabel="Operation9"
+                      modeId="http://www.mulesoft.org/schema/mule/mymodule/operation9"></mode>
+            </modeSwitch>
+        </group>
+    </attribute-category>
+</cloud-connector>

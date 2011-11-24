@@ -25,11 +25,15 @@ import org.mule.devkit.model.studio.NestedElementType;
 import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.model.studio.StringAttributeType;
 import org.mule.devkit.model.studio.TextType;
+import org.mule.devkit.utils.JavaDocUtils;
+import org.mule.devkit.utils.NameUtils;
+import org.mule.devkit.utils.TypeMirrorUtils;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,87 +42,120 @@ public class NestedsBuilder {
 
     private static final String URI_PREFIX = "http://www.mulesoft.org/schema/mule/";
     private ObjectFactory objectFactory;
-    private GeneratorContext context;
     private MuleStudioUtils helper;
     private ExecutableElement executableElement;
     private String moduleName;
     private List<String> parsedLocalIds;
+    private NameUtils nameUtils;
+    private Types typeUtils;
+    private TypeMirrorUtils typeMirrorUtils;
+    private JavaDocUtils javaDocUtils;
 
     public NestedsBuilder(GeneratorContext context, ExecutableElement executableElement, String moduleName, List<String> parsedLocalIds) {
-        this.context = context;
         this.executableElement = executableElement;
         this.moduleName = moduleName;
         this.parsedLocalIds = parsedLocalIds;
-        objectFactory = new ObjectFactory();
         helper = new MuleStudioUtils(context);
+        this.nameUtils = context.getNameUtils();
+        this.typeUtils = context.getTypeUtils();
+        this.typeMirrorUtils = context.getTypeMirrorUtils();
+        javaDocUtils = context.getJavaDocUtils();
+        objectFactory = new ObjectFactory();
     }
 
     public List<JAXBElement<? extends AbstractElementType>> build() {
         List<JAXBElement<? extends AbstractElementType>> nesteds = new ArrayList<JAXBElement<? extends AbstractElementType>>();
         for (VariableElement parameter : executableElement.getParameters()) {
-            String localId = context.getNameUtils().uncamel(parameter.getSimpleName().toString());
-            if (isNested(parameter) && !parsedLocalIds.contains(localId)) {
+            String localId = nameUtils.uncamel(parameter.getSimpleName().toString());
+            if (needToCreateNestedElement(parameter) && !parsedLocalIds.contains(localId)) {
 
                 parsedLocalIds.add(localId);
 
-                NestedElementType nested = new NestedElementType();
-                nested.setLocalId(localId);
-                nested.setCaption(helper.formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
-                nested.setDescription(helper.formatDescription(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
-                nested.setIcon(helper.getIcon(moduleName));
-                nested.setImage(helper.getImage(moduleName));
-
-                NestedElementReference childElement = new NestedElementReference();
-                childElement.setName(URI_PREFIX + moduleName + '/' + context.getNameUtils().singularize(localId));
-                childElement.setDescription(helper.formatDescription(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
-                childElement.setCaption(helper.formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
-                childElement.setAllowMultiple(true);
-                nested.getRegexpOrEncodingOrString().add(helper.createJAXBElement(childElement));
-
-                NestedElementType nested1 = new NestedElementType();
-                nested1.setCaption(helper.formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
-                nested1.setLocalId(childElement.getName().substring(childElement.getName().lastIndexOf("/") + 1));
-                nested1.setDescription(helper.formatDescription(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
-                nested1.setIcon(helper.getIcon(moduleName));
-                nested1.setImage(helper.getImage(moduleName));
+                NestedElementReference childElement = createChildElement(parameter, localId);
+                NestedElementType firstLevelNestedElement = createFirstLevelNestedElement(parameter, localId);
+                firstLevelNestedElement.getRegexpOrEncodingOrString().add(helper.createJAXBElement(childElement));
+                NestedElementType secondLevelNestedElement = createSecondLevelNestedElement(parameter, childElement);
 
                 AttributeType key;
                 if (((DeclaredType) parameter.asType()).getTypeArguments().isEmpty()) {
                     key = new StringAttributeType();
                 } else {
                     TypeMirror typeMirror = ((DeclaredType) parameter.asType()).getTypeArguments().get(0);
-                    key = helper.createAttributeType(context.getTypeUtils().asElement(typeMirror));
+                    key = helper.createAttributeTypeIgnoreEnumsAndCollections(typeUtils.asElement(typeMirror));
                 }
 
-                if (context.getTypeMirrorUtils().isMap(parameter.asType())) {
+                if (typeMirrorUtils.isArrayOrList(parameter.asType())) {
+                    key.setName(nameUtils.singularize(localId));
+                    key.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+                    key.setDescription(helper.formatDescription(javaDocUtils.getParameterSummary(parameter.getSimpleName().toString(), executableElement)));
+                    secondLevelNestedElement.getRegexpOrEncodingOrString().add(helper.createJAXBElement(key));
+                } else { //map
                     key.setName("key");
                     key.setDescription(helper.formatDescription("Key."));
                     key.setCaption(helper.formatCaption("Key"));
-                } else {
-                    key.setName(context.getNameUtils().singularize(localId));
-                    key.setCaption(helper.formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
-                    key.setDescription(helper.formatDescription(context.getJavaDocUtils().getParameterSummary(parameter.getSimpleName().toString(), executableElement)));
-                }
-                nested1.getRegexpOrEncodingOrString().add(helper.createJAXBElement(key));
+                    secondLevelNestedElement.getRegexpOrEncodingOrString().add(helper.createJAXBElement(key));
 
-                if (context.getTypeMirrorUtils().isMap(parameter.asType())) {
                     TextType textAttributeType = new TextType();
                     textAttributeType.setName("value");
                     textAttributeType.setDescription(helper.formatDescription("Value."));
                     textAttributeType.setCaption(helper.formatCaption("Value"));
                     textAttributeType.setIsToElement(true);
-                    nested1.getRegexpOrEncodingOrString().add(helper.createJAXBElement(textAttributeType));
+                    secondLevelNestedElement.getRegexpOrEncodingOrString().add(helper.createJAXBElement(textAttributeType));
                 }
 
-                nesteds.add(objectFactory.createNested(nested));
-                nesteds.add(objectFactory.createNested(nested1));
+                nesteds.add(objectFactory.createNested(firstLevelNestedElement));
+                nesteds.add(objectFactory.createNested(secondLevelNestedElement));
             }
         }
         return nesteds;
     }
 
-    private boolean isNested(VariableElement parameter) {
-        return context.getTypeMirrorUtils().isMap(parameter.asType()) ||
-                context.getTypeMirrorUtils().isArrayOrList(parameter.asType());
+    private NestedElementType createSecondLevelNestedElement(VariableElement parameter, NestedElementReference childElement) {
+        NestedElementType nested1 = new NestedElementType();
+        nested1.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+        nested1.setLocalId(childElement.getName().substring(childElement.getName().lastIndexOf("/") + 1));
+        nested1.setDescription(helper.formatDescription(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+        nested1.setIcon(helper.getIcon(moduleName));
+        nested1.setImage(helper.getImage(moduleName));
+        return nested1;
+    }
+
+    private NestedElementType createFirstLevelNestedElement(VariableElement parameter, String localId) {
+        NestedElementType nested = new NestedElementType();
+        nested.setLocalId(localId);
+        nested.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+        nested.setDescription(helper.formatDescription(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+        nested.setIcon(helper.getIcon(moduleName));
+        nested.setImage(helper.getImage(moduleName));
+        return nested;
+    }
+
+//    private boolean isListOfMaps(VariableElement parameter) {
+//        List<? extends TypeMirror> typeArguments = ((DeclaredType) parameter.asType()).getTypeArguments();
+//        return typeMirrorUtils.isArrayOrList(parameter.asType()) && !typeArguments.isEmpty() && typeMirrorUtils.isMap(typeArguments.get(0));
+//    }
+//
+//    private boolean isSimpleMap(VariableElement parameter) {
+//        List<? extends TypeMirror> typeArguments = ((DeclaredType) parameter.asType()).getTypeArguments();
+//        return typeMirrorUtils.isMap(parameter.asType()) && (typeArguments.isEmpty() || !typeMirrorUtils.isCollection(typeArguments.get(1)));
+//    }
+//
+//    private boolean isSimpleList(VariableElement parameter) {
+//        List<? extends TypeMirror> typeArguments = ((DeclaredType) parameter.asType()).getTypeArguments();
+//        return typeMirrorUtils.isArrayOrList(parameter.asType()) && (typeArguments.isEmpty() || !typeMirrorUtils.isCollection(typeArguments.get(0)));
+//    }
+
+    private NestedElementReference createChildElement(VariableElement parameter, String localId) {
+        NestedElementReference childElement = new NestedElementReference();
+        childElement.setName(URI_PREFIX + moduleName + '/' + nameUtils.singularize(localId));
+        childElement.setDescription(helper.formatDescription(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+        childElement.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+        childElement.setAllowMultiple(true);
+        return childElement;
+    }
+
+    private boolean needToCreateNestedElement(VariableElement parameter) {
+        return typeMirrorUtils.isMap(parameter.asType()) ||
+                typeMirrorUtils.isArrayOrList(parameter.asType());
     }
 }

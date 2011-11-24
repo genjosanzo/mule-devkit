@@ -24,8 +24,10 @@ import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
+import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
@@ -33,12 +35,13 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import javax.xml.bind.annotation.XmlType;
 import java.lang.annotation.Annotation;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public final class TypeMirrorUtils {
-    private static final List<Class<?>> PARAMETER_TYPES_TO_IGNORE = Arrays.asList( new Class<?>[] { SourceCallback.class });
+public class TypeMirrorUtils {
+    private static final List<Class<?>> PARAMETER_TYPES_TO_IGNORE = Arrays.asList(new Class<?>[]{SourceCallback.class});
     private static final List<Class<? extends Annotation>> PARAMETERS_ANNOTATIONS_TO_IGNORE =
             Arrays.asList(InboundHeaders.class, InvocationHeaders.class, OutboundHeaders.class, Payload.class, OAuthAccessToken.class, OAuthAccessTokenSecret.class);
 
@@ -154,4 +157,34 @@ public final class TypeMirrorUtils {
         return false;
     }
 
+    public boolean isString(Element element) {
+        String className = element.asType().toString();
+        return className.startsWith(String.class.getName());
+    }
+
+    public boolean isBoolean(Element element) {
+        String className = element.asType().toString();
+        return className.startsWith(Boolean.class.getName()) || className.startsWith("boolean");
+    }
+
+    public boolean isInteger(Element element) {
+        String className = element.asType().toString();
+        return className.startsWith(Integer.class.getName()) || className.startsWith("int");
+    }
+
+    public boolean isEnum(Element element) {
+        return isEnum(element.asType());
+    }
+
+    public boolean isCollection(Element element) {
+        return isCollection(element.asType());
+    }
+
+    public boolean isHttpCallback(Element element) {
+        return element.asType().toString().startsWith(HttpCallback.class.getName());
+    }
+
+    public boolean isURL(Element element) {
+        return element.asType().toString().startsWith(URL.class.getName());
+    }
 }

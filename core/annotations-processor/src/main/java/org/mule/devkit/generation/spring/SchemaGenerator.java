@@ -84,6 +84,8 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     public static final String ASYNC_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.ASYNC_FIELD_NAME;
     public static final String HTTP_CALLBACK_CONFIG_ELEMENT_NAME = "http-callback-config";
     public static final String OAUTH_CALLBACK_CONFIG_ELEMENT_NAME = "oauth-callback-config";
+    public static final String REF_SUFFIX = "-ref";
+    public static final String FLOW_REF_SUFFIX = "-flow-ref";
     private static final String ATTRIBUTE_NAME_KEY = "key";
     private static final String ATTRIBUTE_NAME_REF = "ref";
     private static final String ATTRIBUTE_NAME_VALUE_REF = "value-ref";
@@ -98,7 +100,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private static final String UNBOUNDED = "unbounded";
     private static final String LAX = "lax";
     private static final String ATTRIBUTE_NAME_NAME = "name";
-    private static final String REF_SUFFIX = "-ref";
     private static final String DOMAIN_DEFAULT_VALUE = "${fullDomain}";
     private static final String PORT_DEFAULT_VALUE = "${http.port}";
     private static final String ASYNC_DEFAULT_VALUE = "true";
@@ -952,8 +953,8 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             attribute.setName(name);
             javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(variable.asType());
             attribute.setType(new QName(schema.getTargetNamespace(), enumElement.getSimpleName() + ENUM_TYPE_SUFFIX));
-        } else if (variable.asType().toString().startsWith(HttpCallback.class.getName())) {
-            attribute.setName(context.getNameUtils().uncamel(name) + "-flow-ref");
+        } else if (context.getTypeMirrorUtils().isHttpCallback(variable)) {
+            attribute.setName(context.getNameUtils().uncamel(name) + FLOW_REF_SUFFIX);
             attribute.setType(SchemaConstants.STRING);
         } else {
             // non-supported types will get "-ref" so beans can be injected

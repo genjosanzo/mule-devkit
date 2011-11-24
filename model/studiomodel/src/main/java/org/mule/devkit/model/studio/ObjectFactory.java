@@ -73,6 +73,7 @@ public class ObjectFactory {
     private final static QName _GroupGlobalRef_QNAME = new QName("http://www.mulesoft.org/schema/mule/tooling.attributes", "globalRef");
     private final static QName _GroupEnum_QNAME = new QName("http://www.mulesoft.org/schema/mule/tooling.attributes", "enum");
     private final static QName _GroupList_QNAME = new QName("http://www.mulesoft.org/schema/mule/tooling.attributes", "list");
+    private final static QName _GroupFlowRef_QNAME = new QName("http://www.mulesoft.org/schema/mule/tooling.attributes", "flowRef");
     private final static QName _GroupInteger_QNAME = new QName("http://www.mulesoft.org/schema/mule/tooling.attributes", "integer");
     private final static QName _GroupClassname_QNAME = new QName("http://www.mulesoft.org/schema/mule/tooling.attributes", "classname");
     private final static QName _GroupExpression_QNAME = new QName("http://www.mulesoft.org/schema/mule/tooling.attributes", "expression");
@@ -488,11 +489,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link UrlType }{@code >}}
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "url", scope = Group.class)
-    public JAXBElement<AttributeType> createGroupUrl(AttributeType value) {
-        return new JAXBElement<AttributeType>(_GroupUrl_QNAME, AttributeType.class, Group.class, value);
+    public JAXBElement<UrlType> createGroupUrl(UrlType value) {
+        return new JAXBElement<UrlType>(_GroupUrl_QNAME, UrlType.class, Group.class, value);
     }
 
     /**
@@ -517,6 +518,14 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "list", scope = Group.class)
     public JAXBElement<AttributeType> createGroupList(AttributeType value) {
         return new JAXBElement<AttributeType>(_GroupList_QNAME, AttributeType.class, Group.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
+     */
+    @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "flowRef", scope = Group.class)
+    public JAXBElement<FlowRefType> createGroupFlowRef(FlowRefType value) {
+        return new JAXBElement<FlowRefType>(_GroupFlowRef_QNAME, FlowRefType.class, Group.class, value);
     }
 
     /**

@@ -19,32 +19,43 @@ package org.mule.devkit.generation.mule.studio;
 import org.apache.commons.lang.WordUtils;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
+import org.mule.api.annotations.param.Payload;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.generation.spring.SchemaGenerator;
+import org.mule.devkit.generation.spring.SchemaTypeConversion;
 import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.Booleantype;
 import org.mule.devkit.model.studio.EnumType;
+import org.mule.devkit.model.studio.FlowRefType;
 import org.mule.devkit.model.studio.IntegerType;
 import org.mule.devkit.model.studio.LongType;
 import org.mule.devkit.model.studio.NestedElementReference;
 import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.model.studio.StringAttributeType;
 import org.mule.devkit.model.studio.TextType;
+import org.mule.devkit.model.studio.UrlType;
+import org.mule.devkit.utils.JavaDocUtils;
+import org.mule.devkit.utils.NameUtils;
+import org.mule.devkit.utils.TypeMirrorUtils;
 import org.mule.util.StringUtils;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.xml.bind.JAXBElement;
-import java.util.List;
 
 public class MuleStudioUtils {
 
     private static final String IMAGE = "icons/large/%s-connector-48x32.png";
     private static final String ICON = "icons/small/%s-connector-24x16.png";
-    private GeneratorContext context;
+    private NameUtils nameUtils;
+    private JavaDocUtils javaDocUtils;
+    private TypeMirrorUtils typeMirrorUtils;
 
     public MuleStudioUtils(GeneratorContext context) {
-        this.context = context;
+        nameUtils = context.getNameUtils();
+        javaDocUtils = context.getJavaDocUtils();
+        typeMirrorUtils = context.getTypeMirrorUtils();
     }
 
     public String formatCaption(String caption) {
@@ -93,34 +104,67 @@ public class MuleStudioUtils {
         if (attributeType instanceof TextType) {
             return objectFactory.createGroupText((TextType) attributeType);
         }
+        if (attributeType instanceof FlowRefType) {
+            return objectFactory.createGroupFlowRef((FlowRefType) attributeType);
+        }
+        if (attributeType instanceof UrlType) {
+            return objectFactory.createGroupUrl((UrlType) attributeType);
+        }
         if (attributeType instanceof NestedElementReference) {
             return objectFactory.createNestedElementTypeChildElement((NestedElementReference) attributeType);
         }
         return null;
     }
 
-    public AttributeType createAttributeType(Element variableElement) {
-        String parameterClassName = variableElement.asType().toString();
-        if (parameterClassName.equals(String.class.getName())) {
+    public AttributeType createAttributeTypeIgnoreEnumsAndCollections(Element element) {
+        if (SchemaTypeConversion.isSupported(element.asType().toString())) {
+            return createAttributeTypeOfSupportedType(element);
+        } else if (typeMirrorUtils.isHttpCallback(element)) {
+            FlowRefType flowRefType = new FlowRefType();
+            flowRefType.setSupportFlow(true);
+            flowRefType.setSupportSubflow(true);
+            return flowRefType;
+        } else if (skipAttributeTypeGeneration(element)) {
+            return null;
+        } else {
             return new StringAttributeType();
-        } else if (parameterClassName.equals("boolean") || parameterClassName.equals(Boolean.class.getName())) {
+        }
+    }
+
+    private boolean skipAttributeTypeGeneration(Element element) {
+        return typeMirrorUtils.isCollection(element.asType()) || element.getAnnotation(Payload.class) != null || typeMirrorUtils.isEnum(element.asType());
+    }
+
+    private AttributeType createAttributeTypeOfSupportedType(Element element) {
+        if (typeMirrorUtils.isString(element)) {
+            return new StringAttributeType();
+        } else if (typeMirrorUtils.isBoolean(element)) {
             return new Booleantype();
-        } else if (parameterClassName.equals("int") || parameterClassName.equals(Integer.class.getName())) {
+        } else if (typeMirrorUtils.isInteger(element)) {
             IntegerType integerType = new IntegerType();
             integerType.setMin(0);
             integerType.setStep(1);
             return integerType;
+        } else if(typeMirrorUtils.isURL(element)) {
+             return new UrlType();
+        } else {
+            throw new RuntimeException("Failed to create Studio XML, type not recognized: type=" + element.getSimpleName().toString() + " name=" + element.getSimpleName().toString());
         }
-        return null;
     }
 
-    public void setAttributeTypeInfo(ExecutableElement executableElement, List<AttributeType> parameters, VariableElement variableElement, AttributeType parameter, String parameterName) {
-        parameter.setCaption(formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameterName)));
-        parameter.setDescription(formatDescription(context.getJavaDocUtils().getParameterSummary(parameterName, executableElement)));
-        parameter.setName(parameterName);
+    public void setAttributeTypeInfo(ExecutableElement executableElement, VariableElement variableElement, AttributeType parameter) {
+        String parameterName = variableElement.getSimpleName().toString();
+        parameter.setCaption(formatCaption(nameUtils.friendlyNameFromCamelCase(parameterName)));
+        parameter.setDescription(formatDescription(javaDocUtils.getParameterSummary(parameterName, executableElement)));
+        if (parameter instanceof StringAttributeType && !SchemaTypeConversion.isSupported(variableElement.asType().toString())) {
+            parameter.setName(parameterName + SchemaGenerator.REF_SUFFIX);
+        } else if (parameter instanceof FlowRefType) {
+            parameter.setName(nameUtils.uncamel(parameterName) + SchemaGenerator.FLOW_REF_SUFFIX);
+        } else {
+            parameter.setName(parameterName);
+        }
         parameter.setRequired(variableElement.getAnnotation(Optional.class) == null);
         setDefaultValueIfAvailable(variableElement, parameter);
-        parameters.add(parameter);
     }
 
     public void setDefaultValueIfAvailable(VariableElement variableElement, AttributeType parameter) {

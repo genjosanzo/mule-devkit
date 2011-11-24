@@ -20,7 +20,6 @@ package org.mule.devkit.generation.mule.studio;
 import org.mule.api.annotations.Processor;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
-import org.mule.devkit.model.studio.Module;
 import org.mule.devkit.model.studio.NamespaceType;
 
 import javax.lang.model.element.ExecutableElement;
@@ -54,10 +53,7 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
             namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, executableElement, moduleName, parsedLocalIds).build());
         }
 
-        Module module = new Module();
-        module.setNamespace(namespace);
-
-        context.getStudioModel().setModule(module);
+        context.getStudioModel().setNamespaceType(namespace);
         context.getStudioModel().setModuleName(moduleName);
     }
 }

@@ -20,15 +20,17 @@ package org.mule.devkit.it;
 import org.mule.api.ConnectionException;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connect;
-import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.ConnectionIdentifier;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
+import org.mule.api.annotations.param.Payload;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +60,14 @@ public class MyModule {
     @Optional
     @Default("a default")
     private String optionalWithDefaultConfigurableString;
+
+    /**
+     * Configurable URL
+     */
+    @Configurable
+    @Optional
+    @Default("http://myUrl:9999")
+    private URL url;
 
     /**
      * operation1 method description
@@ -125,6 +135,36 @@ public class MyModule {
     }
 
     /**
+     * operation7 method description
+     *
+     * @param payload the payload
+     */
+    @Processor
+    public void operation7(@Payload Object payload) {
+    }
+
+    /**
+     * operation8 method description
+     *
+     * @param siNoEnum                represents the siNoEnum
+     * @param siNoEnumOptional        represents the siNoEnumOptional
+     * @param siNoEnumOptionalDefault represents the siNoEnumOptionalDefault
+     */
+    @Processor
+    public void operation8(SiNoEnum siNoEnum, @Optional SiNoEnum siNoEnumOptional, @Optional @Default("NO") SiNoEnum siNoEnumOptionalDefault) {
+    }
+
+    /**
+     * operation9 method description
+     *
+     * @param object       represents the object
+     * @param customObject represents the customObject
+     */
+    @Processor
+    public void operation9(Object object, @Optional CustomObject customObject) {
+    }
+
+    /**
      * Create a connection
      *
      * @param user     the user name to use
@@ -169,5 +209,9 @@ public class MyModule {
 
     public void setOptionalWithDefaultConfigurableString(String optionalWithDefaultConfigurableString) {
         this.optionalWithDefaultConfigurableString = optionalWithDefaultConfigurableString;
+    }
+
+    public void setUrl(URL url) {
+        this.url = url;
     }
 }
