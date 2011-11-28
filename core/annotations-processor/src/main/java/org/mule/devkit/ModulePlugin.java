@@ -34,6 +34,8 @@ import org.mule.devkit.generation.mule.NestedProcessorStringGenerator;
 import org.mule.devkit.generation.mule.RegistryBootstrapGenerator;
 import org.mule.devkit.generation.mule.oauth.AuthorizeBeanDefinitionParserGenerator;
 import org.mule.devkit.generation.mule.oauth.AuthorizeMessageProcessorGenerator;
+import org.mule.devkit.generation.mule.oauth.DefaultRestoreAccessTokenCallbackGenerator;
+import org.mule.devkit.generation.mule.oauth.DefaultSaveAccessTokenCallbackGenerator;
 import org.mule.devkit.generation.mule.studio.MuleStudioXmlGenerator;
 import org.mule.devkit.generation.mule.transfomer.EnumTransformerGenerator;
 import org.mule.devkit.generation.mule.transfomer.JaxbTransformerGenerator;
@@ -82,6 +84,8 @@ public class ModulePlugin implements Plugin {
         generators.add(new MessageProcessorGenerator());
         generators.add(new AuthorizeMessageProcessorGenerator());
         generators.add(new AuthorizeBeanDefinitionParserGenerator());
+        generators.add(new DefaultSaveAccessTokenCallbackGenerator());
+        generators.add(new DefaultRestoreAccessTokenCallbackGenerator());
         generators.add(new NamespaceHandlerGenerator());
         generators.add(new RegistryBootstrapGenerator());
         generators.add(new MuleStudioXmlGenerator());
