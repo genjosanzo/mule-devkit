@@ -94,6 +94,11 @@ public class MuleStudioXmlGenerationTest {
     }
 
     @Test
+    public void cloudConnectorOperation10() throws Exception {
+        runTest("cloud-connector-operation10.xml");
+    }
+
+    @Test
     public void listOfIntegers() throws Exception {
         String expectedXmlPortion = normalizeXml("<nested image=\"icons/large/mymodule-connector-48x32.png\" localId=\"integers\"\n" +
                 "        icon=\"icons/small/mymodule-connector-24x16.png\" description=\"Integers.\" caption=\"Integers\">\n" +
@@ -170,6 +175,22 @@ public class MuleStudioXmlGenerationTest {
         assertTrue("expected: " + expectedXmlPortion + " \nactual: " + actualXml, actualXml.contains(expectedXmlPortion));
     }
 
+    @Test
+    public void listOfMapsOfStringObject() throws Exception {
+        String expectedXmlPortion = normalizeXml(
+                "<nested image=\"icons/large/mymodule-connector-48x32.png\" localId=\"objects\" icon=\"icons/small/mymodule-connector-24x16.png\" description=\"Objects.\" caption=\"Objects\">\n" +
+                "    <childElement allowMultiple=\"true\" description=\"Object.\" caption=\"Object\" name=\"http://www.mulesoft.org/schema/mule/mymodule/object\"></childElement>\n" +
+                "</nested>\n" +
+                "<nested image=\"icons/large/mymodule-connector-48x32.png\" localId=\"inner-object\" icon=\"icons/small/mymodule-connector-24x16.png\" description=\"Objects.\" caption=\"Objects\">\n" +
+                "    <string description=\"Key.\" caption=\"Key\" name=\"key\"></string>\n" +
+                "    <text isToElement=\"true\" description=\"Value.\" caption=\"Value\" name=\"value\"></text>\n" +
+                "</nested>\n" +
+                "<nested image=\"icons/large/mymodule-connector-48x32.png\" localId=\"object\" icon=\"icons/small/mymodule-connector-24x16.png\" description=\"Objects.\" caption=\"Objects\">\n" +
+                "    <childElement allowMultiple=\"true\" description=\"Object.\" caption=\"Object\" name=\"http://www.mulesoft.org/schema/mule/mymodule/inner-object\"></childElement>\n" +
+                "</nested>");
+        assertTrue("expected: " + expectedXmlPortion + " \nactual: " + actualXml, actualXml.contains(expectedXmlPortion));
+    }
+
     private void runTest(String path) {
         String xml = IOUtils.toString(MuleStudioXmlGenerationTest.class.getClassLoader().getResourceAsStream(path));
         String expectedXmlPortion = normalizeXml(xml);
@@ -177,6 +198,6 @@ public class MuleStudioXmlGenerationTest {
     }
 
     private String normalizeXml(String xml) {
-        return xml.replaceAll("\n|\t", "").replaceAll(">\\s+<", "><").replaceAll("\\s+", " ");
+        return xml.trim().replaceAll("\n|\t", "").replaceAll(">\\s+<", "><").replaceAll("\\s+", " ");
     }
 }

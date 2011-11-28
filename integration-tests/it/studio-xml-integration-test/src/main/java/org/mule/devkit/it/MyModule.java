@@ -165,6 +165,15 @@ public class MyModule {
     }
 
     /**
+     * operation10 method description
+     *
+     * @param objects represents a list of maps of string object
+     */
+    @Processor
+    public void operation10(List<Map<String, Object>> objects) {
+    }
+
+    /**
      * Create a connection
      *
      * @param user     the user name to use

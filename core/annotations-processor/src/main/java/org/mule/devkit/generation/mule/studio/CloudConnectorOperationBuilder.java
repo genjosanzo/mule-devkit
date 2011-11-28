@@ -33,8 +33,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
 import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -141,13 +139,8 @@ public class CloudConnectorOperationBuilder {
         for (VariableElement parameter : parameters) {
             if (context.getTypeMirrorUtils().isCollection(parameter.asType())) {
                 NestedElementReference childElement = new NestedElementReference();
-                if (isNestedCollection(parameter)) {
-                    childElement.setAllowMultiple(true);
-                    childElement.setName(URI_PREFIX + typeElement.name() + "/" + context.getNameUtils().uncamel(executableElement.getSimpleName().toString()) + '-' + context.getNameUtils().uncamel(parameter.getSimpleName().toString()));
-                } else {
-                    childElement.setAllowMultiple(false);
-                    childElement.setName(URI_PREFIX + typeElement.name() + "/" + context.getNameUtils().uncamel(parameter.getSimpleName().toString()));
-                }
+                childElement.setName(URI_PREFIX + typeElement.name() + "/" + context.getNameUtils().uncamel(parameter.getSimpleName().toString()));
+                childElement.setAllowMultiple(false);
                 childElement.setDescription(helper.formatDescription(context.getJavaDocUtils().getParameterSummary(parameter.getSimpleName().toString(), executableElement)));
                 childElement.setCaption(helper.formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
                 childElement.setInplace(true);
@@ -178,16 +171,5 @@ public class CloudConnectorOperationBuilder {
             }
         }
         return enumTypes;
-    }
-
-    private boolean isNestedCollection(VariableElement variableElement) {
-        DeclaredType declaredType = (DeclaredType) variableElement.asType();
-        List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
-        for (TypeMirror typeArgument : typeArguments) {
-            if (context.getTypeMirrorUtils().isCollection(typeArgument)) {
-                return true;
-            }
-        }
-        return false;
     }
 }
