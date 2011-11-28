@@ -99,6 +99,11 @@ public class MuleStudioXmlGenerationTest {
     }
 
     @Test
+    public void cloudConnectorOperation11() throws Exception {
+        runTest("cloud-connector-operation11.xml");
+    }
+
+    @Test
     public void listOfIntegers() throws Exception {
         String expectedXmlPortion = normalizeXml("<nested image=\"icons/large/mymodule-connector-48x32.png\" localId=\"integers\"\n" +
                 "        icon=\"icons/small/mymodule-connector-24x16.png\" description=\"Integers.\" caption=\"Integers\">\n" +

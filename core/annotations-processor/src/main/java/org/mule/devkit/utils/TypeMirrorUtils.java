@@ -37,6 +37,7 @@ import javax.xml.bind.annotation.XmlType;
 import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -186,5 +187,9 @@ public class TypeMirrorUtils {
 
     public boolean isURL(Element element) {
         return element.asType().toString().startsWith(URL.class.getName());
+    }
+
+    public boolean isDate(Element element) {
+        return element.asType().toString().startsWith(Date.class.getName());
     }
 }

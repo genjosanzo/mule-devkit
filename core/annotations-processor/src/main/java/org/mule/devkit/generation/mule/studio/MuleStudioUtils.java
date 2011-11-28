@@ -136,7 +136,7 @@ public class MuleStudioUtils {
     }
 
     private AttributeType createAttributeTypeOfSupportedType(Element element) {
-        if (typeMirrorUtils.isString(element)) {
+        if (typeMirrorUtils.isString(element) || typeMirrorUtils.isDate(element)) {
             return new StringAttributeType();
         } else if (typeMirrorUtils.isBoolean(element)) {
             return new Booleantype();
@@ -148,7 +148,7 @@ public class MuleStudioUtils {
         } else if(typeMirrorUtils.isURL(element)) {
              return new UrlType();
         } else {
-            throw new RuntimeException("Failed to create Studio XML, type not recognized: type=" + element.getSimpleName().toString() + " name=" + element.getSimpleName().toString());
+            throw new RuntimeException("Failed to create Studio XML, type not recognized: type=" + element.asType().toString() + " name=" + element.getSimpleName().toString());
         }
     }
 

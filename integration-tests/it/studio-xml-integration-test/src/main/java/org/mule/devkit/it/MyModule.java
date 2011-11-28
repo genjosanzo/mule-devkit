@@ -31,6 +31,7 @@ import org.mule.api.annotations.param.Optional;
 import org.mule.api.annotations.param.Payload;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -171,6 +172,15 @@ public class MyModule {
      */
     @Processor
     public void operation10(List<Map<String, Object>> objects) {
+    }
+
+    /**
+     * operation11 method description
+     *
+     * @param date represents a date object
+     */
+    @Processor
+    public void operation11(Date date) {
     }
 
     /**
