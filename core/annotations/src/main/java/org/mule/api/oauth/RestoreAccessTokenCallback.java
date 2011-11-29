@@ -23,7 +23,7 @@ public interface RestoreAccessTokenCallback {
     /**
      * Restore access token and secret
      */
-    void restore();
+    void restoreAccessToken();
 
     /**
      * Retrieve the just restored access token

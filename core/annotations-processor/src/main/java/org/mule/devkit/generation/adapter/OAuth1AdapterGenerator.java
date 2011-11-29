@@ -199,7 +199,7 @@ public class OAuth1AdapterGenerator extends AbstractOAuthAdapterGenerator {
         ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuilder.invoke("toString")));
 
         TryStatement tryToRestore = ifRestoreCallbackNotNull._then()._try();
-        tryToRestore.body().add(restoreAccessTokenCallbackField.invoke("restore"));
+        tryToRestore.body().add(restoreAccessTokenCallbackField.invoke("restoreAccessToken"));
 
         ifDebugEnabled = ifRestoreCallbackNotNull._then()._if(logger.invoke("isDebugEnabled"));
         messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));

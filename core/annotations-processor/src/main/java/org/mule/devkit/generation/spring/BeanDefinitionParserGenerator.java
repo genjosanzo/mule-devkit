@@ -36,6 +36,8 @@ import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
+import org.mule.devkit.generation.mule.oauth.DefaultRestoreAccessTokenCallbackFactoryGenerator;
+import org.mule.devkit.generation.mule.oauth.DefaultSaveAccessTokenCallbackFactoryGenerator;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -48,6 +50,7 @@ import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
+import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.util.TemplateParser;
 import org.springframework.beans.MutablePropertyValues;
@@ -213,8 +216,10 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
             generateParseHttpCallback(SchemaGenerator.OAUTH_CALLBACK_CONFIG_ELEMENT_NAME, parse, element, builder);
 
-            generateParseNestedProcessor(parse.body(), element, parserContext, builder, "oauthSaveAccessToken", false, false, false);
-            generateParseNestedProcessor(parse.body(), element, parserContext, builder, "oauthRestoreAccessToken", false, false, false);
+            DefinedClass saveAccessTokenCallbackFactory = context.getClassForRole(DefaultSaveAccessTokenCallbackFactoryGenerator.ROLE);
+            DefinedClass restoreAccessTokenCallbackFactory = context.getClassForRole(DefaultRestoreAccessTokenCallbackFactoryGenerator.ROLE);
+            generateParseNestedProcessor(parse.body(), element, parserContext, builder, "oauthSaveAccessToken", false, false, false, saveAccessTokenCallbackFactory);
+            generateParseNestedProcessor(parse.body(), element, parserContext, builder, "oauthRestoreAccessToken", false, false, false, restoreAccessTokenCallbackFactory);
 
             generateGenerateChildBeanNameMethod(beanDefinitionparser);
         }
@@ -380,9 +385,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
                 boolean isList = context.getTypeMirrorUtils().isArrayOrList(variable.asType());
                 if (requiredChildElements == 1) {
-                    generateParseNestedProcessor(parse.body(), element, parserContext, builder, fieldName, true, isList, true);
+                    generateParseNestedProcessor(parse.body(), element, parserContext, builder, fieldName, true, isList, true, ref(MessageProcessorChainFactoryBean.class));
                 } else {
-                    generateParseNestedProcessor(parse.body(), element, parserContext, builder, fieldName, false, isList, true);
+                    generateParseNestedProcessor(parse.body(), element, parserContext, builder, fieldName, false, isList, true, ref(MessageProcessorChainFactoryBean.class));
                 }
             } else if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
                 generateParseSupportedType(parse.body(), element, builder, fieldName);
@@ -485,7 +490,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         return definition;
     }
 
-    private void generateParseNestedProcessor(Block block, Variable element, Variable parserContext, Variable builder, String fieldName, boolean skipElement, boolean isList, boolean allowTextAttribute) {
+    private void generateParseNestedProcessor(Block block, Variable element, Variable parserContext, Variable builder, String fieldName, boolean skipElement, boolean isList, boolean allowTextAttribute, TypeReference factoryBean) {
 
         Variable elements = element;
         if (!skipElement) {
@@ -512,7 +517,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         Variable beanDefinitionBuilder = beanDefinitionBuidlerBlock.decl(ref(BeanDefinitionBuilder.class), fieldName + "BeanDefinitionBuilder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition")
-                        .arg(ref(MessageProcessorChainFactoryBean.class).dotclass()));
+                        .arg(factoryBean.dotclass()));
         Variable beanDefinition = beanDefinitionBuidlerBlock.decl(ref(BeanDefinition.class), fieldName + "BeanDefinition",
                 beanDefinitionBuilder.invoke("getBeanDefinition"));
 

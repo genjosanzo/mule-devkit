@@ -18,21 +18,18 @@ package org.mule.devkit.generation.mule.oauth;
 
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
-import org.mule.api.oauth.SaveAccessTokenCallback;
+import org.mule.api.oauth.RestoreAccessTokenCallback;
+import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.model.code.DefinedClass;
-import org.mule.devkit.model.code.FieldVariable;
-import org.mule.devkit.model.code.Method;
-import org.mule.devkit.model.code.Modifier;
-import org.mule.devkit.model.code.Modifiers;
+import org.mule.devkit.model.code.*;
 
 import javax.lang.model.element.TypeElement;
 
-public class DefaultSaveAccessTokenCallbackGenerator extends AbstractMessageGenerator {
+public class DefaultRestoreAccessTokenCallbackFactoryGenerator extends AbstractMessageGenerator {
 
-    public static final String ROLE = "DefaultSaveAccessTokenCallback";
+    public static final String ROLE = "RestoreAccessTokenCallbackFactoryBean";
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
@@ -45,25 +42,21 @@ public class DefaultSaveAccessTokenCallbackGenerator extends AbstractMessageGene
 
     @Override
     protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
-        DefinedClass callbackClass = getDefaultSaveAccessTokenCallbackClass(typeElement);
+        DefinedClass factory = getDefaultRestoreAccessTokenCallbackFactoryClass(typeElement);
 
-        FieldVariable messageProcessor = generateFieldForMessageProcessor(callbackClass, "messageProcessor");
-
-        generateGetter(callbackClass, messageProcessor);
-        generateSetter(callbackClass, messageProcessor);
-
-        Method saveAccessTokenMethod = callbackClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "saveAccessToken");
-        saveAccessTokenMethod.param(ref(String.class), "accessToken");
-        saveAccessTokenMethod.param(ref(String.class), "accessTokenSecret");
+        DefinedClass callback = context.getClassForRole(DefaultRestoreAccessTokenCallbackGenerator.ROLE);
+        Method getObjectType = factory.method(Modifier.PUBLIC, ref(Class.class), "getObjectType");
+        getObjectType.body()._return(callback.dotclass());
     }
-
-    private DefinedClass getDefaultSaveAccessTokenCallbackClass(TypeElement type) {
-        String callbackClassName = context.getNameUtils().generateClassNameInPackage(type, ".config", "DefaultSaveAccessTokenCallback");
+    
+    private DefinedClass getDefaultRestoreAccessTokenCallbackFactoryClass(TypeElement type) {
+        String callbackClassName = context.getNameUtils().generateClassNameInPackage(type, ".config", "RestoreAccessTokenCallbackFactoryBean");
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(callbackClassName));
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(callbackClassName), new Class[]{
-                SaveAccessTokenCallback.class});
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(callbackClassName));
+        clazz._extends(ref(MessageProcessorChainFactoryBean.class));
+
         context.setClassRole(ROLE, clazz);
 
         return clazz;
-    }
+    }    
 }

@@ -23,11 +23,17 @@ import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.FieldVariable;
+import org.mule.devkit.model.code.Method;
+import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Package;
 
 import javax.lang.model.element.TypeElement;
 
 public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageGenerator {
+
+    public static final String ROLE = "DefaultRestoreAccessTokenCallback";
+
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
@@ -40,6 +46,15 @@ public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageG
     @Override
     protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass callbackClass = getDefaultRestoreAccessTokenCallbackClass(typeElement);
+
+        FieldVariable messageProcessor = generateFieldForMessageProcessor(callbackClass, "messageProcessor");
+
+        generateGetter(callbackClass, messageProcessor);
+        generateSetter(callbackClass, messageProcessor);
+
+        Method restoreAccessTokenMethod = callbackClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "restoreAccessToken");
+        Method getAccessTokenMethod = callbackClass.method(Modifier.PUBLIC, ref(String.class), "getAccessToken");
+        Method getAccessTokenSecretMethod = callbackClass.method(Modifier.PUBLIC, ref(String.class), "getAccessTokenSecret");
     }
 
     private DefinedClass getDefaultRestoreAccessTokenCallbackClass(TypeElement type) {
@@ -48,7 +63,7 @@ public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageG
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(callbackClassName), new Class[]{
                 RestoreAccessTokenCallback.class});
 
-        //context.setClassRole(AUTHORIZE_MESSAGE_PROCESSOR_ROLE, clazz);
+        context.setClassRole(ROLE, clazz);
 
         return clazz;
     }
