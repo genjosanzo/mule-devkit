@@ -76,9 +76,10 @@ public class MyModule {
      * @param stringParameter  stringParameter description
      * @param intParameter     intParameter description
      * @param booleanParameter booleanParameter description
+     * @param longParameter    longParameter description
      */
     @Processor
-    public void operation1(String stringParameter, int intParameter, boolean booleanParameter) {
+    public void operation1(String stringParameter, int intParameter, boolean booleanParameter, long longParameter) {
     }
 
     /**
@@ -87,9 +88,10 @@ public class MyModule {
      * @param stringParameter  stringParameter description
      * @param intParameter     intParameter description
      * @param booleanParameter booleanParameter description
+     * @param longParameter    longParameter description
      */
     @Processor
-    public void operation2(@Optional String stringParameter, @Optional Integer intParameter, @Optional Boolean booleanParameter) {
+    public void operation2(@Optional String stringParameter, @Optional Integer intParameter, @Optional Boolean booleanParameter, @Optional Long longParameter) {
     }
 
     /**

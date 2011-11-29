@@ -173,6 +173,11 @@ public class TypeMirrorUtils {
         return className.startsWith(Integer.class.getName()) || className.startsWith("int");
     }
 
+    public boolean isLong(Element element) {
+        String className = element.asType().toString();
+        return className.startsWith(Long.class.getName()) || className.startsWith("long");
+    }
+
     public boolean isEnum(Element element) {
         return isEnum(element.asType());
     }

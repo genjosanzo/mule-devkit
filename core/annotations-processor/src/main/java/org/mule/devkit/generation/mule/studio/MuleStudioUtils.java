@@ -145,7 +145,13 @@ public class MuleStudioUtils {
             integerType.setMin(0);
             integerType.setStep(1);
             return integerType;
-        } else if(typeMirrorUtils.isURL(element)) {
+        } else if (typeMirrorUtils.isLong(element)) {
+            LongType longType = new LongType();
+            longType.setMin(0);
+            longType.setStep(1);
+            return longType;
+        }
+        else if(typeMirrorUtils.isURL(element)) {
              return new UrlType();
         } else {
             throw new RuntimeException("Failed to create Studio XML, type not recognized: type=" + element.asType().toString() + " name=" + element.getSimpleName().toString());
