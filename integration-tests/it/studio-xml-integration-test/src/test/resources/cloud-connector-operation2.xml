@@ -12,6 +12,8 @@
                      caption="Int Parameter" name="intParameter"></integer>
             <boolean required="false" description="BooleanParameter description." caption="Boolean Parameter"
                      name="booleanParameter"></boolean>
+            <long step="1" min="0" required="false" description="LongParameter description." caption="Long Parameter"
+                  name="longParameter"></long>
         </group>
     </attribute-category>
 </cloud-connector>

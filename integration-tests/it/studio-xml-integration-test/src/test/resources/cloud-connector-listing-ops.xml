@@ -7,6 +7,9 @@
             <modeSwitch description="Operation." caption="Operation" name="Mymodule operations to execute">
                 <mode modeLabel="Operation1"
                       modeId="http://www.mulesoft.org/schema/mule/mymodule/operation1"></mode>
+                <mode modeLabel="Operation10"
+                      modeId="http://www.mulesoft.org/schema/mule/mymodule/operation10"></mode>
+                <mode modeLabel="Operation11" modeId="http://www.mulesoft.org/schema/mule/mymodule/operation11"></mode>
                 <mode modeLabel="Operation2"
                       modeId="http://www.mulesoft.org/schema/mule/mymodule/operation2"></mode>
                 <mode modeLabel="Operation3"

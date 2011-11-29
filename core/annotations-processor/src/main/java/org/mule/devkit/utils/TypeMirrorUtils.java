@@ -37,6 +37,7 @@ import javax.xml.bind.annotation.XmlType;
 import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -172,6 +173,11 @@ public class TypeMirrorUtils {
         return className.startsWith(Integer.class.getName()) || className.startsWith("int");
     }
 
+    public boolean isLong(Element element) {
+        String className = element.asType().toString();
+        return className.startsWith(Long.class.getName()) || className.startsWith("long");
+    }
+
     public boolean isEnum(Element element) {
         return isEnum(element.asType());
     }
@@ -186,5 +192,9 @@ public class TypeMirrorUtils {
 
     public boolean isURL(Element element) {
         return element.asType().toString().startsWith(URL.class.getName());
+    }
+
+    public boolean isDate(Element element) {
+        return element.asType().toString().startsWith(Date.class.getName());
     }
 }

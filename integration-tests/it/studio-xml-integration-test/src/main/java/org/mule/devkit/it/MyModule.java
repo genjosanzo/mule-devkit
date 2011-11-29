@@ -31,6 +31,7 @@ import org.mule.api.annotations.param.Optional;
 import org.mule.api.annotations.param.Payload;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -75,9 +76,10 @@ public class MyModule {
      * @param stringParameter  stringParameter description
      * @param intParameter     intParameter description
      * @param booleanParameter booleanParameter description
+     * @param longParameter    longParameter description
      */
     @Processor
-    public void operation1(String stringParameter, int intParameter, boolean booleanParameter) {
+    public void operation1(String stringParameter, int intParameter, boolean booleanParameter, long longParameter) {
     }
 
     /**
@@ -86,9 +88,10 @@ public class MyModule {
      * @param stringParameter  stringParameter description
      * @param intParameter     intParameter description
      * @param booleanParameter booleanParameter description
+     * @param longParameter    longParameter description
      */
     @Processor
-    public void operation2(@Optional String stringParameter, @Optional Integer intParameter, @Optional Boolean booleanParameter) {
+    public void operation2(@Optional String stringParameter, @Optional Integer intParameter, @Optional Boolean booleanParameter, @Optional Long longParameter) {
     }
 
     /**
@@ -162,6 +165,24 @@ public class MyModule {
      */
     @Processor
     public void operation9(Object object, @Optional CustomObject customObject) {
+    }
+
+    /**
+     * operation10 method description
+     *
+     * @param objects represents a list of maps of string object
+     */
+    @Processor
+    public void operation10(List<Map<String, Object>> objects) {
+    }
+
+    /**
+     * operation11 method description
+     *
+     * @param date represents a date object
+     */
+    @Processor
+    public void operation11(Date date) {
     }
 
     /**

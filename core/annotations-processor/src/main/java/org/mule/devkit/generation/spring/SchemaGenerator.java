@@ -86,6 +86,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     public static final String OAUTH_CALLBACK_CONFIG_ELEMENT_NAME = "oauth-callback-config";
     public static final String REF_SUFFIX = "-ref";
     public static final String FLOW_REF_SUFFIX = "-flow-ref";
+    public static final String INNER_PREFIX = "inner-";
     private static final String ATTRIBUTE_NAME_KEY = "key";
     private static final String ATTRIBUTE_NAME_REF = "ref";
     private static final String ATTRIBUTE_NAME_VALUE_REF = "value-ref";
@@ -554,7 +555,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
                     return generateComplexTypeWithRef(schema, genericType);
                 } else if (context.getTypeMirrorUtils().isArrayOrList(genericType) ||
                         context.getTypeMirrorUtils().isMap(genericType)) {
-                    return generateCollectionComplexType(schema, targetNamespace, "inner-" + name, genericType);
+                    return generateCollectionComplexType(schema, targetNamespace, INNER_PREFIX + name, genericType);
                 } else if (context.getTypeMirrorUtils().isEnum(genericType)) {
                     return genereateEnumComplexType(genericType, targetNamespace);
                 } else {
