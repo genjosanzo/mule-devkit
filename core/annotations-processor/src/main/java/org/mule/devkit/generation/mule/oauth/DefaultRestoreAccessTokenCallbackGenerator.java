@@ -16,17 +16,29 @@
  */
 package org.mule.devkit.generation.mule.oauth;
 
+import org.mule.RequestContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
+import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.Startable;
 import org.mule.api.oauth.RestoreAccessTokenCallback;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.model.code.CatchBlock;
+import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.Package;
+import org.mule.devkit.model.code.TryStatement;
+import org.mule.devkit.model.code.Variable;
 
 import javax.lang.model.element.TypeElement;
 
@@ -48,13 +60,95 @@ public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageG
         DefinedClass callbackClass = getDefaultRestoreAccessTokenCallbackClass(typeElement);
 
         FieldVariable messageProcessor = generateFieldForMessageProcessor(callbackClass, "messageProcessor");
+        FieldVariable logger = generateLoggerField(callbackClass);
+        FieldVariable hasBeenStarted = generateFieldForBoolean(callbackClass, "hasBeenStarted");
+        FieldVariable hasBeenInitialized = generateFieldForBoolean(callbackClass, "hasBeenInitialized");
+        FieldVariable accessToken = generateFieldForString(callbackClass, "restoredAccessToken");
+        FieldVariable accessTokenSecret = generateFieldForString(callbackClass, "restoredAccessTokenSecret");
+
+        Method constructor = callbackClass.constructor(Modifier.PUBLIC);
+        constructor.body().assign(hasBeenStarted, ExpressionFactory.FALSE);
+        constructor.body().assign(hasBeenInitialized, ExpressionFactory.FALSE);
 
         generateGetter(callbackClass, messageProcessor);
         generateSetter(callbackClass, messageProcessor);
 
         Method restoreAccessTokenMethod = callbackClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "restoreAccessToken");
+        Variable event = restoreAccessTokenMethod.body().decl(ref(MuleEvent.class), "event", ref(RequestContext.class).staticInvoke("getEvent"));
+
+        Conditional ifMuleContextAware = restoreAccessTokenMethod.body()._if(Op._instanceof(messageProcessor, ref(MuleContextAware.class)));
+        ifMuleContextAware._then().add(
+                ExpressionFactory.cast(ref(MuleContextAware.class), messageProcessor).invoke("setMuleContext").arg(
+                        ref(RequestContext.class).staticInvoke("getEventContext").invoke("getMuleContext")
+                )
+        );
+
+        Conditional ifFlowConstructAware = restoreAccessTokenMethod.body()._if(Op._instanceof(messageProcessor, ref(FlowConstructAware.class)));
+        ifFlowConstructAware._then().add(
+                ExpressionFactory.cast(ref(FlowConstructAware.class), messageProcessor).invoke("setFlowConstruct").arg(
+                        ref(RequestContext.class).staticInvoke("getEventContext").invoke("getFlowConstruct")
+                )
+        );
+
+        Conditional ifNotInitialized = restoreAccessTokenMethod.body()._if(Op.not(hasBeenInitialized));
+        Conditional ifInitialisable = ifNotInitialized._then()._if(Op._instanceof(messageProcessor, ref(Initialisable.class)));
+        TryStatement tryToInitialize = ifInitialisable._then()._try();
+        tryToInitialize.body().add(
+                ExpressionFactory.cast(ref(Initialisable.class), messageProcessor).invoke("initialise")
+        );
+        CatchBlock catchInitlize = tryToInitialize._catch(ref(Exception.class));
+        Variable exception = catchInitlize.param("e");
+        catchInitlize.body().add(
+                logger.invoke("error").arg(
+                        exception.invoke("getMessage")
+                ).arg(
+                        exception
+                )
+        );
+        ifNotInitialized._then().assign(hasBeenInitialized, ExpressionFactory.TRUE);
+
+        Conditional ifNotStarted = restoreAccessTokenMethod.body()._if(Op.not(hasBeenStarted));
+        Conditional ifStartable = ifNotStarted._then()._if(Op._instanceof(messageProcessor, ref(Startable.class)));
+        TryStatement tryToStart = ifStartable._then()._try();
+        tryToStart.body().add(
+                ExpressionFactory.cast(ref(Startable.class), messageProcessor).invoke("start")
+        );
+        CatchBlock catchStart = tryToStart._catch(ref(Exception.class));
+        exception = catchStart.param("e");
+        catchStart.body().add(
+                logger.invoke("error").arg(
+                        exception.invoke("getMessage")
+                ).arg(
+                        exception
+                )
+        );
+
+        ifNotStarted._then().assign(hasBeenStarted, ExpressionFactory.TRUE);
+
+        TryStatement tryProcess = restoreAccessTokenMethod.body()._try();
+        tryProcess.body().add(
+                messageProcessor.invoke("process").arg(event)
+        );
+        tryProcess.body().assign(accessToken,
+                event.invoke("getMessage").invoke("getInvocationProperty").arg("OAuthAccessToken")
+        );
+        tryProcess.body().assign(accessToken,
+                event.invoke("getMessage").invoke("getInvocationProperty").arg("OAuthAccessTokenSecret")
+        );
+        CatchBlock catchProcess = tryProcess._catch(ref(Exception.class));
+        exception = catchProcess.param("e");
+        catchProcess.body().add(
+                logger.invoke("error").arg(
+                        exception.invoke("getMessage")
+                ).arg(
+                        exception
+                )
+        );
+
         Method getAccessTokenMethod = callbackClass.method(Modifier.PUBLIC, ref(String.class), "getAccessToken");
+        getAccessTokenMethod.body()._return(accessToken);
         Method getAccessTokenSecretMethod = callbackClass.method(Modifier.PUBLIC, ref(String.class), "getAccessTokenSecret");
+        getAccessTokenSecretMethod.body()._return(accessTokenSecret);
     }
 
     private DefinedClass getDefaultRestoreAccessTokenCallbackClass(TypeElement type) {

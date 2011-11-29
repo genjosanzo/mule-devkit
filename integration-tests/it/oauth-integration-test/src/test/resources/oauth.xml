@@ -31,48 +31,34 @@
     <oauth:config name="default-oauth" consumerKey="consumerKey123" consumerSecret="consumerSecret123">
         <oauth:oauth-callback-config domain="localhost" localPort="${http.port}" remotePort="${http.port}"
                                      async="false"/>
-        <oauth:oauth-save-access-token>
-            <script:component>
-                <script:script engine="groovy"><![CDATA[
-                    import groovy.json.JsonBuilder
-                    def file = new File(env["MULE_HOME"] + "/.mule/mytoken").newOutputStream()
-                    def json = new JsonBuilder()
-                    json.state
-                    {
-                        accessToken message.getInvocationProperty("OAuthAccessToken")
-                        accessTokenSecret message.getInvocationProperty("OAuthAccessTokenSecret")
-                    }
+    </oauth:config>
 
-                    file << json.toPrettyString()
-                    file.close()
-                ]]></script:script>
-            </script:component>
+    <oauth:config name="oauth-with-save" consumerKey="consumerKey123" consumerSecret="consumerSecret123">
+        <oauth:oauth-callback-config domain="localhost" localPort="${http.port}" remotePort="${http.port}"
+                                     async="false"/>
+        <oauth:oauth-save-access-token>
+            <component class="org.mule.devkit.it.SaveAccessTokenComponent"  />
         </oauth:oauth-save-access-token>
-        <oauth:oauth-restore-access-token>
-            <script:component>
-                <script:script engine="groovy"><![CDATA[
-                    import groovy.json.JsonSlurper
-                    def file = new File(env["MULE_HOME"] + "/.mule/mytoken").newOutputStream()
-                    def slurper = new JsonSlurper()
-                    def state = slurper.parseText(file.text)
-                    file.close()
-                    message.setInvocationProperty("OAuthAccessToken", state.accessToken)
-                    message.setInvocationProperty("OAuthAccessTokenSecret", state.accessTokenSecret)
-                ]]></script:script>
-            </script:component>
-        </oauth:oauth-restore-access-token>
     </oauth:config>
 
     <flow name="authorize">
-        <oauth:authorize/>
+        <oauth:authorize config-ref="default-oauth"/>
+    </flow>
+
+    <flow name="authorizeWithSave">
+        <oauth:authorize config-ref="oauth-with-save"/>
     </flow>
 
     <flow name="protectedResource">
-        <oauth:protected-resource/>
+        <oauth:protected-resource config-ref="default-oauth"/>
+    </flow>
+
+    <flow name="protectedResourceWithSave">
+        <oauth:protected-resource config-ref="oauth-with-save"/>
     </flow>
 
     <flow name="nonProtectedResource">
-        <oauth:non-protected-resource/>
+        <oauth:non-protected-resource config-ref="default-oauth"/>
     </flow>
 
     <flow name="requestToken">

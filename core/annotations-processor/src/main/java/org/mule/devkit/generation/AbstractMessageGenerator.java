@@ -104,6 +104,16 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return expressionManager;
     }    
 
+    protected FieldVariable generateFieldForBoolean(DefinedClass messageProcessorClass, String name) {
+        FieldVariable expressionManager = messageProcessorClass.field(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, name);
+        return expressionManager;
+    }
+
+    protected FieldVariable generateFieldForString(DefinedClass messageProcessorClass, String name) {
+        FieldVariable expressionManager = messageProcessorClass.field(Modifier.PRIVATE, ref(String.class), name);
+        return expressionManager;
+    }
+    
     protected FieldVariable generateFieldForModuleObject(DefinedClass messageProcessorClass, TypeElement typeElement) {
         FieldVariable field = messageProcessorClass.field(Modifier.PRIVATE, ref(Object.class), "moduleObject");
         field.javadoc().add("Module object");

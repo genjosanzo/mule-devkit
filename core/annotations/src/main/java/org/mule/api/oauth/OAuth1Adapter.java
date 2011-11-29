@@ -83,12 +83,23 @@ public interface OAuth1Adapter {
      *
      * @param saveCallback Callback to be called
      */
-    void setSaveAccessTokenCallback(SaveAccessTokenCallback saveCallback);
+    void setOauthSaveAccessToken(SaveAccessTokenCallback saveCallback);
 
     /**
      * Set the callback to be called when the access token and secret need to be restored
      *
      * @param restoreCallback Callback to be called
      */
-    void setRestoreAccessTokenCallback(RestoreAccessTokenCallback restoreCallback);
+    void setOauthRestoreAccessToken(RestoreAccessTokenCallback restoreCallback);
+
+    /**
+     * Get the callback to be called when the access token and secret need to be saved for
+     * later restoration
+     */
+    SaveAccessTokenCallback getOauthSaveAccessToken();
+
+    /**
+     * Get the callback to be called when the access token and secret need to be restored
+     */
+    RestoreAccessTokenCallback  getOauthRestoreAccessToken();
 }

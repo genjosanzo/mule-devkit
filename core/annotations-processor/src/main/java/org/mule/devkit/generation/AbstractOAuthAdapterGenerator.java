@@ -69,8 +69,8 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
     protected static final String AUTH_CODE_PATTERN_FIELD_NAME = "AUTH_CODE_PATTERN";
     protected static final String EXPIRATION_TIME_PATTERN_FIELD_NAME = "EXPIRATION_TIME_PATTERN";
     protected static final String EXPIRATION_FIELD_NAME = "expiration";
-    public static final String OAUTH_SAVE_ACCESS_TOKEN_CALLBACK_FIELD_NAME = "oauthSaveAccessTokenCallback";
-    public static final String OAUTH_RESTORE_ACCESS_TOKEN_CALLBACK_FIELD_NAME = "oauthRestoreAccessTokenCallback";
+    public static final String OAUTH_SAVE_ACCESS_TOKEN_CALLBACK_FIELD_NAME = "oauthSaveAccessToken";
+    public static final String OAUTH_RESTORE_ACCESS_TOKEN_CALLBACK_FIELD_NAME = "oauthRestoreAccessToken";
 
     protected DefinedClass getOAuthAdapterClass(TypeElement typeElement, String classSuffix, Class<?> interf) {
         String oauthAdapterName = context.getNameUtils().generateClassName(typeElement, ".config", classSuffix);

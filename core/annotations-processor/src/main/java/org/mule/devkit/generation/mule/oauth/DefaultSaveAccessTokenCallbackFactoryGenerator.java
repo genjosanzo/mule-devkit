@@ -18,13 +18,16 @@ package org.mule.devkit.generation.mule.oauth;
 
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Variable;
 
 import javax.lang.model.element.TypeElement;
 
@@ -48,6 +51,16 @@ public class DefaultSaveAccessTokenCallbackFactoryGenerator extends AbstractMess
         DefinedClass callback = context.getClassForRole(DefaultSaveAccessTokenCallbackGenerator.ROLE);
         Method getObjectType = factory.method(Modifier.PUBLIC, ref(Class.class), "getObjectType");
         getObjectType.body()._return(callback.dotclass());
+
+        Method getObject = factory.method(Modifier.PUBLIC, ref(Object.class), "getObject");
+        getObject._throws(ref(Exception.class));
+        Variable callbackVariable = getObject.body().decl(callback, "callback", ExpressionFactory._new(callback));
+        getObject.body().add(
+                callbackVariable.invoke("setMessageProcessor").arg(
+                        ExpressionFactory.cast(ref(MessageProcessor.class),
+                                ExpressionFactory._super().invoke("getObject"))));
+
+        getObject.body()._return(callbackVariable);
     }
 
     private DefinedClass getDefaultSaveAccessTokenCallbackFactoryClass(TypeElement type) {

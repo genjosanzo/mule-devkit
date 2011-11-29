@@ -19,6 +19,7 @@ package org.mule.devkit.generation.mule.oauth;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.oauth.RestoreAccessTokenCallback;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
@@ -47,6 +48,16 @@ public class DefaultRestoreAccessTokenCallbackFactoryGenerator extends AbstractM
         DefinedClass callback = context.getClassForRole(DefaultRestoreAccessTokenCallbackGenerator.ROLE);
         Method getObjectType = factory.method(Modifier.PUBLIC, ref(Class.class), "getObjectType");
         getObjectType.body()._return(callback.dotclass());
+        
+        Method getObject = factory.method(Modifier.PUBLIC, ref(Object.class), "getObject");
+        getObject._throws(ref(Exception.class));
+        Variable callbackVariable = getObject.body().decl(callback, "callback", ExpressionFactory._new(callback));
+        getObject.body().add(
+                callbackVariable.invoke("setMessageProcessor").arg(
+                        ExpressionFactory.cast(ref(MessageProcessor.class),
+                                ExpressionFactory._super().invoke("getObject"))));
+        
+        getObject.body()._return(callbackVariable);
     }
     
     private DefinedClass getDefaultRestoreAccessTokenCallbackFactoryClass(TypeElement type) {
