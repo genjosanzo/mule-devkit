@@ -242,7 +242,7 @@ public class OAuth1AdapterGenerator extends AbstractOAuthAdapterGenerator {
 
         ifDebugEnabled = ifAccessTokenNullOrSecretNull._then()._if(logger.invoke("isDebugEnabled"));
         messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
-        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Access token retrieve successfully "));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Access token retrieved successfully "));
         ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("[accessToken = ")));
         ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(oauthAdapter.fields().get(OAUTH_ACCESS_TOKEN_FIELD_NAME)));
         ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("] ")));

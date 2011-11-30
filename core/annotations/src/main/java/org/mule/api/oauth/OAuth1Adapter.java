@@ -19,38 +19,7 @@ package org.mule.api.oauth;
 /**
  * Adds OAuth 1.0a capabilities to the pojo
  */
-public interface OAuth1Adapter {
-
-    /**
-     * Retrieve OAuth verifier
-     *
-     * @return A String representing the OAuth verifier
-     */
-    String getOauthVerifier();
-
-    /**
-     * Set OAuth verifier
-     *
-     * @param value OAuth verifier to set
-     */
-    void setOauthVerifier(String value);
-
-    /**
-     * Retrieve redirect url
-     */
-    String getRedirectUrl();
-
-    /**
-     * Retrieve access token
-     */
-    String getAccessToken();
-
-    /**
-     * Set access token
-     *
-     * @param value
-     */
-    void setAccessToken(String value);
+public interface OAuth1Adapter extends OAuthAdapter {
 
     /**
      * Retrieve access token secret
@@ -64,42 +33,4 @@ public interface OAuth1Adapter {
      */
     void setAccessTokenSecret(String value);
 
-    /**
-     * Retrieve authorization url
-     */
-    String getAuthorizationUrl() throws UnableToAcquireRequestTokenException;
-
-
-    /**
-     * Acquire access token and secret
-     *
-     * @throws UnableToAcquireAccessTokenException
-     */
-    void fetchAccessToken() throws UnableToAcquireAccessTokenException;
-
-    /**
-     * Set the callback to be called when the access token and secret need to be saved for
-     * later restoration
-     *
-     * @param saveCallback Callback to be called
-     */
-    void setOauthSaveAccessToken(SaveAccessTokenCallback saveCallback);
-
-    /**
-     * Set the callback to be called when the access token and secret need to be restored
-     *
-     * @param restoreCallback Callback to be called
-     */
-    void setOauthRestoreAccessToken(RestoreAccessTokenCallback restoreCallback);
-
-    /**
-     * Get the callback to be called when the access token and secret need to be saved for
-     * later restoration
-     */
-    SaveAccessTokenCallback getOauthSaveAccessToken();
-
-    /**
-     * Get the callback to be called when the access token and secret need to be restored
-     */
-    RestoreAccessTokenCallback  getOauthRestoreAccessToken();
 }

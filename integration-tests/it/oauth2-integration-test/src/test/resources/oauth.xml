@@ -27,15 +27,35 @@
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd">
 
     <oauth:config name="default-oauth" consumerKey="consumerKey123" consumerSecret="consumerSecret123">
-        <oauth:http-callback-config domain="localhost" localPort="${http.port}" remotePort="${http.port}" async="true"/>
+        <oauth:oauth-callback-config domain="localhost" localPort="${http.port}" remotePort="${http.port}" async="true"/>
     </oauth:config>
 
+    <oauth:config name="oauth-with-save" consumerKey="consumerKey123" consumerSecret="consumerSecret123">
+        <oauth:oauth-callback-config domain="localhost" localPort="${http.port}" remotePort="${http.port}"
+                                     async="false"/>
+        <oauth:oauth-save-access-token>
+            <component class="org.mule.devkit.it.SaveAccessTokenComponent"  />
+        </oauth:oauth-save-access-token>
+    </oauth:config>
+
+    <flow name="authorize">
+        <oauth:authorize config-ref="default-oauth"/>
+    </flow>
+
+    <flow name="authorizeWithSave">
+        <oauth:authorize config-ref="oauth-with-save"/>
+    </flow>
+
     <flow name="protectedResource">
-        <oauth:protected-resource/>
+        <oauth:protected-resource config-ref="default-oauth"/>
+    </flow>
+
+    <flow name="protectedResourceWithSave">
+        <oauth:protected-resource config-ref="oauth-with-save"/>
     </flow>
 
     <flow name="nonProtectedResource">
-        <oauth:non-protected-resource/>
+        <oauth:non-protected-resource config-ref="default-oauth"/>
     </flow>
 
     <flow name="accessToken">

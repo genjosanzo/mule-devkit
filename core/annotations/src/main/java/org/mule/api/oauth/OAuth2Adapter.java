@@ -18,7 +18,7 @@ package org.mule.api.oauth;
 
 import java.util.Date;
 
-public interface OAuth2Adapter extends OAuth1Adapter {
+public interface OAuth2Adapter extends OAuthAdapter {
 
     void setExpiration(Date value);
 

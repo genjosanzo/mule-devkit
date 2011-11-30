@@ -22,19 +22,11 @@ import org.mule.api.Capability;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.oauth.OAuth1Adapter;
-import org.mule.api.oauth.SaveAccessTokenCallback;
-import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessors;
-import org.mule.component.DefaultJavaComponent;
 import org.mule.construct.Flow;
-import org.mule.devkit.it.config.DefaultSaveAccessTokenCallback;
-import org.mule.processor.chain.DefaultMessageProcessorChain;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.FunctionalTestCase;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -77,17 +69,17 @@ public class OAuthModuleTest extends FunctionalTestCase {
         simulateCallbackUponUserAuthorizingConsumer(url);
         responseEvent = runFlow("protectedResourceWithSave");
         verifiyProtectedResourceWasAccessed(responseEvent);
-        
+
         assertEquals(SaveAccessTokenComponent.getAccessToken(), Constants.ACCESS_TOKEN);
         assertEquals(SaveAccessTokenComponent.getAccessTokenSecret(), Constants.ACCESS_TOKEN_SECRET);
     }
 
     private void verifiyProtectedResourceWasAccessed(MuleEvent responseEvent) throws MuleException {
         assertEquals(OAuthModule.PROTECTED_RESOURCE, responseEvent.getMessageAsString());
-        if( RequestTokenComponent.timesCalled < 1 ) {
+        if (RequestTokenComponent.timesCalled < 1) {
             fail("Not enough times called");
         }
-        if( RequestTokenComponent.timesCalled == 0 ) {
+        if (RequestTokenComponent.timesCalled == 0) {
             fail("Not enough times called");
         }
     }
@@ -104,7 +96,7 @@ public class OAuthModuleTest extends FunctionalTestCase {
         assertEquals("302", responseEvent.getMessage().getOutboundProperty("http.status"));
         String url = responseEvent.getMessage().getOutboundProperty("Location");
         assertNotNull(url);
-        if( RequestTokenComponent.timesCalled < 1 ) {
+        if (RequestTokenComponent.timesCalled < 1) {
             fail("Not enough times called");
         }
         return url;

@@ -139,24 +139,27 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
         ifAccessTokenIsNull.invoke(moduleObject, OAuth1AdapterGenerator.FETCH_ACCESS_TOKEN_METHOD_NAME);
         
         tryToAuthorize.body()._return(event);
-        
-        CatchBlock unableToAcquireRequestTokenException = tryToAuthorize._catch(ref(UnableToAcquireRequestTokenException.class));
-        Variable exception = unableToAcquireRequestTokenException.param("e");
+
+        // OAuth 2 does not have a request token
+        if( typeElement.hasAnnotation(OAuth.class) ) {
+            CatchBlock unableToAcquireRequestTokenException = tryToAuthorize._catch(ref(UnableToAcquireRequestTokenException.class));
+            Variable exception = unableToAcquireRequestTokenException.param("e");
+            TypeReference coreMessages = ref(CoreMessages.class);
+            Invocation failedToInvoke = coreMessages.staticInvoke("failedToInvoke");
+            failedToInvoke.arg(ExpressionFactory.lit("authorize"));
+            Invocation messageException = ExpressionFactory._new(ref(MessagingException.class));
+            messageException.arg(failedToInvoke);
+            messageException.arg(event);
+            messageException.arg(exception);
+            unableToAcquireRequestTokenException.body()._throw(messageException);
+        }
+
+        CatchBlock unableToAcquireAccessTokenException = tryToAuthorize._catch(ref(UnableToAcquireAccessTokenException.class));
+        Variable exception = unableToAcquireAccessTokenException.param("e2");
         TypeReference coreMessages = ref(CoreMessages.class);
         Invocation failedToInvoke = coreMessages.staticInvoke("failedToInvoke");
         failedToInvoke.arg(ExpressionFactory.lit("authorize"));
         Invocation messageException = ExpressionFactory._new(ref(MessagingException.class));
-        messageException.arg(failedToInvoke);
-        messageException.arg(event);
-        messageException.arg(exception);
-        unableToAcquireRequestTokenException.body()._throw(messageException);
-
-        CatchBlock unableToAcquireAccessTokenException = tryToAuthorize._catch(ref(UnableToAcquireAccessTokenException.class));
-        exception = unableToAcquireAccessTokenException.param("e2");
-        coreMessages = ref(CoreMessages.class);
-        failedToInvoke = coreMessages.staticInvoke("failedToInvoke");
-        failedToInvoke.arg(ExpressionFactory.lit("authorize"));
-        messageException = ExpressionFactory._new(ref(MessagingException.class));
         messageException.arg(failedToInvoke);
         messageException.arg(event);
         messageException.arg(exception);
