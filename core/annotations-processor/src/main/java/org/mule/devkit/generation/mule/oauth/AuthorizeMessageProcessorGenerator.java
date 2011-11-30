@@ -20,7 +20,6 @@ import org.apache.commons.lang.StringUtils;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.construct.FlowConstructAware;
@@ -77,7 +76,6 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
         messageProcessorClass = getAuthorizeMessageProcessorClass(typeElement);
 
         // add standard fields
-        FieldVariable logger = generateLoggerField(messageProcessorClass);
         FieldVariable object = generateFieldForModuleObject(messageProcessorClass, typeElement);
         FieldVariable muleContext = generateFieldForMuleContext(messageProcessorClass);
         FieldVariable flowConstruct = generateFieldForFlowConstruct(messageProcessorClass);
@@ -113,7 +111,6 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
 
         process._throws(MuleException.class);
         Variable event = process.param(muleEvent, "event");
-        Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage", event.invoke("getMessage"));
 
         DefinedClass moduleObjectClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
         Variable moduleObject = process.body().decl(moduleObjectClass, "castedModuleObject", ExpressionFactory._null());
@@ -124,7 +121,7 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
             Block ifTokenExpired = process.body()._if(moduleObject.invoke(OAuth2AdapterGenerator.HAS_TOKEN_EXPIRED_METHOD_NAME))._then();
             ifTokenExpired.invoke(moduleObject, OAuth2AdapterGenerator.RESET_METHOD_NAME);
         }
-        
+
         TryStatement tryToAuthorize = process.body()._try();
 
         Invocation oauthVerifier = moduleObject.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_VERIFIER_FIELD_NAME));
@@ -133,15 +130,15 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
         ifOauthVerifierIsNull.invoke(event.invoke("getMessage"), "setOutboundProperty").arg(HTTP_STATUS_PROPERTY).arg(REDIRECT_HTTP_STATUS);
         ifOauthVerifierIsNull.invoke(event.invoke("getMessage"), "setOutboundProperty").arg(LOCATION_PROPERTY).arg(authorizationUrl);
         ifOauthVerifierIsNull._return(event);
-        
+
         Invocation accessToken = moduleObject.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_ACCESS_TOKEN_FIELD_NAME));
         Block ifAccessTokenIsNull = tryToAuthorize.body()._if(isNull(accessToken))._then();
         ifAccessTokenIsNull.invoke(moduleObject, OAuth1AdapterGenerator.FETCH_ACCESS_TOKEN_METHOD_NAME);
-        
+
         tryToAuthorize.body()._return(event);
 
         // OAuth 2 does not have a request token
-        if( typeElement.hasAnnotation(OAuth.class) ) {
+        if (typeElement.hasAnnotation(OAuth.class)) {
             CatchBlock unableToAcquireRequestTokenException = tryToAuthorize._catch(ref(UnableToAcquireRequestTokenException.class));
             Variable exception = unableToAcquireRequestTokenException.param("e");
             TypeReference coreMessages = ref(CoreMessages.class);

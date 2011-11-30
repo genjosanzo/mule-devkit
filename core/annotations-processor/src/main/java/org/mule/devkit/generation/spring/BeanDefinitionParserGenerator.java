@@ -54,7 +54,6 @@ import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.util.TemplateParser;
 import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -502,11 +501,11 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         Conditional ifNotNull = block._if(Op.ne(elements, ExpressionFactory._null()));
 
         Block beanDefinitionBuidlerBlock = null;
-        if( allowTextAttribute ) {
+        if (allowTextAttribute) {
             Variable text = ifNotNull._then().decl(ref(String.class), "text", elements.invoke("getAttribute").arg("text"));
             Conditional ifTextElement = ifNotNull._then()._if(Op.cand(Op.ne(text, ExpressionFactory._null()),
                     Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(text))));
-    
+
             ifTextElement._then().add(builder.invoke("addPropertyValue")
                     .arg(fieldName).arg(text));
 
