@@ -82,7 +82,7 @@ public class CloudConnectorOperationsBuilder {
         cloudConnector.setCaption(helper.formatCaption(typeElement.name()));
         cloudConnector.setLocalId(typeElement.name() + "-connector");
         cloudConnector.setExtends(URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
-        cloudConnector.setDescription(helper.formatDescription(typeElement.name() + " Integration"));
+        cloudConnector.setDescription(helper.formatDescription(context.getJavaDocUtils().getSummary(typeElement.getInnerTypeElement())));
         cloudConnector.setAliasId(ALIAS_ID_PREFIX + typeElement.name());
         cloudConnector.setIcon(helper.getIcon(typeElement.name()));
         cloudConnector.setImage(helper.getImage(typeElement.name()));

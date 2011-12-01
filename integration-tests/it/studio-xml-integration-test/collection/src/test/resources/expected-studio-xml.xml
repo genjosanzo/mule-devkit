@@ -8,7 +8,7 @@
       </group>
     </attribute-category>
   </global-cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric" image="icons/large/collection-connector-48x32.png" localId="collection-connector" icon="icons/small/collection-connector-24x16.png" description="Collection Integration." caption="Collection" aliasId="org.mule.tooling.ui.modules.core.pattern.collection">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric" image="icons/large/collection-connector-48x32.png" localId="collection-connector" icon="icons/small/collection-connector-24x16.png" description="Collection module." caption="Collection" aliasId="org.mule.tooling.ui.modules.core.pattern.collection">
     <attribute-category description="General properties." caption="General">
       <group caption="Generic" id="collectionConnectorGeneric">
         <modeSwitch description="Operation." caption="Operation" name="Collection operations to execute">

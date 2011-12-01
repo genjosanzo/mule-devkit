@@ -68,7 +68,7 @@ public class MuleStudioUtils {
         if (!description.endsWith(".")) {
             description += '.';
         }
-        return description;
+        return description.replaceAll("\\<.*?\\>", "");
     }
 
     public String getImage(String moduleName) {

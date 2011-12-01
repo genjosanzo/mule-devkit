@@ -8,7 +8,7 @@
       </group>
     </attribute-category>
   </global-cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" image="icons/large/parameter-annotations-connector-48x32.png" localId="parameter-annotations-connector" icon="icons/small/parameter-annotations-connector-24x16.png" description="Parameter-annotations Integration." caption="Parameter-annotations" aliasId="org.mule.tooling.ui.modules.core.pattern.parameter-annotations">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" image="icons/large/parameter-annotations-connector-48x32.png" localId="parameter-annotations-connector" icon="icons/small/parameter-annotations-connector-24x16.png" description="Module to test annotations applied to parameters." caption="Parameter-annotations" aliasId="org.mule.tooling.ui.modules.core.pattern.parameter-annotations">
     <attribute-category description="General properties." caption="General">
       <group caption="Generic" id="parameter-annotationsConnectorGeneric">
         <modeSwitch description="Operation." caption="Operation" name="Parameter-annotations operations to execute">
