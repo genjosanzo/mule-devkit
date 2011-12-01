@@ -19,7 +19,6 @@ package org.mule.devkit.generation.mule.studio;
 import org.apache.commons.lang.WordUtils;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
-import org.mule.api.annotations.param.Payload;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.spring.SchemaGenerator;
 import org.mule.devkit.generation.spring.SchemaTypeConversion;
@@ -117,22 +116,22 @@ public class MuleStudioUtils {
     }
 
     public AttributeType createAttributeTypeIgnoreEnumsAndCollections(Element element) {
-        if (SchemaTypeConversion.isSupported(element.asType().toString())) {
+        if (skipAttributeTypeGeneration(element)) {
+            return null;
+        } else if (SchemaTypeConversion.isSupported(element.asType().toString())) {
             return createAttributeTypeOfSupportedType(element);
         } else if (typeMirrorUtils.isHttpCallback(element)) {
             FlowRefType flowRefType = new FlowRefType();
             flowRefType.setSupportFlow(true);
             flowRefType.setSupportSubflow(true);
             return flowRefType;
-        } else if (skipAttributeTypeGeneration(element)) {
-            return null;
         } else {
             return new StringAttributeType();
         }
     }
 
     private boolean skipAttributeTypeGeneration(Element element) {
-        return typeMirrorUtils.isCollection(element.asType()) || element.getAnnotation(Payload.class) != null || typeMirrorUtils.isEnum(element.asType());
+        return typeMirrorUtils.isCollection(element.asType()) || typeMirrorUtils.isEnum(element.asType()) || typeMirrorUtils.ignoreParameter(element);
     }
 
     private AttributeType createAttributeTypeOfSupportedType(Element element) {
@@ -151,9 +150,8 @@ public class MuleStudioUtils {
             longType.setMin(0);
             longType.setStep(1);
             return longType;
-        }
-        else if(typeMirrorUtils.isURL(element)) {
-             return new UrlType();
+        } else if (typeMirrorUtils.isURL(element)) {
+            return new UrlType();
         } else {
             throw new RuntimeException("Failed to create Studio XML, type not recognized: type=" + element.asType().toString() + " name=" + element.getSimpleName().toString());
         }

@@ -137,7 +137,7 @@ public class CloudConnectorOperationBuilder {
     private List<NestedElementReference> getChildElementsAttributeTypes(ExecutableElement executableElement, List<? extends VariableElement> parameters) {
         List<NestedElementReference> nestedElementReferences = new ArrayList<NestedElementReference>();
         for (VariableElement parameter : parameters) {
-            if (context.getTypeMirrorUtils().isCollection(parameter.asType())) {
+            if (context.getTypeMirrorUtils().isCollection(parameter.asType()) && !context.getTypeMirrorUtils().ignoreParameter(parameter)) {
                 NestedElementReference childElement = new NestedElementReference();
                 childElement.setName(URI_PREFIX + typeElement.name() + "/" + context.getNameUtils().uncamel(parameter.getSimpleName().toString()));
                 childElement.setAllowMultiple(false);
@@ -153,7 +153,7 @@ public class CloudConnectorOperationBuilder {
     private List<EnumType> getEnumAttributeTypes(ExecutableElement executableElement, List<? extends VariableElement> parameters) {
         List<EnumType> enumTypes = new ArrayList<EnumType>();
         for (VariableElement parameter : parameters) {
-            if (context.getTypeMirrorUtils().isEnum(parameter.asType())) {
+            if (context.getTypeMirrorUtils().isEnum(parameter.asType()) && !context.getTypeMirrorUtils().ignoreParameter(parameter)) {
                 EnumType enumType = new EnumType();
                 enumType.setSupportsExpressions(true);
                 enumType.setAllowsCustom(true);
