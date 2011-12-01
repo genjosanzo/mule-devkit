@@ -178,6 +178,21 @@ public class TypeMirrorUtils {
         return className.startsWith(Long.class.getName()) || className.startsWith("long");
     }
 
+    public boolean isFloat(Element element) {
+        String className = element.asType().toString();
+        return className.startsWith(Float.class.getName()) || className.startsWith("float");
+    }
+
+    public boolean isDouble(Element element) {
+        String className = element.asType().toString();
+        return className.startsWith(Double.class.getName()) || className.startsWith("double");
+    }
+
+    public boolean isChar(Element element) {
+        String className = element.asType().toString();
+        return className.startsWith(Character.class.getName()) || className.startsWith("char");
+    }
+
     public boolean isEnum(Element element) {
         return isEnum(element.asType());
     }

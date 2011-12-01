@@ -5,7 +5,16 @@
     <groupId>org.mule.devkit.it</groupId>
     <artifactId>studio-xml-integration-test</artifactId>
     <version>1.0</version>
-    <packaging>mule-module</packaging>
+
+    <modules>
+        <module>basic</module>
+        <module>collection</module>
+        <module>configurable</module>
+        <module>connector</module>
+        <module>parameter-annotations</module>
+    </modules>
+
+    <packaging>pom</packaging>
     <name>Mule DevKit Studio XML Tests</name>
 
     <properties>
@@ -38,8 +47,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
             <plugin>

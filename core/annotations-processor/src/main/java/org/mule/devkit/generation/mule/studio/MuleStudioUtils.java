@@ -136,7 +136,8 @@ public class MuleStudioUtils {
     }
 
     private AttributeType createAttributeTypeOfSupportedType(Element element) {
-        if (typeMirrorUtils.isString(element) || typeMirrorUtils.isDate(element)) {
+        if (typeMirrorUtils.isString(element) || typeMirrorUtils.isDate(element) || typeMirrorUtils.isChar(element) ||
+                typeMirrorUtils.isFloat(element) || typeMirrorUtils.isDouble(element)) {
             return new StringAttributeType();
         } else if (typeMirrorUtils.isBoolean(element)) {
             return new Booleantype();

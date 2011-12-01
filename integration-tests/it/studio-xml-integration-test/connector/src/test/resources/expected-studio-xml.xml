@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="connector" url="http://www.mulesoft.org/schema/mule/connector">
+  <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" image="icons/large/connector-connector-48x32.png" localId="config" icon="icons/small/connector-connector-24x16.png" description="Global Connector configuration information." caption="Connector">
+    <attribute-category description="Connector configuration properties." caption="Connector">
+      <group caption="Generic" id="connectorGenericProperties">
+        <name required="false" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
+        <url required="false" description="A URL." caption="Url" name="url"></url>
+        <string required="false" description="The username to use." caption="Username" name="username"></string>
+        <string required="false" description="The password to use." caption="Password" name="password"></string>
+      </group>
+    </attribute-category>
+  </global-cloud-connector>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" image="icons/large/connector-connector-48x32.png" localId="connector-connector" icon="icons/small/connector-connector-24x16.png" description="Connector Integration." caption="Connector" aliasId="org.mule.tooling.ui.modules.core.pattern.connector">
+    <attribute-category description="General properties." caption="General">
+      <group caption="Generic" id="connectorConnectorGeneric">
+        <modeSwitch description="Operation." caption="Operation" name="Connector operations to execute">
+          <mode modeLabel="Get username" modeId="http://www.mulesoft.org/schema/mule/connector/get-username"></mode>
+          <mode modeLabel="Invalidate" modeId="http://www.mulesoft.org/schema/mule/connector/invalidate"></mode>
+        </modeSwitch>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+  <cloud-connector abstract="true" image="icons/large/connector-connector-48x32.png" localId="abstractConnectorConnectorGeneric" icon="icons/small/connector-connector-24x16.png" description="Interact with Connector." caption="Abstractconnectorconnectorgeneric">
+    <attribute-category description="General properties." caption="General">
+      <group caption="Generic" id="abstractConnectorConnectorGeneric">
+        <globalRef requiredType="http://www.mulesoft.org/schema/mule/connector/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref"></globalRef>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" abstract="true" image="icons/large/connector-connector-48x32.png" localId="invalidate" icon="icons/small/connector-connector-24x16.png" caption="Invalidate">
+    <attribute-category description="General properties." caption="General">
+      <group caption="General" description="Processor method that invalidates connections." id="general">
+        <string required="false" description="The username to use." caption="Username" name="username"></string>
+        <string required="false" description="The password to use." caption="Password" name="password"></string>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" abstract="true" image="icons/large/connector-connector-48x32.png" localId="get-username" icon="icons/small/connector-connector-24x16.png" caption="Get-username">
+    <attribute-category description="General properties." caption="General">
+      <group caption="General" description="Returns the username." id="general">
+        <string required="false" description="The username to use." caption="Username" name="username"></string>
+        <string required="false" description="The password to use." caption="Password" name="password"></string>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+</namespace>
