@@ -21,6 +21,7 @@ import org.mule.devkit.generation.Generator;
 import org.mule.devkit.generation.adapter.CapabilitiesAdapterGenerator;
 import org.mule.devkit.generation.adapter.ConnectionManagerGenerator;
 import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
+import org.mule.devkit.generation.adapter.InjectAdapterGenerator;
 import org.mule.devkit.generation.adapter.LifecycleAdapterFactoryGenerator;
 import org.mule.devkit.generation.adapter.LifecycleAdapterGenerator;
 import org.mule.devkit.generation.adapter.OAuth1AdapterGenerator;
@@ -48,6 +49,7 @@ import org.mule.devkit.generation.spring.NamespaceHandlerGenerator;
 import org.mule.devkit.generation.spring.SchemaGenerator;
 import org.mule.devkit.validation.BasicValidator;
 import org.mule.devkit.validation.ConnectorValidator;
+import org.mule.devkit.validation.InjectValidator;
 import org.mule.devkit.validation.JavaDocValidator;
 import org.mule.devkit.validation.OAuthValidator;
 import org.mule.devkit.validation.ProcessorValidator;
@@ -70,6 +72,7 @@ public class ModulePlugin implements Plugin {
         generators.add(new HttpCallbackGenerator());
         generators.add(new CapabilitiesAdapterGenerator());
         generators.add(new LifecycleAdapterGenerator());
+        generators.add(new InjectAdapterGenerator());
         generators.add(new HttpCallbackAdapterGenerator());
         generators.add(new OAuth1AdapterGenerator());
         generators.add(new OAuth2AdapterGenerator());
@@ -104,6 +107,7 @@ public class ModulePlugin implements Plugin {
         validators.add(new ConnectorValidator());
         validators.add(new SourceValidator());
         validators.add(new TransformerValidator());
+        validators.add(new InjectValidator());
 
     }
 
