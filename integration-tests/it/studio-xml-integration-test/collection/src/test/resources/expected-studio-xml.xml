@@ -37,11 +37,11 @@
       </group>
     </attribute-category>
   </cloud-connector>
-  <nested image="icons/large/collection-connector-48x32.png" localId="operation1-strings" icon="icons/small/collection-connector-24x16.png" description="Strings." caption="Strings">
+  <nested image="icons/large/collection-connector-48x32.png" localId="operation1-strings" xmlname="strings" icon="icons/small/collection-connector-24x16.png" description="Strings." caption="Strings">
     <childElement allowMultiple="true" description="Strings." caption="Strings" name="http://www.mulesoft.org/schema/mule/collection/operation1-string"></childElement>
   </nested>
-  <nested image="icons/large/collection-connector-48x32.png" localId="operation1-string" icon="icons/small/collection-connector-24x16.png" description="Strings." caption="Strings">
-    <string description="A list of strings." caption="Strings" name="operation1-string"></string>
+  <nested image="icons/large/collection-connector-48x32.png" localId="operation1-string" xmlname="string" icon="icons/small/collection-connector-24x16.png" description="Strings." caption="Strings">
+    <text description="A list of strings." caption="Strings" name="operation1-string" isToElement="true"></text>
   </nested>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric" abstract="true" image="icons/large/collection-connector-48x32.png" localId="operation2" icon="icons/small/collection-connector-24x16.png" caption="Operation2">
     <attribute-category description="General properties." caption="General">
@@ -50,10 +50,10 @@
       </group>
     </attribute-category>
   </cloud-connector>
-  <nested image="icons/large/collection-connector-48x32.png" localId="operation2-map-strings" icon="icons/small/collection-connector-24x16.png" description="Map strings." caption="Map Strings">
+  <nested image="icons/large/collection-connector-48x32.png" localId="operation2-map-strings" xmlname="map-strings" icon="icons/small/collection-connector-24x16.png" description="Map strings." caption="Map Strings">
     <childElement allowMultiple="true" description="Map strings." caption="Map Strings" name="http://www.mulesoft.org/schema/mule/collection/operation2-map-string"></childElement>
   </nested>
-  <nested image="icons/large/collection-connector-48x32.png" localId="operation2-map-string" icon="icons/small/collection-connector-24x16.png" description="Map strings." caption="Map Strings">
+  <nested image="icons/large/collection-connector-48x32.png" localId="operation2-map-string" xmlname="map-string" icon="icons/small/collection-connector-24x16.png" description="Map strings." caption="Map Strings">
     <string description="Key." caption="Key" name="key"></string>
     <text isToElement="true" description="Value." caption="Value" name="value"></text>
   </nested>
@@ -64,10 +64,10 @@
       </group>
     </attribute-category>
   </cloud-connector>
-  <nested image="icons/large/collection-connector-48x32.png" localId="operation3-map-objects" icon="icons/small/collection-connector-24x16.png" description="Map objects." caption="Map Objects">
+  <nested image="icons/large/collection-connector-48x32.png" localId="operation3-map-objects" xmlname="map-objects" icon="icons/small/collection-connector-24x16.png" description="Map objects." caption="Map Objects">
     <childElement allowMultiple="true" description="Map objects." caption="Map Objects" name="http://www.mulesoft.org/schema/mule/collection/operation3-map-object"></childElement>
   </nested>
-  <nested image="icons/large/collection-connector-48x32.png" localId="operation3-map-object" icon="icons/small/collection-connector-24x16.png" description="Map objects." caption="Map Objects">
+  <nested image="icons/large/collection-connector-48x32.png" localId="operation3-map-object" xmlname="map-object" icon="icons/small/collection-connector-24x16.png" description="Map objects." caption="Map Objects">
     <string description="Key." caption="Key" name="key"></string>
     <text isToElement="true" description="Value." caption="Value" name="value"></text>
   </nested>
@@ -78,10 +78,10 @@
       </group>
     </attribute-category>
   </cloud-connector>
-  <nested image="icons/large/collection-connector-48x32.png" localId="operation4-properties" icon="icons/small/collection-connector-24x16.png" description="Properties." caption="Properties">
+  <nested image="icons/large/collection-connector-48x32.png" localId="operation4-properties" xmlname="properties" icon="icons/small/collection-connector-24x16.png" description="Properties." caption="Properties">
     <childElement allowMultiple="true" description="Properties." caption="Properties" name="http://www.mulesoft.org/schema/mule/collection/operation4-property"></childElement>
   </nested>
-  <nested image="icons/large/collection-connector-48x32.png" localId="operation4-property" icon="icons/small/collection-connector-24x16.png" description="Properties." caption="Properties">
+  <nested image="icons/large/collection-connector-48x32.png" localId="operation4-property" xmlname="property" icon="icons/small/collection-connector-24x16.png" description="Properties." caption="Properties">
     <string description="Key." caption="Key" name="key"></string>
     <text isToElement="true" description="Value." caption="Value" name="value"></text>
   </nested>
@@ -92,11 +92,11 @@
       </group>
     </attribute-category>
   </cloud-connector>
-  <nested image="icons/large/collection-connector-48x32.png" localId="operation5-list" icon="icons/small/collection-connector-24x16.png" description="List." caption="List">
+  <nested image="icons/large/collection-connector-48x32.png" localId="operation5-list" xmlname="list" icon="icons/small/collection-connector-24x16.png" description="List." caption="List">
     <childElement allowMultiple="true" description="List." caption="List" name="http://www.mulesoft.org/schema/mule/collection/operation5-list"></childElement>
   </nested>
-  <nested image="icons/large/collection-connector-48x32.png" localId="operation5-list" icon="icons/small/collection-connector-24x16.png" description="List." caption="List">
-    <string description="A list." caption="List" name="operation5-list"></string>
+  <nested image="icons/large/collection-connector-48x32.png" localId="operation5-list" xmlname="list" icon="icons/small/collection-connector-24x16.png" description="List." caption="List">
+    <text description="A list." caption="List" name="operation5-list" isToElement="true"></text>
   </nested>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric" abstract="true" image="icons/large/collection-connector-48x32.png" localId="operation6" icon="icons/small/collection-connector-24x16.png" caption="Operation6">
     <attribute-category description="General properties." caption="General">
@@ -105,14 +105,14 @@
       </group>
     </attribute-category>
   </cloud-connector>
-  <nested image="icons/large/collection-connector-48x32.png" localId="operation6-objects" icon="icons/small/collection-connector-24x16.png" description="Objects." caption="Objects">
+  <nested image="icons/large/collection-connector-48x32.png" localId="operation6-objects" xmlname="objects" icon="icons/small/collection-connector-24x16.png" description="Objects." caption="Objects">
     <childElement allowMultiple="true" description="Object." caption="Object" name="http://www.mulesoft.org/schema/mule/collection/operation6-object"></childElement>
   </nested>
-  <nested image="icons/large/collection-connector-48x32.png" localId="inner-operation6-object" icon="icons/small/collection-connector-24x16.png" description="Objects." caption="Objects">
+  <nested image="icons/large/collection-connector-48x32.png" localId="inner-operation6-object" xmlname="inner-object" icon="icons/small/collection-connector-24x16.png" description="Objects." caption="Objects">
     <string description="Key." caption="Key" name="key"></string>
     <text isToElement="true" description="Value." caption="Value" name="value"></text>
   </nested>
-  <nested image="icons/large/collection-connector-48x32.png" localId="operation6-object" icon="icons/small/collection-connector-24x16.png" description="Objects." caption="Objects">
+  <nested image="icons/large/collection-connector-48x32.png" localId="operation6-object" xmlname="object" icon="icons/small/collection-connector-24x16.png" description="Objects." caption="Objects">
     <childElement allowMultiple="true" description="Object." caption="Object" name="http://www.mulesoft.org/schema/mule/collection/inner-operation6-object"></childElement>
   </nested>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric" abstract="true" image="icons/large/collection-connector-48x32.png" localId="operation7" icon="icons/small/collection-connector-24x16.png" caption="Operation7">
@@ -122,7 +122,7 @@
       </group>
     </attribute-category>
   </cloud-connector>
-  <nested image="icons/large/collection-connector-48x32.png" localId="operation7-map" icon="icons/small/collection-connector-24x16.png" description="Map." caption="Map">
+  <nested image="icons/large/collection-connector-48x32.png" localId="operation7-map" xmlname="map" icon="icons/small/collection-connector-24x16.png" description="Map." caption="Map">
     <childElement allowMultiple="true" description="Map." caption="Map" name="http://www.mulesoft.org/schema/mule/collection/operation7-map"></childElement>
   </nested>
   <nested xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></nested>
