@@ -1913,6 +1913,8 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
             }
             if (hasConnect && hasDisconnect) {
                 mModuleHasConnectionManager = true;
+            } else {
+                mModuleHasConnectionManager = false;
             }
             mModuleKnown = true;
         }
