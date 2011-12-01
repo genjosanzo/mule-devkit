@@ -46,16 +46,14 @@ public class NestedsBuilder {
     private MuleStudioUtils helper;
     private ExecutableElement executableElement;
     private String moduleName;
-    private List<String> parsedLocalIds;
     private NameUtils nameUtils;
     private Types typeUtils;
     private TypeMirrorUtils typeMirrorUtils;
     private JavaDocUtils javaDocUtils;
 
-    public NestedsBuilder(GeneratorContext context, ExecutableElement executableElement, String moduleName, List<String> parsedLocalIds) {
+    public NestedsBuilder(GeneratorContext context, ExecutableElement executableElement, String moduleName) {
         this.executableElement = executableElement;
         this.moduleName = moduleName;
-        this.parsedLocalIds = parsedLocalIds;
         helper = new MuleStudioUtils(context);
         this.nameUtils = context.getNameUtils();
         this.typeUtils = context.getTypeUtils();

@@ -59,7 +59,6 @@ public class CloudConnectorOperationBuilder {
 
         Group group = new Group();
         group.setCaption(helper.formatCaption("General"));
-        group.setDescription(helper.formatDescription(context.getJavaDocUtils().getSummary(executableElement).replaceAll("\\n|<p/>", "")));
         group.setId("general");
 
         addMethodParametersToGroup(group);
