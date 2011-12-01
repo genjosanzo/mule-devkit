@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="parameter-annotations" url="http://www.mulesoft.org/schema/mule/parameter-annotations">
+  <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" image="icons/large/parameter-annotations-connector-48x32.png" localId="config" icon="icons/small/parameter-annotations-connector-24x16.png" description="Global Parameter annotations configuration information." caption="Parameter Annotations">
+    <attribute-category description="Parameter-annotations configuration properties." caption="Parameter-annotations">
+      <group caption="Generic" id="parameter-annotationsGenericProperties">
+        <name required="false" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
+      </group>
+    </attribute-category>
+  </global-cloud-connector>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" image="icons/large/parameter-annotations-connector-48x32.png" localId="parameter-annotations-connector" icon="icons/small/parameter-annotations-connector-24x16.png" description="Parameter-annotations Integration." caption="Parameter-annotations" aliasId="org.mule.tooling.ui.modules.core.pattern.parameter-annotations">
+    <attribute-category description="General properties." caption="General">
+      <group caption="Generic" id="parameter-annotationsConnectorGeneric">
+        <modeSwitch description="Operation." caption="Operation" name="Parameter-annotations operations to execute">
+          <mode modeLabel="Inbound headers" modeId="http://www.mulesoft.org/schema/mule/parameter-annotations/inbound-headers"></mode>
+          <mode modeLabel="Invocation headers" modeId="http://www.mulesoft.org/schema/mule/parameter-annotations/invocation-headers"></mode>
+          <mode modeLabel="Optional params" modeId="http://www.mulesoft.org/schema/mule/parameter-annotations/optional-params"></mode>
+          <mode modeLabel="Optional params with defaults" modeId="http://www.mulesoft.org/schema/mule/parameter-annotations/optional-params-with-defaults"></mode>
+          <mode modeLabel="Outbound headers" modeId="http://www.mulesoft.org/schema/mule/parameter-annotations/outbound-headers"></mode>
+          <mode modeLabel="Pauth" modeId="http://www.mulesoft.org/schema/mule/parameter-annotations/pauth"></mode>
+          <mode modeLabel="Payload" modeId="http://www.mulesoft.org/schema/mule/parameter-annotations/payload"></mode>
+        </modeSwitch>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+  <cloud-connector abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="abstractParameter-annotationsConnectorGeneric" icon="icons/small/parameter-annotations-connector-24x16.png" description="Interact with Parameter-annotations." caption="Abstractparameter-annotationsconnectorgeneric">
+    <attribute-category description="General properties." caption="General">
+      <group caption="Generic" id="abstractParameter-annotationsConnectorGeneric">
+        <globalRef requiredType="http://www.mulesoft.org/schema/mule/parameter-annotations/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref"></globalRef>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="optional-params" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Optional-params">
+    <attribute-category description="General properties." caption="General">
+      <group caption="General" description="Method that takes optional parameters." id="general">
+        <string required="false" description="A optional string parameter." caption="A String" name="aString"></string>
+        <integer step="1" min="0" required="false" description="A optional integer parameter." caption="A Integer" name="aInteger"></integer>
+        <boolean required="false" description="A optional boolean parameter." caption="A Boolean" name="aBoolean"></boolean>
+        <string required="false" description="A optional character parameter." caption="A Character" name="aCharacter"></string>
+        <string required="false" description="A optional double parameter." caption="A Double" name="aDouble"></string>
+        <string required="false" description="A optonal float parameter." caption="A Float" name="aFloat"></string>
+        <long step="1" min="0" required="false" description="A optional long parameter." caption="A Long" name="aLong"></long>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="optional-params-with-defaults" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Optional-params-with-defaults">
+    <attribute-category description="General properties." caption="General">
+      <group caption="General" description="Method that takes optional parameters with default values." id="general">
+        <string defaultValue="fede" required="false" description="A optional string parameter with default value." caption="A String" name="aString"></string>
+        <integer step="1" min="0" defaultValue="1" required="false" description="A optional integer parameter with default value." caption="A Integer" name="aInteger"></integer>
+        <boolean defaultValue="false" required="false" description="A optional boolean parameter with default value." caption="A Boolean" name="aBoolean"></boolean>
+        <string defaultValue="A" required="false" description="A optional character parameter with default value." caption="A Character" name="aCharacter"></string>
+        <string defaultValue="5.3" required="false" description="A optional double parameter with default value." caption="A Double" name="aDouble"></string>
+        <string defaultValue="3.2" required="false" description="A optonal float parameter with default value." caption="A Float" name="aFloat"></string>
+        <long step="1" min="0" defaultValue="2" required="false" description="A optional long parameter with default value." caption="A Long" name="aLong"></long>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="payload" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Payload">
+    <attribute-category description="General properties." caption="General">
+      <group caption="General" description="Method that takes the payload." id="general"></group>
+    </attribute-category>
+  </cloud-connector>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="inbound-headers" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Inbound-headers">
+    <attribute-category description="General properties." caption="General">
+      <group caption="General" description="Method that takes the inbound headers." id="general"></group>
+    </attribute-category>
+  </cloud-connector>
+  <nested image="icons/large/parameter-annotations-connector-48x32.png" localId="inbound-headers" icon="icons/small/parameter-annotations-connector-24x16.png" description="Inbound headers." caption="Inbound Headers">
+    <childElement allowMultiple="true" description="Inbound headers." caption="Inbound Headers" name="http://www.mulesoft.org/schema/mule/parameter-annotations/inbound-header"></childElement>
+  </nested>
+  <nested image="icons/large/parameter-annotations-connector-48x32.png" localId="inbound-header" icon="icons/small/parameter-annotations-connector-24x16.png" description="Inbound headers." caption="Inbound Headers">
+    <string description="Key." caption="Key" name="key"></string>
+    <text isToElement="true" description="Value." caption="Value" name="value"></text>
+  </nested>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="invocation-headers" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Invocation-headers">
+    <attribute-category description="General properties." caption="General">
+      <group caption="General" description="Method that takes the invocation headers." id="general"></group>
+    </attribute-category>
+  </cloud-connector>
+  <nested image="icons/large/parameter-annotations-connector-48x32.png" localId="invocation-headers" icon="icons/small/parameter-annotations-connector-24x16.png" description="Invocation headers." caption="Invocation Headers">
+    <childElement allowMultiple="true" description="Invocation headers." caption="Invocation Headers" name="http://www.mulesoft.org/schema/mule/parameter-annotations/invocation-header"></childElement>
+  </nested>
+  <nested image="icons/large/parameter-annotations-connector-48x32.png" localId="invocation-header" icon="icons/small/parameter-annotations-connector-24x16.png" description="Invocation headers." caption="Invocation Headers">
+    <string description="Key." caption="Key" name="key"></string>
+    <text isToElement="true" description="Value." caption="Value" name="value"></text>
+  </nested>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="outbound-headers" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Outbound-headers">
+    <attribute-category description="General properties." caption="General">
+      <group caption="General" description="Method that takes the outbound headers." id="general"></group>
+    </attribute-category>
+  </cloud-connector>
+  <nested image="icons/large/parameter-annotations-connector-48x32.png" localId="outbound-headers" icon="icons/small/parameter-annotations-connector-24x16.png" description="Outbound headers." caption="Outbound Headers">
+    <childElement allowMultiple="true" description="Outbound headers." caption="Outbound Headers" name="http://www.mulesoft.org/schema/mule/parameter-annotations/outbound-header"></childElement>
+  </nested>
+  <nested image="icons/large/parameter-annotations-connector-48x32.png" localId="outbound-header" icon="icons/small/parameter-annotations-connector-24x16.png" description="Outbound headers." caption="Outbound Headers">
+    <string description="Key." caption="Key" name="key"></string>
+    <text isToElement="true" description="Value." caption="Value" name="value"></text>
+  </nested>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="pauth" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Pauth">
+    <attribute-category description="General properties." caption="General">
+      <group caption="General" description="Method that takes the access token and token secret." id="general"></group>
+    </attribute-category>
+  </cloud-connector>
+</namespace>

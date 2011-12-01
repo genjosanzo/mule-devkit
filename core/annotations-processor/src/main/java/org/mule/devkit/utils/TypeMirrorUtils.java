@@ -28,7 +28,6 @@ import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -143,15 +142,15 @@ public class TypeMirrorUtils {
         return false;
     }
 
-    public boolean ignoreParameter(VariableElement variable) {
-        String variableType = variable.asType().toString();
+    public boolean ignoreParameter(Element element) {
+        String variableType = element.asType().toString();
         for (Class<?> typeToIgnore : PARAMETER_TYPES_TO_IGNORE) {
             if (variableType.contains(typeToIgnore.getName())) {
                 return true;
             }
         }
         for (Class<? extends Annotation> annotationToIgnore : PARAMETERS_ANNOTATIONS_TO_IGNORE) {
-            if (variable.getAnnotation(annotationToIgnore) != null) {
+            if (element.getAnnotation(annotationToIgnore) != null) {
                 return true;
             }
         }
@@ -176,6 +175,21 @@ public class TypeMirrorUtils {
     public boolean isLong(Element element) {
         String className = element.asType().toString();
         return className.startsWith(Long.class.getName()) || className.startsWith("long");
+    }
+
+    public boolean isFloat(Element element) {
+        String className = element.asType().toString();
+        return className.startsWith(Float.class.getName()) || className.startsWith("float");
+    }
+
+    public boolean isDouble(Element element) {
+        String className = element.asType().toString();
+        return className.startsWith(Double.class.getName()) || className.startsWith("double");
+    }
+
+    public boolean isChar(Element element) {
+        String className = element.asType().toString();
+        return className.startsWith(Character.class.getName()) || className.startsWith("char");
     }
 
     public boolean isEnum(Element element) {

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="collection" url="http://www.mulesoft.org/schema/mule/collection">
+  <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric" image="icons/large/collection-connector-48x32.png" localId="config" icon="icons/small/collection-connector-24x16.png" description="Global Collection configuration information." caption="Collection">
+    <attribute-category description="Collection configuration properties." caption="Collection">
+      <group caption="Generic" id="collectionGenericProperties">
+        <name required="false" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
+      </group>
+    </attribute-category>
+  </global-cloud-connector>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric" image="icons/large/collection-connector-48x32.png" localId="collection-connector" icon="icons/small/collection-connector-24x16.png" description="Collection Integration." caption="Collection" aliasId="org.mule.tooling.ui.modules.core.pattern.collection">
+    <attribute-category description="General properties." caption="General">
+      <group caption="Generic" id="collectionConnectorGeneric">
+        <modeSwitch description="Operation." caption="Operation" name="Collection operations to execute">
+          <mode modeLabel="List of map of string string" modeId="http://www.mulesoft.org/schema/mule/collection/list-of-map-of-string-string"></mode>
+          <mode modeLabel="List of strings" modeId="http://www.mulesoft.org/schema/mule/collection/list-of-strings"></mode>
+          <mode modeLabel="Map of string list of strings" modeId="http://www.mulesoft.org/schema/mule/collection/map-of-string-list-of-strings"></mode>
+          <mode modeLabel="Map of string object" modeId="http://www.mulesoft.org/schema/mule/collection/map-of-string-object"></mode>
+          <mode modeLabel="Map of string string" modeId="http://www.mulesoft.org/schema/mule/collection/map-of-string-string"></mode>
+          <mode modeLabel="Raw list" modeId="http://www.mulesoft.org/schema/mule/collection/raw-list"></mode>
+          <mode modeLabel="Raw map" modeId="http://www.mulesoft.org/schema/mule/collection/raw-map"></mode>
+        </modeSwitch>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+  <cloud-connector abstract="true" image="icons/large/collection-connector-48x32.png" localId="abstractCollectionConnectorGeneric" icon="icons/small/collection-connector-24x16.png" description="Interact with Collection." caption="Abstractcollectionconnectorgeneric">
+    <attribute-category description="General properties." caption="General">
+      <group caption="Generic" id="abstractCollectionConnectorGeneric">
+        <globalRef requiredType="http://www.mulesoft.org/schema/mule/collection/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref"></globalRef>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric" abstract="true" image="icons/large/collection-connector-48x32.png" localId="list-of-strings" icon="icons/small/collection-connector-24x16.png" caption="List-of-strings">
+    <attribute-category description="General properties." caption="General">
+      <group caption="General" description="Method that accepts a List&lt;String&gt;." id="general">
+        <childElement allowMultiple="false" inplace="true" description="A list of strings." caption="Strings" name="http://www.mulesoft.org/schema/mule/collection/strings"></childElement>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+  <nested image="icons/large/collection-connector-48x32.png" localId="strings" icon="icons/small/collection-connector-24x16.png" description="Strings." caption="Strings">
+    <childElement allowMultiple="true" description="Strings." caption="Strings" name="http://www.mulesoft.org/schema/mule/collection/string"></childElement>
+  </nested>
+  <nested image="icons/large/collection-connector-48x32.png" localId="string" icon="icons/small/collection-connector-24x16.png" description="Strings." caption="Strings">
+    <string description="A list of strings." caption="Strings" name="string"></string>
+  </nested>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric" abstract="true" image="icons/large/collection-connector-48x32.png" localId="map-of-string-string" icon="icons/small/collection-connector-24x16.png" caption="Map-of-string-string">
+    <attribute-category description="General properties." caption="General">
+      <group caption="General" description="Method that accepts a Map&lt;String, String&gt;." id="general">
+        <childElement allowMultiple="false" inplace="true" description="A map of strings." caption="Map Strings" name="http://www.mulesoft.org/schema/mule/collection/map-strings"></childElement>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+  <nested image="icons/large/collection-connector-48x32.png" localId="map-strings" icon="icons/small/collection-connector-24x16.png" description="Map strings." caption="Map Strings">
+    <childElement allowMultiple="true" description="Map strings." caption="Map Strings" name="http://www.mulesoft.org/schema/mule/collection/map-string"></childElement>
+  </nested>
+  <nested image="icons/large/collection-connector-48x32.png" localId="map-string" icon="icons/small/collection-connector-24x16.png" description="Map strings." caption="Map Strings">
+    <string description="Key." caption="Key" name="key"></string>
+    <text isToElement="true" description="Value." caption="Value" name="value"></text>
+  </nested>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric" abstract="true" image="icons/large/collection-connector-48x32.png" localId="map-of-string-object" icon="icons/small/collection-connector-24x16.png" caption="Map-of-string-object">
+    <attribute-category description="General properties." caption="General">
+      <group caption="General" description="Method that accepts a Map&lt;String, Object&gt;." id="general">
+        <childElement allowMultiple="false" inplace="true" description="A map of string-object." caption="Map Objects" name="http://www.mulesoft.org/schema/mule/collection/map-objects"></childElement>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+  <nested image="icons/large/collection-connector-48x32.png" localId="map-objects" icon="icons/small/collection-connector-24x16.png" description="Map objects." caption="Map Objects">
+    <childElement allowMultiple="true" description="Map objects." caption="Map Objects" name="http://www.mulesoft.org/schema/mule/collection/map-object"></childElement>
+  </nested>
+  <nested image="icons/large/collection-connector-48x32.png" localId="map-object" icon="icons/small/collection-connector-24x16.png" description="Map objects." caption="Map Objects">
+    <string description="Key." caption="Key" name="key"></string>
+    <text isToElement="true" description="Value." caption="Value" name="value"></text>
+  </nested>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric" abstract="true" image="icons/large/collection-connector-48x32.png" localId="raw-map" icon="icons/small/collection-connector-24x16.png" caption="Raw-map">
+    <attribute-category description="General properties." caption="General">
+      <group caption="General" description="Method that accepts a raw Map." id="general">
+        <childElement allowMultiple="false" inplace="true" description="A raw map." caption="Properties" name="http://www.mulesoft.org/schema/mule/collection/properties"></childElement>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+  <nested image="icons/large/collection-connector-48x32.png" localId="properties" icon="icons/small/collection-connector-24x16.png" description="Properties." caption="Properties">
+    <childElement allowMultiple="true" description="Properties." caption="Properties" name="http://www.mulesoft.org/schema/mule/collection/property"></childElement>
+  </nested>
+  <nested image="icons/large/collection-connector-48x32.png" localId="property" icon="icons/small/collection-connector-24x16.png" description="Properties." caption="Properties">
+    <string description="Key." caption="Key" name="key"></string>
+    <text isToElement="true" description="Value." caption="Value" name="value"></text>
+  </nested>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric" abstract="true" image="icons/large/collection-connector-48x32.png" localId="raw-list" icon="icons/small/collection-connector-24x16.png" caption="Raw-list">
+    <attribute-category description="General properties." caption="General">
+      <group caption="General" description="Method that accepts a raw List." id="general">
+        <childElement allowMultiple="false" inplace="true" description="A list." caption="List" name="http://www.mulesoft.org/schema/mule/collection/list"></childElement>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+  <nested image="icons/large/collection-connector-48x32.png" localId="list" icon="icons/small/collection-connector-24x16.png" description="List." caption="List">
+    <childElement allowMultiple="true" description="List." caption="List" name="http://www.mulesoft.org/schema/mule/collection/list"></childElement>
+  </nested>
+  <nested image="icons/large/collection-connector-48x32.png" localId="list" icon="icons/small/collection-connector-24x16.png" description="List." caption="List">
+    <string description="A list." caption="List" name="list"></string>
+  </nested>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric" abstract="true" image="icons/large/collection-connector-48x32.png" localId="list-of-map-of-string-string" icon="icons/small/collection-connector-24x16.png" caption="List-of-map-of-string-string">
+    <attribute-category description="General properties." caption="General">
+      <group caption="General" description="Method that accepts a List&lt;Map&lt;String, Strin&gt;&gt;." id="general">
+        <childElement allowMultiple="false" inplace="true" description="A list of maps." caption="Objects" name="http://www.mulesoft.org/schema/mule/collection/objects"></childElement>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+  <nested image="icons/large/collection-connector-48x32.png" localId="objects" icon="icons/small/collection-connector-24x16.png" description="Objects." caption="Objects">
+    <childElement allowMultiple="true" description="Object." caption="Object" name="http://www.mulesoft.org/schema/mule/collection/object"></childElement>
+  </nested>
+  <nested image="icons/large/collection-connector-48x32.png" localId="inner-object" icon="icons/small/collection-connector-24x16.png" description="Objects." caption="Objects">
+    <string description="Key." caption="Key" name="key"></string>
+    <text isToElement="true" description="Value." caption="Value" name="value"></text>
+  </nested>
+  <nested image="icons/large/collection-connector-48x32.png" localId="object" icon="icons/small/collection-connector-24x16.png" description="Objects." caption="Objects">
+    <childElement allowMultiple="true" description="Object." caption="Object" name="http://www.mulesoft.org/schema/mule/collection/inner-object"></childElement>
+  </nested>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric" abstract="true" image="icons/large/collection-connector-48x32.png" localId="map-of-string-list-of-strings" icon="icons/small/collection-connector-24x16.png" caption="Map-of-string-list-of-strings">
+    <attribute-category description="General properties." caption="General">
+      <group caption="General" description="Method that accepts a Map&lt;String, List&lt;String&gt;&gt;." id="general">
+        <childElement allowMultiple="false" inplace="true" description="A map of string-lists." caption="Map" name="http://www.mulesoft.org/schema/mule/collection/map"></childElement>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+  <nested image="icons/large/collection-connector-48x32.png" localId="map" icon="icons/small/collection-connector-24x16.png" description="Map." caption="Map">
+    <childElement allowMultiple="true" description="Map." caption="Map" name="http://www.mulesoft.org/schema/mule/collection/map"></childElement>
+  </nested>
+  <nested xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></nested>
+</namespace>
