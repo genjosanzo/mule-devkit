@@ -18,11 +18,12 @@
 package org.mule.devkit.generation.adapter;
 
 import org.apache.commons.lang.StringUtils;
-import org.mule.api.adapter.OAuth2Adapter;
+import org.mule.api.oauth.OAuth2Adapter;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.annotations.oauth.OAuthConsumerKey;
 import org.mule.api.annotations.oauth.OAuthConsumerSecret;
 import org.mule.api.annotations.oauth.OAuthScope;
+import org.mule.api.oauth.UnableToAcquireAccessTokenException;
 import org.mule.devkit.generation.AbstractOAuthAdapterGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
@@ -74,6 +75,10 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
         redirectUrlField(oauthAdapter);
         oauthCallbackField(oauthAdapter);
         accessTokenField(oauthAdapter);
+
+        FieldVariable saveAccessTokenCallback = saveAccessTokenCallbackField(oauthAdapter);
+        FieldVariable restoreAccessTokenCallback = restoreAccessTokenCallbackField(oauthAdapter);
+
         expirationField(oauthAdapter, typeElement.getAnnotation(OAuth2.class));
 
         DefinedClass messageProcessor = generateMessageProcessorInnerClass(oauthAdapter);
@@ -84,7 +89,7 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
 
         FieldVariable logger = FieldBuilder.newLoggerField(oauthAdapter);
         generateGetAuthorizationUrlMethod(oauthAdapter, typeElement, oauth2, logger);
-        generateFetchAccessTokenMethod(oauthAdapter, typeElement, oauth2);
+        generateFetchAccessTokenMethod(oauthAdapter, typeElement, oauth2, restoreAccessTokenCallback, saveAccessTokenCallback, logger);
         generateHasTokenExpiredMethod(oauthAdapter, oauth2);
         generateResetMethod(oauthAdapter, oauth2);
     }
@@ -132,10 +137,41 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
         getAuthorizationUrl.body()._return(urlBuilder.invoke("toString"));
     }
 
-    private void generateFetchAccessTokenMethod(DefinedClass oauthAdapter, DevKitTypeElement typeElement, OAuth2 oauth2) {
+    private void generateFetchAccessTokenMethod(DefinedClass oauthAdapter, DevKitTypeElement typeElement, OAuth2 oauth2, FieldVariable restoreAccessTokenCallbackField, FieldVariable saveAccessTokenCallback, FieldVariable logger) {
         Method fetchAccessToken = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, "fetchAccessToken");
+        fetchAccessToken._throws(ref(UnableToAcquireAccessTokenException.class));
 
-        TryStatement tryStatement = fetchAccessToken.body()._try();
+        Conditional ifRestoreCallbackNotNull = fetchAccessToken.body()._if(Op.ne(restoreAccessTokenCallbackField, ExpressionFactory._null()));
+
+        Conditional ifDebugEnabled = ifRestoreCallbackNotNull._then()._if(logger.invoke("isDebugEnabled"));
+        Variable messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Attempting to restore access token..."));
+        ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuilder.invoke("toString")));
+
+        TryStatement tryToRestore = ifRestoreCallbackNotNull._then()._try();
+        tryToRestore.body().add(restoreAccessTokenCallbackField.invoke("restoreAccessToken"));
+
+        ifDebugEnabled = ifRestoreCallbackNotNull._then()._if(logger.invoke("isDebugEnabled"));
+        messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Access token and secret has been restored successfully "));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("[accessToken = ")));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(restoreAccessTokenCallbackField.invoke("getAccessToken")));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("] ")));
+        ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuilder.invoke("toString")));
+
+        tryToRestore.body().assign(oauthAdapter.fields().get(OAUTH_ACCESS_TOKEN_FIELD_NAME), restoreAccessTokenCallbackField.invoke("getAccessToken"));
+        CatchBlock logIfCannotRestore = tryToRestore._catch(ref(Exception.class));
+        Variable e = logIfCannotRestore.param("e");
+        logIfCannotRestore.body().add(logger.invoke("error").arg("Cannot restore access token, an unexpected error occurred").arg(e));
+
+        Conditional ifAccessTokenNull = fetchAccessToken.body()._if(Op.eq(oauthAdapter.fields().get(OAUTH_ACCESS_TOKEN_FIELD_NAME), ExpressionFactory._null()));
+
+        TryStatement tryStatement = ifAccessTokenNull._then()._try();
+
+        ifDebugEnabled = tryStatement.body()._if(logger.invoke("isDebugEnabled"));
+        messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Retrieving access token..."));
+        ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuilder.invoke("toString")));
 
         Block body = tryStatement.body();
         Variable conn = body.decl(ref(HttpURLConnection.class), "conn",
@@ -164,27 +200,93 @@ public class OAuth2AdapterGenerator extends AbstractOAuthAdapterGenerator {
         body.invoke(builder, "append").arg("&redirect_uri=");
         body.invoke(builder, "append").arg(ref(URLEncoder.class).staticInvoke("encode").arg(oauthAdapter.fields().get(REDIRECT_URL_FIELD_NAME)).arg(ENCODING));
 
+        ifDebugEnabled = tryStatement.body()._if(logger.invoke("isDebugEnabled"));
+        messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Sending request to ["));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(oauth2.accessTokenUrl()));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("] using the following as content ["));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(builder.invoke("toString")));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("]"));
+        ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuilder.invoke("toString")));
+
         Variable out = body.decl(ref(OutputStreamWriter.class), "out", ExpressionFactory._new(ref(OutputStreamWriter.class)).arg(conn.invoke("getOutputStream")));
         body.invoke(out, "write").arg(builder.invoke("toString"));
         body.invoke(out, "close");
 
         Variable response = body.decl(ref(String.class), "response", ref(IOUtils.class).staticInvoke("toString").arg(conn.invoke("getInputStream")));
 
+        ifDebugEnabled = tryStatement.body()._if(logger.invoke("isDebugEnabled"));
+        messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Received response ["));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(response));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("]"));
+        ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuilder.invoke("toString")));
+
         Variable matcher = body.decl(ref(Matcher.class), "matcher", oauthAdapter.fields().get(ACCESS_CODE_PATTERN_FIELD_NAME).invoke("matcher").arg(response));
         Conditional ifAccessTokenFound = body._if(Op.cand(matcher.invoke("find"), Op.gte(matcher.invoke("groupCount"), ExpressionFactory.lit(1))));
         Invocation group = matcher.invoke("group").arg(ExpressionFactory.lit(1));
         ifAccessTokenFound._then().assign(oauthAdapter.fields().get(ACCESS_TOKEN_FIELD_NAME), ref(URLDecoder.class).staticInvoke("decode").arg(group).arg(ENCODING));
+
+        ifDebugEnabled = ifAccessTokenFound._then()._if(logger.invoke("isDebugEnabled"));
+        messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Access token retrieved successfully "));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("[accessToken = ")));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(oauthAdapter.fields().get(ACCESS_TOKEN_FIELD_NAME)));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("] ")));
+        ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuilder.invoke("toString")));
+
         ifAccessTokenFound._else()._throw(ExpressionFactory._new(
                 ref(Exception.class)).arg(ref(String.class).staticInvoke("format").arg("OAuth access token could not be extracted from: %s").arg(response)));
 
+        Conditional ifSaveCallbackNotNull = ifAccessTokenFound._then()._if(Op.ne(saveAccessTokenCallback, ExpressionFactory._null()));
+        Invocation saveAccessToken = saveAccessTokenCallback.invoke("saveAccessToken").arg(oauthAdapter.fields().get(OAUTH_ACCESS_TOKEN_FIELD_NAME))
+                .arg(ExpressionFactory._null());
+        TryStatement tryToSave = ifSaveCallbackNotNull._then()._try();
+
+        ifDebugEnabled = ifSaveCallbackNotNull._then()._if(logger.invoke("isDebugEnabled"));
+        messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Attempting to save access token..."));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("[accessToken = ")));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(oauthAdapter.fields().get(OAUTH_ACCESS_TOKEN_FIELD_NAME)));
+        ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("] ")));
+        ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuilder.invoke("toString")));
+
+        tryToSave.body().add(saveAccessToken);
+        CatchBlock logIfCannotSave = tryToSave._catch(ref(Exception.class));
+        Variable e2 = logIfCannotSave.param("e");
+        logIfCannotSave.body().add(logger.invoke("error").arg("Cannot save access token, an unexpected error occurred").arg(e2));
 
         if (!StringUtils.isEmpty(oauth2.expirationRegex())) {
-            Variable expirationMatcher = body.decl(ref(Matcher.class), "expirationMatcher", oauthAdapter.fields().get(EXPIRATION_TIME_PATTERN_FIELD_NAME).invoke("matcher").arg(response));
-            Conditional ifExpirationFound = body._if(Op.cand(expirationMatcher.invoke("find"), Op.gte(expirationMatcher.invoke("groupCount"), ExpressionFactory.lit(1))));
+            ifDebugEnabled = ifAccessTokenFound._then()._if(logger.invoke("isDebugEnabled"));
+            messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Attempting to extract expiration time using "));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("[expirationPattern = ")));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(oauth2.expirationRegex()));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("] ")));
+            ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuilder.invoke("toString")));
+
+            Variable expirationMatcher = ifAccessTokenFound._then().decl(ref(Matcher.class), "expirationMatcher", oauthAdapter.fields().get(EXPIRATION_TIME_PATTERN_FIELD_NAME).invoke("matcher").arg(response));
+            Conditional ifExpirationFound = ifAccessTokenFound._then()._if(Op.cand(expirationMatcher.invoke("find"), Op.gte(expirationMatcher.invoke("groupCount"), ExpressionFactory.lit(1))));
             Variable seconds = ifExpirationFound._then().decl(ref(Long.class), "expirationSecsAhead",
                     ref(Long.class).staticInvoke("parseLong").arg(expirationMatcher.invoke("group").arg(ExpressionFactory.lit(1))));
             ifExpirationFound._then().assign(oauthAdapter.fields().get(EXPIRATION_FIELD_NAME), ExpressionFactory._new(ref(Date.class)).arg(
                     Op.plus(ref(System.class).staticInvoke("currentTimeMillis"), Op.mul(seconds, ExpressionFactory.lit(1000)))));
+
+            ifDebugEnabled = ifExpirationFound._then()._if(logger.invoke("isDebugEnabled"));
+            messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Token expiration extracted successfully "));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("[expiration = ")));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(oauthAdapter.fields().get(EXPIRATION_FIELD_NAME)));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("] ")));
+            ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuilder.invoke("toString")));
+
+            ifDebugEnabled = ifExpirationFound._else()._if(logger.invoke("isDebugEnabled"));
+            messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Token expiration could not be extracted from "));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("[response = ")));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(response));
+            ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("] ")));
+            ifDebugEnabled._then().add(logger.invoke("debug").arg(messageStringBuilder.invoke("toString")));
         }
         generateReThrow(tryStatement, Exception.class, RuntimeException.class);
     }

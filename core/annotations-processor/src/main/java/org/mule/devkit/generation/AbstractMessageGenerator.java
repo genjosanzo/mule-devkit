@@ -69,8 +69,9 @@ import org.mule.devkit.model.code.builders.FieldBuilder;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.TemplateParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.PropertyValue;
+import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 
 import javax.lang.model.element.ExecutableElement;
@@ -84,10 +85,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
-    protected FieldVariable generateLoggerField(DefinedClass clazz) {
-        return clazz.field(Modifier.PRIVATE | Modifier.STATIC, ref(Logger.class), "logger",
-                ref(LoggerFactory.class).staticInvoke("getLogger").arg(clazz.dotclass()));
-    }
 
     protected FieldVariable generateFieldForPatternInfo(DefinedClass messageProcessorClass) {
         FieldVariable patternInfo = messageProcessorClass.field(Modifier.PRIVATE, ref(TemplateParser.PatternInfo.class), "patternInfo");
@@ -100,7 +97,23 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         expressionManager.javadoc().add("Mule Expression Manager");
         return expressionManager;
     }
+    
+    protected FieldVariable generateFieldForMessageProcessor(DefinedClass messageProcessorClass, String name) {
+        FieldVariable expressionManager = messageProcessorClass.field(Modifier.PRIVATE, ref(MessageProcessor.class), name);
+        expressionManager.javadoc().add("Message Processor");
+        return expressionManager;
+    }    
 
+    protected FieldVariable generateFieldForBoolean(DefinedClass messageProcessorClass, String name) {
+        FieldVariable expressionManager = messageProcessorClass.field(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, name);
+        return expressionManager;
+    }
+
+    protected FieldVariable generateFieldForString(DefinedClass messageProcessorClass, String name) {
+        FieldVariable expressionManager = messageProcessorClass.field(Modifier.PRIVATE, ref(String.class), name);
+        return expressionManager;
+    }
+    
     protected FieldVariable generateFieldForModuleObject(DefinedClass messageProcessorClass, TypeElement typeElement) {
         FieldVariable field = messageProcessorClass.field(Modifier.PRIVATE, ref(Object.class), "moduleObject");
         field.javadoc().add("Module object");
@@ -133,9 +146,14 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected DefinedClass getMessageProcessorClass(ExecutableElement executableElement) {
-        String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, "MessageProcessor");
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + ".config");
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), new Class[]{
+        String className = context.getNameUtils().generateClassName(executableElement, "MessageProcessor");
+        return getMessageProcessorClass(className,
+                context.getNameUtils().getPackageName(className) + ".config");
+    }
+
+    protected DefinedClass getMessageProcessorClass(String className, String packageName) {
+        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(packageName);
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(className), new Class[]{
                 Initialisable.class,
                 Startable.class,
                 Disposable.class,
@@ -326,10 +344,10 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                 } else if (variableElement.getVariableElement().asType().toString().startsWith(HttpCallback.class.getName())) {
                     FieldVariable callbackFlowName = fields.get(fieldName).getField();
                     Block ifCallbackFlowNameIsNull = initialise.body()._if(Op.ne(callbackFlowName, ExpressionFactory._null()))._then();
-                    Invocation domain = ExpressionFactory.cast(pojoClass,object).invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.DOMAIN_FIELD_NAME));
-                    Invocation localPort = ExpressionFactory.cast(pojoClass,object).invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.LOCAL_PORT_FIELD_NAME));
-                    Invocation remotePort = ExpressionFactory.cast(pojoClass,object).invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.REMOTE_PORT_FIELD_NAME));
-                    Invocation async = ExpressionFactory.cast(pojoClass,object).invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.ASYNC_FIELD_NAME));
+                    Invocation domain = ExpressionFactory.cast(pojoClass, object).invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.DOMAIN_FIELD_NAME));
+                    Invocation localPort = ExpressionFactory.cast(pojoClass, object).invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.LOCAL_PORT_FIELD_NAME));
+                    Invocation remotePort = ExpressionFactory.cast(pojoClass, object).invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.REMOTE_PORT_FIELD_NAME));
+                    Invocation async = ExpressionFactory.cast(pojoClass, object).invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.ASYNC_FIELD_NAME));
                     ifCallbackFlowNameIsNull.assign(variableElement.getFieldType(), ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
                             arg(callbackFlowName).arg(muleContext).arg(domain).arg(localPort).arg(remotePort).arg(async));
                 }
@@ -625,7 +643,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         tryBlock._catch(ref(MuleException.class));
         process.body()._return(ExpressionFactory._null());
     }
-    
+
     protected void generateSourceCallbackProcessMethodWithNoPayload(DefinedClass messageSourceClass, FieldVariable messageProcessor, FieldVariable muleContext, FieldVariable flowConstruct) {
         Method process = messageSourceClass.method(Modifier.PUBLIC, ref(Object.class), "process");
         process.javadoc().add("Implements {@link SourceCallback#process()}. This message source will be passed on to ");
@@ -645,7 +663,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         tryBlock._catch(ref(MuleException.class));
         process.body()._return(ExpressionFactory._null());
     }
-    
+
 
     protected void generateSourceCallbackProcessWithPropertiesMethod(DefinedClass messageSourceClass, FieldVariable messageProcessor, FieldVariable muleContext, FieldVariable flowConstruct) {
         Method process = messageSourceClass.method(Modifier.PUBLIC, ref(Object.class), "process");
@@ -689,5 +707,139 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
         tryBlock._catch(ref(MuleException.class));
         process.body()._return(ExpressionFactory._null());
+    }
+
+
+    protected void generateStartMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields) {
+        Method startMethod = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
+        startMethod._throws(ref(MuleException.class));
+
+        if (fields != null) {
+            for (String fieldName : fields.keySet()) {
+                FieldVariableElement variableElement = fields.get(fieldName);
+
+                if (context.getTypeMirrorUtils().isNestedProcessor(variableElement.getVariableElement().asType())) {
+                    boolean isList = context.getTypeMirrorUtils().isArrayOrList(variableElement.getVariableElement().asType());
+
+                    if (!isList) {
+                        Conditional ifStartable = startMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Startable.class)));
+                        ifStartable._then().add(
+                                ExpressionFactory.cast(ref(Startable.class), variableElement.getField()).invoke("start")
+                        );
+                    } else {
+                        Conditional ifIsList = startMethod.body()._if(Op._instanceof(variableElement.getField(), ref(List.class)));
+                        ForEach forEachProcessor = ifIsList._then().forEach(ref(MessageProcessor.class), "messageProcessor", ExpressionFactory.cast(ref(List.class).narrow(MessageProcessor.class), fields.get(fieldName).getField()));
+                        Conditional ifStartable = forEachProcessor.body()._if(Op._instanceof(forEachProcessor.var(), ref(Startable.class)));
+                        ifStartable._then().add(
+                                ExpressionFactory.cast(ref(Startable.class), forEachProcessor.var()).invoke("start")
+                        );
+                    }
+                } else if (variableElement.getVariableElement().asType().toString().startsWith(HttpCallback.class.getName())) {
+                    startMethod.body()._if(Op.ne(variableElement.getFieldType(), ExpressionFactory._null()))._then().invoke(variableElement.getFieldType(), "start");
+                }
+            }
+        }
+    }
+
+    protected void generateStopMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields) {
+        Method stopMethod = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "stop");
+        stopMethod._throws(ref(MuleException.class));
+
+        if (fields != null) {
+            for (String fieldName : fields.keySet()) {
+                FieldVariableElement variableElement = fields.get(fieldName);
+
+                if (context.getTypeMirrorUtils().isNestedProcessor(variableElement.getVariableElement().asType())) {
+                    boolean isList = context.getTypeMirrorUtils().isArrayOrList(variableElement.getVariableElement().asType());
+
+                    if (!isList) {
+                        Conditional ifStoppable = stopMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Stoppable.class)));
+                        ifStoppable._then().add(
+                                ExpressionFactory.cast(ref(Stoppable.class), variableElement.getField()).invoke("stop")
+                        );
+                    } else {
+                        Conditional ifIsList = stopMethod.body()._if(Op._instanceof(variableElement.getField(), ref(List.class)));
+                        ForEach forEachProcessor = ifIsList._then().forEach(ref(MessageProcessor.class), "messageProcessor",
+                                ExpressionFactory.cast(ref(List.class).narrow(MessageProcessor.class), fields.get(fieldName).getField()));
+                        Conditional ifStoppable = forEachProcessor.body()._if(Op._instanceof(forEachProcessor.var(), ref(Stoppable.class)));
+                        ifStoppable._then().add(
+                                ExpressionFactory.cast(ref(Stoppable.class), forEachProcessor.var()).invoke("stop")
+                        );
+                    }
+                } else if (variableElement.getVariableElement().asType().toString().startsWith(HttpCallback.class.getName())) {
+                    stopMethod.body()._if(Op.ne(variableElement.getFieldType(), ExpressionFactory._null()))._then().invoke(variableElement.getFieldType(), "stop");
+                }
+            }
+        }
+    }
+
+    protected void generateDiposeMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields) {
+        Method diposeMethod = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "dispose");
+
+        if (fields != null) {
+            for (String fieldName : fields.keySet()) {
+                FieldVariableElement variableElement = fields.get(fieldName);
+
+                if (context.getTypeMirrorUtils().isNestedProcessor(variableElement.getVariableElement().asType())) {
+                    boolean isList = context.getTypeMirrorUtils().isArrayOrList(variableElement.getVariableElement().asType());
+
+                    if (!isList) {
+                        Conditional ifDisposable = diposeMethod.body()._if(Op._instanceof(variableElement.getField(), ref(Disposable.class)));
+                        ifDisposable._then().add(
+                                ExpressionFactory.cast(ref(Disposable.class), variableElement.getField()).invoke("dispose")
+                        );
+                    } else {
+                        Conditional ifIsList = diposeMethod.body()._if(Op._instanceof(variableElement.getField(), ref(List.class)));
+                        ForEach forEachProcessor = ifIsList._then().forEach(ref(MessageProcessor.class), "messageProcessor", ExpressionFactory.cast(ref(List.class).narrow(MessageProcessor.class), fields.get(fieldName).getField()));
+                        Conditional ifDisposable = forEachProcessor.body()._if(Op._instanceof(forEachProcessor.var(), ref(Disposable.class)));
+                        ifDisposable._then().add(
+                                ExpressionFactory.cast(ref(Disposable.class), forEachProcessor.var()).invoke("dispose")
+                        );
+                    }
+                }
+            }
+
+
+        }
+    }
+
+
+    protected Method generateGetAttributeValue(DefinedClass beanDefinitionparser) {
+        Method getAttributeValue = beanDefinitionparser.method(Modifier.PROTECTED, ref(String.class), "getAttributeValue");
+        Variable element = getAttributeValue.param(ref(org.w3c.dom.Element.class), "element");
+        Variable attributeName = getAttributeValue.param(ref(String.class), "attributeName");
+
+        Invocation getAttribute = element.invoke("getAttribute").arg(attributeName);
+
+        Invocation isEmpty = ref(StringUtils.class).staticInvoke("isEmpty");
+        isEmpty.arg(getAttribute);
+
+        Block ifIsEmpty = getAttributeValue.body()._if(isEmpty.not())._then();
+        ifIsEmpty._return(getAttribute);
+
+        getAttributeValue.body()._return(ExpressionFactory._null());
+        return getAttributeValue;
+    }
+
+
+    protected void generateAttachMessageProcessor(Method parse, Variable definition, Variable parserContext) {
+        Variable propertyValues = parse.body().decl(ref(MutablePropertyValues.class), "propertyValues",
+                parserContext.invoke("getContainingBeanDefinition").invoke("getPropertyValues"));
+
+        Conditional ifIsPoll = parse.body()._if(parserContext.invoke("getContainingBeanDefinition").invoke("getBeanClassName")
+                .invoke("equals").arg("org.mule.config.spring.factories.PollingMessageSourceFactoryBean"));
+
+        ifIsPoll._then().add(propertyValues.invoke("addPropertyValue").arg("messageProcessor").arg(definition));
+
+        Variable messageProcessors = ifIsPoll._else().decl(ref(PropertyValue.class), "messageProcessors",
+                propertyValues.invoke("getPropertyValue").arg("messageProcessors"));
+        Conditional noList = ifIsPoll._else()._if(Op.cor(Op.eq(messageProcessors, ExpressionFactory._null()), Op.eq(messageProcessors.invoke("getValue"),
+                ExpressionFactory._null())));
+        noList._then().add(propertyValues.invoke("addPropertyValue").arg("messageProcessors").arg(ExpressionFactory._new(ref(ManagedList.class))));
+        Variable listMessageProcessors = ifIsPoll._else().decl(ref(List.class), "listMessageProcessors",
+                ExpressionFactory.cast(ref(List.class), propertyValues.invoke("getPropertyValue").arg("messageProcessors").invoke("getValue")));
+        ifIsPoll._else().add(listMessageProcessors.invoke("add").arg(
+                definition
+        ));
     }
 }

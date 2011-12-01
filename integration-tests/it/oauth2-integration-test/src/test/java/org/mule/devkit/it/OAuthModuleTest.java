@@ -16,8 +16,10 @@
  */
 package org.mule.devkit.it;
 
+import org.junit.Test;
 import org.mule.api.Capabilities;
 import org.mule.api.Capability;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.registry.RegistrationException;
@@ -38,27 +40,46 @@ public class OAuthModuleTest extends FunctionalTestCase {
         return "oauth.xml";
     }
 
+    @Test
     public void testEnsureCapability() throws Exception {
         Capabilities capabilities = (Capabilities) AbstractMuleTestCase.muleContext.getRegistry().lookupObject("default-oauth");
 
         assertTrue(capabilities.isCapableOf(Capability.OAUTH2_CAPABLE));
     }
 
+    @Test
     public void testNonProtectedResource() throws Exception {
         MuleEvent responseEvent = runFlow("nonProtectedResource");
         assertEquals(OAuthModule.NON_PROTECTED_RESOURCE, responseEvent.getMessageAsString());
     }
 
-    public void testProtectedResource() throws Exception {
+    @Test(expected = MessagingException.class)
+    public void testProtectedResourceWithoutAuthorization() throws Exception {
         MuleEvent responseEvent = runFlow("protectedResource");
+    }
+
+    public void testProtectedResource() throws Exception {
+        MuleEvent responseEvent = runFlow("authorize");
         String url = verifyUserIsRedirectedToAuthorizationUrl(responseEvent);
         simulateCallbackUponUserAuthorizingConsumer(url);
         responseEvent = runFlow("protectedResource");
         verifiyProtectedResourceWasAccessed(responseEvent);
     }
 
+    @Test
+    public void testProtectedResourceWithSave() throws Exception {
+        MuleEvent responseEvent = runFlow("authorizeWithSave");
+        String url = verifyUserIsRedirectedToAuthorizationUrl(responseEvent);
+        simulateCallbackUponUserAuthorizingConsumer(url);
+        responseEvent = runFlow("protectedResourceWithSave");
+        verifiyProtectedResourceWasAccessed(responseEvent);
+
+        assertEquals(SaveAccessTokenComponent.getAccessToken(), Constants.ACCESS_TOKEN);
+    }
+
+    @Test
     public void testProtectedResourceAccessTokenExpired() throws Exception {
-        MuleEvent responseEvent = runFlow("protectedResource");
+        MuleEvent responseEvent = runFlow("authorize");
         String url = verifyUserIsRedirectedToAuthorizationUrl(responseEvent);
         simulateCallbackUponUserAuthorizingConsumer(url);
         responseEvent = runFlow("protectedResource");
@@ -66,7 +87,7 @@ public class OAuthModuleTest extends FunctionalTestCase {
 
         overrideTokenExpiration();
 
-        responseEvent = runFlow("protectedResource");
+        responseEvent = runFlow("authorize");
         url = verifyUserIsRedirectedToAuthorizationUrl(responseEvent);
         simulateCallbackUponUserAuthorizingConsumer(url);
         responseEvent = runFlow("protectedResource");
@@ -74,7 +95,7 @@ public class OAuthModuleTest extends FunctionalTestCase {
     }
 
     private void overrideTokenExpiration() throws RegistrationException {
-        OAuthModuleOAuth2Adapter oauthAdapter = muleContext.getRegistry().lookupObject(OAuthModuleOAuth2Adapter.class);
+        OAuthModuleOAuth2Adapter oauthAdapter = muleContext.getRegistry().lookupObject("default-oauth");
         oauthAdapter.setExpiration(new Date(System.currentTimeMillis() - 1000));
     }
 

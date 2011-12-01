@@ -39,6 +39,8 @@ import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.Type;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -62,6 +64,11 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
 
     public Type ref(String fullyQualifiedClassName) {
         return context.getCodeModel().ref(fullyQualifiedClassName);
+    }
+
+    protected FieldVariable generateLoggerField(DefinedClass clazz) {
+        return clazz.field(Modifier.PRIVATE | Modifier.STATIC, ref(Logger.class), "logger",
+                ref(LoggerFactory.class).staticInvoke("getLogger").arg(clazz.dotclass()));
     }
 
     protected Method generateSetter(DefinedClass clazz, FieldVariable field) {

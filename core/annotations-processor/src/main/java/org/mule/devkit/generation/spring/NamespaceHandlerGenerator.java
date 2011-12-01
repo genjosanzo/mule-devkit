@@ -20,9 +20,12 @@ package org.mule.devkit.generation.spring;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.Transformer;
+import org.mule.api.annotations.oauth.OAuth;
+import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.generation.mule.oauth.AuthorizeBeanDefinitionParserGenerator;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.Invocation;
@@ -75,6 +78,10 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
     }
 
     private void registerBeanDefinitionParserForEachProcessor(DevKitTypeElement typeElement, Method init) {
+        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
+            DefinedClass authorizeMessageProcessorClass = context.getClassForRole(AuthorizeBeanDefinitionParserGenerator.AUTHORIZE_DEFINITION_PARSER_ROLE);
+            init.body().invoke("registerBeanDefinitionParser").arg(ExpressionFactory.lit("authorize")).arg(ExpressionFactory._new(authorizeMessageProcessorClass));
+        }
         for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             registerBeanDefinitionParserForProcessor(init, executableElement);
         }

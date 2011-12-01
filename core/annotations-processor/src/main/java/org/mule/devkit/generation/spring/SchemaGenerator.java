@@ -83,6 +83,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     public static final String REMOTE_PORT_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.REMOTE_PORT_FIELD_NAME;
     public static final String ASYNC_ATTRIBUTE_NAME = HttpCallbackAdapterGenerator.ASYNC_FIELD_NAME;
     public static final String HTTP_CALLBACK_CONFIG_ELEMENT_NAME = "http-callback-config";
+    public static final String OAUTH_CALLBACK_CONFIG_ELEMENT_NAME = "oauth-callback-config";
     public static final String REF_SUFFIX = "-ref";
     public static final String FLOW_REF_SUFFIX = "-flow-ref";
     public static final String INNER_PREFIX = "inner-";
@@ -103,6 +104,17 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private static final String DOMAIN_DEFAULT_VALUE = "${fullDomain}";
     private static final String PORT_DEFAULT_VALUE = "${http.port}";
     private static final String ASYNC_DEFAULT_VALUE = "true";
+    private static final String ATTRIBUTE_RETRY_MAX_DESCRIPTION = "Specify how many times this operation can be retried automatically.";
+    private static final String ATTRIBUTE_NAME_REF_DESCRIPTION = "The reference object for this parameter";
+    private static final String ATTRIBUTE_NAME_NAME_DESCRIPTION = "Give a name to this configuration so it can be later referenced by config-ref.";
+    private static final String CONNECTION_POOLING_PROFILE = "connection-pooling-profile";
+    private static final String CONNECTION_POOLING_PROFILE_ELEMENT_DESCRIPTION = "Characteristics of the connection pool.";
+    private static final String POOLING_PROFILE_ELEMENT = "pooling-profile";
+    private static final String POOLING_PROFILE_ELEMENT_DESCRIPTION = "Characteristics of the object pool.";
+    private static final String OAUTH_SAVE_ACCESS_TOKEN_ELEMENT = "oauth-save-access-token";
+    private static final String OAUTH_RESTORE_ACCESS_TOKEN_ELEMENT = "oauth-restore-access-token";
+    private static final String OAUTH_SAVE_ACCESS_TOKEN_ELEMENT_DESCRIPTION = "A chain of message processors processed synchronously that can be used to save OAuth state. They will be executed once the connector acquires an OAuth access token.";
+    private static final String OAUTH_RESTORE_ACCESS_TOKEN_ELEMENT_DESCRIPTION = "A chain of message processors processed synchronously that can be used to restore OAuth state. They will be executed whenever access to a protected resource is requested and the connector is not authorized yet.";
     private ObjectFactory objectFactory;
 
     public SchemaGenerator() {
@@ -244,6 +256,12 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     }
 
     private void registerProcessorsAndSources(Schema schema, String targetNamespace, DevKitTypeElement typeElement) {
+        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
+            // generate an MP to start the OAuth process
+            registerProcessorElement(schema, false, targetNamespace, "authorize", "AuthorizeType", "Starts OAuth authorization process. It must be called from a flow with an http:inbound-endpoint.");
+            registerProcessorType(schema, false, targetNamespace, "AuthorizeType", null);
+        }
+
         for (ExecutableElement method : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             String name = method.getSimpleName().toString();
             Processor processor = method.getAnnotation(Processor.class);
@@ -252,7 +270,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             }
             String typeName = StringUtils.capitalize(name) + TYPE_SUFFIX;
 
-            registerProcessorElement(schema, processor.intercepting(), targetNamespace, name, typeName, method);
+            registerProcessorElement(schema, processor.intercepting(), targetNamespace, name, typeName, context.getJavaDocUtils().getSummary(method));
 
             registerProcessorType(schema, processor.intercepting(), targetNamespace, typeName, method);
         }
@@ -272,7 +290,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     }
 
-    private void registerProcessorElement(Schema schema, boolean intercepting, String targetNamespace, String name, String typeName, ExecutableElement executableElement) {
+    private void registerProcessorElement(Schema schema, boolean intercepting, String targetNamespace, String name, String typeName, String docText) {
         Element element = new TopLevelElement();
         element.setName(context.getNameUtils().uncamel(name));
         if (intercepting) {
@@ -285,7 +303,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         // add doc
         Annotation annotation = new Annotation();
         Documentation doc = new Documentation();
-        doc.getContent().add(context.getJavaDocUtils().getSummary(executableElement));
+        doc.getContent().add(docText);
         annotation.getAppinfoOrDocumentation().add(doc);
 
         element.setAnnotation(annotation);
@@ -338,61 +356,63 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         ExplicitGroup all = new ExplicitGroup();
         complexContentExtension.setSequence(all);
 
-        if (element.getKind() == ElementKind.METHOD) {
-            int requiredChildElements = 0;
-            for (VariableElement variable : element.getParameters()) {
-                if (context.getTypeMirrorUtils().ignoreParameter(variable)) {
-                    continue;
-                }
-                if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
-                    requiredChildElements++;
-                } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
-                    requiredChildElements++;
-                } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
-                    requiredChildElements++;
-                }
-            }
-            for (VariableElement variable : element.getParameters()) {
-                if (context.getTypeMirrorUtils().ignoreParameter(variable)) {
-                    continue;
-                }
-                if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
-                    if (requiredChildElements == 1) {
-                        GroupRef groupRef = generateNestedProcessorGroup();
-                        complexContentExtension.setGroup(groupRef);
-                        complexContentExtension.setAll(null);
-
-                        Attribute attribute = new Attribute();
-                        attribute.setUse(SchemaConstants.USE_OPTIONAL);
-                        attribute.setName("text");
-                        attribute.setType(SchemaConstants.STRING);
-
-                        complexContentExtension.getAttributeOrAttributeGroup().add(attribute);
-                    } else {
-                        generateNestedProcessorElement(all, variable);
+        if (element != null) {
+            if (element.getKind() == ElementKind.METHOD) {
+                int requiredChildElements = 0;
+                for (VariableElement variable : element.getParameters()) {
+                    if (context.getTypeMirrorUtils().ignoreParameter(variable)) {
+                        continue;
                     }
-                } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
-                    all.getParticle().add(objectFactory.createElement(generateXmlElement(variable.getSimpleName().toString(), targetNamespace)));
-                } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
-                    generateCollectionElement(schema, targetNamespace, all, variable);
-                } else {
-                    complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(schema, variable));
+                    if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
+                        requiredChildElements++;
+                    } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
+                        requiredChildElements++;
+                    } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
+                        requiredChildElements++;
+                    }
                 }
-            }
+                for (VariableElement variable : element.getParameters()) {
+                    if (context.getTypeMirrorUtils().ignoreParameter(variable)) {
+                        continue;
+                    }
+                    if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
+                        if (requiredChildElements == 1) {
+                            GroupRef groupRef = generateNestedProcessorGroup();
+                            complexContentExtension.setGroup(groupRef);
+                            complexContentExtension.setAll(null);
 
-            ExecutableElement connectExecutableElement = connectForMethod(element);
-            if (connectExecutableElement != null) {
-                if( element.getAnnotation(Processor.class) != null ) {
-                    Attribute retryMaxAttr = createAttribute(ATTRIBUTE_RETRY_MAX, true, SchemaConstants.STRING, "Specify how many times this operation can be retried automatically.");
-                    retryMaxAttr.setDefault("1");
-                    complexContentExtension.getAttributeOrAttributeGroup().add(retryMaxAttr);
-                }
+                            Attribute attribute = new Attribute();
+                            attribute.setUse(SchemaConstants.USE_OPTIONAL);
+                            attribute.setName("text");
+                            attribute.setType(SchemaConstants.STRING);
 
-                for (VariableElement connectVariable : connectExecutableElement.getParameters()) {
-                    if (context.getTypeMirrorUtils().isCollection(connectVariable.asType())) {
-                        generateCollectionElement(schema, targetNamespace, all, connectVariable, true);
+                            complexContentExtension.getAttributeOrAttributeGroup().add(attribute);
+                        } else {
+                            generateNestedProcessorElement(all, variable);
+                        }
+                    } else if (context.getTypeMirrorUtils().isXmlType(variable.asType())) {
+                        all.getParticle().add(objectFactory.createElement(generateXmlElement(variable.getSimpleName().toString(), targetNamespace)));
+                    } else if (context.getTypeMirrorUtils().isCollection(variable.asType())) {
+                        generateCollectionElement(schema, targetNamespace, all, variable);
                     } else {
-                        complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(schema, connectVariable, true));
+                        complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(schema, variable));
+                    }
+                }
+
+                ExecutableElement connectExecutableElement = connectForMethod(element);
+                if (connectExecutableElement != null) {
+                    if (element.getAnnotation(Processor.class) != null) {
+                        Attribute retryMaxAttr = createAttribute(ATTRIBUTE_RETRY_MAX, true, SchemaConstants.STRING, ATTRIBUTE_RETRY_MAX_DESCRIPTION);
+                        retryMaxAttr.setDefault("1");
+                        complexContentExtension.getAttributeOrAttributeGroup().add(retryMaxAttr);
+                    }
+
+                    for (VariableElement connectVariable : connectExecutableElement.getParameters()) {
+                        if (context.getTypeMirrorUtils().isCollection(connectVariable.asType())) {
+                            generateCollectionElement(schema, targetNamespace, all, connectVariable, true);
+                        } else {
+                            complexContentExtension.getAttributeOrAttributeGroup().add(createParameterAttribute(schema, connectVariable, true));
+                        }
                     }
                 }
             }
@@ -440,7 +460,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         attribute.setType(SchemaConstants.STRING);
 
         collectionComplexType.getAttributeOrAttributeGroup().add(attribute);
-
     }
 
     private GroupRef generateNestedProcessorGroup() {
@@ -668,7 +687,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         all.getParticle().add(any);
         xmlComplexType.setSequence(all);
 
-        Attribute ref = createAttribute(ATTRIBUTE_NAME_REF, true, SchemaConstants.STRING, "The reference object for this parameter");
+        Attribute ref = createAttribute(ATTRIBUTE_NAME_REF, true, SchemaConstants.STRING, ATTRIBUTE_NAME_REF_DESCRIPTION);
         xmlComplexType.getAttributeOrAttributeGroup().add(ref);
 
         return xmlComplexType;
@@ -680,7 +699,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         Map<QName, String> otherAttributes = new HashMap<QName, String>();
         otherAttributes.put(SchemaConstants.MULE_DEVKIT_JAVA_CLASS_TYPE, moduleClass.fullName());
         ExtensionType config = registerExtension(schema, SchemaConstants.ELEMENT_NAME_CONFIG, otherAttributes);
-        Attribute nameAttribute = createAttribute(ATTRIBUTE_NAME_NAME, true, SchemaConstants.STRING, "Give a name to this configuration so it can be later referenced by config-ref.");
+        Attribute nameAttribute = createAttribute(ATTRIBUTE_NAME_NAME, true, SchemaConstants.STRING, ATTRIBUTE_NAME_NAME_DESCRIPTION);
         config.getAttributeOrAttributeGroup().add(nameAttribute);
 
         ExplicitGroup all = new ExplicitGroup();
@@ -708,13 +727,13 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             }
 
             TopLevelElement poolingProfile = new TopLevelElement();
-            poolingProfile.setName("connection-pooling-profile");
+            poolingProfile.setName(CONNECTION_POOLING_PROFILE);
             poolingProfile.setType(SchemaConstants.MULE_POOLING_PROFILE_TYPE);
             poolingProfile.setMinOccurs(BigInteger.valueOf(0L));
 
             Annotation annotation = new Annotation();
             Documentation doc = new Documentation();
-            doc.getContent().add("Characteristics of the connection pool.");
+            doc.getContent().add(CONNECTION_POOLING_PROFILE_ELEMENT_DESCRIPTION);
             annotation.getAppinfoOrDocumentation().add(doc);
 
             poolingProfile.setAnnotation(annotation);
@@ -723,71 +742,27 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
 
         // add oauth callback configuration
-        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class) || typeElement.hasProcessorMethodWithParameter(HttpCallback.class)) {
+        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
+            generateHttpCallbackElement(OAUTH_CALLBACK_CONFIG_ELEMENT_NAME, all);
 
-            Attribute domainAttribute = new Attribute();
-            domainAttribute.setUse(SchemaConstants.USE_OPTIONAL);
-            domainAttribute.setName(DOMAIN_ATTRIBUTE_NAME);
-            domainAttribute.setType(SchemaConstants.STRING);
-            domainAttribute.setDefault(DOMAIN_DEFAULT_VALUE);
-
-            Attribute localPortAttribute = new Attribute();
-            localPortAttribute.setUse(SchemaConstants.USE_OPTIONAL);
-            localPortAttribute.setName(LOCAL_PORT_ATTRIBUTE_NAME);
-            localPortAttribute.setType(SchemaConstants.STRING);
-            localPortAttribute.setDefault(PORT_DEFAULT_VALUE);
-
-            Attribute remotePortAttribute = new Attribute();
-            remotePortAttribute.setUse(SchemaConstants.USE_OPTIONAL);
-            remotePortAttribute.setName(REMOTE_PORT_ATTRIBUTE_NAME);
-            remotePortAttribute.setType(SchemaConstants.STRING);
-            remotePortAttribute.setDefault(PORT_DEFAULT_VALUE);
-
-            Attribute asyncAttribute = new Attribute();
-            asyncAttribute.setUse(SchemaConstants.USE_OPTIONAL);
-            asyncAttribute.setName(ASYNC_ATTRIBUTE_NAME);
-            asyncAttribute.setType(SchemaConstants.BOOLEAN);
-            asyncAttribute.setDefault(ASYNC_DEFAULT_VALUE);
-
-            TopLevelElement httpCallbackConfig = new TopLevelElement();
-            httpCallbackConfig.setName(HTTP_CALLBACK_CONFIG_ELEMENT_NAME);
-            httpCallbackConfig.setMinOccurs(BigInteger.ZERO);
-            httpCallbackConfig.setMaxOccurs("1");
-
-            Annotation annotation = new Annotation();
-            Documentation doc = new Documentation();
-            doc.getContent().add("Config for http callbacks.");
-            annotation.getAppinfoOrDocumentation().add(doc);
-            httpCallbackConfig.setAnnotation(annotation);
-
-            ExtensionType extensionType = new ExtensionType();
-            extensionType.setBase(SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE);
-            extensionType.getAttributeOrAttributeGroup().add(localPortAttribute);
-            extensionType.getAttributeOrAttributeGroup().add(remotePortAttribute);
-            extensionType.getAttributeOrAttributeGroup().add(domainAttribute);
-            extensionType.getAttributeOrAttributeGroup().add(asyncAttribute);
-
-            ComplexContent complextContent = new ComplexContent();
-            complextContent.setExtension(extensionType);
-
-            LocalComplexType localComplexType = new LocalComplexType();
-            localComplexType.setComplexContent(complextContent);
-
-            httpCallbackConfig.setComplexType(localComplexType);
-            all.getParticle().add(objectFactory.createElement(httpCallbackConfig));
+            generateOAuthSaveAccessTokenElement(all);
+            generateOAuthRestoreAccessTokenElement(all);
+        }
+        if (typeElement.hasProcessorMethodWithParameter(HttpCallback.class)) {
+            generateHttpCallbackElement(HTTP_CALLBACK_CONFIG_ELEMENT_NAME, all);
         }
 
         if (typeElement.isPoolable()) {
             //<xsd:element name="abstract-pooling-profile" abstract="true" type="abstractPoolingProfileType"/>
 
             TopLevelElement poolingProfile = new TopLevelElement();
-            poolingProfile.setName("pooling-profile");
+            poolingProfile.setName(POOLING_PROFILE_ELEMENT);
             poolingProfile.setType(SchemaConstants.MULE_POOLING_PROFILE_TYPE);
             poolingProfile.setMinOccurs(BigInteger.valueOf(0L));
 
             Annotation annotation = new Annotation();
             Documentation doc = new Documentation();
-            doc.getContent().add("Characteristics of the object pool.");
+            doc.getContent().add(POOLING_PROFILE_ELEMENT_DESCRIPTION);
             annotation.getAppinfoOrDocumentation().add(doc);
 
             poolingProfile.setAnnotation(annotation);
@@ -804,6 +779,105 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         if (all.getParticle().size() == 0) {
             config.setSequence(null);
         }
+    }
+
+    private void generateOAuthSaveAccessTokenElement(ExplicitGroup all) {
+        TopLevelElement collectionElement = new TopLevelElement();
+        all.getParticle().add(objectFactory.createElement(collectionElement));
+        collectionElement.setName(OAUTH_SAVE_ACCESS_TOKEN_ELEMENT);
+
+        collectionElement.setMinOccurs(BigInteger.valueOf(0L));
+        collectionElement.setMaxOccurs("1");
+
+        LocalComplexType collectionComplexType = new LocalComplexType();
+        GroupRef group = generateNestedProcessorGroup();
+
+        collectionComplexType.setGroup(group);
+        collectionElement.setComplexType(collectionComplexType);
+
+        // add doc
+        Annotation annotation = new Annotation();
+        Documentation doc = new Documentation();
+        doc.getContent().add(OAUTH_SAVE_ACCESS_TOKEN_ELEMENT_DESCRIPTION);
+        annotation.getAppinfoOrDocumentation().add(doc);
+
+        collectionElement.setAnnotation(annotation);
+    }
+
+    private void generateOAuthRestoreAccessTokenElement(ExplicitGroup all) {
+        TopLevelElement collectionElement = new TopLevelElement();
+        all.getParticle().add(objectFactory.createElement(collectionElement));
+        collectionElement.setName(OAUTH_RESTORE_ACCESS_TOKEN_ELEMENT);
+
+        collectionElement.setMinOccurs(BigInteger.valueOf(0L));
+        collectionElement.setMaxOccurs("1");
+
+        LocalComplexType collectionComplexType = new LocalComplexType();
+        GroupRef group = generateNestedProcessorGroup();
+
+        collectionComplexType.setGroup(group);
+        collectionElement.setComplexType(collectionComplexType);
+
+        // add doc
+        Annotation annotation = new Annotation();
+        Documentation doc = new Documentation();
+        doc.getContent().add(OAUTH_RESTORE_ACCESS_TOKEN_ELEMENT_DESCRIPTION);
+        annotation.getAppinfoOrDocumentation().add(doc);
+
+        collectionElement.setAnnotation(annotation);
+    }
+
+    private void generateHttpCallbackElement(String elementName, ExplicitGroup all) {
+        Attribute domainAttribute = new Attribute();
+        domainAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+        domainAttribute.setName(DOMAIN_ATTRIBUTE_NAME);
+        domainAttribute.setType(SchemaConstants.STRING);
+        domainAttribute.setDefault(DOMAIN_DEFAULT_VALUE);
+
+        Attribute localPortAttribute = new Attribute();
+        localPortAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+        localPortAttribute.setName(LOCAL_PORT_ATTRIBUTE_NAME);
+        localPortAttribute.setType(SchemaConstants.STRING);
+        localPortAttribute.setDefault(PORT_DEFAULT_VALUE);
+
+        Attribute remotePortAttribute = new Attribute();
+        remotePortAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+        remotePortAttribute.setName(REMOTE_PORT_ATTRIBUTE_NAME);
+        remotePortAttribute.setType(SchemaConstants.STRING);
+        remotePortAttribute.setDefault(PORT_DEFAULT_VALUE);
+
+        Attribute asyncAttribute = new Attribute();
+        asyncAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+        asyncAttribute.setName(ASYNC_ATTRIBUTE_NAME);
+        asyncAttribute.setType(SchemaConstants.BOOLEAN);
+        asyncAttribute.setDefault(ASYNC_DEFAULT_VALUE);
+
+        TopLevelElement httpCallbackConfig = new TopLevelElement();
+        httpCallbackConfig.setName(elementName);
+        httpCallbackConfig.setMinOccurs(BigInteger.ZERO);
+        httpCallbackConfig.setMaxOccurs("1");
+
+        Annotation annotation = new Annotation();
+        Documentation doc = new Documentation();
+        doc.getContent().add("Config for http callbacks.");
+        annotation.getAppinfoOrDocumentation().add(doc);
+        httpCallbackConfig.setAnnotation(annotation);
+
+        ExtensionType extensionType = new ExtensionType();
+        extensionType.setBase(SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE);
+        extensionType.getAttributeOrAttributeGroup().add(localPortAttribute);
+        extensionType.getAttributeOrAttributeGroup().add(remotePortAttribute);
+        extensionType.getAttributeOrAttributeGroup().add(domainAttribute);
+        extensionType.getAttributeOrAttributeGroup().add(asyncAttribute);
+
+        ComplexContent complextContent = new ComplexContent();
+        complextContent.setExtension(extensionType);
+
+        LocalComplexType localComplexType = new LocalComplexType();
+        localComplexType.setComplexContent(complextContent);
+
+        httpCallbackConfig.setComplexType(localComplexType);
+        all.getParticle().add(objectFactory.createElement(httpCallbackConfig));
     }
 
     private Attribute createAttribute(Schema schema, VariableElement variable) {
@@ -965,7 +1039,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         extension.setName(name);
         extension.setSubstitutionGroup(SchemaConstants.MULE_ABSTRACT_EXTENSION);
         extension.setComplexType(complexType);
-        
+
         extension.getOtherAttributes().putAll(otherAttributes);
 
         ComplexContent complexContent = new ComplexContent();

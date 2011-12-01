@@ -36,6 +36,8 @@ import org.mule.config.spring.util.SpringXMLUtils;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
+import org.mule.devkit.generation.mule.oauth.DefaultRestoreAccessTokenCallbackFactoryGenerator;
+import org.mule.devkit.generation.mule.oauth.DefaultSaveAccessTokenCallbackFactoryGenerator;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -48,10 +50,10 @@ import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
+import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.util.TemplateParser;
 import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -210,14 +212,18 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             }
         }
 
-        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class) || typeElement.hasProcessorMethodWithParameter(HttpCallback.class)) {
-            Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class), "httpCallbackConfigElement", ref(DomUtils.class).staticInvoke("getChildElementByTagName").
-                    arg(element).arg(SchemaGenerator.HTTP_CALLBACK_CONFIG_ELEMENT_NAME));
-            Block ifHttpCallbackConfigPresent = parse.body()._if(Op.ne(listElement, ExpressionFactory._null()))._then();
-            generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.DOMAIN_FIELD_NAME);
-            generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.LOCAL_PORT_FIELD_NAME);
-            generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.REMOTE_PORT_FIELD_NAME);
-            generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.ASYNC_FIELD_NAME);
+        if (typeElement.hasAnnotation(OAuth.class) || typeElement.hasAnnotation(OAuth2.class)) {
+            generateParseHttpCallback(SchemaGenerator.OAUTH_CALLBACK_CONFIG_ELEMENT_NAME, parse, element, builder);
+
+            DefinedClass saveAccessTokenCallbackFactory = context.getClassForRole(DefaultSaveAccessTokenCallbackFactoryGenerator.ROLE);
+            DefinedClass restoreAccessTokenCallbackFactory = context.getClassForRole(DefaultRestoreAccessTokenCallbackFactoryGenerator.ROLE);
+            generateParseNestedProcessor(parse.body(), element, parserContext, builder, "oauthSaveAccessToken", false, false, false, saveAccessTokenCallbackFactory);
+            generateParseNestedProcessor(parse.body(), element, parserContext, builder, "oauthRestoreAccessToken", false, false, false, restoreAccessTokenCallbackFactory);
+
+            generateGenerateChildBeanNameMethod(beanDefinitionparser);
+        }
+        if (typeElement.hasProcessorMethodWithParameter(HttpCallback.class)) {
+            generateParseHttpCallback(SchemaGenerator.HTTP_CALLBACK_CONFIG_ELEMENT_NAME, parse, element, builder);
         }
 
         if (connect != null) {
@@ -235,6 +241,16 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         parse.body()._return(definition);
 
+    }
+
+    private void generateParseHttpCallback(String elementName, Method parse, Variable element, Variable builder) {
+        Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class), "httpCallbackConfigElement", ref(DomUtils.class).staticInvoke("getChildElementByTagName").
+                arg(element).arg(elementName));
+        Block ifHttpCallbackConfigPresent = parse.body()._if(Op.ne(listElement, ExpressionFactory._null()))._then();
+        generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.DOMAIN_FIELD_NAME);
+        generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.LOCAL_PORT_FIELD_NAME);
+        generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.REMOTE_PORT_FIELD_NAME);
+        generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.ASYNC_FIELD_NAME);
     }
 
     private void generateParsePoolingProfile(String elementName, String propertyName, Method parse, Variable element, Variable builder) {
@@ -368,9 +384,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
             if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
                 boolean isList = context.getTypeMirrorUtils().isArrayOrList(variable.asType());
                 if (requiredChildElements == 1) {
-                    generateParseNestedProcessor(parse.body(), element, parserContext, builder, fieldName, true, isList);
+                    generateParseNestedProcessor(parse.body(), element, parserContext, builder, fieldName, true, isList, true, ref(MessageProcessorChainFactoryBean.class));
                 } else {
-                    generateParseNestedProcessor(parse.body(), element, parserContext, builder, fieldName, false, isList);
+                    generateParseNestedProcessor(parse.body(), element, parserContext, builder, fieldName, false, isList, true, ref(MessageProcessorChainFactoryBean.class));
                 }
             } else if (SchemaTypeConversion.isSupported(variable.asType().toString())) {
                 generateParseSupportedType(parse.body(), element, builder, fieldName);
@@ -473,7 +489,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         return definition;
     }
 
-    private void generateParseNestedProcessor(Block block, Variable element, Variable parserContext, Variable builder, String fieldName, boolean skipElement, boolean isList) {
+    private void generateParseNestedProcessor(Block block, Variable element, Variable parserContext, Variable builder, String fieldName, boolean skipElement, boolean isList, boolean allowTextAttribute, TypeReference factoryBean) {
 
         Variable elements = element;
         if (!skipElement) {
@@ -484,44 +500,51 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         Conditional ifNotNull = block._if(Op.ne(elements, ExpressionFactory._null()));
 
-        Variable text = ifNotNull._then().decl(ref(String.class), "text", elements.invoke("getAttribute").arg("text"));
-        Conditional ifTextElement = ifNotNull._then()._if(Op.cand(Op.ne(text, ExpressionFactory._null()),
-                Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(text))));
+        Block beanDefinitionBuidlerBlock = null;
+        if (allowTextAttribute) {
+            Variable text = ifNotNull._then().decl(ref(String.class), "text", elements.invoke("getAttribute").arg("text"));
+            Conditional ifTextElement = ifNotNull._then()._if(Op.cand(Op.ne(text, ExpressionFactory._null()),
+                    Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(text))));
 
-        ifTextElement._then().add(builder.invoke("addPropertyValue")
-                .arg(fieldName).arg(text));
+            ifTextElement._then().add(builder.invoke("addPropertyValue")
+                    .arg(fieldName).arg(text));
 
-        Variable beanDefinitionBuilder = ifTextElement._else().decl(ref(BeanDefinitionBuilder.class), fieldName + "BeanDefinitionBuilder",
+            beanDefinitionBuidlerBlock = ifTextElement._else();
+        } else {
+            beanDefinitionBuidlerBlock = ifNotNull._then();
+        }
+
+        Variable beanDefinitionBuilder = beanDefinitionBuidlerBlock.decl(ref(BeanDefinitionBuilder.class), fieldName + "BeanDefinitionBuilder",
                 ref(BeanDefinitionBuilder.class).staticInvoke("rootBeanDefinition")
-                        .arg(ref(MessageProcessorChainFactoryBean.class).dotclass()));
-        Variable beanDefinition = ifTextElement._else().decl(ref(BeanDefinition.class), fieldName + "BeanDefinition",
+                        .arg(factoryBean.dotclass()));
+        Variable beanDefinition = beanDefinitionBuidlerBlock.decl(ref(BeanDefinition.class), fieldName + "BeanDefinition",
                 beanDefinitionBuilder.invoke("getBeanDefinition"));
 
-        ifTextElement._else().add(parserContext.invoke("getRegistry").invoke("registerBeanDefinition")
+        beanDefinitionBuidlerBlock.add(parserContext.invoke("getRegistry").invoke("registerBeanDefinition")
                 .arg(ExpressionFactory.invoke("generateChildBeanName").arg(elements))
                 .arg(beanDefinition));
 
-        ifTextElement._else().add(elements.invoke("setAttribute")
+        beanDefinitionBuidlerBlock.add(elements.invoke("setAttribute")
                 .arg("name").arg(ExpressionFactory.invoke("generateChildBeanName").arg(elements)));
 
-        ifTextElement._else().add(beanDefinitionBuilder.invoke("setSource").arg(parserContext.invoke("extractSource")
+        beanDefinitionBuidlerBlock.add(beanDefinitionBuilder.invoke("setSource").arg(parserContext.invoke("extractSource")
                 .arg(elements)));
 
-        ifTextElement._else().add(beanDefinitionBuilder.invoke("setScope")
+        beanDefinitionBuidlerBlock.add(beanDefinitionBuilder.invoke("setScope")
                 .arg(ref(BeanDefinition.class).staticRef("SCOPE_SINGLETON")));
 
-        Variable list = ifTextElement._else().decl(ref(List.class), fieldName + "List",
+        Variable list = beanDefinitionBuidlerBlock.decl(ref(List.class), fieldName + "List",
                 parserContext.invoke("getDelegate").invoke("parseListElement")
                         .arg(elements).arg(beanDefinitionBuilder.invoke("getBeanDefinition")));
 
-        ifTextElement._else().add(parserContext.invoke("getRegistry").invoke("removeBeanDefinition")
+        beanDefinitionBuidlerBlock.add(parserContext.invoke("getRegistry").invoke("removeBeanDefinition")
                 .arg(ExpressionFactory.invoke("generateChildBeanName").arg(elements)));
 
         if (!isList) {
-            ifTextElement._else().add(builder.invoke("addPropertyValue").arg(fieldName)
+            beanDefinitionBuidlerBlock.add(builder.invoke("addPropertyValue").arg(fieldName)
                     .arg(beanDefinition));
         } else {
-            ifTextElement._else().add(builder.invoke("addPropertyValue").arg(fieldName)
+            beanDefinitionBuidlerBlock.add(builder.invoke("addPropertyValue").arg(fieldName)
                     .arg(list));
         }
     }
@@ -770,26 +793,6 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         return new UpperBlockClosure(managedList, ifRef._else());
     }
 
-    private void generateAttachMessageProcessor(Method parse, Variable definition, Variable parserContext) {
-        Variable propertyValues = parse.body().decl(ref(MutablePropertyValues.class), "propertyValues",
-                parserContext.invoke("getContainingBeanDefinition").invoke("getPropertyValues"));
-
-        Conditional ifIsPoll = parse.body()._if(parserContext.invoke("getContainingBeanDefinition").invoke("getBeanClassName")
-                .invoke("equals").arg("org.mule.config.spring.factories.PollingMessageSourceFactoryBean"));
-
-        ifIsPoll._then().add(propertyValues.invoke("addPropertyValue").arg("messageProcessor").arg(definition));
-
-        Variable messageProcessors = ifIsPoll._else().decl(ref(PropertyValue.class), "messageProcessors",
-                propertyValues.invoke("getPropertyValue").arg("messageProcessors"));
-        Conditional noList = ifIsPoll._else()._if(Op.cor(Op.eq(messageProcessors, ExpressionFactory._null()), Op.eq(messageProcessors.invoke("getValue"),
-                ExpressionFactory._null())));
-        noList._then().add(propertyValues.invoke("addPropertyValue").arg("messageProcessors").arg(ExpressionFactory._new(ref(ManagedList.class))));
-        Variable listMessageProcessors = ifIsPoll._else().decl(ref(List.class), "listMessageProcessors",
-                ExpressionFactory.cast(ref(List.class), propertyValues.invoke("getPropertyValue").arg("messageProcessors").invoke("getValue")));
-        ifIsPoll._else().add(listMessageProcessors.invoke("add").arg(
-                definition
-        ));
-    }
 
     private void generateAttachMessageSource(Method parse, Variable definition, Variable parserContext) {
         Variable propertyValues = parse.body().decl(ref(MutablePropertyValues.class), "propertyValues",
@@ -814,23 +817,6 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         isBlank._else()._return(id);
     }
 
-
-    private Method generateGetAttributeValue(DefinedClass beanDefinitionparser) {
-        Method getAttributeValue = beanDefinitionparser.method(Modifier.PROTECTED, ref(String.class), "getAttributeValue");
-        Variable element = getAttributeValue.param(ref(org.w3c.dom.Element.class), "element");
-        Variable attributeName = getAttributeValue.param(ref(String.class), "attributeName");
-
-        Invocation getAttribute = element.invoke("getAttribute").arg(attributeName);
-
-        Invocation isEmpty = ref(StringUtils.class).staticInvoke("isEmpty");
-        isEmpty.arg(getAttribute);
-
-        Block ifIsEmpty = getAttributeValue.body()._if(isEmpty.not())._then();
-        ifIsEmpty._return(getAttribute);
-
-        getAttributeValue.body()._return(ExpressionFactory._null());
-        return getAttributeValue;
-    }
 
     private class UpperBlockClosure {
         private Variable managedCollection;

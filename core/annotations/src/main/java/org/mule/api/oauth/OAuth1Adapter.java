@@ -14,43 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mule.api.adapter;
+package org.mule.api.oauth;
 
 /**
  * Adds OAuth 1.0a capabilities to the pojo
  */
-public interface OAuth1Adapter {
-
-    /**
-     * Retrieve OAuth verifier
-     *
-     * @return A String representing the OAuth verifier
-     */
-    String getOauthVerifier();
-
-    /**
-     * Set OAuth verifier
-     *
-     * @param value OAuth verifier to set
-     */
-    void setOauthVerifier(String value);
-
-    /**
-     * Retrieve redirect url
-     */
-    String getRedirectUrl();
-
-    /**
-     * Retrieve access token
-     */
-    String getAccessToken();
-
-    /**
-     * Set access token
-     *
-     * @param value
-     */
-    void setAccessToken(String value);
+public interface OAuth1Adapter extends OAuthAdapter {
 
     /**
      * Retrieve access token secret
@@ -64,8 +33,4 @@ public interface OAuth1Adapter {
      */
     void setAccessTokenSecret(String value);
 
-    /**
-     * Retrieve authorization url
-     */
-    String getAuthorizationUrl();
 }

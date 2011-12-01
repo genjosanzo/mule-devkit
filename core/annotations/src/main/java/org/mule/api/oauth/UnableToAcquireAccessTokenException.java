@@ -14,26 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mule.api.adapter;
+package org.mule.api.oauth;
 
-import java.util.Date;
-
-public interface OAuth2Adapter {
-    String getOauthVerifier();
-
-    void setOauthVerifier(String value);
-
-    String getRedirectUrl();
-
-    String getAccessToken();
-
-    void setAccessToken(String value);
-
-    void setExpiration(Date value);
-
-    String getAuthorizationUrl();
-
-    void fetchAccessToken();
-
-    boolean hasTokenExpired();
+/**
+ * Exception thrown when the access token needed for accessing a protected
+ * resource cannot be acquired
+ */
+public class UnableToAcquireAccessTokenException extends Exception {
+    /**
+     * Create a new exception
+     *
+     * @param throwable      Inner exception
+     */
+    public UnableToAcquireAccessTokenException(Throwable throwable) {
+        super(throwable);
+    }
 }

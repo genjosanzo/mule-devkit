@@ -19,7 +19,7 @@
                 <plugin>
                     <groupId>org.mule.tools.devkit</groupId>
                     <artifactId>mule-devkit-maven-plugin</artifactId>
-                    <version>${devkit.version}</version>
+                    <version>3.0.3-SNAPSHOT</version>
                     <extensions>true</extensions>
                 </plugin>
                 <plugin>
@@ -45,7 +45,7 @@
             <plugin>
                 <groupId>org.mule.tools.devkit</groupId>
                 <artifactId>mule-devkit-maven-plugin</artifactId>
-                <version>${devkit.version}</version>
+                <version>3.0.3-SNAPSHOT</version>
                 <extensions>true</extensions>
             </plugin>
         </plugins>
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${mule.version}</version>
+            <version>3.2.0</version>
             <optional>true</optional>
             <exclusions>
                 <exclusion>
@@ -100,7 +100,7 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
-            <version>${mule.version}</version>
+            <version>3.2.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.safehaus.jug</groupId>
@@ -111,18 +111,25 @@
         <dependency>
             <groupId>org.mule.tools.devkit</groupId>
             <artifactId>mule-devkit-annotations</artifactId>
-            <version>${devkit.version}</version>
+            <version>3.0.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
-            <version>${mule.version}</version>
+            <version>3.2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-scripting</artifactId>
+            <version>3.2.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
-            <version>${mule.version}</version>
+            <version>3.2.0</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>

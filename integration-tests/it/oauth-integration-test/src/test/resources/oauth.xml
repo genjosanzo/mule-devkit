@@ -21,22 +21,44 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:oauth="http://www.mulesoft.org/schema/mule/oauth"
+      xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/current/mule-oauth.xsd
-        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd">
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd">
 
     <oauth:config name="default-oauth" consumerKey="consumerKey123" consumerSecret="consumerSecret123">
-        <oauth:http-callback-config domain="localhost" localPort="${http.port}" remotePort="${http.port}"
-                                    async="false"/>
+        <oauth:oauth-callback-config domain="localhost" localPort="${http.port}" remotePort="${http.port}"
+                                     async="false"/>
     </oauth:config>
 
+    <oauth:config name="oauth-with-save" consumerKey="consumerKey123" consumerSecret="consumerSecret123">
+        <oauth:oauth-callback-config domain="localhost" localPort="${http.port}" remotePort="${http.port}"
+                                     async="false"/>
+        <oauth:oauth-save-access-token>
+            <component class="org.mule.devkit.it.SaveAccessTokenComponent"  />
+        </oauth:oauth-save-access-token>
+    </oauth:config>
+
+    <flow name="authorize">
+        <oauth:authorize config-ref="default-oauth"/>
+    </flow>
+
+    <flow name="authorizeWithSave">
+        <oauth:authorize config-ref="oauth-with-save"/>
+    </flow>
+
     <flow name="protectedResource">
-        <oauth:protected-resource/>
+        <oauth:protected-resource config-ref="default-oauth"/>
+    </flow>
+
+    <flow name="protectedResourceWithSave">
+        <oauth:protected-resource config-ref="oauth-with-save"/>
     </flow>
 
     <flow name="nonProtectedResource">
-        <oauth:non-protected-resource/>
+        <oauth:non-protected-resource config-ref="default-oauth"/>
     </flow>
 
     <flow name="requestToken">

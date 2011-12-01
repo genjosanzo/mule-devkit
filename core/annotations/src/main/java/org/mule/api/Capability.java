@@ -34,12 +34,12 @@ public enum Capability {
     CONNECTION_MANAGEMENT_CAPABLE(1),
 
     /**
-     * This capability indicates that the module implements {@link org.mule.api.adapter.OAuth1Adapter}
+     * This capability indicates that the module implements {@link org.mule.api.oauth.OAuth1Adapter}
      */
     OAUTH1_CAPABLE(2),
 
     /**
-     * This capability indicates that the module implements {@link org.mule.api.adapter.OAuth2Adapter}
+     * This capability indicates that the module implements {@link org.mule.api.oauth.OAuth2Adapter}
      */
     OAUTH2_CAPABLE(3),
 

@@ -21,6 +21,8 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.oauth.RestoreAccessTokenCallback;
+import org.mule.api.oauth.SaveAccessTokenCallback;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
@@ -67,6 +69,8 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
     protected static final String AUTH_CODE_PATTERN_FIELD_NAME = "AUTH_CODE_PATTERN";
     protected static final String EXPIRATION_TIME_PATTERN_FIELD_NAME = "EXPIRATION_TIME_PATTERN";
     protected static final String EXPIRATION_FIELD_NAME = "expiration";
+    public static final String OAUTH_SAVE_ACCESS_TOKEN_CALLBACK_FIELD_NAME = "oauthSaveAccessToken";
+    public static final String OAUTH_RESTORE_ACCESS_TOKEN_CALLBACK_FIELD_NAME = "oauthRestoreAccessToken";
 
     protected DefinedClass getOAuthAdapterClass(TypeElement typeElement, String classSuffix, Class<?> interf) {
         String oauthAdapterName = context.getNameUtils().generateClassName(typeElement, ".config", classSuffix);
@@ -97,6 +101,14 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
 
     protected FieldVariable authorizationCodeField(DefinedClass oauthAdapter) {
         return new FieldBuilder(oauthAdapter).type(String.class).name(OAUTH_VERIFIER_FIELD_NAME).getterAndSetter().build();
+    }
+
+    protected FieldVariable saveAccessTokenCallbackField(DefinedClass oauthAdapter) {
+        return new FieldBuilder(oauthAdapter).type(SaveAccessTokenCallback.class).name(OAUTH_SAVE_ACCESS_TOKEN_CALLBACK_FIELD_NAME).getterAndSetter().build();
+    }
+
+    protected FieldVariable restoreAccessTokenCallbackField(DefinedClass oauthAdapter) {
+        return new FieldBuilder(oauthAdapter).type(RestoreAccessTokenCallback.class).name(OAUTH_RESTORE_ACCESS_TOKEN_CALLBACK_FIELD_NAME).getterAndSetter().build();
     }
 
     protected FieldVariable redirectUrlField(DefinedClass oauthAdapter) {
@@ -160,6 +172,8 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
 
         TryStatement tryToExtractVerifier = processMethod.body()._try();
         tryToExtractVerifier.body().assign(oauthAdapter.fields().get(VERIFIER_FIELD_NAME), ExpressionFactory.invoke("extractAuthorizationCode").arg(event.invoke("getMessageAsString")));
+        tryToExtractVerifier.body().add(ExpressionFactory.invoke("fetchAccessToken"));
+
         CatchBlock catchBlock = tryToExtractVerifier._catch(ref(Exception.class));
         Variable exceptionCaught = catchBlock.param("e");
         catchBlock.body()._throw(ExpressionFactory._new(
