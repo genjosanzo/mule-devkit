@@ -303,7 +303,8 @@ def:op_description(obj) ?><?cs
                 <?cs set:count = count + #1 ?>
             <?cs /each ?>
           <?cs /if ?>
-          <?cs if:((obj.hasConnectionManager=="1") && (obj.isProcessor=="1")) ?>
+          <?cs if:obj.hasConnectionManager=="1" ?>
+          <?cs if:obj.isProcessor=="1" ?>
             <tr><th colspan="12">Retry and Reconnect<br/><span style="font-weight: 200;">This message processor supports automatic retry and reconnect. If the API call fail for a known error then the API will be automatically retried. This does not happen on every type of error, only a few that has been selected and are known to be recoverable from.</span></th></tr>
             <tr class="<?cs if:count % #2 ?>alt-color<?cs /if ?> api apilevel-<?cs var:field.since.key ?>" >
                 <td class="jd-linkcol"><nobr>retryMax</nobr></td>
@@ -311,6 +312,7 @@ def:op_description(obj) ?><?cs
                 <td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i>Specify how many times this operation can be retried automatically</td>
             </tr>
             <?cs set:count = count + #1 ?>
+          <?cs /if ?>
           <?cs /if ?>
         </table>
   </div>
