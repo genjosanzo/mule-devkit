@@ -66,7 +66,7 @@ public class CollectionModule {
      * @param strings a list of strings
      */
     @Processor
-    public void listOfStrings(List<String> strings) {
+    public void operation1(List<String> strings) {
     }
 
     /**
@@ -75,7 +75,7 @@ public class CollectionModule {
      * @param mapStrings a map of strings
      */
     @Processor
-    public void mapOfStringString(Map<String, String> mapStrings) {
+    public void operation2(Map<String, String> mapStrings) {
     }
 
     /**
@@ -84,7 +84,7 @@ public class CollectionModule {
      * @param mapObjects a map of string-object
      */
     @Processor
-    public void mapOfStringObject(Map<String, Object> mapObjects) {
+    public void operation3(Map<String, Object> mapObjects) {
     }
 
     /**
@@ -93,7 +93,7 @@ public class CollectionModule {
      * @param properties a raw map
      */
     @Processor
-    public void rawMap(Map properties) {
+    public void operation4(Map properties) {
     }
 
     /**
@@ -102,7 +102,7 @@ public class CollectionModule {
      * @param list a list
      */
     @Processor
-    public void rawList(List list) {
+    public void operation5(List list) {
     }
 
     /**
@@ -111,7 +111,7 @@ public class CollectionModule {
      * @param objects a list of maps
      */
     @Processor
-    public void listOfMapOfStringString(List<Map<String, String>> objects) {
+    public void operation6(List<Map<String, String>> objects) {
     }
 
     /**
@@ -120,7 +120,7 @@ public class CollectionModule {
      * @param map a map of string-lists
      */
     @Processor
-    public void mapOfStringListOfStrings(Map<String, List<String>> map) {
+    public void operation7(Map<String, List<String>> map) {
     }
 
     public void setStrings(List strings) {

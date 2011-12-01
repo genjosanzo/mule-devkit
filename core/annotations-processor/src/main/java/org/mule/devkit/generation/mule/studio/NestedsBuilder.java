@@ -67,10 +67,8 @@ public class NestedsBuilder {
     public List<JAXBElement<? extends AbstractElementType>> build() {
         List<JAXBElement<? extends AbstractElementType>> nesteds = new ArrayList<JAXBElement<? extends AbstractElementType>>();
         for (VariableElement parameter : executableElement.getParameters()) {
-            String localId = nameUtils.uncamel(parameter.getSimpleName().toString());
-            if (needToCreateNestedElement(parameter) && !parsedLocalIds.contains(localId)) {
-
-                parsedLocalIds.add(localId);
+            String localId = nameUtils.uncamel(executableElement.getSimpleName().toString()) + '-' + nameUtils.uncamel(parameter.getSimpleName().toString());
+            if (needToCreateNestedElement(parameter)) {
 
                 NestedElementReference childElement = createChildElement(parameter, localId);
                 NestedElementType firstLevelNestedElement = createFirstLevelNestedElement(parameter, localId);
@@ -205,7 +203,7 @@ public class NestedsBuilder {
     }
 
     private boolean needToCreateNestedElement(VariableElement parameter) {
-        return typeMirrorUtils.isMap(parameter.asType()) ||
-                typeMirrorUtils.isArrayOrList(parameter.asType());
+        return (typeMirrorUtils.isMap(parameter.asType()) ||
+                typeMirrorUtils.isArrayOrList(parameter.asType())) && !typeMirrorUtils.ignoreParameter(parameter);
     }
 }

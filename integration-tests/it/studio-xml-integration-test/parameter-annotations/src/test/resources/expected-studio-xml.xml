@@ -66,37 +66,16 @@
       <group caption="General" description="Method that takes the inbound headers." id="general"></group>
     </attribute-category>
   </cloud-connector>
-  <nested image="icons/large/parameter-annotations-connector-48x32.png" localId="inbound-headers" icon="icons/small/parameter-annotations-connector-24x16.png" description="Inbound headers." caption="Inbound Headers">
-    <childElement allowMultiple="true" description="Inbound headers." caption="Inbound Headers" name="http://www.mulesoft.org/schema/mule/parameter-annotations/inbound-header"></childElement>
-  </nested>
-  <nested image="icons/large/parameter-annotations-connector-48x32.png" localId="inbound-header" icon="icons/small/parameter-annotations-connector-24x16.png" description="Inbound headers." caption="Inbound Headers">
-    <string description="Key." caption="Key" name="key"></string>
-    <text isToElement="true" description="Value." caption="Value" name="value"></text>
-  </nested>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="invocation-headers" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Invocation-headers">
     <attribute-category description="General properties." caption="General">
       <group caption="General" description="Method that takes the invocation headers." id="general"></group>
     </attribute-category>
   </cloud-connector>
-  <nested image="icons/large/parameter-annotations-connector-48x32.png" localId="invocation-headers" icon="icons/small/parameter-annotations-connector-24x16.png" description="Invocation headers." caption="Invocation Headers">
-    <childElement allowMultiple="true" description="Invocation headers." caption="Invocation Headers" name="http://www.mulesoft.org/schema/mule/parameter-annotations/invocation-header"></childElement>
-  </nested>
-  <nested image="icons/large/parameter-annotations-connector-48x32.png" localId="invocation-header" icon="icons/small/parameter-annotations-connector-24x16.png" description="Invocation headers." caption="Invocation Headers">
-    <string description="Key." caption="Key" name="key"></string>
-    <text isToElement="true" description="Value." caption="Value" name="value"></text>
-  </nested>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="outbound-headers" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Outbound-headers">
     <attribute-category description="General properties." caption="General">
       <group caption="General" description="Method that takes the outbound headers." id="general"></group>
     </attribute-category>
   </cloud-connector>
-  <nested image="icons/large/parameter-annotations-connector-48x32.png" localId="outbound-headers" icon="icons/small/parameter-annotations-connector-24x16.png" description="Outbound headers." caption="Outbound Headers">
-    <childElement allowMultiple="true" description="Outbound headers." caption="Outbound Headers" name="http://www.mulesoft.org/schema/mule/parameter-annotations/outbound-header"></childElement>
-  </nested>
-  <nested image="icons/large/parameter-annotations-connector-48x32.png" localId="outbound-header" icon="icons/small/parameter-annotations-connector-24x16.png" description="Outbound headers." caption="Outbound Headers">
-    <string description="Key." caption="Key" name="key"></string>
-    <text isToElement="true" description="Value." caption="Value" name="value"></text>
-  </nested>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="pauth" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Pauth">
     <attribute-category description="General properties." caption="General">
       <group caption="General" description="Method that takes the access token and token secret." id="general"></group>

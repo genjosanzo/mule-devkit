@@ -139,7 +139,7 @@ public class CloudConnectorOperationBuilder {
         for (VariableElement parameter : parameters) {
             if (context.getTypeMirrorUtils().isCollection(parameter.asType()) && !context.getTypeMirrorUtils().ignoreParameter(parameter)) {
                 NestedElementReference childElement = new NestedElementReference();
-                childElement.setName(URI_PREFIX + typeElement.name() + "/" + context.getNameUtils().uncamel(parameter.getSimpleName().toString()));
+                childElement.setName(URI_PREFIX + typeElement.name() + "/" + context.getNameUtils().uncamel(executableElement.getSimpleName().toString()) + '-' + context.getNameUtils().uncamel(parameter.getSimpleName().toString()));
                 childElement.setAllowMultiple(false);
                 childElement.setDescription(helper.formatDescription(context.getJavaDocUtils().getParameterSummary(parameter.getSimpleName().toString(), executableElement)));
                 childElement.setCaption(helper.formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
