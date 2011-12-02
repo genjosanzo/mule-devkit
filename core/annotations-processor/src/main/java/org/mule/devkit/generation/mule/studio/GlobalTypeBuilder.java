@@ -17,6 +17,7 @@
 
 package org.mule.devkit.generation.mule.studio;
 
+import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
@@ -29,7 +30,7 @@ import org.mule.devkit.utils.NameUtils;
 
 import javax.lang.model.element.ExecutableElement;
 
-public class GlobalTransformerBuilder {
+public class GlobalTypeBuilder {
 
     private static final String URI_PREFIX = "http://www.mulesoft.org/schema/mule/";
     private ObjectFactory objectFactory;
@@ -39,7 +40,7 @@ public class GlobalTransformerBuilder {
     private JavaDocUtils javaDocUtils;
     private ExecutableElement executableElement;
 
-    public GlobalTransformerBuilder(GeneratorContext context, ExecutableElement executableElement, DevKitTypeElement typeElement) {
+    public GlobalTypeBuilder(GeneratorContext context, ExecutableElement executableElement, DevKitTypeElement typeElement) {
         this.typeElement = typeElement;
         this.executableElement = executableElement;
         helper = new MuleStudioUtils(context);
@@ -49,34 +50,54 @@ public class GlobalTransformerBuilder {
     }
 
     public GlobalType build() {
-        GlobalType globalTransformer = new GlobalType();
-        globalTransformer.setImage(helper.getImage(typeElement.name()));
-        globalTransformer.setIcon(helper.getIcon(typeElement.name()));
-        globalTransformer.setCaption(nameUtils.uncamel(executableElement.getSimpleName().toString()));
-        globalTransformer.setLocalId(nameUtils.uncamel(executableElement.getSimpleName().toString()));
-        globalTransformer.setExtends(URI_PREFIX + typeElement.name() + '/' + nameUtils.uncamel(executableElement.getSimpleName().toString()));
-        globalTransformer.setDescription(helper.formatDescription(javaDocUtils.getSummary(executableElement)));
+        GlobalType globalType = new GlobalType();
+        globalType.setImage(helper.getImage(typeElement.name()));
+        globalType.setIcon(helper.getIcon(typeElement.name()));
+        globalType.setCaption(nameUtils.uncamel(executableElement.getSimpleName().toString()));
+        globalType.setLocalId(nameUtils.uncamel(executableElement.getSimpleName().toString()));
+        globalType.setExtends(URI_PREFIX + typeElement.name() + '/' + nameUtils.uncamel(executableElement.getSimpleName().toString()));
+        globalType.setDescription(helper.formatDescription(javaDocUtils.getSummary(executableElement)));
 
         AttributeCategory attributeCategory = new AttributeCategory();
         attributeCategory.setCaption(helper.formatCaption("General"));
         attributeCategory.setDescription(helper.formatDescription("General properties"));
 
-        globalTransformer.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
+        globalType.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
 
         Group group = new Group();
         group.setCaption(helper.formatCaption("Generic"));
-        group.setId("abstractTransformerGeneric");
+        group.setId(getIdBasedOnType());
 
         attributeCategory.getGroup().add(group);
 
         AttributeType name = new AttributeType();
         name.setName("name");
         name.setCaption(helper.formatCaption("Name"));
-        name.setDescription(helper.formatDescription("Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level."));
+        name.setDescription(helper.formatDescription(getDescriptionBasedOnType()));
         name.setXsdType("substitutableClass");
 
         group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupName(name));
 
-        return globalTransformer;
+        return globalType;
+    }
+
+    private String getDescriptionBasedOnType() {
+        if(isTransformer()) {
+            return "Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level.";
+        } else {
+            return "Endpoint name";
+        }
+    }
+
+    private String getIdBasedOnType() {
+        if(isTransformer()) {
+            return "abstractTransformerGeneric";
+        } else {
+            return "abstractEndpointGeneric";
+        }
+    }
+
+    private boolean isTransformer() {
+        return executableElement.getAnnotation(Transformer.class) !=null;
     }
 }

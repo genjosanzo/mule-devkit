@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="source" url="http://www.mulesoft.org/schema/mule/source">
+  <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/source/abstractSourceConnectorGeneric" image="icons/large/source-connector-48x32.png" localId="config" icon="icons/small/source-connector-24x16.png" description="Global Source configuration information." caption="Source">
+    <attribute-category description="Source configuration properties." caption="Source">
+      <group caption="Generic" id="sourceGenericProperties">
+        <name required="false" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
+      </group>
+    </attribute-category>
+  </global-cloud-connector>
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/source/abstractSourceConnectorGeneric" image="icons/large/source-connector-48x32.png" localId="source-connector" icon="icons/small/source-connector-24x16.png" description="Source class." caption="Source" aliasId="org.mule.tooling.ui.modules.core.pattern.source">
+    <attribute-category description="General properties." caption="General">
+      <group caption="Generic" id="sourceConnectorGeneric">
+        <modeSwitch description="Operation." caption="Operation" name="Source operations to execute"></modeSwitch>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+  <cloud-connector abstract="true" image="icons/large/source-connector-48x32.png" localId="abstractSourceConnectorGeneric" icon="icons/small/source-connector-24x16.png" description="Interact with Source." caption="Abstractsourceconnectorgeneric">
+    <attribute-category description="General properties." caption="General">
+      <group caption="Generic" id="abstractSourceConnectorGeneric">
+        <globalRef requiredType="http://www.mulesoft.org/schema/mule/source/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref"></globalRef>
+      </group>
+    </attribute-category>
+  </cloud-connector>
+  <endpoint supportsOutbound="false" supportsInbound="true" image="icons/small/source-connector-24x16.png" localId="suscribe" icon="icons/small/source-connector-24x16.png" description="Message source method." caption="Suscribe">
+    <attribute-category description="General properties." caption="General">
+      <group caption="General" id="general"></group>
+    </attribute-category>
+  </endpoint>
+  <global-endpoint extends="http://www.mulesoft.org/schema/mule/source/suscribe" image="icons/large/source-connector-48x32.png" localId="suscribe" icon="icons/small/source-connector-24x16.png" description="Message source method." caption="suscribe">
+    <attribute-category description="General properties." caption="General">
+      <group caption="Generic" id="abstractEndpointGeneric">
+        <name description="Endpoint name." caption="Name" xsdType="substitutableClass" name="name"></name>
+      </group>
+    </attribute-category>
+  </global-endpoint>
+  <endpoint supportsOutbound="false" supportsInbound="true" image="icons/small/source-connector-24x16.png" localId="suscribe-with-params" icon="icons/small/source-connector-24x16.png" description="Message source method with parameters." caption="Suscribe with params">
+    <attribute-category description="General properties." caption="General">
+      <group caption="General" id="general">
+        <string required="true" description="The topic." caption="Topic" name="topic"></string>
+        <childElement allowMultiple="false" inplace="true" description="The strings." caption="Strings" name="http://www.mulesoft.org/schema/mule/source/suscribe-with-params-strings"></childElement>
+      </group>
+    </attribute-category>
+  </endpoint>
+  <global-endpoint extends="http://www.mulesoft.org/schema/mule/source/suscribe-with-params" image="icons/large/source-connector-48x32.png" localId="suscribe-with-params" icon="icons/small/source-connector-24x16.png" description="Message source method with parameters." caption="suscribe-with-params">
+    <attribute-category description="General properties." caption="General">
+      <group caption="Generic" id="abstractEndpointGeneric">
+        <name description="Endpoint name." caption="Name" xsdType="substitutableClass" name="name"></name>
+      </group>
+    </attribute-category>
+  </global-endpoint>
+</namespace>
