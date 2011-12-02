@@ -18,6 +18,8 @@
 package org.mule.devkit.generation.mule.studio;
 
 import org.mule.api.annotations.Connect;
+import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
@@ -33,12 +35,11 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
-import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CloudConnectorOperationBuilder {
+public class PatternTypeBuilder {
 
     private static final String URI_PREFIX = "http://www.mulesoft.org/schema/mule/";
     private ObjectFactory objectFactory;
@@ -47,7 +48,7 @@ public class CloudConnectorOperationBuilder {
     private DevKitTypeElement typeElement;
     private ExecutableElement executableElement;
 
-    public CloudConnectorOperationBuilder(GeneratorContext context, ExecutableElement executableElement, DevKitTypeElement typeElement) {
+    public PatternTypeBuilder(GeneratorContext context, ExecutableElement executableElement, DevKitTypeElement typeElement) {
         this.context = context;
         this.executableElement = executableElement;
         this.typeElement = typeElement;
@@ -55,21 +56,25 @@ public class CloudConnectorOperationBuilder {
         objectFactory = new ObjectFactory();
     }
 
-    public JAXBElement<PatternType> build() {
+    public PatternType build() {
 
-        Group group = new Group();
-        group.setCaption(helper.formatCaption("General"));
-        group.setId("general");
+        PatternType patternType = createPatternType();
 
-        addMethodParametersToGroup(group);
+        if (executableElement.getAnnotation(Processor.class) != null) {
+            Group group = new Group();
+            group.setCaption(helper.formatCaption("General"));
+            group.setId("general");
 
-        AttributeCategory attributeCategory = new AttributeCategory();
-        attributeCategory.setCaption(helper.formatCaption("General"));
-        attributeCategory.setDescription(helper.formatDescription("General properties"));
-        attributeCategory.getGroup().add(group);
+            addMethodParametersToGroup(group);
 
-        PatternType cloudConnector = createCloudConnectorElement(attributeCategory);
-        return objectFactory.createNamespaceTypeCloudConnector(cloudConnector);
+            AttributeCategory attributeCategory = new AttributeCategory();
+            attributeCategory.setCaption(helper.formatCaption("General"));
+            attributeCategory.setDescription(helper.formatDescription("General properties"));
+            attributeCategory.getGroup().add(group);
+
+            patternType.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
+        }
+        return patternType;
     }
 
     private void addMethodParametersToGroup(Group group) {
@@ -96,13 +101,18 @@ public class CloudConnectorOperationBuilder {
         return parameters;
     }
 
-    private PatternType createCloudConnectorElement(AttributeCategory attributeCategory) {
+    private PatternType createPatternType() {
         PatternType cloudConnector = new PatternType();
-        cloudConnector.setLocalId(context.getNameUtils().uncamel(executableElement.getSimpleName().toString()));
-        cloudConnector.setCaption(helper.formatCaption(context.getNameUtils().uncamel(executableElement.getSimpleName().toString())));
-        cloudConnector.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
-        cloudConnector.setAbstract(true);
-        cloudConnector.setExtends(URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
+        cloudConnector.setLocalId(context.getNameUtils().uncamel(this.executableElement.getSimpleName().toString()));
+        cloudConnector.setCaption(helper.formatCaption(context.getNameUtils().uncamel(this.executableElement.getSimpleName().toString())));
+
+        cloudConnector.setAbstract(executableElement.getAnnotation(Processor.class) != null);
+        if (executableElement.getAnnotation(Processor.class) != null) {
+            cloudConnector.setExtends(URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
+        } else if (executableElement.getAnnotation(Transformer.class) != null) {
+            cloudConnector.setExtends(URI_PREFIX + typeElement.name() + '/' + AbstractTransformerBuilder.ABSTRACT_TRANSFORMER_LOCAL_ID);
+            cloudConnector.setDescription(helper.formatDescription(context.getJavaDocUtils().getSummary(executableElement)));
+        }
         cloudConnector.setIcon(helper.getIcon(typeElement.name()));
         cloudConnector.setImage(helper.getImage(typeElement.name()));
         return cloudConnector;
@@ -110,7 +120,7 @@ public class CloudConnectorOperationBuilder {
 
     private List<AttributeType> getSimpleTypeAttributeTypes(ExecutableElement executableElement, DevKitTypeElement typeElement, List<? extends VariableElement> parameters) {
         List<AttributeType> attributeTypes = new ArrayList<AttributeType>();
-        if (typeElement.usesConnectionManager()) {
+        if (typeElement.usesConnectionManager() && executableElement.getAnnotation(Transformer.class) == null) {
             addConnectionAttributeTypes(typeElement, attributeTypes);
         }
         for (VariableElement parameter : parameters) {

@@ -24,6 +24,7 @@ import org.mule.devkit.generation.spring.SchemaGenerator;
 import org.mule.devkit.generation.spring.SchemaTypeConversion;
 import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.Booleantype;
+import org.mule.devkit.model.studio.EncodingType;
 import org.mule.devkit.model.studio.EnumType;
 import org.mule.devkit.model.studio.FlowRefType;
 import org.mule.devkit.model.studio.IntegerType;
@@ -108,6 +109,9 @@ public class MuleStudioUtils {
         }
         if (attributeType instanceof UrlType) {
             return objectFactory.createGroupUrl((UrlType) attributeType);
+        }
+        if (attributeType instanceof EncodingType) {
+            return objectFactory.createGroupEncoding((EncodingType) attributeType);
         }
         if (attributeType instanceof NestedElementReference) {
             return objectFactory.createNestedElementTypeChildElement((NestedElementReference) attributeType);
