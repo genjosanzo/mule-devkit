@@ -12,7 +12,7 @@
       </group>
     </attribute-category>
   </global-cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/configurable/abstractConfigurableConnectorGeneric" image="icons/large/configurable-connector-48x32.png" localId="configurable-connector" icon="icons/small/configurable-connector-24x16.png" description="Configurable Integration." caption="Configurable" aliasId="org.mule.tooling.ui.modules.core.pattern.configurable">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/configurable/abstractConfigurableConnectorGeneric" image="icons/large/configurable-connector-48x32.png" localId="configurable-connector" icon="icons/small/configurable-connector-24x16.png" description="Connector class." caption="Configurable" aliasId="org.mule.tooling.ui.modules.core.pattern.configurable">
     <attribute-category description="General properties." caption="General">
       <group caption="Generic" id="configurableConnectorGeneric">
         <modeSwitch description="Operation." caption="Operation" name="Configurable operations to execute"></modeSwitch>

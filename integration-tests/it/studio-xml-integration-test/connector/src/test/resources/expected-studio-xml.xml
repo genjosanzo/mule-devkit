@@ -11,7 +11,7 @@
       </group>
     </attribute-category>
   </global-cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" image="icons/large/connector-connector-48x32.png" localId="connector-connector" icon="icons/small/connector-connector-24x16.png" description="Connector Integration." caption="Connector" aliasId="org.mule.tooling.ui.modules.core.pattern.connector">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" image="icons/large/connector-connector-48x32.png" localId="connector-connector" icon="icons/small/connector-connector-24x16.png" description="Connector class." caption="Connector" aliasId="org.mule.tooling.ui.modules.core.pattern.connector">
     <attribute-category description="General properties." caption="General">
       <group caption="Generic" id="connectorConnectorGeneric">
         <modeSwitch description="Operation." caption="Operation" name="Connector operations to execute">
@@ -30,7 +30,7 @@
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" abstract="true" image="icons/large/connector-connector-48x32.png" localId="invalidate" icon="icons/small/connector-connector-24x16.png" caption="Invalidate">
     <attribute-category description="General properties." caption="General">
-      <group caption="General" description="Processor method that invalidates connections." id="general">
+      <group caption="General" id="general">
         <string required="false" description="The username to use." caption="Username" name="username"></string>
         <string required="false" description="The password to use." caption="Password" name="password"></string>
       </group>
@@ -38,7 +38,7 @@
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" abstract="true" image="icons/large/connector-connector-48x32.png" localId="get-username" icon="icons/small/connector-connector-24x16.png" caption="Get-username">
     <attribute-category description="General properties." caption="General">
-      <group caption="General" description="Returns the username." id="general">
+      <group caption="General" id="general">
         <string required="false" description="The username to use." caption="Username" name="username"></string>
         <string required="false" description="The password to use." caption="Password" name="password"></string>
       </group>

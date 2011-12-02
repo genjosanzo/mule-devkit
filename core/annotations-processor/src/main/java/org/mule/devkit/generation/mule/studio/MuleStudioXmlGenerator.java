@@ -23,8 +23,6 @@ import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.NamespaceType;
 
 import javax.lang.model.element.ExecutableElement;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
 
@@ -47,10 +45,9 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
         namespace.getConnectorOrEndpointOrGlobal().add(new CloudConnectorOperationsBuilder(context, typeElement).build());
         namespace.getConnectorOrEndpointOrGlobal().add(new ConfigRefBuilder(context).build(moduleName));
 
-        List<String> parsedLocalIds = new ArrayList<String>();
         for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
             namespace.getConnectorOrEndpointOrGlobal().add(new CloudConnectorOperationBuilder(context, executableElement, typeElement).build());
-            namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, executableElement, moduleName, parsedLocalIds).build());
+            namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, executableElement, moduleName).build());
         }
 
         context.getStudioModel().setNamespaceType(namespace);

@@ -28,6 +28,7 @@ package org.mule.devkit.model.studio;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlType;
@@ -65,6 +66,7 @@ import java.util.List;
  *         &lt;element name="expression" type="{http://www.mulesoft.org/schema/mule/tooling.attributes}ExpressionAttributeType"/>
  *         &lt;element name="file" type="{http://www.mulesoft.org/schema/mule/tooling.attributes}AttributeType"/>
  *       &lt;/choice>
+ *       <attribute name="xmlname" type="string"></attribute>
  *     &lt;/extension>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -99,6 +101,9 @@ public class NestedElementType
             @XmlElementRef(name = "enum", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class)
     })
     protected List<JAXBElement<? extends AttributeType>> regexpOrEncodingOrString;
+
+    @XmlAttribute(name = "xmlname")
+    protected String xmlname;
 
     /**
      * Gets the value of the regexpOrEncodingOrString property.
@@ -145,4 +150,11 @@ public class NestedElementType
         return this.regexpOrEncodingOrString;
     }
 
+    public String getXmlname() {
+        return xmlname;
+    }
+
+    public void setXmlname(String xmlname) {
+        this.xmlname = xmlname;
+    }
 }
