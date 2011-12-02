@@ -594,8 +594,9 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
             Invocation newKey = ExpressionFactory._new(connectionKey);
             Invocation createConnection = moduleObject.invoke("acquireConnection");
-            for (String field : connectionParameters.keySet()) {
-                newKey.arg(connectionParameters.get(field));
+            for (VariableElement variable : connectMethod.getParameters()) {
+                String fieldName = variable.getSimpleName().toString();
+                newKey.arg(connectionParameters.get(fieldName));
             }
             createConnection.arg(newKey);
             callProcessor.body().assign(connection, createConnection);
@@ -687,8 +688,9 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
             DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey((TypeElement) executableElement.getEnclosingElement()));
             Invocation newKey = ExpressionFactory._new(connectionKey);
-            for (String field : connectionParameters.keySet()) {
-                newKey.arg(connectionParameters.get(field));
+            for (VariableElement variable : connectMethod.getParameters()) {
+                String fieldName = variable.getSimpleName().toString();
+                newKey.arg(connectionParameters.get(fieldName));
             }
 
             Invocation destroySession = moduleObject.invoke("destroyConnection");
@@ -758,8 +760,9 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
             DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey((TypeElement) executableElement.getEnclosingElement()));
             Invocation newKey = ExpressionFactory._new(connectionKey);
-            for (String field : connectionParameters.keySet()) {
-                newKey.arg(connectionParameters.get(field));
+            for (VariableElement variable : connectMethod.getParameters()) {
+                String fieldName = variable.getSimpleName().toString();
+                newKey.arg(connectionParameters.get(fieldName));
             }
 
             Invocation returnConnection = moduleObject.invoke("releaseConnection");

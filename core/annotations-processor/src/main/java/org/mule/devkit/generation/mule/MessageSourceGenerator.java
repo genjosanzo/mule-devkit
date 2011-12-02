@@ -261,8 +261,9 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
             Invocation newKey = ExpressionFactory._new(connectionKey);
             Invocation createConnection = moduleObject.invoke("acquireConnection");
-            for (String field : connectionParameters.keySet()) {
-                newKey.arg(connectionParameters.get(field));
+            for (VariableElement variable : connectMethod.getParameters()) {
+                String fieldName = variable.getSimpleName().toString();
+                newKey.arg(connectionParameters.get(fieldName));
             }
             createConnection.arg(newKey);
             callSource.body().assign(connection, createConnection);

@@ -273,7 +273,8 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         Conditional ifNotConnected = tryDisconnect.body()._if(Op.not(casterConnector.invoke(validateConnectionMethod.getSimpleName().toString())));
         Cast castedConnectionKey = ExpressionFactory.cast(connectionKeyClass, key);
         Invocation connectInvoke = ExpressionFactory.cast(connectorClass, obj).invoke(connect.getSimpleName().toString());
-        for (String fieldName : keyFields.keySet()) {
+        for (VariableElement variable : connect.getParameters()) {
+            String fieldName = variable.getSimpleName().toString();
             connectInvoke.arg(castedConnectionKey.invoke("get" + StringUtils.capitalize(keyFields.get(fieldName).getField().name())));
         }
         ifNotConnected._then().add(connectInvoke);
