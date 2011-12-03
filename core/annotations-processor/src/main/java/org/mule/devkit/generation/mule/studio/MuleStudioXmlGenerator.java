@@ -28,8 +28,6 @@ import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.model.studio.PatternType;
 
 import javax.lang.model.element.ExecutableElement;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
 
@@ -61,43 +59,26 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
             namespace.getConnectorOrEndpointOrGlobal().add(new AbstractTransformerBuilder(context).build());
         }
 
-        for (ExecutableElement executableElement : getMethodsToProcess(typeElement)) {
-            if (isProcessor(executableElement) || isTransformer(executableElement)) {
-                PatternType patternType = new PatternTypeBuilder(context, executableElement, typeElement).build();
-                if (isProcessor(executableElement)) {
-                    namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeCloudConnector(patternType));
-                } else {
-                    namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeTransformer(patternType));
-                    namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalTransformer(new GlobalTypeBuilder(context, executableElement, typeElement).build()));
-                }
-                namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, executableElement, moduleName).build());
-            } else {
-                EndpointType endpointType = new EndpointTypeBuilder(context, executableElement, typeElement).build();
-                namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createEndpoint(endpointType));
-                namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalEndpoint(new GlobalTypeBuilder(context, executableElement, typeElement).build()));
-            }
+        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
+            PatternType patternType = new PatternTypeBuilder(context, executableElement, typeElement).build();
+            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeCloudConnector(patternType));
+            namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, executableElement, moduleName).build());
+        }
+
+        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
+            PatternType patternType = new PatternTypeBuilder(context, executableElement, typeElement).build();
+            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeTransformer(patternType));
+            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalTransformer(new GlobalTypeBuilder(context, executableElement, typeElement).build()));
+            namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, executableElement, moduleName).build());
+        }
+
+        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Source.class)) {
+            EndpointType endpointType = new EndpointTypeBuilder(context, executableElement, typeElement).build();
+            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createEndpoint(endpointType));
+            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalEndpoint(new GlobalTypeBuilder(context, executableElement, typeElement).build()));
         }
 
         context.getStudioModel().setNamespaceType(namespace);
         context.getStudioModel().setModuleName(moduleName);
-    }
-
-    private List<ExecutableElement> getMethodsToProcess(DevKitTypeElement typeElement) {
-        List<ExecutableElement> processors = typeElement.getMethodsAnnotatedWith(Processor.class);
-        List<ExecutableElement> transformers = typeElement.getMethodsAnnotatedWith(Transformer.class);
-        List<ExecutableElement> sources = typeElement.getMethodsAnnotatedWith(Source.class);
-        List<ExecutableElement> methodsToProcess = new ArrayList<ExecutableElement>(processors.size() + transformers.size() + sources.size());
-        methodsToProcess.addAll(processors);
-        methodsToProcess.addAll(transformers);
-        methodsToProcess.addAll(sources);
-        return methodsToProcess;
-    }
-
-    private boolean isProcessor(ExecutableElement executableElement) {
-        return executableElement.getAnnotation(Processor.class) != null;
-    }
-
-    private boolean isTransformer(ExecutableElement executableElement) {
-        return executableElement.getAnnotation(Transformer.class) != null;
     }
 }

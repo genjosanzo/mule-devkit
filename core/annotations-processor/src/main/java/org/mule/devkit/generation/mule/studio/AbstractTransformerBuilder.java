@@ -56,6 +56,37 @@ public class AbstractTransformerBuilder {
         attributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
         attributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
 
+        attributeCategory.getGroup().add(createTransformerSettingsGroup());
+        attributeCategory.getGroup().add(createMimeAttributesGroup());
+
+        abstractTransformer.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
+
+        return abstractTransformer;
+    }
+
+    private Group createMimeAttributesGroup() {
+        Group mimeAttributesGroup = new Group();
+        mimeAttributesGroup.setCaption(helper.formatCaption("Mime type attributes"));
+        mimeAttributesGroup.setId("mimeTypeAttributes");
+
+        EnumType mimeTypesEnum = new EnumType();
+        mimeTypesEnum.setCaption(helper.formatCaption("Mime type"));
+        mimeTypesEnum.setDescription(helper.formatDescription("The mime type of the transformer's output"));
+        mimeTypesEnum.setName("mimeType");
+        mimeTypesEnum.setXsdType("string");
+        mimeTypesEnum.setAllowsCustom(true);
+
+        for (MimeType mimeType : MimeType.values()) {
+            EnumElement mimeTypeOption = new EnumElement();
+            mimeTypeOption.setValue(mimeType.toString());
+            mimeTypesEnum.getOption().add(mimeTypeOption);
+        }
+
+        mimeAttributesGroup.getRegexpOrEncodingOrModeSwitch().add(helper.createJAXBElement(mimeTypesEnum));
+        return mimeAttributesGroup;
+    }
+
+    private Group createTransformerSettingsGroup() {
         Group transformerSettingsGroup = new Group();
         transformerSettingsGroup.setCaption(helper.formatCaption("Transformer Settings"));
         transformerSettingsGroup.setId("abstractTransformerSettings");
@@ -80,31 +111,6 @@ public class AbstractTransformerBuilder {
         transformerSettingsGroup.getRegexpOrEncodingOrModeSwitch().add(helper.createJAXBElement(returnClassAttribute));
         transformerSettingsGroup.getRegexpOrEncodingOrModeSwitch().add(helper.createJAXBElement(ignoreBadInputAttribute));
         transformerSettingsGroup.getRegexpOrEncodingOrModeSwitch().add(helper.createJAXBElement(encodingAttribute));
-
-        Group mimeAttributesGroup = new Group();
-        mimeAttributesGroup.setCaption(helper.formatCaption("Mime type attributes"));
-        mimeAttributesGroup.setId("mimeTypeAttributes");
-
-        EnumType mimeTypesEnum = new EnumType();
-        mimeTypesEnum.setCaption(helper.formatCaption("Mime type"));
-        mimeTypesEnum.setDescription(helper.formatDescription("The mime type of the transformer's output"));
-        mimeTypesEnum.setName("mimeType");
-        mimeTypesEnum.setXsdType("string");
-        mimeTypesEnum.setAllowsCustom(true);
-
-        for (MimeType mimeType : MimeType.values()) {
-            EnumElement mimeTypeOption = new EnumElement();
-            mimeTypeOption.setValue(mimeType.toString());
-            mimeTypesEnum.getOption().add(mimeTypeOption);
-        }
-
-        mimeAttributesGroup.getRegexpOrEncodingOrModeSwitch().add(helper.createJAXBElement(mimeTypesEnum));
-
-        attributeCategory.getGroup().add(transformerSettingsGroup);
-        attributeCategory.getGroup().add(mimeAttributesGroup);
-
-        abstractTransformer.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
-
-        return abstractTransformer;
+        return transformerSettingsGroup;
     }
 }

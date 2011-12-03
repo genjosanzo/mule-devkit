@@ -55,6 +55,26 @@ public class CloudConnectorOperationsBuilder {
     }
 
     public JAXBElement<PatternType> build() {
+
+        AttributeCategory attributeCategory = new AttributeCategory();
+        attributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
+        attributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
+        attributeCategory.getGroup().add(createGroupWithModeSwitch());
+
+        PatternType cloudConnector = new PatternType();
+        cloudConnector.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
+        cloudConnector.setCaption(helper.formatCaption(typeElement.name()));
+        cloudConnector.setLocalId(typeElement.name() + "-connector");
+        cloudConnector.setExtends(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
+        cloudConnector.setDescription(helper.formatDescription(javaDocUtils.getSummary(typeElement.getInnerTypeElement())));
+        cloudConnector.setAliasId(ALIAS_ID_PREFIX + typeElement.name());
+        cloudConnector.setIcon(helper.getIcon(typeElement.name()));
+        cloudConnector.setImage(helper.getImage(typeElement.name()));
+
+        return objectFactory.createNamespaceTypeCloudConnector(cloudConnector);
+    }
+
+    private Group createGroupWithModeSwitch() {
         List<ModeElementType> modes = new ArrayList<ModeElementType>();
         for (ExecutableElement processorMethod : getProcessorMethodsSorted()) {
             ModeElementType mode = new ModeElementType();
@@ -74,23 +94,7 @@ public class CloudConnectorOperationsBuilder {
         group.setId(typeElement.name() + "ConnectorGeneric");
         group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupModeSwitch(modeSwitch));
         group.setCaption(helper.formatCaption(MuleStudioXmlGenerator.GROUP_DEFAULT_CAPTION));
-
-        AttributeCategory attributeCategory = new AttributeCategory();
-        attributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
-        attributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
-        attributeCategory.getGroup().add(group);
-
-        PatternType cloudConnector = new PatternType();
-        cloudConnector.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
-        cloudConnector.setCaption(helper.formatCaption(typeElement.name()));
-        cloudConnector.setLocalId(typeElement.name() + "-connector");
-        cloudConnector.setExtends(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
-        cloudConnector.setDescription(helper.formatDescription(javaDocUtils.getSummary(typeElement.getInnerTypeElement())));
-        cloudConnector.setAliasId(ALIAS_ID_PREFIX + typeElement.name());
-        cloudConnector.setIcon(helper.getIcon(typeElement.name()));
-        cloudConnector.setImage(helper.getImage(typeElement.name()));
-
-        return objectFactory.createNamespaceTypeCloudConnector(cloudConnector);
+        return group;
     }
 
     private List<ExecutableElement> getProcessorMethodsSorted() {
