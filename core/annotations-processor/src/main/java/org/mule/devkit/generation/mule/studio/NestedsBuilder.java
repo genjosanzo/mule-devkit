@@ -41,7 +41,6 @@ import java.util.List;
 
 public class NestedsBuilder {
 
-    private static final String URI_PREFIX = "http://www.mulesoft.org/schema/mule/";
     private ObjectFactory objectFactory;
     private MuleStudioUtils helper;
     private ExecutableElement executableElement;
@@ -118,7 +117,7 @@ public class NestedsBuilder {
             }
         }
 
-        attributeTypeForMapKey.setName("key");
+        attributeTypeForMapKey.setName(SchemaGenerator.ATTRIBUTE_NAME_KEY);
         attributeTypeForMapKey.setDescription(helper.formatDescription("Key."));
         attributeTypeForMapKey.setCaption(helper.formatCaption("Key"));
         secondLevelNestedElement.getRegexpOrEncodingOrString().add(helper.createJAXBElement(attributeTypeForMapKey));
@@ -150,7 +149,7 @@ public class NestedsBuilder {
     private NestedElementType createSecondLevelNestedElement(VariableElement parameter, NestedElementReference childElement) {
         NestedElementType nestedElement = new NestedElementType();
         nestedElement.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
-        String localIdSuffix = childElement.getName().substring(childElement.getName().lastIndexOf("/") + 1);
+        String localIdSuffix = childElement.getName().substring(childElement.getName().lastIndexOf('/') + 1);
         if (isListOfMaps(parameter)) {
             nestedElement.setLocalId(SchemaGenerator.INNER_PREFIX + nameUtils.singularize(localIdSuffix));
             nestedElement.setXmlname(SchemaGenerator.INNER_PREFIX + nameUtils.uncamel(nameUtils.singularize(parameter.getSimpleName().toString())));
@@ -194,11 +193,11 @@ public class NestedsBuilder {
         NestedElementReference childElement = new NestedElementReference();
         String parameterFriendlyName = nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString());
         if (isListOfMaps(parameter)) {
-            childElement.setName(URI_PREFIX + moduleName + '/' + localId);
+            childElement.setName(MuleStudioXmlGenerator.URI_PREFIX + moduleName + '/' + localId);
             childElement.setDescription(helper.formatDescription(nameUtils.singularize(parameterFriendlyName)));
             childElement.setCaption(helper.formatCaption(nameUtils.singularize(parameterFriendlyName)));
         } else {
-            childElement.setName(URI_PREFIX + moduleName + '/' + nameUtils.singularize(localId));
+            childElement.setName(MuleStudioXmlGenerator.URI_PREFIX + moduleName + '/' + nameUtils.singularize(localId));
             childElement.setDescription(helper.formatDescription(parameterFriendlyName));
             childElement.setCaption(helper.formatCaption(parameterFriendlyName));
         }

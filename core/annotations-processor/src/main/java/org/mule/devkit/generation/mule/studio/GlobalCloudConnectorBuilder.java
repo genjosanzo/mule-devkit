@@ -40,8 +40,6 @@ import java.util.List;
 
 public class GlobalCloudConnectorBuilder {
 
-    private static final String URI_PREFIX = "http://www.mulesoft.org/schema/mule/";
-    private static final String GLOBAL_CLOUD_CONNECTOR_LOCAL_ID = "config";
     private ObjectFactory objectFactory;
     private MuleStudioUtils helper;
     private DevKitTypeElement typeElement;
@@ -87,7 +85,7 @@ public class GlobalCloudConnectorBuilder {
         Group group = new Group();
         group.setId(typeElement.name() + "GenericProperties");
         group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupName(nameAttributeType));
-        group.setCaption(helper.formatCaption("Generic"));
+        group.setCaption(helper.formatCaption(MuleStudioXmlGenerator.GROUP_DEFAULT_CAPTION));
 
         for (AttributeType attributeType : fields) {
             group.getRegexpOrEncodingOrModeSwitch().add(helper.createJAXBElement(attributeType));
@@ -101,9 +99,9 @@ public class GlobalCloudConnectorBuilder {
         GlobalType globalCloudConnector = new GlobalType();
         globalCloudConnector.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
         globalCloudConnector.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(typeElement.name())));
-        globalCloudConnector.setLocalId(GLOBAL_CLOUD_CONNECTOR_LOCAL_ID);
+        globalCloudConnector.setLocalId(MuleStudioXmlGenerator.GLOBAL_CLOUD_CONNECTOR_LOCAL_ID);
         globalCloudConnector.setDescription(helper.formatDescription("Global " + nameUtils.friendlyNameFromCamelCase(typeElement.name()) + " configuration information"));
-        globalCloudConnector.setExtends(URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
+        globalCloudConnector.setExtends(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
         globalCloudConnector.setIcon(helper.getIcon(typeElement.name()));
         globalCloudConnector.setImage(helper.getImage(typeElement.name()));
         return objectFactory.createNamespaceTypeGlobalCloudConnector(globalCloudConnector);

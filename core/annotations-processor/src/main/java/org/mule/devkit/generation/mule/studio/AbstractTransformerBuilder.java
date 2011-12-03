@@ -53,8 +53,8 @@ public class AbstractTransformerBuilder {
         abstractTransformer.setAbstract(true);
 
         AttributeCategory attributeCategory = new AttributeCategory();
-        attributeCategory.setCaption(helper.formatCaption("General"));
-        attributeCategory.setDescription(helper.formatDescription("General properties"));
+        attributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
+        attributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
 
         Group transformerSettingsGroup = new Group();
         transformerSettingsGroup.setCaption(helper.formatCaption("Transformer Settings"));

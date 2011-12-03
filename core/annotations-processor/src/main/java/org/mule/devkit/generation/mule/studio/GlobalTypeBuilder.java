@@ -32,7 +32,6 @@ import javax.lang.model.element.ExecutableElement;
 
 public class GlobalTypeBuilder {
 
-    private static final String URI_PREFIX = "http://www.mulesoft.org/schema/mule/";
     private ObjectFactory objectFactory;
     private MuleStudioUtils helper;
     private DevKitTypeElement typeElement;
@@ -55,17 +54,17 @@ public class GlobalTypeBuilder {
         globalType.setIcon(helper.getIcon(typeElement.name()));
         globalType.setCaption(nameUtils.uncamel(executableElement.getSimpleName().toString()));
         globalType.setLocalId(nameUtils.uncamel(executableElement.getSimpleName().toString()));
-        globalType.setExtends(URI_PREFIX + typeElement.name() + '/' + nameUtils.uncamel(executableElement.getSimpleName().toString()));
+        globalType.setExtends(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + nameUtils.uncamel(executableElement.getSimpleName().toString()));
         globalType.setDescription(helper.formatDescription(javaDocUtils.getSummary(executableElement)));
 
         AttributeCategory attributeCategory = new AttributeCategory();
-        attributeCategory.setCaption(helper.formatCaption("General"));
-        attributeCategory.setDescription(helper.formatDescription("General properties"));
+        attributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
+        attributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
 
         globalType.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
 
         Group group = new Group();
-        group.setCaption(helper.formatCaption("Generic"));
+        group.setCaption(helper.formatCaption(MuleStudioXmlGenerator.GROUP_DEFAULT_CAPTION));
         group.setId(getIdBasedOnType());
 
         attributeCategory.getGroup().add(group);

@@ -87,7 +87,8 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     public static final String REF_SUFFIX = "-ref";
     public static final String FLOW_REF_SUFFIX = "-flow-ref";
     public static final String INNER_PREFIX = "inner-";
-    private static final String ATTRIBUTE_NAME_KEY = "key";
+    public static final String ATTRIBUTE_NAME_CONFIG_REF = "config-ref";
+    public static final String ATTRIBUTE_NAME_KEY = "key";
     private static final String ATTRIBUTE_NAME_REF = "ref";
     private static final String ATTRIBUTE_NAME_VALUE_REF = "value-ref";
     private static final String ATTRIBUTE_NAME_KEY_REF = "key-ref";
@@ -97,7 +98,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private static final String ENUM_TYPE_SUFFIX = "EnumType";
     private static final String TYPE_SUFFIX = "Type";
     private static final String XML_TYPE_SUFFIX = "XmlType";
-    private static final String ATTRIBUTE_NAME_CONFIG_REF = "config-ref";
     private static final String UNBOUNDED = "unbounded";
     private static final String LAX = "lax";
     private static final String ATTRIBUTE_NAME_NAME = "name";

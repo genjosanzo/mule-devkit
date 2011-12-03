@@ -24,9 +24,9 @@ import java.util.Comparator;
 
 public class VariableComparator implements Comparator<VariableElement> {
 
-    private TypeMirrorUtils typeMirrorUtils;
     private static final int VARIABLE1_FIRST = -1;
     private static final int VARIABLE2_FIRST = 1;
+    private TypeMirrorUtils typeMirrorUtils;
 
     public VariableComparator(TypeMirrorUtils typeMirrorUtils) {
         this.typeMirrorUtils = typeMirrorUtils;

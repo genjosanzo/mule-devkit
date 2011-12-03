@@ -41,7 +41,6 @@ import java.util.List;
 
 public class PatternTypeBuilder {
 
-    private static final String URI_PREFIX = "http://www.mulesoft.org/schema/mule/";
     private ObjectFactory objectFactory;
     private GeneratorContext context;
     private MuleStudioUtils helper;
@@ -62,14 +61,14 @@ public class PatternTypeBuilder {
 
         if (executableElement.getAnnotation(Processor.class) != null) {
             Group group = new Group();
-            group.setCaption(helper.formatCaption("General"));
+            group.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
             group.setId("general");
 
             addMethodParametersToGroup(group);
 
             AttributeCategory attributeCategory = new AttributeCategory();
-            attributeCategory.setCaption(helper.formatCaption("General"));
-            attributeCategory.setDescription(helper.formatDescription("General properties"));
+            attributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
+            attributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
             attributeCategory.getGroup().add(group);
 
             patternType.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
@@ -103,14 +102,14 @@ public class PatternTypeBuilder {
 
     private PatternType createPatternType() {
         PatternType cloudConnector = new PatternType();
-        cloudConnector.setLocalId(context.getNameUtils().uncamel(this.executableElement.getSimpleName().toString()));
-        cloudConnector.setCaption(helper.formatCaption(context.getNameUtils().uncamel(this.executableElement.getSimpleName().toString())));
+        cloudConnector.setLocalId(context.getNameUtils().uncamel(executableElement.getSimpleName().toString()));
+        cloudConnector.setCaption(helper.formatCaption(context.getNameUtils().uncamel(executableElement.getSimpleName().toString())));
 
         cloudConnector.setAbstract(executableElement.getAnnotation(Processor.class) != null);
         if (executableElement.getAnnotation(Processor.class) != null) {
-            cloudConnector.setExtends(URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
+            cloudConnector.setExtends(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
         } else if (executableElement.getAnnotation(Transformer.class) != null) {
-            cloudConnector.setExtends(URI_PREFIX + typeElement.name() + '/' + AbstractTransformerBuilder.ABSTRACT_TRANSFORMER_LOCAL_ID);
+            cloudConnector.setExtends(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + AbstractTransformerBuilder.ABSTRACT_TRANSFORMER_LOCAL_ID);
             cloudConnector.setDescription(helper.formatDescription(context.getJavaDocUtils().getSummary(executableElement)));
         }
         cloudConnector.setIcon(helper.getIcon(typeElement.name()));
@@ -148,7 +147,7 @@ public class PatternTypeBuilder {
         for (VariableElement parameter : parameters) {
             if (context.getTypeMirrorUtils().isCollection(parameter.asType()) && !context.getTypeMirrorUtils().ignoreParameter(parameter)) {
                 NestedElementReference childElement = new NestedElementReference();
-                childElement.setName(URI_PREFIX + typeElement.name() + "/" + context.getNameUtils().uncamel(executableElement.getSimpleName().toString()) + '-' + context.getNameUtils().uncamel(parameter.getSimpleName().toString()));
+                childElement.setName(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + context.getNameUtils().uncamel(executableElement.getSimpleName().toString()) + '-' + context.getNameUtils().uncamel(parameter.getSimpleName().toString()));
                 childElement.setAllowMultiple(false);
                 childElement.setDescription(helper.formatDescription(context.getJavaDocUtils().getParameterSummary(parameter.getSimpleName().toString(), executableElement)));
                 childElement.setCaption(helper.formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));

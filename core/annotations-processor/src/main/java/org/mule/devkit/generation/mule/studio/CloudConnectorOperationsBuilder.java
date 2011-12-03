@@ -26,6 +26,8 @@ import org.mule.devkit.model.studio.ModeElementType;
 import org.mule.devkit.model.studio.ModeType;
 import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.model.studio.PatternType;
+import org.mule.devkit.utils.JavaDocUtils;
+import org.mule.devkit.utils.NameUtils;
 import org.mule.util.StringUtils;
 
 import javax.lang.model.element.ExecutableElement;
@@ -36,18 +38,19 @@ import java.util.List;
 
 public class CloudConnectorOperationsBuilder {
 
-    private static final String URI_PREFIX = "http://www.mulesoft.org/schema/mule/";
     private static final String ALIAS_ID_PREFIX = "org.mule.tooling.ui.modules.core.pattern.";
     private static final MethodComparator METHOD_COMPARATOR = new MethodComparator();
     private ObjectFactory objectFactory;
-    private GeneratorContext context;
     private MuleStudioUtils helper;
     private DevKitTypeElement typeElement;
+    private NameUtils nameUtils;
+    private JavaDocUtils javaDocUtils;
 
     public CloudConnectorOperationsBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
-        this.context = context;
         this.typeElement = typeElement;
         helper = new MuleStudioUtils(context);
+        nameUtils = context.getNameUtils();
+        javaDocUtils = context.getJavaDocUtils();
         objectFactory = new ObjectFactory();
     }
 
@@ -56,8 +59,8 @@ public class CloudConnectorOperationsBuilder {
         for (ExecutableElement processorMethod : getProcessorMethodsSorted()) {
             ModeElementType mode = new ModeElementType();
             String methodName = processorMethod.getSimpleName().toString();
-            mode.setModeId(URI_PREFIX + typeElement.name() + '/' + context.getNameUtils().uncamel(methodName));
-            mode.setModeLabel(context.getNameUtils().friendlyNameFromCamelCase(methodName));
+            mode.setModeId(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + nameUtils.uncamel(methodName));
+            mode.setModeLabel(nameUtils.friendlyNameFromCamelCase(methodName));
             modes.add(mode);
         }
 
@@ -70,19 +73,19 @@ public class CloudConnectorOperationsBuilder {
         Group group = new Group();
         group.setId(typeElement.name() + "ConnectorGeneric");
         group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupModeSwitch(modeSwitch));
-        group.setCaption(helper.formatCaption("Generic"));
+        group.setCaption(helper.formatCaption(MuleStudioXmlGenerator.GROUP_DEFAULT_CAPTION));
 
         AttributeCategory attributeCategory = new AttributeCategory();
-        attributeCategory.setCaption(helper.formatCaption("General"));
-        attributeCategory.setDescription(helper.formatDescription("General properties"));
+        attributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
+        attributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
         attributeCategory.getGroup().add(group);
 
         PatternType cloudConnector = new PatternType();
         cloudConnector.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
         cloudConnector.setCaption(helper.formatCaption(typeElement.name()));
         cloudConnector.setLocalId(typeElement.name() + "-connector");
-        cloudConnector.setExtends(URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
-        cloudConnector.setDescription(helper.formatDescription(context.getJavaDocUtils().getSummary(typeElement.getInnerTypeElement())));
+        cloudConnector.setExtends(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
+        cloudConnector.setDescription(helper.formatDescription(javaDocUtils.getSummary(typeElement.getInnerTypeElement())));
         cloudConnector.setAliasId(ALIAS_ID_PREFIX + typeElement.name());
         cloudConnector.setIcon(helper.getIcon(typeElement.name()));
         cloudConnector.setImage(helper.getImage(typeElement.name()));

@@ -18,6 +18,7 @@
 package org.mule.devkit.generation.mule.studio;
 
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.generation.spring.SchemaGenerator;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.Group;
 import org.mule.devkit.model.studio.NewType;
@@ -29,33 +30,29 @@ import javax.xml.bind.JAXBElement;
 
 public class ConfigRefBuilder {
 
-    private static final String URI_PREFIX = "http://www.mulesoft.org/schema/mule/";
-    private static final String GLOBAL_CLOUD_CONNECTOR_LOCAL_ID = "config";
     private ObjectFactory objectFactory;
-    private GeneratorContext context;
     private MuleStudioUtils helper;
 
     public ConfigRefBuilder(GeneratorContext context) {
-        this.context = context;
         helper = new MuleStudioUtils(context);
         objectFactory = new ObjectFactory();
     }
 
     public JAXBElement<PatternType> build(String moduleName) {
         NewType globalRef = new NewType();
-        globalRef.setRequiredType(URI_PREFIX + moduleName + "/" + GLOBAL_CLOUD_CONNECTOR_LOCAL_ID);
-        globalRef.setName("config-ref");
+        globalRef.setRequiredType(MuleStudioXmlGenerator.URI_PREFIX + moduleName + '/' + MuleStudioXmlGenerator.GLOBAL_CLOUD_CONNECTOR_LOCAL_ID);
+        globalRef.setName(SchemaGenerator.ATTRIBUTE_NAME_CONFIG_REF);
         globalRef.setCaption(helper.formatCaption("config reference"));
         globalRef.setDescription(helper.formatDescription("Specify which configuration to use for this invocation"));
 
         Group group = new Group();
         group.setId(helper.getGlobalRefId(moduleName));
         group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupGlobalRef(globalRef));
-        group.setCaption(helper.formatCaption("Generic"));
+        group.setCaption(helper.formatCaption(MuleStudioXmlGenerator.GROUP_DEFAULT_CAPTION));
 
         AttributeCategory attributeCategory = new AttributeCategory();
-        attributeCategory.setCaption(helper.formatCaption("General"));
-        attributeCategory.setDescription(helper.formatDescription("General properties"));
+        attributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
+        attributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
         attributeCategory.getGroup().add(group);
 
         PatternType cloudConnector = new PatternType();

@@ -40,7 +40,6 @@ import java.util.List;
 
 public class EndpointTypeBuilder {
 
-    private static final String URI_PREFIX = "http://www.mulesoft.org/schema/mule/";
     private ObjectFactory objectFactory;
     private GeneratorContext context;
     private MuleStudioUtils helper;
@@ -70,14 +69,14 @@ public class EndpointTypeBuilder {
         endpoint.setSupportsOutbound(false);
 
         Group group = new Group();
-        group.setCaption(helper.formatCaption("General"));
+        group.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
         group.setId("general");
 
         addMethodParametersToGroup(group);
 
         AttributeCategory attributeCategory = new AttributeCategory();
-        attributeCategory.setCaption(helper.formatCaption("General"));
-        attributeCategory.setDescription(helper.formatDescription("General properties"));
+        attributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
+        attributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
         attributeCategory.getGroup().add(group);
 
         endpoint.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
@@ -126,7 +125,7 @@ public class EndpointTypeBuilder {
         for (VariableElement parameter : parameters) {
             if (context.getTypeMirrorUtils().isCollection(parameter.asType()) && !context.getTypeMirrorUtils().ignoreParameter(parameter)) {
                 NestedElementReference childElement = new NestedElementReference();
-                childElement.setName(URI_PREFIX + typeElement.name() + "/" + context.getNameUtils().uncamel(executableElement.getSimpleName().toString()) + '-' + context.getNameUtils().uncamel(parameter.getSimpleName().toString()));
+                childElement.setName(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + context.getNameUtils().uncamel(executableElement.getSimpleName().toString()) + '-' + context.getNameUtils().uncamel(parameter.getSimpleName().toString()));
                 childElement.setAllowMultiple(false);
                 childElement.setDescription(helper.formatDescription(context.getJavaDocUtils().getParameterSummary(parameter.getSimpleName().toString(), executableElement)));
                 childElement.setCaption(helper.formatCaption(context.getNameUtils().friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
