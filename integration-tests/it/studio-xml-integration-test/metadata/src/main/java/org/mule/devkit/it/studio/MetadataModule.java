@@ -20,7 +20,7 @@ import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
-import org.mule.api.annotations.studio.InputGroup;
+import org.mule.api.annotations.studio.Display;
 import org.mule.api.callback.SourceCallback;
 
 /**
@@ -35,21 +35,20 @@ public class MetadataModule {
      * Configurable field in group 1
      */
     @Configurable
-    @InputGroup("Group1")
+    @Display(inputGroup = "Group1")
     private String configurable1;
     /**
      * Configurable field in group 2
      */
     @Configurable
-    @InputGroup("Group2")
+    @Display(inputGroup = "Group2")
     private String configurable2;
     /**
      * Configurable field in group 1
      */
     @Configurable
-    @InputGroup("Group1")
+    @Display(inputGroup = "Group1")
     private String configurable3;
-
 
     /**
      * A processor method with Studio metadata
@@ -61,8 +60,8 @@ public class MetadataModule {
      */
     @Processor
     public void processor(String noInputGroupExplicit,
-                          @InputGroup("Advanced") String advanced1,
-                          @InputGroup("Advanced") String advanced2,
+                          @Display(inputGroup = "Advanced") String advanced1,
+                          @Display(inputGroup = "Advanced") String advanced2,
                           String general) {
     }
 
@@ -78,10 +77,8 @@ public class MetadataModule {
     @Source
     public void source(SourceCallback sourceCallback,
                        String noInputGroupExplicit,
-                       @InputGroup("Advanced") String advanced1,
-                       @InputGroup("Advanced") String advanced2,
+                       @Display(inputGroup = "Advanced") String advanced1,
+                       @Display(inputGroup = "Advanced") String advanced2,
                        String general) {
     }
-
-
 }

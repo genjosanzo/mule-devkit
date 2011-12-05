@@ -20,19 +20,28 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
 /**
- * Defines how to group the annotated field or parameter in a Mule Studio dialog. A group
- * is a subdivision of a Mule Studio dialog window in which one or inputs are rendered
- * together.
- *
+ * Defines how to display the annotated field or parameter in a Mule Studio dialog. The tab and input
+ * group can be specified with this annotation.
  */
 @Target({ElementType.PARAMETER, ElementType.FIELD})
-public @interface InputGroup {
+public @interface Display {
 
     /**
+     * The name of the tab in which the annotated element should be rendered. If not tab is
+     * specified it will be rendered in a default tab. To render more than one parameter or
+     * field in the same the tab then this value should be exactly the same for them.
+     */
+    String tab() default "";
+
+    /**
+     * A group is a subdivision of a Mule Studio dialog window in which one or inputs are rendered
+     * together. If the element is not annotated with this annotation it will be part of a
+     * default group. If a method or class specifies more than one different value,
+     * groups will be rendered in the order they are declared. Within a single group, inputs are
+     * rendered in the order they appear.
      * The name of the group in which the annotated element should be rendered. A group can
      * contain more than one element. In such case, these elements have to be annotated and
-     * use the same {@link InputGroup#value()} constant.
-     * @return
+     * use the same value.
      */
-    String value();
+    String inputGroup();
 }

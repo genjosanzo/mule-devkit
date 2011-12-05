@@ -21,7 +21,6 @@ import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.EndpointType;
-import org.mule.devkit.model.studio.Group;
 
 import javax.lang.model.element.ExecutableElement;
 import java.util.Collection;
@@ -42,15 +41,8 @@ public class EndpointTypeBuilder extends BaseStudioXmlBuilder {
         endpoint.setSupportsInbound(true);
         endpoint.setSupportsOutbound(false);
 
-
-        AttributeCategory attributeCategory = new AttributeCategory();
-        attributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
-        attributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
-
-        Collection<Group> groups = processMethodParameters();
-        attributeCategory.getGroup().addAll(groups);
-
-        endpoint.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
+        Collection<AttributeCategory> attributeCategories = processMethodParameters();
+        endpoint.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().addAll(attributeCategories);
 
         return endpoint;
     }

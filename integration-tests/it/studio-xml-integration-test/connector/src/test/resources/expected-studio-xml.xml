@@ -16,7 +16,7 @@
     </attribute-category>
   </global-cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" image="icons/large/connector-connector-48x32.png" localId="connector-connector" icon="icons/small/connector-connector-24x16.png" description="Connector class." caption="Connector" aliasId="org.mule.tooling.ui.modules.core.pattern.connector">
-    <attribute-category description="General properties." caption="General">
+    <attribute-category description="General." caption="General">
       <group caption="Generic" id="connectorConnectorGeneric">
         <modeSwitch description="Operation." caption="Operation" name="Connector operations to execute">
           <mode modeLabel="Get username" modeId="http://www.mulesoft.org/schema/mule/connector/get-username"></mode>
@@ -26,14 +26,14 @@
     </attribute-category>
   </cloud-connector>
   <cloud-connector abstract="true" image="icons/large/connector-connector-48x32.png" localId="abstractConnectorConnectorGeneric" icon="icons/small/connector-connector-24x16.png" description="Interact with Connector." caption="Abstractconnectorconnectorgeneric">
-    <attribute-category description="General properties." caption="General">
+    <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractConnectorConnectorGeneric">
         <globalRef requiredType="http://www.mulesoft.org/schema/mule/connector/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref"></globalRef>
       </group>
     </attribute-category>
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" abstract="true" image="icons/large/connector-connector-48x32.png" localId="invalidate" icon="icons/small/connector-connector-24x16.png" caption="Invalidate">
-    <attribute-category description="General properties." caption="General">
+    <attribute-category description="General." caption="General">
       <group caption="Connection" id="connection">
         <string required="false" description="The username to use." caption="Username" name="username"></string>
         <string required="false" description="The password to use." caption="Password" name="password"></string>
@@ -41,7 +41,7 @@
     </attribute-category>
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" abstract="true" image="icons/large/connector-connector-48x32.png" localId="get-username" icon="icons/small/connector-connector-24x16.png" caption="Get-username">
-    <attribute-category description="General properties." caption="General">
+    <attribute-category description="General." caption="General">
       <group caption="Connection" id="connection">
         <string required="false" description="The username to use." caption="Username" name="username"></string>
         <string required="false" description="The password to use." caption="Password" name="password"></string>

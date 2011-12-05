@@ -9,7 +9,7 @@
     </attribute-category>
   </global-cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" image="icons/large/parameter-annotations-connector-48x32.png" localId="parameter-annotations-connector" icon="icons/small/parameter-annotations-connector-24x16.png" description="Module to test annotations applied to parameters." caption="Parameter-annotations" aliasId="org.mule.tooling.ui.modules.core.pattern.parameter-annotations">
-    <attribute-category description="General properties." caption="General">
+    <attribute-category description="General." caption="General">
       <group caption="Generic" id="parameter-annotationsConnectorGeneric">
         <modeSwitch description="Operation." caption="Operation" name="Parameter-annotations operations to execute">
           <mode modeLabel="Inbound headers" modeId="http://www.mulesoft.org/schema/mule/parameter-annotations/inbound-headers"></mode>
@@ -24,14 +24,14 @@
     </attribute-category>
   </cloud-connector>
   <cloud-connector abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="abstractParameter-annotationsConnectorGeneric" icon="icons/small/parameter-annotations-connector-24x16.png" description="Interact with Parameter-annotations." caption="Abstractparameter-annotationsconnectorgeneric">
-    <attribute-category description="General properties." caption="General">
+    <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractParameter-annotationsConnectorGeneric">
         <globalRef requiredType="http://www.mulesoft.org/schema/mule/parameter-annotations/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref"></globalRef>
       </group>
     </attribute-category>
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="optional-params" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Optional-params">
-    <attribute-category description="General properties." caption="General">
+    <attribute-category description="General." caption="General">
       <group caption="General" id="general">
         <string required="false" description="A optional string parameter." caption="A String" name="aString"></string>
         <integer step="1" min="0" required="false" description="A optional integer parameter." caption="A Integer" name="aInteger"></integer>
@@ -44,7 +44,7 @@
     </attribute-category>
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="optional-params-with-defaults" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Optional-params-with-defaults">
-    <attribute-category description="General properties." caption="General">
+    <attribute-category description="General." caption="General">
       <group caption="General" id="general">
         <string defaultValue="fede" required="false" description="A optional string parameter with default value." caption="A String" name="aString"></string>
         <integer step="1" min="0" defaultValue="1" required="false" description="A optional integer parameter with default value." caption="A Integer" name="aInteger"></integer>
@@ -57,18 +57,18 @@
     </attribute-category>
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="payload" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Payload">
-    <attribute-category description="General properties." caption="General" />
+    <attribute-category description="General." caption="General" />
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="inbound-headers" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Inbound-headers">
-    <attribute-category description="General properties." caption="General" />
+    <attribute-category description="General." caption="General" />
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="invocation-headers" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Invocation-headers">
-    <attribute-category description="General properties." caption="General" />
+    <attribute-category description="General." caption="General" />
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="outbound-headers" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Outbound-headers">
-    <attribute-category description="General properties." caption="General" />
+    <attribute-category description="General." caption="General" />
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="pauth" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Pauth">
-    <attribute-category description="General properties." caption="General" />
+    <attribute-category description="General." caption="General" />
   </cloud-connector>
 </namespace>

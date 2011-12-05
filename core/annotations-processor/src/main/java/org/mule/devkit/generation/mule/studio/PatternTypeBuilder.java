@@ -22,7 +22,6 @@ import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
-import org.mule.devkit.model.studio.Group;
 import org.mule.devkit.model.studio.PatternType;
 
 import javax.lang.model.element.ExecutableElement;
@@ -37,12 +36,8 @@ public class PatternTypeBuilder extends BaseStudioXmlBuilder {
     public PatternType build() {
         PatternType patternType = createPatternType();
         if (executableElement.getAnnotation(Processor.class) != null) {
-            Collection<Group> groups = processMethodParameters();
-            AttributeCategory attributeCategory = new AttributeCategory();
-            attributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
-            attributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
-            attributeCategory.getGroup().addAll(groups);
-            patternType.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
+            Collection<AttributeCategory> attributeCategories = processMethodParameters();
+            patternType.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().addAll(attributeCategories);
         }
         return patternType;
     }

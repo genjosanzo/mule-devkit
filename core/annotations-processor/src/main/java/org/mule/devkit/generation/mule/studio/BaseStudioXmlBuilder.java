@@ -20,9 +20,10 @@ package org.mule.devkit.generation.mule.studio;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connect;
 import org.mule.api.annotations.Transformer;
-import org.mule.api.annotations.studio.InputGroup;
+import org.mule.api.annotations.studio.Display;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.EnumElement;
 import org.mule.devkit.model.studio.EnumType;
@@ -41,7 +42,6 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Types;
 import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -85,17 +85,39 @@ public abstract class BaseStudioXmlBuilder {
         this.executableElement = executableElement;
     }
 
-    protected Collection<Group> processMethodParameters() {
+    protected List<AttributeCategory> processMethodParameters() {
         return processVariableElements(getParametersSorted());
     }
 
-    protected Collection<Group> processConfigurableFields() {
-        return processVariableElements(getConfigurableFieldsSorted());
+    protected List<AttributeCategory> processConfigurableFields(Group defaultGroup) {
+        List<AttributeCategory> attributeCategories = processVariableElements(getConfigurableFieldsSorted());
+        for (AttributeCategory attributeCategory : attributeCategories) {
+            if (attributeCategory.getCaption().equals(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION)) {
+                attributeCategory.setCaption(helper.formatCaption(typeElement.name()));
+                attributeCategory.setDescription(helper.formatDescription(typeElement.name() + " configuration properties"));
+                List<Group> groups = attributeCategory.getGroup();
+                if (groups.isEmpty()) {
+                    groups.add(defaultGroup);
+                } else {
+                    groups.add(0, defaultGroup);
+                }
+            }
+        }
+        if (attributeCategories.isEmpty()) {
+            AttributeCategory attributeCategory = new AttributeCategory();
+            attributeCategory.setCaption(helper.formatCaption(typeElement.name()));
+            attributeCategory.setDescription(helper.formatDescription(typeElement.name() + " configuration properties"));
+            attributeCategory.getGroup().add(defaultGroup);
+            attributeCategories.add(attributeCategory);
+        }
+        return attributeCategories;
     }
 
-    private Collection<Group> processVariableElements(List<? extends VariableElement> variableElements) {
+    private List<AttributeCategory> processVariableElements(List<? extends VariableElement> variableElements) {
 
         Map<String, Group> groupsByName = new LinkedHashMap<String, Group>();
+        Map<String, AttributeCategory> attributeCategoriesByName = new LinkedHashMap<String, AttributeCategory>();
+        getOrCreateDefaultAttributeCategory(attributeCategoriesByName);
 
         if (typeElement.usesConnectionManager() && (executableElement == null || executableElement.getAnnotation(Transformer.class) == null)) {
             Group connectionAttributesGroup = new Group();
@@ -105,20 +127,58 @@ public abstract class BaseStudioXmlBuilder {
 
             List<AttributeType> connectionAttributes = getConnectionAttributes(typeElement);
             connectionAttributesGroup.getRegexpOrEncodingOrModeSwitch().addAll(helper.createJAXBElements(connectionAttributes));
+
+            getOrCreateDefaultAttributeCategory(attributeCategoriesByName).getGroup().add(connectionAttributesGroup);
         }
 
         for (VariableElement parameter : variableElements) {
             JAXBElement<? extends AttributeType> jaxbElement = createJaxbElement(parameter);
+            AttributeCategory attributeCategory = getOrCreateAttributeCategory(attributeCategoriesByName, parameter.getAnnotation(Display.class));
             Group group = getOrCreateGroup(groupsByName, parameter);
             group.getRegexpOrEncodingOrModeSwitch().add(jaxbElement);
+
+            if (!attributeCategory.getGroup().contains(group)) {
+                attributeCategory.getGroup().add(group);
+            }
         }
 
-        return groupsByName.values();
+        return new ArrayList<AttributeCategory>(attributeCategoriesByName.values());
+    }
+
+    private AttributeCategory getOrCreateDefaultAttributeCategory(Map<String, AttributeCategory> attributeCategoriesByName) {
+        return getOrCreateAttributeCategory(attributeCategoriesByName, null);
+
+    }
+
+    private AttributeCategory getOrCreateAttributeCategory(Map<String, AttributeCategory> attributeCategoriesByName, Display display) {
+        if (display == null) {
+            if (!attributeCategoriesByName.containsKey(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION)) {
+                AttributeCategory attributeCategoryGeneral = new AttributeCategory();
+                attributeCategoryGeneral.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
+                attributeCategoryGeneral.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
+                attributeCategoriesByName.put(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION, attributeCategoryGeneral);
+            }
+            return attributeCategoriesByName.get(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION);
+        } else {
+            String attributeCategoryName;
+            if (StringUtils.isNotBlank(display.tab())) {
+                attributeCategoryName = display.tab();
+            } else {
+                attributeCategoryName = MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION;
+            }
+            if (!attributeCategoriesByName.containsKey(attributeCategoryName)) {
+                AttributeCategory attributeCategory = new AttributeCategory();
+                attributeCategory.setCaption(helper.formatCaption(attributeCategoryName));
+                attributeCategory.setDescription(helper.formatDescription(attributeCategoryName));
+                attributeCategoriesByName.put(attributeCategoryName, attributeCategory);
+            }
+            return attributeCategoriesByName.get(attributeCategoryName);
+        }
     }
 
     private Group getOrCreateGroup(Map<String, Group> groupsByName, VariableElement parameter) {
-        InputGroup inputGroup = parameter.getAnnotation(InputGroup.class);
-        if (inputGroup == null) {
+        Display display = parameter.getAnnotation(Display.class);
+        if (display == null) {
             if (!groupsByName.containsKey(GENERAL_GROUP_NAME)) {
                 Group groupGeneral = new Group();
                 groupGeneral.setCaption(helper.formatCaption(GENERAL_GROUP_NAME));
@@ -127,7 +187,7 @@ public abstract class BaseStudioXmlBuilder {
             }
             return groupsByName.get(GENERAL_GROUP_NAME);
         } else {
-            String groupName = inputGroup.value();
+            String groupName = display.inputGroup();
             if (!groupsByName.containsKey(groupName)) {
                 Group group = new Group();
                 group.setCaption(helper.formatCaption(groupName));
@@ -188,7 +248,7 @@ public abstract class BaseStudioXmlBuilder {
     private NestedElementReference createNestedElementReference(ExecutableElement executableElement, VariableElement parameter) {
         NestedElementReference childElement = new NestedElementReference();
         String prefix;
-        if(executableElement != null) {
+        if (executableElement != null) {
             prefix = nameUtils.uncamel(executableElement.getSimpleName().toString());
             childElement.setDescription(helper.formatDescription(javaDocUtils.getParameterSummary(parameter.getSimpleName().toString(), executableElement)));
         } else {

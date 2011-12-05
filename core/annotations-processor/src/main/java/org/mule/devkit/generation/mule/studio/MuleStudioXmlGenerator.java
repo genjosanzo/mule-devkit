@@ -37,7 +37,7 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
     public static final String URI_PREFIX = "http://www.mulesoft.org/schema/mule/";
     public static final String GLOBAL_CLOUD_CONNECTOR_LOCAL_ID = "config";
     public static final String ATTRIBUTE_CATEGORY_DEFAULT_CAPTION = "General";
-    public static final String ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION = "General properties";
+    public static final String ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION = "General";
     public static final String GROUP_DEFAULT_CAPTION = "Generic";
     private ObjectFactory objectFactory = new ObjectFactory();
 

@@ -31,7 +31,7 @@
                      image="icons/large/collection-connector-48x32.png" localId="collection-connector"
                      icon="icons/small/collection-connector-24x16.png" description="Collection module."
                      caption="Collection" aliasId="org.mule.tooling.ui.modules.core.pattern.collection">
-        <attribute-category description="General properties." caption="General">
+        <attribute-category description="General." caption="General">
             <group caption="Generic" id="collectionConnectorGeneric">
                 <modeSwitch description="Operation." caption="Operation" name="Collection operations to execute">
                     <mode modeLabel="Operation1"
@@ -55,7 +55,7 @@
     <cloud-connector abstract="true" image="icons/large/collection-connector-48x32.png"
                      localId="abstractCollectionConnectorGeneric" icon="icons/small/collection-connector-24x16.png"
                      description="Interact with Collection." caption="Abstractcollectionconnectorgeneric">
-        <attribute-category description="General properties." caption="General">
+        <attribute-category description="General." caption="General">
             <group caption="Generic" id="abstractCollectionConnectorGeneric">
                 <globalRef requiredType="http://www.mulesoft.org/schema/mule/collection/config"
                            description="Specify which configuration to use for this invocation."
@@ -105,7 +105,7 @@
     <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric"
                      abstract="true" image="icons/large/collection-connector-48x32.png" localId="operation1"
                      icon="icons/small/collection-connector-24x16.png" caption="Operation1">
-        <attribute-category description="General properties." caption="General">
+        <attribute-category description="General." caption="General">
             <group caption="General" id="general">
                 <childElement allowMultiple="false" inplace="true" description="A list of strings." caption="Strings"
                               name="http://www.mulesoft.org/schema/mule/collection/operation1-strings"></childElement>
@@ -124,7 +124,7 @@
     <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric"
                      abstract="true" image="icons/large/collection-connector-48x32.png" localId="operation2"
                      icon="icons/small/collection-connector-24x16.png" caption="Operation2">
-        <attribute-category description="General properties." caption="General">
+        <attribute-category description="General." caption="General">
             <group caption="General" id="general">
                 <childElement allowMultiple="false" inplace="true" description="A map of strings." caption="Map Strings"
                               name="http://www.mulesoft.org/schema/mule/collection/operation2-map-strings"></childElement>
@@ -144,7 +144,7 @@
     <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric"
                      abstract="true" image="icons/large/collection-connector-48x32.png" localId="operation3"
                      icon="icons/small/collection-connector-24x16.png" caption="Operation3">
-        <attribute-category description="General properties." caption="General">
+        <attribute-category description="General." caption="General">
             <group caption="General" id="general">
                 <childElement allowMultiple="false" inplace="true" description="A map of string-object."
                               caption="Map Objects"
@@ -165,7 +165,7 @@
     <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric"
                      abstract="true" image="icons/large/collection-connector-48x32.png" localId="operation4"
                      icon="icons/small/collection-connector-24x16.png" caption="Operation4">
-        <attribute-category description="General properties." caption="General">
+        <attribute-category description="General." caption="General">
             <group caption="General" id="general">
                 <childElement allowMultiple="false" inplace="true" description="A raw map." caption="Properties"
                               name="http://www.mulesoft.org/schema/mule/collection/operation4-properties"></childElement>
@@ -185,7 +185,7 @@
     <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric"
                      abstract="true" image="icons/large/collection-connector-48x32.png" localId="operation5"
                      icon="icons/small/collection-connector-24x16.png" caption="Operation5">
-        <attribute-category description="General properties." caption="General">
+        <attribute-category description="General." caption="General">
             <group caption="General" id="general">
                 <childElement allowMultiple="false" inplace="true" description="A list." caption="List"
                               name="http://www.mulesoft.org/schema/mule/collection/operation5-list"></childElement>
@@ -204,7 +204,7 @@
     <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric"
                      abstract="true" image="icons/large/collection-connector-48x32.png" localId="operation6"
                      icon="icons/small/collection-connector-24x16.png" caption="Operation6">
-        <attribute-category description="General properties." caption="General">
+        <attribute-category description="General." caption="General">
             <group caption="General" id="general">
                 <childElement allowMultiple="false" inplace="true" description="A list of maps." caption="Objects"
                               name="http://www.mulesoft.org/schema/mule/collection/operation6-objects"></childElement>
@@ -229,7 +229,7 @@
     <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric"
                      abstract="true" image="icons/large/collection-connector-48x32.png" localId="operation7"
                      icon="icons/small/collection-connector-24x16.png" caption="Operation7">
-        <attribute-category description="General properties." caption="General">
+        <attribute-category description="General." caption="General">
             <group caption="General" id="general">
                 <childElement allowMultiple="false" inplace="true" description="A map of string-lists." caption="Map"
                               name="http://www.mulesoft.org/schema/mule/collection/operation7-map"></childElement>

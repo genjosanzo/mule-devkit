@@ -46,16 +46,10 @@ public class GlobalCloudConnectorBuilder extends BaseStudioXmlBuilder {
         group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupName(nameAttributeType));
         group.setCaption(helper.formatCaption(MuleStudioXmlGenerator.GROUP_DEFAULT_CAPTION));
 
-        AttributeCategory attributeCategory = new AttributeCategory();
-        attributeCategory.setCaption(helper.formatCaption(typeElement.name()));
-        attributeCategory.setDescription(helper.formatDescription(typeElement.name() + " configuration properties"));
-        attributeCategory.getGroup().add(group);
-
-        Collection<Group> groups = processConfigurableFields();
-        attributeCategory.getGroup().addAll(groups);
+        Collection<AttributeCategory> attributeCategories = processConfigurableFields(group);
 
         GlobalType globalCloudConnector = new GlobalType();
-        globalCloudConnector.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
+        globalCloudConnector.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().addAll(attributeCategories);
         globalCloudConnector.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(typeElement.name())));
         globalCloudConnector.setLocalId(MuleStudioXmlGenerator.GLOBAL_CLOUD_CONNECTOR_LOCAL_ID);
         globalCloudConnector.setDescription(helper.formatDescription("Global " + nameUtils.friendlyNameFromCamelCase(typeElement.name()) + " configuration information"));
