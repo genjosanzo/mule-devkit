@@ -25,16 +25,16 @@ import org.mule.util.IOUtils;
 
 import static org.junit.Assert.assertTrue;
 
-public class SourceModuleStudioXmlTest {
+public class MetadataModuleStudioXmlTest {
 
     private static final String EXPECTED_STUDIO_XML = "expected-studio-xml.xml";
-    private static final String ACTUAL_STUDIO_XML = "META-INF/source-studio.xml";
+    private static final String ACTUAL_STUDIO_XML = "META-INF/metadata-studio.xml";
 
     @Test
-    public void sourceModulesStudioXmlGeneration() throws Exception {
+    public void metadataModuleStudioXmlGeneration() throws Exception {
         XMLUnit.setIgnoreWhitespace(true);
-        String expectedXml = IOUtils.toString(SourceModuleStudioXmlTest.class.getClassLoader().getResourceAsStream(EXPECTED_STUDIO_XML));
-        String actualXml = IOUtils.toString(SourceModuleStudioXmlTest.class.getClassLoader().getResourceAsStream(ACTUAL_STUDIO_XML));
+        String expectedXml = IOUtils.toString(MetadataModuleStudioXmlTest.class.getClassLoader().getResourceAsStream(EXPECTED_STUDIO_XML));
+        String actualXml = IOUtils.toString(MetadataModuleStudioXmlTest.class.getClassLoader().getResourceAsStream(ACTUAL_STUDIO_XML));
         Diff diff = new Diff(expectedXml, actualXml);
         diff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
         DetailedDiff detailedDiff = new DetailedDiff(diff);

@@ -31,7 +31,7 @@ public class ConfigurableModuleStudioXmlTest {
     private static final String ACTUAL_STUDIO_XML = "META-INF/configurable-studio.xml";
 
     @Test
-    public void connectorModulesStudioXmlGeneration() throws Exception {
+    public void configurableModuleStudioXmlGeneration() throws Exception {
         XMLUnit.setIgnoreWhitespace(true);
         String expectedXml = IOUtils.toString(ConfigurableModuleStudioXmlTest.class.getClassLoader().getResourceAsStream(EXPECTED_STUDIO_XML));
         String actualXml = IOUtils.toString(ConfigurableModuleStudioXmlTest.class.getClassLoader().getResourceAsStream(ACTUAL_STUDIO_XML));

@@ -57,28 +57,18 @@
     </attribute-category>
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="payload" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Payload">
-    <attribute-category description="General properties." caption="General">
-      <group caption="General" id="general"></group>
-    </attribute-category>
+    <attribute-category description="General properties." caption="General" />
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="inbound-headers" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Inbound-headers">
-    <attribute-category description="General properties." caption="General">
-      <group caption="General" id="general"></group>
-    </attribute-category>
+    <attribute-category description="General properties." caption="General" />
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="invocation-headers" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Invocation-headers">
-    <attribute-category description="General properties." caption="General">
-      <group caption="General" id="general"></group>
-    </attribute-category>
+    <attribute-category description="General properties." caption="General" />
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="outbound-headers" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Outbound-headers">
-    <attribute-category description="General properties." caption="General">
-      <group caption="General" id="general"></group>
-    </attribute-category>
+    <attribute-category description="General properties." caption="General" />
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="pauth" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Pauth">
-    <attribute-category description="General properties." caption="General">
-      <group caption="General" id="general"></group>
-    </attribute-category>
+    <attribute-category description="General properties." caption="General" />
   </cloud-connector>
 </namespace>

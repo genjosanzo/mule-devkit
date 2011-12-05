@@ -23,9 +23,7 @@
     </attribute-category>
   </cloud-connector>
   <endpoint supportsOutbound="false" supportsInbound="true" image="icons/small/source-connector-24x16.png" localId="suscribe" icon="icons/small/source-connector-24x16.png" description="Message source method." caption="Suscribe">
-    <attribute-category description="General properties." caption="General">
-      <group caption="General" id="general"></group>
-    </attribute-category>
+    <attribute-category description="General properties." caption="General" />
   </endpoint>
   <global-endpoint extends="http://www.mulesoft.org/schema/mule/source/suscribe" image="icons/large/source-connector-48x32.png" localId="suscribe" icon="icons/small/source-connector-24x16.png" description="Message source method." caption="suscribe">
     <attribute-category description="General properties." caption="General">

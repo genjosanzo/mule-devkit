@@ -43,6 +43,8 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.xml.bind.JAXBElement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MuleStudioUtils {
 
@@ -82,6 +84,17 @@ public class MuleStudioUtils {
 
     public String getGlobalRefId(String moduleName) {
         return "abstract" + StringUtils.capitalize(moduleName) + "ConnectorGeneric";
+    }
+
+    public List<JAXBElement<? extends AttributeType>> createJAXBElements(List<AttributeType> attributeTypes) {
+        List<JAXBElement<? extends AttributeType>> jaxbElements = new ArrayList<JAXBElement<? extends AttributeType>>();
+        for (AttributeType attributeType : attributeTypes) {
+            JAXBElement<? extends AttributeType> jaxbElement = createJAXBElement(attributeType);
+            if (jaxbElement != null) {
+                jaxbElements.add(jaxbElement);
+            }
+        }
+        return jaxbElements;
     }
 
     public JAXBElement<? extends AttributeType> createJAXBElement(AttributeType attributeType) {
@@ -164,7 +177,11 @@ public class MuleStudioUtils {
     public void setAttributeTypeInfo(ExecutableElement executableElement, VariableElement variableElement, AttributeType parameter) {
         String parameterName = variableElement.getSimpleName().toString();
         parameter.setCaption(formatCaption(nameUtils.friendlyNameFromCamelCase(parameterName)));
-        parameter.setDescription(formatDescription(javaDocUtils.getParameterSummary(parameterName, executableElement)));
+        if (executableElement != null) {
+            parameter.setDescription(formatDescription(javaDocUtils.getParameterSummary(parameterName, executableElement)));
+        } else {
+            parameter.setDescription(formatDescription(javaDocUtils.getSummary(variableElement)));
+        }
         if (parameter instanceof StringAttributeType && !SchemaTypeConversion.isSupported(variableElement.asType().toString())) {
             parameter.setName(parameterName + SchemaGenerator.REF_SUFFIX);
         } else if (parameter instanceof FlowRefType) {
@@ -188,6 +205,14 @@ public class MuleStudioUtils {
             } else if (parameter instanceof EnumType) {
                 ((EnumType) parameter).setDefaultValue(annotation.value());
             }
+        }
+    }
+
+    public String getLocalId(ExecutableElement executableElement, VariableElement variableElement) {
+        if (executableElement != null) {
+            return nameUtils.uncamel(executableElement.getSimpleName().toString()) + '-' + nameUtils.uncamel(variableElement.getSimpleName().toString());
+        } else {
+            return "configurable-" + nameUtils.uncamel(variableElement.getSimpleName().toString());
         }
     }
 }

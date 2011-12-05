@@ -24,10 +24,7 @@ import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.Group;
 import org.mule.devkit.model.studio.ModeElementType;
 import org.mule.devkit.model.studio.ModeType;
-import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.model.studio.PatternType;
-import org.mule.devkit.utils.JavaDocUtils;
-import org.mule.devkit.utils.NameUtils;
 import org.mule.util.StringUtils;
 
 import javax.lang.model.element.ExecutableElement;
@@ -36,22 +33,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CloudConnectorOperationsBuilder {
+public class CloudConnectorOperationsBuilder extends BaseStudioXmlBuilder {
 
     private static final String ALIAS_ID_PREFIX = "org.mule.tooling.ui.modules.core.pattern.";
     private static final MethodComparator METHOD_COMPARATOR = new MethodComparator();
-    private ObjectFactory objectFactory;
-    private MuleStudioUtils helper;
-    private DevKitTypeElement typeElement;
-    private NameUtils nameUtils;
-    private JavaDocUtils javaDocUtils;
 
     public CloudConnectorOperationsBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
-        this.typeElement = typeElement;
-        helper = new MuleStudioUtils(context);
-        nameUtils = context.getNameUtils();
-        javaDocUtils = context.getJavaDocUtils();
-        objectFactory = new ObjectFactory();
+        super(context, typeElement);
     }
 
     public JAXBElement<PatternType> build() {
@@ -87,7 +75,7 @@ public class CloudConnectorOperationsBuilder {
         ModeType modeSwitch = new ModeType();
         modeSwitch.getMode().addAll(modes);
         modeSwitch.setCaption(helper.formatCaption("Operation"));
-        modeSwitch.setName(StringUtils.capitalize(typeElement.name()) + " operations to execute");
+        modeSwitch.setName(StringUtils.capitalize(moduleName) + " operations to execute");
         modeSwitch.setDescription(helper.formatDescription("Operation"));
 
         Group group = new Group();

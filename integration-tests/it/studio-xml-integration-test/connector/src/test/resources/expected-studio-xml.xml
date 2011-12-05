@@ -5,9 +5,13 @@
     <attribute-category description="Connector configuration properties." caption="Connector">
       <group caption="Generic" id="connectorGenericProperties">
         <name required="false" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
-        <url required="false" description="A URL." caption="Url" name="url"></url>
+      </group>
+      <group caption="Connection" id="connection">
         <string required="false" description="The username to use." caption="Username" name="username"></string>
         <string required="false" description="The password to use." caption="Password" name="password"></string>
+      </group>
+      <group caption="General" id="general">
+        <url required="false" description="A URL." caption="Url" name="url"></url>
       </group>
     </attribute-category>
   </global-cloud-connector>
@@ -30,7 +34,7 @@
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" abstract="true" image="icons/large/connector-connector-48x32.png" localId="invalidate" icon="icons/small/connector-connector-24x16.png" caption="Invalidate">
     <attribute-category description="General properties." caption="General">
-      <group caption="General" id="general">
+      <group caption="Connection" id="connection">
         <string required="false" description="The username to use." caption="Username" name="username"></string>
         <string required="false" description="The password to use." caption="Password" name="password"></string>
       </group>
@@ -38,7 +42,7 @@
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" abstract="true" image="icons/large/connector-connector-48x32.png" localId="get-username" icon="icons/small/connector-connector-24x16.png" caption="Get-username">
     <attribute-category description="General properties." caption="General">
-      <group caption="General" id="general">
+      <group caption="Connection" id="connection">
         <string required="false" description="The username to use." caption="Username" name="username"></string>
         <string required="false" description="The password to use." caption="Password" name="password"></string>
       </group>

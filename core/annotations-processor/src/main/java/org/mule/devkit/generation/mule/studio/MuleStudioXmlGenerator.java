@@ -23,11 +23,14 @@ import org.mule.api.annotations.Transformer;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.EndpointType;
+import org.mule.devkit.model.studio.GlobalType;
 import org.mule.devkit.model.studio.NamespaceType;
 import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.model.studio.PatternType;
 
 import javax.lang.model.element.ExecutableElement;
+import javax.xml.bind.JAXBElement;
+import java.util.List;
 
 public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
 
@@ -53,32 +56,46 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
 
         namespace.getConnectorOrEndpointOrGlobal().add(new GlobalCloudConnectorBuilder(context, typeElement).build());
         namespace.getConnectorOrEndpointOrGlobal().add(new CloudConnectorOperationsBuilder(context, typeElement).build());
-        namespace.getConnectorOrEndpointOrGlobal().add(new ConfigRefBuilder(context).build(moduleName));
+        namespace.getConnectorOrEndpointOrGlobal().add(new ConfigRefBuilder(context, typeElement).build());
+        namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, typeElement).build());
 
-        if (typeElement.hasMethodsAnnotatedWith(Transformer.class)) {
-            namespace.getConnectorOrEndpointOrGlobal().add(new AbstractTransformerBuilder(context).build());
-        }
-
-        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Processor.class)) {
-            PatternType patternType = new PatternTypeBuilder(context, executableElement, typeElement).build();
-            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeCloudConnector(patternType));
-            namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, executableElement, moduleName).build());
-        }
-
-        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
-            PatternType patternType = new PatternTypeBuilder(context, executableElement, typeElement).build();
-            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeTransformer(patternType));
-            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalTransformer(new GlobalTypeBuilder(context, executableElement, typeElement).build()));
-            namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, executableElement, moduleName).build());
-        }
-
-        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Source.class)) {
-            EndpointType endpointType = new EndpointTypeBuilder(context, executableElement, typeElement).build();
-            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createEndpoint(endpointType));
-            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalEndpoint(new GlobalTypeBuilder(context, executableElement, typeElement).build()));
-        }
+        processProcessorMethods(typeElement, namespace);
+        processTransformerMethods(typeElement, namespace);
+        processSourceMethods(typeElement, namespace);
 
         context.getStudioModel().setNamespaceType(namespace);
         context.getStudioModel().setModuleName(moduleName);
+    }
+
+    private void processProcessorMethods(DevKitTypeElement typeElement, NamespaceType namespace) {
+        for (ExecutableElement processorMethod : typeElement.getMethodsAnnotatedWith(Processor.class)) {
+            PatternType cloudConnector = new PatternTypeBuilder(context, processorMethod, typeElement).build();
+            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeCloudConnector(cloudConnector));
+            namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, processorMethod, typeElement).build());
+        }
+    }
+
+    private void processTransformerMethods(DevKitTypeElement typeElement, NamespaceType namespace) {
+        List<ExecutableElement> transformerMethods = typeElement.getMethodsAnnotatedWith(Transformer.class);
+        if (!transformerMethods.isEmpty()) {
+            namespace.getConnectorOrEndpointOrGlobal().add(new AbstractTransformerBuilder(context).build());
+        }
+        for (ExecutableElement transformerMethod : transformerMethods) {
+            PatternType transformer = new PatternTypeBuilder(context, transformerMethod, typeElement).build();
+            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeTransformer(transformer));
+            GlobalType globalTransformer = new GlobalTypeBuilder(context, transformerMethod, typeElement).build();
+            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalTransformer(globalTransformer));
+            namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, transformerMethod, typeElement).build());
+        }
+    }
+
+    private void processSourceMethods(DevKitTypeElement typeElement, NamespaceType namespace) {
+        for (ExecutableElement sourceMethod : typeElement.getMethodsAnnotatedWith(Source.class)) {
+            EndpointType endpoint = new EndpointTypeBuilder(context, sourceMethod, typeElement).build();
+            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createEndpoint(endpoint));
+            GlobalType globalEndpoint = new GlobalTypeBuilder(context, sourceMethod, typeElement).build();
+            JAXBElement<GlobalType> namespaceTypeGlobalEndpoint = objectFactory.createNamespaceTypeGlobalEndpoint(globalEndpoint);
+            namespace.getConnectorOrEndpointOrGlobal().add(namespaceTypeGlobalEndpoint);
+        }
     }
 }

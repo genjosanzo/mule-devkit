@@ -24,28 +24,13 @@ import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.GlobalType;
 import org.mule.devkit.model.studio.Group;
-import org.mule.devkit.model.studio.ObjectFactory;
-import org.mule.devkit.utils.JavaDocUtils;
-import org.mule.devkit.utils.NameUtils;
 
 import javax.lang.model.element.ExecutableElement;
 
-public class GlobalTypeBuilder {
-
-    private ObjectFactory objectFactory;
-    private MuleStudioUtils helper;
-    private DevKitTypeElement typeElement;
-    private NameUtils nameUtils;
-    private JavaDocUtils javaDocUtils;
-    private ExecutableElement executableElement;
+public class GlobalTypeBuilder extends BaseStudioXmlBuilder {
 
     public GlobalTypeBuilder(GeneratorContext context, ExecutableElement executableElement, DevKitTypeElement typeElement) {
-        this.typeElement = typeElement;
-        this.executableElement = executableElement;
-        helper = new MuleStudioUtils(context);
-        objectFactory = new ObjectFactory();
-        nameUtils = context.getNameUtils();
-        javaDocUtils = context.getJavaDocUtils();
+        super(context, executableElement, typeElement);
     }
 
     public GlobalType build() {
@@ -81,7 +66,7 @@ public class GlobalTypeBuilder {
     }
 
     private String getDescriptionBasedOnType() {
-        if(isTransformer()) {
+        if (isTransformer()) {
             return "Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level.";
         } else {
             return "Endpoint name";
@@ -89,7 +74,7 @@ public class GlobalTypeBuilder {
     }
 
     private String getIdBasedOnType() {
-        if(isTransformer()) {
+        if (isTransformer()) {
             return "abstractTransformerGeneric";
         } else {
             return "abstractEndpointGeneric";
@@ -97,6 +82,6 @@ public class GlobalTypeBuilder {
     }
 
     private boolean isTransformer() {
-        return executableElement.getAnnotation(Transformer.class) !=null;
+        return executableElement.getAnnotation(Transformer.class) != null;
     }
 }

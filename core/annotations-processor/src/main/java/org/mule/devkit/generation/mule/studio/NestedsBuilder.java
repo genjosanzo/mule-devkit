@@ -17,78 +17,63 @@
 
 package org.mule.devkit.generation.mule.studio;
 
+import org.mule.api.annotations.Configurable;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.spring.SchemaGenerator;
 import org.mule.devkit.model.studio.AbstractElementType;
 import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.NestedElementReference;
 import org.mule.devkit.model.studio.NestedElementType;
-import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.model.studio.StringAttributeType;
 import org.mule.devkit.model.studio.TextType;
-import org.mule.devkit.utils.JavaDocUtils;
-import org.mule.devkit.utils.NameUtils;
-import org.mule.devkit.utils.TypeMirrorUtils;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.Types;
 import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NestedsBuilder {
+public class NestedsBuilder extends BaseStudioXmlBuilder {
 
-    private ObjectFactory objectFactory;
-    private MuleStudioUtils helper;
-    private ExecutableElement executableElement;
-    private String moduleName;
-    private NameUtils nameUtils;
-    private Types typeUtils;
-    private TypeMirrorUtils typeMirrorUtils;
-    private JavaDocUtils javaDocUtils;
+    public NestedsBuilder(GeneratorContext context, ExecutableElement executableElement, DevKitTypeElement typeElement) {
+        super(context, executableElement, typeElement);
+    }
 
-    public NestedsBuilder(GeneratorContext context, ExecutableElement executableElement, String moduleName) {
-        this.executableElement = executableElement;
-        this.moduleName = moduleName;
-        helper = new MuleStudioUtils(context);
-        this.nameUtils = context.getNameUtils();
-        this.typeUtils = context.getTypeUtils();
-        this.typeMirrorUtils = context.getTypeMirrorUtils();
-        javaDocUtils = context.getJavaDocUtils();
-        objectFactory = new ObjectFactory();
+    public NestedsBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
+        super(context, typeElement);
     }
 
     public List<JAXBElement<? extends AbstractElementType>> build() {
         List<JAXBElement<? extends AbstractElementType>> nesteds = new ArrayList<JAXBElement<? extends AbstractElementType>>();
-        for (VariableElement parameter : executableElement.getParameters()) {
-            String localId = nameUtils.uncamel(executableElement.getSimpleName().toString()) + '-' + nameUtils.uncamel(parameter.getSimpleName().toString());
-            if (needToCreateNestedElement(parameter)) {
+        for (VariableElement variableElement : getVariableElements()) {
+            if (needToCreateNestedElement(variableElement)) {
 
-                NestedElementReference childElement = createChildElement(parameter, localId);
-                NestedElementType firstLevelNestedElement = createFirstLevelNestedElement(parameter, localId);
+                String localId = helper.getLocalId(executableElement, variableElement);
+                NestedElementReference childElement = createChildElement(variableElement, localId);
+                NestedElementType firstLevelNestedElement = createFirstLevelNestedElement(variableElement, localId);
                 firstLevelNestedElement.getRegexpOrEncodingOrString().add(helper.createJAXBElement(childElement));
 
                 NestedElementType secondLevelNestedElement = null;
                 NestedElementType thirdLevelNestedElement = null;
-                if (isSimpleList(parameter)) {
-                    secondLevelNestedElement = createSecondLevelNestedElement(parameter, childElement);
-                    handleSimpleList(parameter, localId, secondLevelNestedElement);
-                } else if (isSimpleMap(parameter) || isListOfMaps(parameter)) {
-                    secondLevelNestedElement = createSecondLevelNestedElement(parameter, childElement);
-                    handleSimpleMap(parameter, secondLevelNestedElement);
-                    if (isListOfMaps(parameter)) {
+                if (isSimpleList(variableElement)) {
+                    secondLevelNestedElement = createSecondLevelNestedElement(variableElement, childElement);
+                    handleSimpleList(variableElement, localId, secondLevelNestedElement);
+                } else if (isSimpleMap(variableElement) || isListOfMaps(variableElement)) {
+                    secondLevelNestedElement = createSecondLevelNestedElement(variableElement, childElement);
+                    handleSimpleMap(variableElement, secondLevelNestedElement);
+                    if (isListOfMaps(variableElement)) {
                         childElement.setName(nameUtils.singularize(childElement.getName()));
                         thirdLevelNestedElement = new NestedElementType();
-                        thirdLevelNestedElement.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+                        thirdLevelNestedElement.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(variableElement.getSimpleName().toString())));
                         thirdLevelNestedElement.setLocalId(nameUtils.singularize(localId));
-                        thirdLevelNestedElement.setXmlname(nameUtils.uncamel(nameUtils.singularize(parameter.getSimpleName().toString())));
-                        thirdLevelNestedElement.setDescription(helper.formatDescription(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+                        thirdLevelNestedElement.setXmlname(nameUtils.uncamel(nameUtils.singularize(variableElement.getSimpleName().toString())));
+                        thirdLevelNestedElement.setDescription(helper.formatDescription(nameUtils.friendlyNameFromCamelCase(variableElement.getSimpleName().toString())));
                         thirdLevelNestedElement.setIcon(helper.getIcon(moduleName));
                         thirdLevelNestedElement.setImage(helper.getImage(moduleName));
-                        NestedElementReference childElement1 = createChildElement(parameter, SchemaGenerator.INNER_PREFIX + nameUtils.singularize(localId));
+                        NestedElementReference childElement1 = createChildElement(variableElement, SchemaGenerator.INNER_PREFIX + nameUtils.singularize(localId));
                         childElement1.setCaption(nameUtils.singularize(childElement1.getCaption()));
                         childElement1.setDescription(nameUtils.singularize(childElement1.getDescription()));
                         thirdLevelNestedElement.getRegexpOrEncodingOrString().add(helper.createJAXBElement(childElement1));
@@ -103,6 +88,14 @@ public class NestedsBuilder {
             }
         }
         return nesteds;
+    }
+
+    private List<? extends VariableElement> getVariableElements() {
+        if (executableElement != null) {
+            return executableElement.getParameters();
+        } else {
+            return typeElement.getFieldsAnnotatedWith(Configurable.class);
+        }
     }
 
     private void handleSimpleMap(VariableElement parameter, NestedElementType secondLevelNestedElement) {
@@ -142,7 +135,11 @@ public class NestedsBuilder {
         }
         attributeTypeForListValues.setName(nameUtils.singularize(localId));
         attributeTypeForListValues.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
-        attributeTypeForListValues.setDescription(helper.formatDescription(javaDocUtils.getParameterSummary(parameter.getSimpleName().toString(), executableElement)));
+        if (executableElement != null) {
+            attributeTypeForListValues.setDescription(helper.formatDescription(javaDocUtils.getParameterSummary(parameter.getSimpleName().toString(), executableElement)));
+        } else {
+            attributeTypeForListValues.setDescription(helper.formatDescription(javaDocUtils.getSummary(parameter)));
+        }
         secondLevelNestedElement.getRegexpOrEncodingOrString().add(helper.createJAXBElement(attributeTypeForListValues));
     }
 
@@ -209,4 +206,5 @@ public class NestedsBuilder {
         return (typeMirrorUtils.isMap(parameter.asType()) ||
                 typeMirrorUtils.isArrayOrList(parameter.asType())) && !typeMirrorUtils.ignoreParameter(parameter);
     }
+
 }

@@ -24,21 +24,17 @@ import org.mule.devkit.model.studio.EncodingType;
 import org.mule.devkit.model.studio.EnumElement;
 import org.mule.devkit.model.studio.EnumType;
 import org.mule.devkit.model.studio.Group;
-import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.model.studio.PatternType;
 import org.mule.devkit.model.studio.StringAttributeType;
 
 import javax.xml.bind.JAXBElement;
 
-public class AbstractTransformerBuilder {
+public class AbstractTransformerBuilder extends BaseStudioXmlBuilder {
 
     public static final String ABSTRACT_TRANSFORMER_LOCAL_ID = "abstractTransformer";
-    private ObjectFactory objectFactory;
-    private MuleStudioUtils helper;
 
     public AbstractTransformerBuilder(GeneratorContext context) {
-        helper = new MuleStudioUtils(context);
-        objectFactory = new ObjectFactory();
+        super(context);
     }
 
     public JAXBElement<PatternType> build() {

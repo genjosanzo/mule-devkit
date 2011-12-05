@@ -17,64 +17,23 @@
 
 package org.mule.devkit.generation.mule.studio;
 
-import org.mule.api.annotations.Configurable;
-import org.mule.api.annotations.Connect;
-import org.mule.api.annotations.param.Optional;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.GlobalType;
 import org.mule.devkit.model.studio.Group;
-import org.mule.devkit.model.studio.ObjectFactory;
-import org.mule.devkit.utils.JavaDocUtils;
-import org.mule.devkit.utils.NameUtils;
-import org.mule.devkit.utils.TypeMirrorUtils;
 
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.VariableElement;
 import javax.xml.bind.JAXBElement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Collection;
 
-public class GlobalCloudConnectorBuilder {
-
-    private ObjectFactory objectFactory;
-    private MuleStudioUtils helper;
-    private DevKitTypeElement typeElement;
-    private TypeMirrorUtils typeMirrorUtils;
-    private NameUtils nameUtils;
-    private JavaDocUtils javaDocUtils;
+public class GlobalCloudConnectorBuilder extends BaseStudioXmlBuilder {
 
     public GlobalCloudConnectorBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
-        this.typeElement = typeElement;
-        helper = new MuleStudioUtils(context);
-        objectFactory = new ObjectFactory();
-        typeMirrorUtils = context.getTypeMirrorUtils();
-        nameUtils = context.getNameUtils();
-        javaDocUtils = context.getJavaDocUtils();
+        super(context, typeElement);
     }
 
-    // TODO: handle collection, map and enum configurable fields
     public JAXBElement<GlobalType> build() {
-        List<AttributeType> fields = new ArrayList<AttributeType>();
-        for (VariableElement field : getConfigurableFieldsSorted()) {
-            AttributeType parameter = helper.createAttributeTypeIgnoreEnumsAndCollections(field);
-            if (parameter != null) {
-                String parameterName = field.getSimpleName().toString();
-                parameter.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameterName)));
-                parameter.setDescription(helper.formatDescription(javaDocUtils.getSummary(field)));
-                parameter.setName(parameterName);
-                parameter.setRequired(field.getAnnotation(Optional.class) == null);
-                helper.setDefaultValueIfAvailable(field, parameter);
-                fields.add(parameter);
-            }
-        }
-
-        if (typeElement.usesConnectionManager()) {
-            addConnectionAttributeTypes(typeElement, fields);
-        }
 
         AttributeType nameAttributeType = new AttributeType();
         nameAttributeType.setName("name");
@@ -83,18 +42,17 @@ public class GlobalCloudConnectorBuilder {
         nameAttributeType.setRequired(false);
 
         Group group = new Group();
-        group.setId(typeElement.name() + "GenericProperties");
+        group.setId(moduleName + "GenericProperties");
         group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupName(nameAttributeType));
         group.setCaption(helper.formatCaption(MuleStudioXmlGenerator.GROUP_DEFAULT_CAPTION));
-
-        for (AttributeType attributeType : fields) {
-            group.getRegexpOrEncodingOrModeSwitch().add(helper.createJAXBElement(attributeType));
-        }
 
         AttributeCategory attributeCategory = new AttributeCategory();
         attributeCategory.setCaption(helper.formatCaption(typeElement.name()));
         attributeCategory.setDescription(helper.formatDescription(typeElement.name() + " configuration properties"));
         attributeCategory.getGroup().add(group);
+
+        Collection<Group> groups = processConfigurableFields();
+        attributeCategory.getGroup().addAll(groups);
 
         GlobalType globalCloudConnector = new GlobalType();
         globalCloudConnector.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
@@ -105,21 +63,5 @@ public class GlobalCloudConnectorBuilder {
         globalCloudConnector.setIcon(helper.getIcon(typeElement.name()));
         globalCloudConnector.setImage(helper.getImage(typeElement.name()));
         return objectFactory.createNamespaceTypeGlobalCloudConnector(globalCloudConnector);
-    }
-
-    private List<VariableElement> getConfigurableFieldsSorted() {
-        List<VariableElement> configurableFields = typeElement.getFieldsAnnotatedWith(Configurable.class);
-        Collections.sort(configurableFields, new VariableComparator(typeMirrorUtils));
-        return configurableFields;
-    }
-
-    private void addConnectionAttributeTypes(DevKitTypeElement typeElement, List<AttributeType> parameters) {
-        ExecutableElement connectMethod = typeElement.getMethodsAnnotatedWith(Connect.class).get(0);
-        for (VariableElement connectAttributeType : connectMethod.getParameters()) {
-            AttributeType parameter = helper.createAttributeTypeIgnoreEnumsAndCollections(connectAttributeType);
-            helper.setAttributeTypeInfo(connectMethod, connectAttributeType, parameter);
-            parameter.setRequired(false);
-            parameters.add(parameter);
-        }
     }
 }
