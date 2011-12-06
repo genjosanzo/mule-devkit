@@ -11,7 +11,10 @@
         <module>collection</module>
         <module>configurable</module>
         <module>connector</module>
+        <module>metadata</module>
         <module>parameter-annotations</module>
+        <module>source</module>
+        <module>transformer</module>
     </modules>
 
     <packaging>pom</packaging>
