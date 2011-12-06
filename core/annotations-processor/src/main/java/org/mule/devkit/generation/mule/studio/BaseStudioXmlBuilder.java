@@ -151,7 +151,7 @@ public abstract class BaseStudioXmlBuilder {
     }
 
     private AttributeCategory getOrCreateAttributeCategory(Map<String, AttributeCategory> attributeCategoriesByName, Display display) {
-        if (display == null) {
+        if (display == null || StringUtils.isBlank(display.tab())) {
             if (!attributeCategoriesByName.containsKey(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION)) {
                 AttributeCategory attributeCategoryGeneral = new AttributeCategory();
                 attributeCategoryGeneral.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
@@ -178,7 +178,7 @@ public abstract class BaseStudioXmlBuilder {
 
     private Group getOrCreateGroup(Map<String, Group> groupsByName, VariableElement parameter) {
         Display display = parameter.getAnnotation(Display.class);
-        if (display == null) {
+        if (display == null || StringUtils.isBlank(display.inputGroup())) {
             if (!groupsByName.containsKey(GENERAL_GROUP_NAME)) {
                 Group groupGeneral = new Group();
                 groupGeneral.setCaption(helper.formatCaption(GENERAL_GROUP_NAME));
@@ -201,13 +201,13 @@ public abstract class BaseStudioXmlBuilder {
     private JAXBElement<? extends AttributeType> createJaxbElement(VariableElement parameter) {
         JAXBElement<? extends AttributeType> jaxbElement;
         if (typeMirrorUtils.isEnum(parameter)) {
-            EnumType enumType = createEnumType(executableElement, parameter);
+            EnumType enumType = createEnumType(parameter);
             jaxbElement = helper.createJAXBElement(enumType);
         } else if (typeMirrorUtils.isCollection(parameter)) {
             NestedElementReference childElement = createNestedElementReference(executableElement, parameter);
             jaxbElement = objectFactory.createGroupChildElement(childElement);
         } else {
-            AttributeType attributeType = createAttributeType(executableElement, parameter);
+            AttributeType attributeType = createAttributeType(parameter);
             jaxbElement = helper.createJAXBElement(attributeType);
         }
         return jaxbElement;
@@ -225,10 +225,10 @@ public abstract class BaseStudioXmlBuilder {
         return parameters;
     }
 
-    private AttributeType createAttributeType(ExecutableElement executableElement, VariableElement parameter) {
+    private AttributeType createAttributeType(VariableElement parameter) {
         AttributeType attributeType = helper.createAttributeTypeIgnoreEnumsAndCollections(parameter);
         if (attributeType != null) {
-            helper.setAttributeTypeInfo(executableElement, parameter, attributeType);
+            helper.setAttributeTypeInfo(parameter, attributeType);
         }
         return attributeType;
     }
@@ -238,7 +238,7 @@ public abstract class BaseStudioXmlBuilder {
         ExecutableElement connectMethod = typeElement.getMethodsAnnotatedWith(Connect.class).get(0);
         for (VariableElement connectAttributeType : connectMethod.getParameters()) {
             AttributeType parameter = helper.createAttributeTypeIgnoreEnumsAndCollections(connectAttributeType);
-            helper.setAttributeTypeInfo(connectMethod, connectAttributeType, parameter);
+            helper.setAttributeTypeInfo(connectAttributeType, parameter);
             parameter.setRequired(false);
             parameters.add(parameter);
         }
@@ -262,11 +262,11 @@ public abstract class BaseStudioXmlBuilder {
         return childElement;
     }
 
-    private EnumType createEnumType(ExecutableElement executableElement, VariableElement parameter) {
+    private EnumType createEnumType(VariableElement parameter) {
         EnumType enumType = new EnumType();
         enumType.setSupportsExpressions(true);
         enumType.setAllowsCustom(true);
-        helper.setAttributeTypeInfo(executableElement, parameter, enumType);
+        helper.setAttributeTypeInfo(parameter, enumType);
         for (Element enumMember : typeUtils.asElement(parameter.asType()).getEnclosedElements()) {
             if (enumMember.getKind() == ElementKind.ENUM_CONSTANT) {
                 String enumConstant = enumMember.getSimpleName().toString();

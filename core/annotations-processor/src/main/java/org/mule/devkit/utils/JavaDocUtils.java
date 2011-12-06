@@ -17,6 +17,7 @@
 package org.mule.devkit.utils;
 
 import org.apache.commons.lang.StringUtils;
+import org.mule.devkit.generation.DevKitTypeElement;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -31,6 +32,9 @@ public class JavaDocUtils {
     }
 
     public String getSummary(Element element) {
+        if(element instanceof DevKitTypeElement) {
+            element = ((DevKitTypeElement) element).getInnerTypeElement();
+        }
         String comment = elements.getDocComment(element);
         if (comment == null || StringUtils.isBlank(comment)) {
             return null;

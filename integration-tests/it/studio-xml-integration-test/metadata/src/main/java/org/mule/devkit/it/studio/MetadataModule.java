@@ -29,25 +29,26 @@ import org.mule.api.callback.SourceCallback;
  * @author MuleSoft inc
  */
 @Module(name = "metadata")
+@Display(description = "This description overrides class-level javadoc")
 public class MetadataModule {
 
     /**
      * Configurable field in group 1
      */
     @Configurable
-    @Display(inputGroup = "Group1")
+    @Display(inputGroup = "Group1", caption = "non-default caption")
     private String configurable1;
     /**
      * Configurable field in group 2
      */
     @Configurable
-    @Display(inputGroup = "Group2")
+    @Display(inputGroup = "Group2", description = "non-default description")
     private String configurable2;
     /**
      * Configurable field in group 1
      */
     @Configurable
-    @Display(inputGroup = "Group1")
+    @Display(inputGroup = "Group1", caption = "non-default caption", description = "non-default description")
     private String configurable3;
 
     /**
@@ -59,9 +60,9 @@ public class MetadataModule {
      * @param general              parameter in General input group
      */
     @Processor
-    public void processor(String noInputGroupExplicit,
-                          @Display(inputGroup = "Advanced") String advanced1,
-                          @Display(inputGroup = "Advanced") String advanced2,
+    public void processor(@Display(caption = "non-default caption", description = "non-default description") String noInputGroupExplicit,
+                          @Display(inputGroup = "Advanced", caption = "non-default caption") String advanced1,
+                          @Display(inputGroup = "Advanced", description = "non-default description") String advanced2,
                           String general) {
     }
 
@@ -76,9 +77,9 @@ public class MetadataModule {
      */
     @Source
     public void source(SourceCallback sourceCallback,
-                       String noInputGroupExplicit,
-                       @Display(inputGroup = "Advanced") String advanced1,
-                       @Display(inputGroup = "Advanced") String advanced2,
+                       @Display(caption = "non-default caption", description = "non-default description") String noInputGroupExplicit,
+                       @Display(inputGroup = "Advanced", caption = "non-default caption") String advanced1,
+                       @Display(inputGroup = "Advanced", description = "non-default description") String advanced2,
                        String general) {
     }
 }

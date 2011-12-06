@@ -51,10 +51,10 @@ public class CloudConnectorOperationsBuilder extends BaseStudioXmlBuilder {
 
         PatternType cloudConnector = new PatternType();
         cloudConnector.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
-        cloudConnector.setCaption(helper.formatCaption(typeElement.name()));
+        cloudConnector.setCaption(helper.getFormattedCaption(typeElement));
         cloudConnector.setLocalId(typeElement.name() + "-connector");
         cloudConnector.setExtends(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
-        cloudConnector.setDescription(helper.formatDescription(javaDocUtils.getSummary(typeElement.getInnerTypeElement())));
+        cloudConnector.setDescription(helper.getFormattedDescription(typeElement));
         cloudConnector.setAliasId(ALIAS_ID_PREFIX + typeElement.name());
         cloudConnector.setIcon(helper.getIcon(typeElement.name()));
         cloudConnector.setImage(helper.getImage(typeElement.name()));

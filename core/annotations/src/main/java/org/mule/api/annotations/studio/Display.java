@@ -20,16 +20,16 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
 /**
- * Defines how to display the annotated field or parameter in a Mule Studio dialog. The tab and input
- * group can be specified with this annotation.
+ * Defines how to display the annotated field or parameter in a Mule Studio dialog.
  */
-@Target({ElementType.PARAMETER, ElementType.FIELD})
+@Target({ElementType.TYPE, ElementType.PARAMETER, ElementType.FIELD})
 public @interface Display {
 
     /**
      * The name of the tab in which the annotated element should be rendered. If not tab is
      * specified it will be rendered in a default tab. To render more than one parameter or
      * field in the same the tab then this value should be exactly the same for them.
+     * NOTE: it is not possible to specify the tab when annotating types.
      */
     String tab() default "";
 
@@ -42,6 +42,19 @@ public @interface Display {
      * The name of the group in which the annotated element should be rendered. A group can
      * contain more than one element. In such case, these elements have to be annotated and
      * use the same value.
+     * NOTE: it is not possible to specify the input group when annotating types.
      */
-    String inputGroup();
+    String inputGroup() default "";
+
+    /**
+     * The caption is a short name for the annotated element. If this value is not specified it will
+     * inferred from the annotated element name.
+     */
+    String caption() default "";
+
+    /**
+     * The description is a friendly explanation for the annotated element. If this value is not specified
+     * the javadoc of the annotated element.
+     */
+    String description() default "";
 }

@@ -19,7 +19,9 @@ package org.mule.devkit.generation.mule.studio;
 import org.apache.commons.lang.WordUtils;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
+import org.mule.api.annotations.studio.Display;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.spring.SchemaGenerator;
 import org.mule.devkit.generation.spring.SchemaTypeConversion;
 import org.mule.devkit.model.studio.AttributeType;
@@ -40,6 +42,7 @@ import org.mule.devkit.utils.TypeMirrorUtils;
 import org.mule.util.StringUtils;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.xml.bind.JAXBElement;
@@ -174,23 +177,19 @@ public class MuleStudioUtils {
         }
     }
 
-    public void setAttributeTypeInfo(ExecutableElement executableElement, VariableElement variableElement, AttributeType parameter) {
+    public void setAttributeTypeInfo(VariableElement variableElement, AttributeType attributeType) {
         String parameterName = variableElement.getSimpleName().toString();
-        parameter.setCaption(formatCaption(nameUtils.friendlyNameFromCamelCase(parameterName)));
-        if (executableElement != null) {
-            parameter.setDescription(formatDescription(javaDocUtils.getParameterSummary(parameterName, executableElement)));
+        attributeType.setCaption(getFormattedCaption(variableElement));
+        attributeType.setDescription(getFormattedDescription(variableElement));
+        if (attributeType instanceof StringAttributeType && !SchemaTypeConversion.isSupported(variableElement.asType().toString())) {
+            attributeType.setName(parameterName + SchemaGenerator.REF_SUFFIX);
+        } else if (attributeType instanceof FlowRefType) {
+            attributeType.setName(nameUtils.uncamel(parameterName) + SchemaGenerator.FLOW_REF_SUFFIX);
         } else {
-            parameter.setDescription(formatDescription(javaDocUtils.getSummary(variableElement)));
+            attributeType.setName(parameterName);
         }
-        if (parameter instanceof StringAttributeType && !SchemaTypeConversion.isSupported(variableElement.asType().toString())) {
-            parameter.setName(parameterName + SchemaGenerator.REF_SUFFIX);
-        } else if (parameter instanceof FlowRefType) {
-            parameter.setName(nameUtils.uncamel(parameterName) + SchemaGenerator.FLOW_REF_SUFFIX);
-        } else {
-            parameter.setName(parameterName);
-        }
-        parameter.setRequired(variableElement.getAnnotation(Optional.class) == null);
-        setDefaultValueIfAvailable(variableElement, parameter);
+        attributeType.setRequired(variableElement.getAnnotation(Optional.class) == null);
+        setDefaultValueIfAvailable(variableElement, attributeType);
     }
 
     public void setDefaultValueIfAvailable(VariableElement variableElement, AttributeType parameter) {
@@ -214,5 +213,31 @@ public class MuleStudioUtils {
         } else {
             return "configurable-" + nameUtils.uncamel(variableElement.getSimpleName().toString());
         }
+    }
+
+    public String getFormattedDescription(Element element) {
+        Display display = element.getAnnotation(Display.class);
+        if (display != null && StringUtils.isNotBlank(display.description())) {
+            return formatDescription(display.description());
+        }
+        if (element instanceof VariableElement && element.getKind() == ElementKind.PARAMETER) {
+            Element executableElement = element.getEnclosingElement();
+            return formatDescription(javaDocUtils.getParameterSummary(element.getSimpleName().toString(), executableElement));
+        }
+        return formatDescription(javaDocUtils.getSummary(element));
+    }
+
+    public String getFormattedCaption(Element element) {
+        Display display = element.getAnnotation(Display.class);
+        if (display != null && StringUtils.isNotBlank(display.caption())) {
+            return formatCaption(display.caption());
+        }
+        if (element instanceof DevKitTypeElement) {
+            return formatCaption(((DevKitTypeElement) element).name());
+        }
+        if (element instanceof VariableElement) {
+            return formatCaption(nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString()));
+        }
+        return formatCaption(nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString()));
     }
 }
