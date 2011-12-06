@@ -235,9 +235,6 @@ public class MuleStudioUtils {
         if (element instanceof DevKitTypeElement) {
             return formatCaption(((DevKitTypeElement) element).name());
         }
-        if (element instanceof VariableElement) {
-            return formatCaption(nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString()));
-        }
         return formatCaption(nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString()));
     }
 }

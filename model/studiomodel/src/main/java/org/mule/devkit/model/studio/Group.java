@@ -48,6 +48,7 @@ import java.util.List;
  *       &lt;sequence>
  *         &lt;choice maxOccurs="unbounded" minOccurs="0">
  *           &lt;element name="regexp" type="{http://www.mulesoft.org/schema/mule/tooling.attributes}AttributeType"/>
+ *           &lt;element name="label" type="{http://www.mulesoft.org/schema/mule/tooling.attributes}AttributeType"/>
  *           &lt;element name="encoding" type="{http://www.mulesoft.org/schema/mule/tooling.attributes}encodingType"/>
  *           &lt;element name="modeSwitch" type="{http://www.mulesoft.org/schema/mule/tooling.attributes}ModeType"/>
  *           &lt;element name="string" type="{http://www.mulesoft.org/schema/mule/tooling.attributes}StringAttributeType"/>
@@ -109,7 +110,8 @@ public class Group {
             @XmlElementRef(name = "boolean", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
             @XmlElementRef(name = "name", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
             @XmlElementRef(name = "globalRef", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
-            @XmlElementRef(name = "long", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class)
+            @XmlElementRef(name = "long", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class),
+            @XmlElementRef(name = "label", namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", type = JAXBElement.class)
     })
     protected List<JAXBElement<? extends AttributeType>> regexpOrEncodingOrModeSwitch;
     @XmlAttribute(name = "id", required = true)

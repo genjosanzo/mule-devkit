@@ -59,6 +59,7 @@ public class ObjectFactory {
     private final static QName _Scope_QNAME = new QName("http://www.mulesoft.org/schema/mule/tooling.attributes", "scope");
     private final static QName _GroupModeSwitch_QNAME = new QName("http://www.mulesoft.org/schema/mule/tooling.attributes", "modeSwitch");
     private final static QName _GroupRegexp_QNAME = new QName("http://www.mulesoft.org/schema/mule/tooling.attributes", "regexp");
+    private final static QName _GroupLabel_QNAME = new QName("http://www.mulesoft.org/schema/mule/tooling.attributes", "label");
     private final static QName _GroupTransientBoolean_QNAME = new QName("http://www.mulesoft.org/schema/mule/tooling.attributes", "transientBoolean");
     private final static QName _GroupEncoding_QNAME = new QName("http://www.mulesoft.org/schema/mule/tooling.attributes", "encoding");
     private final static QName _GroupPath_QNAME = new QName("http://www.mulesoft.org/schema/mule/tooling.attributes", "path");
@@ -406,6 +407,14 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "regexp", scope = Group.class)
     public JAXBElement<AttributeType> createGroupRegexp(AttributeType value) {
         return new JAXBElement<AttributeType>(_GroupRegexp_QNAME, AttributeType.class, Group.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AttributeType }{@code >}}
+     */
+    @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "label", scope = Group.class)
+    public JAXBElement<AttributeType> createGroupLabel(AttributeType value) {
+        return new JAXBElement<AttributeType>(_GroupLabel_QNAME, AttributeType.class, Group.class, value);
     }
 
     /**
