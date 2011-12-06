@@ -47,7 +47,7 @@
       </group>
     </attribute-category>
   </cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" abstract="true" image="icons/large/connector-connector-48x32.png" localId="get-username" icon="icons/small/connector-connector-24x16.png" caption="Get-username">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" abstract="true" image="icons/large/connector-connector-48x32.png" localId="get-username" icon="icons/small/connector-connector-24x16.png" caption="Get Username">
     <attribute-category description="General." caption="General"></attribute-category>
     <attribute-category description="Connection." caption="Connection">
       <group caption="Connection" id="connection">

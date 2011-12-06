@@ -233,7 +233,7 @@ public class MuleStudioUtils {
             return formatCaption(display.caption());
         }
         if (element instanceof DevKitTypeElement) {
-            return formatCaption(((DevKitTypeElement) element).name());
+            return formatCaption(((DevKitTypeElement) element).name().replaceAll("-", " "));
         }
         return formatCaption(nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString()));
     }

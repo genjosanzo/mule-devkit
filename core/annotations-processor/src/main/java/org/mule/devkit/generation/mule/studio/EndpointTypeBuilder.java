@@ -34,12 +34,13 @@ public class EndpointTypeBuilder extends BaseStudioXmlBuilder {
     public EndpointType build() {
         EndpointType endpoint = new EndpointType();
         endpoint.setLocalId(nameUtils.uncamel(executableElement.getSimpleName().toString()));
-        endpoint.setCaption(nameUtils.friendlyNameFromCamelCase(executableElement.getSimpleName().toString()));
+        endpoint.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(executableElement.getSimpleName().toString())));
         endpoint.setIcon(helper.getIcon(typeElement.name()));
         endpoint.setImage(helper.getIcon(typeElement.name()));
         endpoint.setDescription(helper.formatDescription(javaDocUtils.getSummary(executableElement)));
         endpoint.setSupportsInbound(true);
         endpoint.setSupportsOutbound(false);
+        endpoint.setInboundLocalName(nameUtils.uncamel(executableElement.getSimpleName().toString()));
 
         Collection<AttributeCategory> attributeCategories = processMethodParameters();
         endpoint.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().addAll(attributeCategories);

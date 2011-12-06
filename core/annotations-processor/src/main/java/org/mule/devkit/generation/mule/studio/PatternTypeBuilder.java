@@ -45,7 +45,7 @@ public class PatternTypeBuilder extends BaseStudioXmlBuilder {
     private PatternType createPatternType() {
         PatternType cloudConnector = new PatternType();
         cloudConnector.setLocalId(nameUtils.uncamel(executableElement.getSimpleName().toString()));
-        cloudConnector.setCaption(helper.formatCaption(nameUtils.uncamel(executableElement.getSimpleName().toString())));
+        cloudConnector.setCaption(helper.getFormattedCaption(executableElement));
         cloudConnector.setAbstract(executableElement.getAnnotation(Processor.class) != null);
 
         if (executableElement.getAnnotation(Processor.class) != null) {

@@ -36,7 +36,7 @@ public class SourceModule {
      * @param sourceCallback the source callback
      */
     @Source
-    public void suscribe(SourceCallback sourceCallback) {
+    public void subscribe(SourceCallback sourceCallback) {
     }
 
     /**
@@ -47,6 +47,6 @@ public class SourceModule {
      * @param strings        the strings
      */
     @Source
-    public void suscribeWithParams(SourceCallback sourceCallback, String topic, List<String> strings) {
+    public void subscribeWithParams(SourceCallback sourceCallback, String topic, List<String> strings) {
     }
 }

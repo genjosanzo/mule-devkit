@@ -94,7 +94,7 @@ public abstract class BaseStudioXmlBuilder {
         List<AttributeCategory> attributeCategories = processVariableElements(getConfigurableFieldsSorted());
         for (AttributeCategory attributeCategory : attributeCategories) {
             if (attributeCategory.getCaption().equals(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION)) {
-                attributeCategory.setCaption(helper.formatCaption(typeElement.name()));
+                attributeCategory.setCaption(helper.getFormattedCaption(typeElement));
                 attributeCategory.setDescription(helper.formatDescription(typeElement.name() + " configuration properties"));
                 List<Group> groups = attributeCategory.getGroup();
                 if (groups.isEmpty()) {
@@ -106,7 +106,7 @@ public abstract class BaseStudioXmlBuilder {
         }
         if (attributeCategories.isEmpty()) {
             AttributeCategory attributeCategory = new AttributeCategory();
-            attributeCategory.setCaption(helper.formatCaption(typeElement.name()));
+            attributeCategory.setCaption(helper.getFormattedCaption(typeElement));
             attributeCategory.setDescription(helper.formatDescription(typeElement.name() + " configuration properties"));
             attributeCategory.getGroup().add(defaultGroup);
             attributeCategories.add(attributeCategory);
@@ -272,7 +272,7 @@ public abstract class BaseStudioXmlBuilder {
         }
         childElement.setName(MuleStudioXmlGenerator.URI_PREFIX + moduleName + '/' + prefix + '-' + nameUtils.uncamel(parameter.getSimpleName().toString()));
         childElement.setAllowMultiple(false);
-        childElement.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
+        childElement.setCaption(helper.getFormattedCaption(parameter));
         childElement.setInplace(true);
         return childElement;
     }

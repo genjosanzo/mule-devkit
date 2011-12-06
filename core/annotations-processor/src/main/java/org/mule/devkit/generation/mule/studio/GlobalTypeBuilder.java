@@ -37,7 +37,7 @@ public class GlobalTypeBuilder extends BaseStudioXmlBuilder {
         GlobalType globalType = new GlobalType();
         globalType.setImage(helper.getImage(typeElement.name()));
         globalType.setIcon(helper.getIcon(typeElement.name()));
-        globalType.setCaption(nameUtils.uncamel(executableElement.getSimpleName().toString()));
+        globalType.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(executableElement.getSimpleName().toString())));
         globalType.setLocalId(nameUtils.uncamel(executableElement.getSimpleName().toString()));
         globalType.setExtends(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + nameUtils.uncamel(executableElement.getSimpleName().toString()));
         globalType.setDescription(helper.formatDescription(javaDocUtils.getSummary(executableElement)));
