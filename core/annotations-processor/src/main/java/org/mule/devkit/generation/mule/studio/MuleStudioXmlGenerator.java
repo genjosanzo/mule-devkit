@@ -82,6 +82,8 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
         if (!transformerMethods.isEmpty()) {
             namespace.getConnectorOrEndpointOrGlobal().add(new PatternTypeOperationsBuilder(context, typeElement, PatternTypes.TRANSFORMER).build());
             namespace.getConnectorOrEndpointOrGlobal().add(new AbstractTransformerBuilder(context, typeElement).build());
+            GlobalType globalTransformer = new GlobalTransformerTypeOperationsBuilder(context, typeElement).build();
+            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalTransformer(globalTransformer));
         }
         for (ExecutableElement transformerMethod : transformerMethods) {
             PatternType transformer = new PatternTypeBuilder(context, transformerMethod, typeElement).build();

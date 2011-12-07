@@ -22,15 +22,10 @@ import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
-import org.mule.devkit.model.studio.Group;
-import org.mule.devkit.model.studio.ModeElementType;
-import org.mule.devkit.model.studio.ModeType;
 import org.mule.devkit.model.studio.PatternType;
-import org.mule.util.StringUtils;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.xml.bind.JAXBElement;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -53,7 +48,7 @@ public class PatternTypeOperationsBuilder extends BaseStudioXmlBuilder {
         AttributeCategory attributeCategory = new AttributeCategory();
         attributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
         attributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
-        attributeCategory.getGroup().add(createGroupWithModeSwitch());
+        attributeCategory.getGroup().add(createGroupWithModeSwitch(getMethods()));
 
         PatternType patternType = new PatternType();
         patternType.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
@@ -75,29 +70,6 @@ public class PatternTypeOperationsBuilder extends BaseStudioXmlBuilder {
         } else {
             return objectFactory.createNamespaceTypeTransformer(patternType);
         }
-    }
-
-    private Group createGroupWithModeSwitch() {
-        List<ModeElementType> modes = new ArrayList<ModeElementType>();
-        for (ExecutableElement processorMethod : getMethods()) {
-            ModeElementType mode = new ModeElementType();
-            String methodName = processorMethod.getSimpleName().toString();
-            mode.setModeId(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + nameUtils.uncamel(methodName));
-            mode.setModeLabel(nameUtils.friendlyNameFromCamelCase(methodName));
-            modes.add(mode);
-        }
-
-        ModeType modeSwitch = new ModeType();
-        modeSwitch.getMode().addAll(modes);
-        modeSwitch.setCaption(helper.formatCaption("Operation"));
-        modeSwitch.setName(StringUtils.capitalize(moduleName) + " operations to execute");
-        modeSwitch.setDescription(helper.formatDescription("Operation"));
-
-        Group group = new Group();
-        group.setId(typeElement.name() + "ConnectorGeneric");
-        group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupModeSwitch(modeSwitch));
-        group.setCaption(helper.formatCaption(MuleStudioXmlGenerator.GROUP_DEFAULT_CAPTION));
-        return group;
     }
 
     private List<ExecutableElement> getMethods() {

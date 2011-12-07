@@ -28,6 +28,8 @@ import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.EnumElement;
 import org.mule.devkit.model.studio.EnumType;
 import org.mule.devkit.model.studio.Group;
+import org.mule.devkit.model.studio.ModeElementType;
+import org.mule.devkit.model.studio.ModeType;
 import org.mule.devkit.model.studio.NestedElementReference;
 import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.utils.JavaDocUtils;
@@ -79,6 +81,29 @@ public abstract class BaseStudioXmlBuilder {
         this(context);
         this.typeElement = typeElement;
         moduleName = typeElement.name();
+    }
+
+    protected Group createGroupWithModeSwitch(List<ExecutableElement> methods) {
+        List<ModeElementType> modes = new ArrayList<ModeElementType>();
+        for (ExecutableElement method : methods) {
+            ModeElementType mode = new ModeElementType();
+            String methodName = method.getSimpleName().toString();
+            mode.setModeId(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + nameUtils.uncamel(methodName));
+            mode.setModeLabel(nameUtils.friendlyNameFromCamelCase(methodName));
+            modes.add(mode);
+        }
+
+        ModeType modeSwitch = new ModeType();
+        modeSwitch.getMode().addAll(modes);
+        modeSwitch.setCaption(helper.formatCaption("Operation"));
+        modeSwitch.setName(StringUtils.capitalize(moduleName) + " operations to execute");
+        modeSwitch.setDescription(helper.formatDescription("Operation"));
+
+        Group group = new Group();
+        group.setId(typeElement.name() + "ConnectorGeneric");
+        group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupModeSwitch(modeSwitch));
+        group.setCaption(helper.formatCaption(MuleStudioXmlGenerator.GROUP_DEFAULT_CAPTION));
+        return group;
     }
 
     protected BaseStudioXmlBuilder(GeneratorContext context, ExecutableElement executableElement, DevKitTypeElement typeElement) {
