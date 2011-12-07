@@ -70,8 +70,4 @@ public class GlobalTransformerTypeOperationsBuilder extends GlobalTypeBuilder {
     protected String getNameDescriptionBasedOnType() {
         return "Identifies the transformer so that other elements can reference it.";
     }
-
-    private String getIdBasedOnType() {
-        return "globalTransformer";
-    }
 }

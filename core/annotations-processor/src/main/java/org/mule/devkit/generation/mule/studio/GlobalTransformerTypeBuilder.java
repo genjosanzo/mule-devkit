@@ -75,8 +75,4 @@ public class GlobalTransformerTypeBuilder extends GlobalTypeBuilder {
     protected String getNameDescriptionBasedOnType() {
         return "Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level.";
     }
-
-    private String getIdBasedOnType() {
-        return "abstractTransformerGeneric";
-    }
 }
