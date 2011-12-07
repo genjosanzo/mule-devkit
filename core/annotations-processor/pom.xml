@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.tools.devkit</groupId>
         <artifactId>mule-devkit-core</artifactId>
-        <version>3.0.3-SNAPSHOT</version>
+        <version>3.1</version>
     </parent>
 
     <name>Mule DevKit Annotations Processor</name>
@@ -18,22 +18,22 @@
         <dependency>
             <groupId>org.mule.tools.devkit</groupId>
             <artifactId>mule-devkit-annotations</artifactId>
-            <version>3.0.3-SNAPSHOT</version>
+            <version>3.1</version>
         </dependency>
         <dependency>
             <groupId>org.mule.tools.devkit</groupId>
             <artifactId>mule-devkit-codemodel</artifactId>
-            <version>3.0.3-SNAPSHOT</version>
+            <version>3.1</version>
         </dependency>
         <dependency>
             <groupId>org.mule.tools.devkit</groupId>
             <artifactId>mule-devkit-schemamodel</artifactId>
-            <version>3.0.3-SNAPSHOT</version>
+            <version>3.1</version>
         </dependency>
         <dependency>
             <groupId>org.mule.tools.devkit</groupId>
             <artifactId>mule-devkit-studiomodel</artifactId>
-            <version>3.0.3-SNAPSHOT</version>
+            <version>3.1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
