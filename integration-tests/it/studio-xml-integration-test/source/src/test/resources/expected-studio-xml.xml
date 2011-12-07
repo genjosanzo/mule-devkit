@@ -22,17 +22,44 @@
       </group>
     </attribute-category>
   </cloud-connector>
-  <endpoint inboundLocalName="subscribe" supportsOutbound="false" supportsInbound="true" image="icons/small/source-connector-24x16.png" localId="subscribe" icon="icons/small/source-connector-24x16.png" description="Message source method." caption="Subscribe">
+  <global-endpoint abstract="true" image="icons/large/source-connector-48x32.png" localId="abstractGlobalEndpoint" icon="icons/small/source-connector-24x16.png" description="" caption="">
+    <attribute-category description="General." caption="General">
+      <group caption="Generic" id="abstractEndpointGeneric">
+        <name required="true" description="Endpoint name." caption="Name" name="name"></name>
+      </group>
+    </attribute-category>
+  </global-endpoint>
+  <endpoint supportsOutbound="false" supportsInbound="true" abstract="false" image="icons/large/source-connector-48x32.png" localId="endpoint" icon="icons/small/source-connector-24x16.png" description="Source class." caption="Source">
+    <attribute-category description="General." caption="General">
+      <group caption="Generic" id="sourceConnectorGeneric">
+        <modeSwitch description="Operation." caption="Operation" name="Source operations to execute">
+          <mode modeLabel="Subscribe" modeId="http://www.mulesoft.org/schema/mule/source/subscribe"></mode>
+          <mode modeLabel="Subscribe with params" modeId="http://www.mulesoft.org/schema/mule/source/subscribe-with-params"></mode>
+        </modeSwitch>
+      </group>
+    </attribute-category>
+  </endpoint>
+  <global-endpoint extends="http://www.mulesoft.org/schema/mule/source/abstractGlobalEndpoint" image="icons/large/source-connector-48x32.png" localId="global-endpoint" icon="icons/small/source-connector-24x16.png" description="Global endpoint." caption="Source">
+    <attribute-category description="General." caption="General">
+      <group caption="Generic" id="sourceConnectorGeneric">
+        <modeSwitch description="Operation." caption="Operation" name="Source operations to execute">
+          <mode modeLabel="Subscribe" modeId="http://www.mulesoft.org/schema/mule/source/subscribe"></mode>
+          <mode modeLabel="Subscribe with params" modeId="http://www.mulesoft.org/schema/mule/source/subscribe-with-params"></mode>
+        </modeSwitch>
+      </group>
+    </attribute-category>
+  </global-endpoint>
+  <endpoint inboundLocalName="subscribe" supportsOutbound="false" supportsInbound="true" abstract="true" image="icons/large/source-connector-48x32.png" localId="subscribe" icon="icons/small/source-connector-24x16.png" description="Message source method." caption="Subscribe">
     <attribute-category description="General." caption="General" />
   </endpoint>
-  <global-endpoint extends="http://www.mulesoft.org/schema/mule/source/subscribe" image="icons/large/source-connector-48x32.png" localId="subscribe" icon="icons/small/source-connector-24x16.png" description="Message source method." caption="Subscribe">
+  <global-endpoint extends="http://www.mulesoft.org/schema/mule/source/subscribe" abstract="true" image="icons/large/source-connector-48x32.png" localId="subscribe" icon="icons/small/source-connector-24x16.png" description="Message source method." caption="Subscribe">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractEndpointGeneric">
         <name description="Endpoint name." caption="Name" required="true" name="name"></name>
       </group>
     </attribute-category>
   </global-endpoint>
-  <endpoint inboundLocalName="subscribe-with-params" supportsOutbound="false" supportsInbound="true" image="icons/small/source-connector-24x16.png" localId="subscribe-with-params" icon="icons/small/source-connector-24x16.png" description="Message source method with parameters." caption="Subscribe With Params">
+  <endpoint inboundLocalName="subscribe-with-params" supportsOutbound="false" supportsInbound="true" abstract="true" image="icons/large/source-connector-48x32.png" localId="subscribe-with-params" icon="icons/small/source-connector-24x16.png" description="Message source method with parameters." caption="Subscribe With Params">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
         <string required="true" description="The topic." caption="Topic" name="topic"></string>
@@ -40,7 +67,7 @@
       </group>
     </attribute-category>
   </endpoint>
-  <global-endpoint extends="http://www.mulesoft.org/schema/mule/source/subscribe-with-params" image="icons/large/source-connector-48x32.png" localId="subscribe-with-params" icon="icons/small/source-connector-24x16.png" description="Message source method with parameters." caption="Subscribe With Params">
+  <global-endpoint extends="http://www.mulesoft.org/schema/mule/source/subscribe-with-params" abstract="true" image="icons/large/source-connector-48x32.png" localId="subscribe-with-params" icon="icons/small/source-connector-24x16.png" description="Message source method with parameters." caption="Subscribe With Params">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractEndpointGeneric">
         <name description="Endpoint name." caption="Name" name="name" required="true"></name>

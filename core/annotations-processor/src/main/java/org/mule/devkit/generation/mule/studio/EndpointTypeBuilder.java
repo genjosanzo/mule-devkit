@@ -32,19 +32,36 @@ public class EndpointTypeBuilder extends BaseStudioXmlBuilder {
     }
 
     public EndpointType build() {
-        EndpointType endpoint = new EndpointType();
-        endpoint.setLocalId(nameUtils.uncamel(executableElement.getSimpleName().toString()));
-        endpoint.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(executableElement.getSimpleName().toString())));
-        endpoint.setIcon(helper.getIcon(typeElement.name()));
-        endpoint.setImage(helper.getIcon(typeElement.name()));
-        endpoint.setDescription(helper.formatDescription(javaDocUtils.getSummary(executableElement)));
-        endpoint.setSupportsInbound(true);
-        endpoint.setSupportsOutbound(false);
-        endpoint.setInboundLocalName(nameUtils.uncamel(executableElement.getSimpleName().toString()));
+        EndpointType endpointType = new EndpointType();
+        endpointType.setLocalId(getLocalId());
+        endpointType.setCaption(getCaption());
+        endpointType.setIcon(helper.getIcon(typeElement.name()));
+        endpointType.setImage(helper.getImage(typeElement.name()));
+        endpointType.setDescription(getDescription());
+        endpointType.setSupportsInbound(true);
+        endpointType.setSupportsOutbound(false);
+        endpointType.setInboundLocalName(getLocalId());
+        endpointType.setAbstract(true);
 
+        processMethodParameters(endpointType);
+
+        return endpointType;
+    }
+
+    protected void processMethodParameters(EndpointType endpoint) {
         Collection<AttributeCategory> attributeCategories = processMethodParameters();
         endpoint.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().addAll(attributeCategories);
+    }
 
-        return endpoint;
+    protected String getDescription() {
+        return helper.formatDescription(javaDocUtils.getSummary(executableElement));
+    }
+
+    protected String getCaption() {
+        return helper.formatCaption(nameUtils.friendlyNameFromCamelCase(executableElement.getSimpleName().toString()));
+    }
+
+    protected String getLocalId() {
+        return nameUtils.uncamel(executableElement.getSimpleName().toString());
     }
 }

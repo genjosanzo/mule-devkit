@@ -33,6 +33,7 @@ public class MetadataModuleStudioXmlTest {
     @Test
     public void metadataModuleStudioXmlGeneration() throws Exception {
         XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setIgnoreAttributeOrder(true);
         String expectedXml = IOUtils.toString(MetadataModuleStudioXmlTest.class.getClassLoader().getResourceAsStream(EXPECTED_STUDIO_XML));
         String actualXml = IOUtils.toString(MetadataModuleStudioXmlTest.class.getClassLoader().getResourceAsStream(ACTUAL_STUDIO_XML));
         Diff diff = new Diff(expectedXml, actualXml);

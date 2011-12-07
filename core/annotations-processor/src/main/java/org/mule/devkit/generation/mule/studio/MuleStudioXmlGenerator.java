@@ -29,7 +29,6 @@ import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.model.studio.PatternType;
 
 import javax.lang.model.element.ExecutableElement;
-import javax.xml.bind.JAXBElement;
 import java.util.List;
 
 public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
@@ -95,12 +94,20 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
     }
 
     private void processSourceMethods(DevKitTypeElement typeElement, NamespaceType namespace) {
-        for (ExecutableElement sourceMethod : typeElement.getMethodsAnnotatedWith(Source.class)) {
+        List<ExecutableElement> sourceMethods = typeElement.getMethodsAnnotatedWith(Source.class);
+        if (!sourceMethods.isEmpty()) {
+            GlobalType abstractGlobalEndpoint = new GlobalEndpointTypeWithNameBuilder(context, typeElement).build();
+            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalEndpoint(abstractGlobalEndpoint));
+            EndpointType endpointTypeListingOps = new EndpointTypeOperationsBuilder(context, typeElement).build();
+            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createEndpoint(endpointTypeListingOps));
+            GlobalType globalEndpointListingOps = new GlobalEndpointTypeOperationsBuilder(context, typeElement).build();
+            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalEndpoint(globalEndpointListingOps));
+        }
+        for (ExecutableElement sourceMethod : sourceMethods) {
             EndpointType endpoint = new EndpointTypeBuilder(context, sourceMethod, typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createEndpoint(endpoint));
             GlobalType globalEndpoint = new GlobalEndpointTypeBuilder(context, sourceMethod, typeElement).build();
-            JAXBElement<GlobalType> namespaceTypeGlobalEndpoint = objectFactory.createNamespaceTypeGlobalEndpoint(globalEndpoint);
-            namespace.getConnectorOrEndpointOrGlobal().add(namespaceTypeGlobalEndpoint);
+            namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalEndpoint(globalEndpoint));
         }
     }
 }
