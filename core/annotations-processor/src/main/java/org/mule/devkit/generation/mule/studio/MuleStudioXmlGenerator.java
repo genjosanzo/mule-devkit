@@ -55,7 +55,7 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
         namespace.setPrefix(moduleName);
         namespace.setUrl(URI_PREFIX + moduleName);
 
-        GlobalType globalCloudConnector = new GlobalTypeBuilder(context, typeElement).build();
+        GlobalType globalCloudConnector = new GlobalCloudConnectorTypeBuilder(context, typeElement).build();
         namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalCloudConnector(globalCloudConnector));
         namespace.getConnectorOrEndpointOrGlobal().add(new PatternTypeOperationsBuilder(context, typeElement, PatternTypes.CLOUD_CONNECTOR).build());
         namespace.getConnectorOrEndpointOrGlobal().add(new ConfigRefBuilder(context, typeElement).build());
@@ -86,7 +86,7 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
         for (ExecutableElement transformerMethod : transformerMethods) {
             PatternType transformer = new PatternTypeBuilder(context, transformerMethod, typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeTransformer(transformer));
-            GlobalType globalTransformer = new GlobalTypeBuilder(context, transformerMethod, typeElement).build();
+            GlobalType globalTransformer = new GlobalTransformerTypeBuilder(context, transformerMethod, typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalTransformer(globalTransformer));
             namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, transformerMethod, typeElement).build());
         }
@@ -96,7 +96,7 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
         for (ExecutableElement sourceMethod : typeElement.getMethodsAnnotatedWith(Source.class)) {
             EndpointType endpoint = new EndpointTypeBuilder(context, sourceMethod, typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createEndpoint(endpoint));
-            GlobalType globalEndpoint = new GlobalTypeBuilder(context, sourceMethod, typeElement).build();
+            GlobalType globalEndpoint = new GlobalEndpointTypeBuilder(context, sourceMethod, typeElement).build();
             JAXBElement<GlobalType> namespaceTypeGlobalEndpoint = objectFactory.createNamespaceTypeGlobalEndpoint(globalEndpoint);
             namespace.getConnectorOrEndpointOrGlobal().add(namespaceTypeGlobalEndpoint);
         }
