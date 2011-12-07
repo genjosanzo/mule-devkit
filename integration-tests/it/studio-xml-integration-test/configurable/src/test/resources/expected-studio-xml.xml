@@ -4,7 +4,7 @@
   <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/configurable/abstractConfigurableConnectorGeneric" image="icons/large/configurable-connector-48x32.png" localId="config" icon="icons/small/configurable-connector-24x16.png" description="Global Configurable configuration information." caption="Configurable">
     <attribute-category description="Configurable configuration properties." caption="Configurable">
       <group caption="Generic" id="configurableGenericProperties">
-        <name required="false" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
+        <name required="true" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
       </group>
       <group caption="General" id="general">
         <string required="true" description="Configurable String." caption="Configurable String" name="configurableString"></string>

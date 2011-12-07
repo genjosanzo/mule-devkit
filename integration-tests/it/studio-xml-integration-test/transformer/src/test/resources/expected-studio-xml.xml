@@ -4,7 +4,7 @@
   <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformerConnectorGeneric" image="icons/large/transformer-connector-48x32.png" localId="config" icon="icons/small/transformer-connector-24x16.png" description="Global Transformer configuration information." caption="Transformer">
     <attribute-category description="Transformer configuration properties." caption="Transformer">
       <group caption="Generic" id="transformerGenericProperties">
-        <name required="false" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
+        <name required="true" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
       </group>
     </attribute-category>
   </global-cloud-connector>
@@ -64,7 +64,7 @@
   <global-transformer extends="http://www.mulesoft.org/schema/mule/transformer/string-to-char" image="icons/large/transformer-connector-48x32.png" localId="string-to-char" icon="icons/small/transformer-connector-24x16.png" description="Transforms a String to a character." caption="String To Char">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractTransformerGeneric">
-        <name description="Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level." caption="Name" xsdType="substitutableClass" name="name"></name>
+        <name description="Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level." caption="Name" required="true" name="name"></name>
       </group>
     </attribute-category>
   </global-transformer>
@@ -72,7 +72,7 @@
   <global-transformer extends="http://www.mulesoft.org/schema/mule/transformer/string-to-url" image="icons/large/transformer-connector-48x32.png" localId="string-to-url" icon="icons/small/transformer-connector-24x16.png" description="Transforms a String to a URL." caption="String To Url">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractTransformerGeneric">
-        <name description="Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level." caption="Name" xsdType="substitutableClass" name="name"></name>
+        <name description="Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level." caption="Name" required="true" name="name"></name>
       </group>
     </attribute-category>
   </global-transformer>

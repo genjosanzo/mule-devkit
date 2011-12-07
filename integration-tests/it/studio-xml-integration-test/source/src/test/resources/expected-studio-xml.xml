@@ -4,7 +4,7 @@
   <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/source/abstractSourceConnectorGeneric" image="icons/large/source-connector-48x32.png" localId="config" icon="icons/small/source-connector-24x16.png" description="Global Source configuration information." caption="Source">
     <attribute-category description="Source configuration properties." caption="Source">
       <group caption="Generic" id="sourceGenericProperties">
-        <name required="false" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
+        <name required="true" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
       </group>
     </attribute-category>
   </global-cloud-connector>
@@ -28,7 +28,7 @@
   <global-endpoint extends="http://www.mulesoft.org/schema/mule/source/subscribe" image="icons/large/source-connector-48x32.png" localId="subscribe" icon="icons/small/source-connector-24x16.png" description="Message source method." caption="Subscribe">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractEndpointGeneric">
-        <name description="Endpoint name." caption="Name" xsdType="substitutableClass" name="name"></name>
+        <name description="Endpoint name." caption="Name" required="true" name="name"></name>
       </group>
     </attribute-category>
   </global-endpoint>
@@ -43,7 +43,7 @@
   <global-endpoint extends="http://www.mulesoft.org/schema/mule/source/subscribe-with-params" image="icons/large/source-connector-48x32.png" localId="subscribe-with-params" icon="icons/small/source-connector-24x16.png" description="Message source method with parameters." caption="Subscribe With Params">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractEndpointGeneric">
-        <name description="Endpoint name." caption="Name" xsdType="substitutableClass" name="name"></name>
+        <name description="Endpoint name." caption="Name" name="name" required="true"></name>
       </group>
     </attribute-category>
   </global-endpoint>

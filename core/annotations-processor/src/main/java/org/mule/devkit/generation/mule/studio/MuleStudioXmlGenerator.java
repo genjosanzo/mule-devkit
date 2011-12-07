@@ -55,7 +55,8 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
         namespace.setPrefix(moduleName);
         namespace.setUrl(URI_PREFIX + moduleName);
 
-        namespace.getConnectorOrEndpointOrGlobal().add(new GlobalCloudConnectorBuilder(context, typeElement).build());
+        GlobalType globalCloudConnector = new GlobalTypeBuilder(context, typeElement).build();
+        namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalCloudConnector(globalCloudConnector));
         namespace.getConnectorOrEndpointOrGlobal().add(new PatternTypeOperationsBuilder(context, typeElement, PatternTypes.CLOUD_CONNECTOR).build());
         namespace.getConnectorOrEndpointOrGlobal().add(new ConfigRefBuilder(context, typeElement).build());
         namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, typeElement).build());

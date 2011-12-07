@@ -9,7 +9,7 @@
                             description="Global Collection configuration information." caption="Collection">
         <attribute-category description="Collection configuration properties." caption="Collection">
             <group caption="Generic" id="collectionGenericProperties">
-                <name required="false"
+                <name required="true"
                       description="Give a name to this configuration so it can be later referenced by config-ref."
                       caption="Name" name="name"></name>
             </group>
