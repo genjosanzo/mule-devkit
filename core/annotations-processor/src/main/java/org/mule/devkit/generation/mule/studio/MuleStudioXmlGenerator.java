@@ -56,7 +56,7 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
         namespace.setUrl(URI_PREFIX + moduleName);
 
         namespace.getConnectorOrEndpointOrGlobal().add(new GlobalCloudConnectorBuilder(context, typeElement).build());
-        namespace.getConnectorOrEndpointOrGlobal().add(new CloudConnectorOperationsBuilder(context, typeElement).build());
+        namespace.getConnectorOrEndpointOrGlobal().add(new PatternTypeOperationsBuilder(context, typeElement, PatternTypes.CLOUD_CONNECTOR).build());
         namespace.getConnectorOrEndpointOrGlobal().add(new ConfigRefBuilder(context, typeElement).build());
         namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, typeElement).build());
 
@@ -79,7 +79,8 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
     private void processTransformerMethods(DevKitTypeElement typeElement, NamespaceType namespace) {
         List<ExecutableElement> transformerMethods = typeElement.getMethodsAnnotatedWith(Transformer.class);
         if (!transformerMethods.isEmpty()) {
-            namespace.getConnectorOrEndpointOrGlobal().add(new AbstractTransformerBuilder(context).build());
+            namespace.getConnectorOrEndpointOrGlobal().add(new PatternTypeOperationsBuilder(context, typeElement, PatternTypes.TRANSFORMER).build());
+            namespace.getConnectorOrEndpointOrGlobal().add(new AbstractTransformerBuilder(context, typeElement).build());
         }
         for (ExecutableElement transformerMethod : transformerMethods) {
             PatternType transformer = new PatternTypeBuilder(context, transformerMethod, typeElement).build();

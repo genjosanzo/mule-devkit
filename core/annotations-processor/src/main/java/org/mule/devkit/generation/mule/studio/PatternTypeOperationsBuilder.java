@@ -18,6 +18,7 @@
 package org.mule.devkit.generation.mule.studio;
 
 import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
@@ -33,13 +34,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CloudConnectorOperationsBuilder extends BaseStudioXmlBuilder {
+public class PatternTypeOperationsBuilder extends BaseStudioXmlBuilder {
 
     private static final String ALIAS_ID_PREFIX = "org.mule.tooling.ui.modules.core.pattern.";
     private static final MethodComparator METHOD_COMPARATOR = new MethodComparator();
+    private PatternTypes patternTypeToUse;
 
-    public CloudConnectorOperationsBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
+    public PatternTypeOperationsBuilder(GeneratorContext context, DevKitTypeElement typeElement, PatternTypes patternTypeToUse) {
         super(context, typeElement);
+        if (!patternTypeToUse.equals(PatternTypes.CLOUD_CONNECTOR) && !patternTypeToUse.equals(PatternTypes.TRANSFORMER)) {
+            throw new IllegalArgumentException("PatternType not supported: " + patternTypeToUse);
+        }
+        this.patternTypeToUse = patternTypeToUse;
     }
 
     public JAXBElement<PatternType> build() {
@@ -49,22 +55,31 @@ public class CloudConnectorOperationsBuilder extends BaseStudioXmlBuilder {
         attributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
         attributeCategory.getGroup().add(createGroupWithModeSwitch());
 
-        PatternType cloudConnector = new PatternType();
-        cloudConnector.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
-        cloudConnector.setCaption(helper.getFormattedCaption(typeElement));
-        cloudConnector.setLocalId(typeElement.name() + "-connector");
-        cloudConnector.setExtends(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
-        cloudConnector.setDescription(helper.getFormattedDescription(typeElement));
-        cloudConnector.setAliasId(ALIAS_ID_PREFIX + typeElement.name());
-        cloudConnector.setIcon(helper.getIcon(typeElement.name()));
-        cloudConnector.setImage(helper.getImage(typeElement.name()));
+        PatternType patternType = new PatternType();
+        patternType.getAttributeCategoryOrRequiredSetAlternativesOrFixedAttribute().add(attributeCategory);
+        patternType.setCaption(helper.getFormattedCaption(typeElement));
 
-        return objectFactory.createNamespaceTypeCloudConnector(cloudConnector);
+        if (patternTypeToUse.equals(PatternTypes.CLOUD_CONNECTOR)) {
+            patternType.setLocalId(typeElement.name() + "-connector");
+            patternType.setExtends(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
+        } else {
+            patternType.setLocalId(typeElement.name() + "-transformer");
+        }
+        patternType.setDescription(helper.getFormattedDescription(typeElement));
+        patternType.setAliasId(ALIAS_ID_PREFIX + typeElement.name());
+        patternType.setIcon(helper.getIcon(typeElement.name()));
+        patternType.setImage(helper.getImage(typeElement.name()));
+
+        if (patternTypeToUse.equals(PatternTypes.CLOUD_CONNECTOR)) {
+            return objectFactory.createNamespaceTypeCloudConnector(patternType);
+        } else {
+            return objectFactory.createNamespaceTypeTransformer(patternType);
+        }
     }
 
     private Group createGroupWithModeSwitch() {
         List<ModeElementType> modes = new ArrayList<ModeElementType>();
-        for (ExecutableElement processorMethod : getProcessorMethodsSorted()) {
+        for (ExecutableElement processorMethod : getMethods()) {
             ModeElementType mode = new ModeElementType();
             String methodName = processorMethod.getSimpleName().toString();
             mode.setModeId(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + nameUtils.uncamel(methodName));
@@ -85,9 +100,14 @@ public class CloudConnectorOperationsBuilder extends BaseStudioXmlBuilder {
         return group;
     }
 
-    private List<ExecutableElement> getProcessorMethodsSorted() {
-        List<ExecutableElement> processorMethods = typeElement.getMethodsAnnotatedWith(Processor.class);
-        Collections.sort(processorMethods, METHOD_COMPARATOR);
-        return processorMethods;
+    private List<ExecutableElement> getMethods() {
+        List<ExecutableElement> methods;
+        if (patternTypeToUse.equals(PatternTypes.CLOUD_CONNECTOR)) {
+            methods = typeElement.getMethodsAnnotatedWith(Processor.class);
+        } else {
+            methods = typeElement.getMethodsAnnotatedWith(Transformer.class);
+        }
+        Collections.sort(methods, METHOD_COMPARATOR);
+        return methods;
     }
 }

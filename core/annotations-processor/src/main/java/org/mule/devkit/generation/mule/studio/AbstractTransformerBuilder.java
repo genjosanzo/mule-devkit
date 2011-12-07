@@ -18,6 +18,7 @@
 package org.mule.devkit.generation.mule.studio;
 
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.Booleantype;
 import org.mule.devkit.model.studio.EncodingType;
@@ -33,8 +34,8 @@ public class AbstractTransformerBuilder extends BaseStudioXmlBuilder {
 
     public static final String ABSTRACT_TRANSFORMER_LOCAL_ID = "abstractTransformer";
 
-    public AbstractTransformerBuilder(GeneratorContext context) {
-        super(context);
+    public AbstractTransformerBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
+        super(context, typeElement);
     }
 
     public JAXBElement<PatternType> build() {
@@ -47,6 +48,7 @@ public class AbstractTransformerBuilder extends BaseStudioXmlBuilder {
         abstractTransformer.setCaption(helper.formatCaption("Base transformer"));
         abstractTransformer.setDescription(helper.formatDescription("Base transformer"));
         abstractTransformer.setAbstract(true);
+        abstractTransformer.setExtends(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + "/" + typeElement.name() + "-transformer");
 
         AttributeCategory attributeCategory = new AttributeCategory();
         attributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
