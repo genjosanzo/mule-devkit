@@ -230,7 +230,7 @@ public class MuleStudioUtils {
     public String getFormattedCaption(Element element) {
         Display display = element.getAnnotation(Display.class);
         if (display != null && StringUtils.isNotBlank(display.caption())) {
-            return formatCaption(display.caption());
+            return display.caption();
         }
         if (element instanceof DevKitTypeElement) {
             return formatCaption(((DevKitTypeElement) element).name().replaceAll("-", " "));

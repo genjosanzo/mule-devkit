@@ -151,7 +151,7 @@ public abstract class BaseStudioXmlBuilder {
             connectionAttributesGroup.setId(StringUtils.uncapitalize(CONNECTION_GROUP_NAME));
 
             AttributeType label = new AttributeType();
-            label.setCaption(String.format(CONNECTION_GROUP_LABEL, typeElement.name().replaceAll("-", " ")));
+            label.setCaption(String.format(CONNECTION_GROUP_LABEL, helper.getFormattedCaption(typeElement)));
 
             AttributeType newLine = new AttributeType();
             newLine.setCaption("");
@@ -230,7 +230,7 @@ public abstract class BaseStudioXmlBuilder {
             String groupName = display.inputGroup();
             if (!groupsByName.containsKey(groupName)) {
                 Group group = new Group();
-                group.setCaption(helper.formatCaption(groupName));
+                group.setCaption(groupName);
                 group.setId(StringUtils.uncapitalize(groupName));
                 groupsByName.put(groupName, group);
             }
