@@ -114,15 +114,6 @@ public class CollectionModule {
     public void operation6(List<Map<String, String>> objects) {
     }
 
-    /**
-     * Method that accepts a Map<String, List<String>>
-     *
-     * @param map a map of string-lists
-     */
-    @Processor
-    public void operation7(Map<String, List<String>> map) {
-    }
-
     public void setStrings(List strings) {
         this.strings = strings;
     }

@@ -194,7 +194,11 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
             childElement.setDescription(helper.formatDescription(nameUtils.singularize(parameterFriendlyName)));
             childElement.setCaption(helper.formatCaption(nameUtils.singularize(parameterFriendlyName)));
         } else {
-            childElement.setName(MuleStudioXmlGenerator.URI_PREFIX + moduleName + '/' + nameUtils.singularize(localId));
+            String singularizedLocalId = nameUtils.singularize(localId);
+            if(localId.equals(singularizedLocalId)) {
+                singularizedLocalId+= "-each";
+            }
+            childElement.setName(MuleStudioXmlGenerator.URI_PREFIX + moduleName + '/' + singularizedLocalId);
             childElement.setDescription(helper.formatDescription(parameterFriendlyName));
             childElement.setCaption(helper.formatCaption(parameterFriendlyName));
         }

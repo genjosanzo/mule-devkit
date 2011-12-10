@@ -46,8 +46,6 @@
                           modeId="http://www.mulesoft.org/schema/mule/collection/operation5"></mode>
                     <mode modeLabel="Operation6"
                           modeId="http://www.mulesoft.org/schema/mule/collection/operation6"></mode>
-                    <mode modeLabel="Operation7"
-                          modeId="http://www.mulesoft.org/schema/mule/collection/operation7"></mode>
                 </modeSwitch>
             </group>
         </attribute-category>
@@ -195,9 +193,9 @@
     <nested xmlname="list" image="icons/large/collection-connector-48x32.png" localId="operation5-list"
             icon="icons/small/collection-connector-24x16.png" description="List." caption="List">
         <childElement allowMultiple="true" description="List." caption="List"
-                      name="http://www.mulesoft.org/schema/mule/collection/operation5-list"></childElement>
+                      name="http://www.mulesoft.org/schema/mule/collection/operation5-list-each"></childElement>
     </nested>
-    <nested xmlname="list" image="icons/large/collection-connector-48x32.png" localId="operation5-list"
+    <nested xmlname="list" image="icons/large/collection-connector-48x32.png" localId="operation5-list-each"
             icon="icons/small/collection-connector-24x16.png" description="List." caption="List">
         <text isToElement="true" description="A list." caption="List" name="operation5-list"></text>
     </nested>
@@ -226,20 +224,4 @@
         <childElement allowMultiple="true" description="Object." caption="Object"
                       name="http://www.mulesoft.org/schema/mule/collection/inner-operation6-object"></childElement>
     </nested>
-    <cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric"
-                     abstract="true" image="icons/large/collection-connector-48x32.png" localId="operation7"
-                     icon="icons/small/collection-connector-24x16.png" caption="Operation7">
-        <attribute-category description="General." caption="General">
-            <group caption="General" id="general">
-                <childElement allowMultiple="false" inplace="true" description="A map of string-lists." caption="Map"
-                              name="http://www.mulesoft.org/schema/mule/collection/operation7-map"></childElement>
-            </group>
-        </attribute-category>
-    </cloud-connector>
-    <nested xmlname="map" image="icons/large/collection-connector-48x32.png" localId="operation7-map"
-            icon="icons/small/collection-connector-24x16.png" description="Map." caption="Map">
-        <childElement allowMultiple="true" description="Map." caption="Map"
-                      name="http://www.mulesoft.org/schema/mule/collection/operation7-map"></childElement>
-    </nested>
-    <nested xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></nested>
 </namespace>
