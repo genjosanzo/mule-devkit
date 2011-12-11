@@ -57,4 +57,14 @@ public @interface Display {
      * the javadoc of the annotated element.
      */
     String description() default "";
+
+    /**
+     * This attributes provides additional information on how the annotated element should be treated
+     * in Mule Studio. Annotated elements are rendered differently based on their Java types but in some
+     * cases they should be rendered in another way. The most clear example are passwords, they might
+     * be of type String in Java but in Studio they should not be treated as normal strings.
+     */
+    Type type() default Type.STANDARD;
+
+    enum Type { STANDARD, PASSWORD }
 }

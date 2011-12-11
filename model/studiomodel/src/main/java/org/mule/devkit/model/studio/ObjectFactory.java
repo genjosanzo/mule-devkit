@@ -482,14 +482,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link StringAttributeType }{@code >}}
-     */
-    @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "password", scope = Group.class)
-    public JAXBElement<StringAttributeType> createGroupPassword(StringAttributeType value) {
-        return new JAXBElement<StringAttributeType>(_GroupPassword_QNAME, StringAttributeType.class, Group.class, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link LongType }{@code >}}
      */
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "long", scope = Group.class)
@@ -503,6 +495,14 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "url", scope = Group.class)
     public JAXBElement<UrlType> createGroupUrl(UrlType value) {
         return new JAXBElement<UrlType>(_GroupUrl_QNAME, UrlType.class, Group.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link PasswordType }{@code >}}
+     */
+    @XmlElementDecl(namespace = "http://www.mulesoft.org/schema/mule/tooling.attributes", name = "password", scope = Group.class)
+    public JAXBElement<PasswordType> createGroupPassword(PasswordType value) {
+        return new JAXBElement<PasswordType>(_GroupPassword_QNAME, PasswordType.class, Group.class, value);
     }
 
     /**

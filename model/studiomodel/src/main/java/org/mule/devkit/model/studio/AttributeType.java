@@ -78,7 +78,8 @@ import javax.xml.bind.annotation.XmlType;
         NewType.class,
         ModeType.class,
         FlowRefType.class,
-        UrlType.class
+        UrlType.class,
+        PasswordType.class
 })
 public class AttributeType {
 

@@ -40,6 +40,7 @@
       <group caption="General" id="general">
         <string required="true" description="Parameter in General input group." caption="General" name="general"></string>
         <string required="true" description="Non-default description." caption="non-default caption" name="noInputGroupExplicit"></string>
+        <password required="true" description="Password parameter." caption="Password" name="password"></password>
       </group>
     </attribute-category>
   </cloud-connector>

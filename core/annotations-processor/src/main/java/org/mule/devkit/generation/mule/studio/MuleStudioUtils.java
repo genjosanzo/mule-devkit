@@ -33,6 +33,7 @@ import org.mule.devkit.model.studio.IntegerType;
 import org.mule.devkit.model.studio.LongType;
 import org.mule.devkit.model.studio.NestedElementReference;
 import org.mule.devkit.model.studio.ObjectFactory;
+import org.mule.devkit.model.studio.PasswordType;
 import org.mule.devkit.model.studio.StringAttributeType;
 import org.mule.devkit.model.studio.TextType;
 import org.mule.devkit.model.studio.UrlType;
@@ -102,6 +103,9 @@ public class MuleStudioUtils {
 
     public JAXBElement<? extends AttributeType> createJAXBElement(AttributeType attributeType) {
         ObjectFactory objectFactory = new ObjectFactory();
+        if (attributeType instanceof PasswordType) {
+            return objectFactory.createGroupPassword((PasswordType) attributeType);
+        }
         if (attributeType instanceof StringAttributeType) {
             return objectFactory.createGroupString((StringAttributeType) attributeType);
         }
@@ -155,6 +159,10 @@ public class MuleStudioUtils {
     }
 
     private AttributeType createAttributeTypeOfSupportedType(Element element) {
+        Display display = element.getAnnotation(Display.class);
+        if(display != null && display.type().equals(Display.Type.PASSWORD)) {
+            return new PasswordType();
+        }
         if (typeMirrorUtils.isString(element) || typeMirrorUtils.isDate(element) || typeMirrorUtils.isChar(element) ||
                 typeMirrorUtils.isFloat(element) || typeMirrorUtils.isDouble(element)) {
             return new StringAttributeType();

@@ -39,7 +39,7 @@ public class GlobalCloudConnectorTypeBuilder extends GlobalTypeBuilder {
     }
 
     protected String getDescriptionBasedOnType() {
-        return helper.formatDescription("Global " + nameUtils.friendlyNameFromCamelCase(typeElement.name()) + " configuration information");
+        return helper.formatDescription("Global " + helper.getFormattedCaption(typeElement) + " configuration information");
     }
 
     protected String getExtendsBasedOnType() {
@@ -51,7 +51,7 @@ public class GlobalCloudConnectorTypeBuilder extends GlobalTypeBuilder {
     }
 
     protected String getCaptionBasedOnType() {
-        return helper.formatCaption(nameUtils.friendlyNameFromCamelCase(typeElement.name()));
+        return helper.getFormattedCaption(typeElement);
     }
 
     protected String getNameDescriptionBasedOnType() {

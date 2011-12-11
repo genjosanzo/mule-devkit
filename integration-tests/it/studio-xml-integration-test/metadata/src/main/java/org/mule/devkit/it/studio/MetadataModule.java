@@ -58,12 +58,14 @@ public class MetadataModule {
      * @param advanced1            parameter in Advanced input group
      * @param advanced2            parameter in Advanced input group
      * @param general              parameter in General input group
+     * @param password             password parameter
      */
     @Processor
     public void processor(@Display(caption = "non-default caption", description = "non-default description") String noInputGroupExplicit,
                           @Display(inputGroup = "Advanced", caption = "non-default caption") String advanced1,
                           @Display(inputGroup = "Advanced", description = "non-default description") String advanced2,
-                          String general) {
+                          String general,
+                          @Display(type = Display.Type.PASSWORD) String password) {
     }
 
     /**
