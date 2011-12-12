@@ -918,6 +918,7 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
         data.setValue("class.moduleVersion", this.moduleVersion());
         data.setValue("class.moduleMinMuleVersion", this.moduleMinMuleVersion());
         data.setValue("class.moduleSessionAware", Boolean.toString(this.moduleSessionAware()));
+        data.setValue("class.moduleOAuthAware", Boolean.toString(this.oauthAware()));
 
         if (moduleSessionAware()) {
             //ParameterInfo.makeHDF(data, "class.moduleSessionVariables", mModuleConnectVariables, false, mModuleConnectVariablesTypes);
@@ -1515,6 +1516,7 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
     private String mModuleNamespace;
     private String mModuleSchemaLocation;
     private boolean mModuleHasConnectionManager;
+    private boolean mModuleOAuthAware;
     private ParamTagInfo[] mModuleConnectVariables;
     private Set<String> mModuleConnectVariablesTypes;
     private String mName;
@@ -1852,6 +1854,10 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
     }
 
 
+    public boolean oauthAware() {
+        return mModuleOAuthAware;
+    }
+    
     public void setTypeInfo(TypeInfo typeInfo) {
         mTypeInfo = typeInfo;
     }
@@ -1916,7 +1922,23 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
             } else {
                 mModuleHasConnectionManager = false;
             }
+            boolean hasOAuth = false;
+            if( mIsModule ) {
+                for (AnnotationInstanceInfo annotation : annotations()) {
+                    if (annotation.type().qualifiedName().equals("org.mule.api.annotations.oauth.OAuth")) {
+                        hasOAuth = true;
+                        break;
+                    }
+                    else if (annotation.type().qualifiedName().equals("org.mule.api.annotations.oauth.OAuth2")) {
+                        hasOAuth = true;
+                        break;
+                    }
+                }
+
+            }
+            mModuleOAuthAware = hasOAuth;
             mModuleKnown = true;
+            
         }
         return mIsModule;
     }

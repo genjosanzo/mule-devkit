@@ -233,6 +233,122 @@ attribute on each operation.</p>
 </pre>
 <?cs /if ?>
 
+<?cs if:class.moduleOAuthAware=="true" ?>
+<?cs # this next line must be exactly like this to be parsed by eclipse ?>
+<!-- ========= OAUTH DETAIL ======== -->
+<h2>OAuth</h2>
+<p>This connector uses OAuth as an authorization and authentication mechanism. All the message processors or sources that require the connector
+to be authorized by the service provider will throw a NotAuthorizedException until the connector is authorized properly.</p>
+<p>Authorizing the connector is a simple process of calling:</p>
+<pre>
+    &lt;<?cs var:class.moduleName ?>:authorize/&gt;
+</pre>
+<p>The call to authorize message processor must be made from a message coming from an HTTP inbound endpoint as the authorize process will
+reply with a redirect to the service provider. The following is an example of how to use it in a flow with an HTTP inbound endpoint:</p>
+<pre>
+    &lt;flow name="authorizationAndAuthenticationFlow"&gt;
+    &lt;http:inbound-endpoint host="localhost" port="8080" path="oauth-authorize"/&gt;
+    &lt;<?cs var:class.moduleName ?>:authorize/&gt;
+    &lt;/flow&gt;
+</pre>
+<p>If you hit that endpoint via a web-browser it will initiate the OAuth dance, redirecting the user to the service provider page
+and creating a callback endpoint so the service provider can call us back once the user has been authenticated. Once the callback
+gets called then the connector will switch to an authorized state and any message processor or source that requires authentication
+can be called.</p>
+<h3>Callback Customization</h3>
+<p>As mentioned earlier once authorize gets called and before we redirect the user to the service provider we create a callback
+endpoint. The callback endpoint will get called automatically by the service provider once the user is authenticated and he
+grants authorization to the connector to access his private information.</p>
+<p>The callback can be customized in the config element of the this connector as follows:</p>
+<pre>
+    &lt;<?cs var:class.moduleName ?>:config&gt;
+        &lt;<?cs var:class.moduleName ?>:oauth-callback-config domain="${fullDomain}" localPort="${http.port}" remotePort="80"/&gt;
+    &lt;/<?cs var:class.moduleName ?>:config&gt;
+</pre>
+<p>The <i>oauth-callback-config</i> element can be used to customize the endpoint that gets created for the callback. It
+features the following attributes:</p>
+<table id="lconfig" class="jd-sumtable">
+<tr><th colspan="12">OAuth Callback Config Attributes</th></tr>
+<tr><th>Name</th><th>Description</th></tr>
+<tr class="api" >
+<td class="jd-linkcol"><nobr>domain</nobr></td>
+<td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i>The domain portion of the callback URL. This is usually something like xxx.muleion.com if you are deploying to iON for example.</td>
+</tr>
+<tr class="api" >
+<td class="jd-linkcol"><nobr>localPort</nobr></td>
+<td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i>The local port number that the endpoint will listen on. Normally 80, in the case of Mule iON you can use the environment variable ${http.port}.</td>
+</tr>
+<tr class="api" >
+<td class="jd-linkcol"><nobr>remotePort</nobr></td>
+<td class="jd-descrcol" width="100%"><i>Optional.&nbsp;</i>This is the port number that we will tell the service provider we are listening on. It is usually the same as localPort but it is separated in case your deployment features port forwarding or a proxy.</td>
+</tr>
+</table>
+<p class="caution">The example shown above is what the configuration would look like if your app would be deployed to iON.</p>
+<h3>Saving and Restoring State</h3>
+<p>Once the service providers hits the callback it will do so in way that state information it is also sent. This state information
+is later used by the connector on each call made to the service provider to let him know that we have completed the authorization
+and authentication process.<p>
+<p>The state information is currently held in-memory but the connector offers hooks to save/restore this state. The ammount of information
+that needs to be saved and/or restored varies between version of the OAuth specification. At the bare minimum for OAuth 1.0a that needs
+to be the OAuth access token and OAuth access token secret.</p>
+<p>The following is an example of how to log the access token and access token secret.<p>
+<pre>
+    &lt;<?cs var:class.moduleName ?>:config&gt;
+        &lt;<?cs var:class.moduleName ?>:save-oauth-access-token&gt;
+            &lt;logger level="INFO" message="Received access token #[header:INBOUND:OAuthAccessToken] and #[header:INBOUND:OAuthAccessTokenSecret]"/&gt;
+        &lt;/<?cs var:class.moduleName ?>:save-oauth-access-token&gt;
+    &lt;/<?cs var:class.moduleName ?>:config&gt;
+</pre>
+<p>The <i>save-oauth-access-token</i> is a message processor chain and you can add inside of it as many message processors as you want. The chain will
+be called with special inbound properties in the message which the information that needs saved.</p>
+<p>Restoring the information is equally simple:</p>
+<pre>
+    &lt;<?cs var:class.moduleName ?>:config&gt;
+        &lt;<?cs var:class.moduleName ?>:restore-oauth-access-token&gt;
+            &lt;message-properties-transformer&gt;
+                &lt;add-message-property key="OAuthAccessToken" value="123"/&gt;
+                &lt;add-message-property key="OAuthAccessTokenSecret" value="567"/&gt;
+            &lt;/message-properties-transformer&gt;
+        &lt;/<?cs var:class.moduleName ?>:restore-oauth-access-token&gt;
+    &lt;/<?cs var:class.moduleName ?>:config&gt;
+</pre>
+<p>The example above does not do anything useful expect hardcode the access token and the token secret to 123 and 567 respectively. Just like
+<i>save-oauth-access-token</i>, <i>restore-oauth-access-token</i> is another message processor chain. Once the chain is done executing
+we will extract the OAuth access token property and OAuth access token secret property values.</p>
+<p>The following shows a full example on how to save and restore using Mule ObjectStore Module to store the information inside an object store.<p>
+<pre>
+&lt;mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:<?cs var:class.moduleName ?>="<?cs var:class.moduleNamespace ?>"
+      xmlns:objectstore="http://www.mulesoft.org/schema/mule/objectstore"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core
+               http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/objectstore
+               http://www.mulesoft.org/schema/mule/objectstore/1.0/mule-objectstore.xsd
+               <?cs var:class.moduleNamespace ?>
+               <?cs var:class.moduleSchemaLocation ?>"&gt;
+
+    &lt;<?cs var:class.moduleName ?>:config&gt;
+        &lt;<?cs var:class.moduleName ?>:save-oauth-access-token&gt;
+            &lt;objectstore:store key="OAuthAccessToken" value="#[header:INBOUND:OAuthAccessToken]"/&gt;
+            &lt;objectstore:store key="OAuthAccessTokenSecret" value="#[header:INBOUND:OAuthAccessTokenSecret]"/&gt;
+        &lt;/<?cs var:class.moduleName ?>:save-oauth-access-token&gt;
+        &lt;<?cs var:class.moduleName ?>:restore-oauth-access-token&gt;
+            &lt;enricher target="#[header:OAuthAccessToken]"&gt;
+                &lt;objectstore:retrieve key="OAuthAccessToken"/&gt;
+            &lt;/enricher&gt;
+            &lt;enricher target="#[header:OAuthAccessTokenSecret]"&gt;
+                &lt;objectstore:retrieve key="OAuthAccessTokenSecret"/&gt;
+            &lt;/enricher&gt;
+        &lt;/<?cs var:class.moduleName ?>:restore-oauth-access-token&gt;
+    &lt;/<?cs var:class.moduleName ?>:config&gt;
+
+&lt;/mule&gt;
+</pre>
+
+<?cs /if ?>
+
 <?cs def:write_op_details(methods) ?>
 <?cs each:method=methods ?>
 <?cs # the A tag in the next line must remain where it is, so that Eclipse can parse the docs ?>
