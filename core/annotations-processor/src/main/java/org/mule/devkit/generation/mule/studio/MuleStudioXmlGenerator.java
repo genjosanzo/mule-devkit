@@ -108,6 +108,7 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createEndpoint(endpoint));
             GlobalType globalEndpoint = new GlobalEndpointTypeBuilder(context, sourceMethod, typeElement).build();
             namespace.getConnectorOrEndpointOrGlobal().add(objectFactory.createNamespaceTypeGlobalEndpoint(globalEndpoint));
+            namespace.getConnectorOrEndpointOrGlobal().addAll(new NestedsBuilder(context, sourceMethod, typeElement).build());
         }
     }
 }

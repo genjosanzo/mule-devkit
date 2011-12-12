@@ -74,4 +74,10 @@
       </group>
     </attribute-category>
   </global-endpoint>
+  <nested xmlname="strings" image="icons/large/source-connector-48x32.png" localId="subscribe-with-params-strings" icon="icons/small/source-connector-24x16.png" description="Strings." caption="Strings">
+    <childElement allowMultiple="true" description="Strings." caption="Strings" name="http://www.mulesoft.org/schema/mule/source/subscribe-with-params-string"></childElement>
+  </nested>
+  <nested xmlname="string" image="icons/large/source-connector-48x32.png" localId="subscribe-with-params-string" icon="icons/small/source-connector-24x16.png" description="Strings." caption="Strings">
+    <text isToElement="true" description="The strings." caption="Strings" name="subscribe-with-params-string"></text>
+  </nested>
 </namespace>
