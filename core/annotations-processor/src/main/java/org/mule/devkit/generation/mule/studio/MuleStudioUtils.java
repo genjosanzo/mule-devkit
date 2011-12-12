@@ -30,7 +30,6 @@ import org.mule.devkit.model.studio.EncodingType;
 import org.mule.devkit.model.studio.EnumType;
 import org.mule.devkit.model.studio.FlowRefType;
 import org.mule.devkit.model.studio.IntegerType;
-import org.mule.devkit.model.studio.LongType;
 import org.mule.devkit.model.studio.NestedElementReference;
 import org.mule.devkit.model.studio.ObjectFactory;
 import org.mule.devkit.model.studio.PasswordType;
@@ -165,16 +164,11 @@ public class MuleStudioUtils {
             return new StringAttributeType();
         } else if (typeMirrorUtils.isBoolean(element)) {
             return new Booleantype();
-        } else if (typeMirrorUtils.isInteger(element)) {
+        } else if (typeMirrorUtils.isInteger(element) || typeMirrorUtils.isLong(element)) {
             IntegerType integerType = new IntegerType();
             integerType.setMin(0);
             integerType.setStep(1);
             return integerType;
-        } else if (typeMirrorUtils.isLong(element)) {
-            LongType longType = new LongType();
-            longType.setMin(0);
-            longType.setStep(1);
-            return longType;
         } else if (typeMirrorUtils.isURL(element)) {
             return new UrlType();
         } else {

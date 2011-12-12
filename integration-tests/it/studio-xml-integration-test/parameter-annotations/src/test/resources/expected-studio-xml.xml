@@ -39,7 +39,7 @@
         <string required="false" description="A optional character parameter." caption="A Character" name="aCharacter"></string>
         <string required="false" description="A optional double parameter." caption="A Double" name="aDouble"></string>
         <string required="false" description="A optonal float parameter." caption="A Float" name="aFloat"></string>
-        <long step="1" min="0" required="false" description="A optional long parameter." caption="A Long" name="aLong"></long>
+        <integer step="1" min="0" required="false" description="A optional long parameter." caption="A Long" name="aLong" />
       </group>
     </attribute-category>
   </cloud-connector>
@@ -52,7 +52,7 @@
         <string defaultValue="A" required="false" description="A optional character parameter with default value." caption="A Character" name="aCharacter"></string>
         <string defaultValue="5.3" required="false" description="A optional double parameter with default value." caption="A Double" name="aDouble"></string>
         <string defaultValue="3.2" required="false" description="A optonal float parameter with default value." caption="A Float" name="aFloat"></string>
-        <long step="1" min="0" defaultValue="2" required="false" description="A optional long parameter with default value." caption="A Long" name="aLong"></long>
+        <integer step="1" min="0" defaultValue="2" required="false" description="A optional long parameter with default value." caption="A Long" name="aLong" />
       </group>
     </attribute-category>
   </cloud-connector>

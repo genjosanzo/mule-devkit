@@ -52,7 +52,7 @@ import java.util.Map;
 
 public abstract class BaseStudioXmlBuilder {
 
-    private static final String GENERAL_GROUP_NAME = "General";
+    public static final String GENERAL_GROUP_NAME = "General";
     private static final String CONNECTION_GROUP_NAME = "Connection";
     private static final String CONNECTION_GROUP_LABEL = "Use these fields to override the credentials defined in the %s connector.";
     protected ObjectFactory objectFactory;
@@ -182,7 +182,11 @@ public abstract class BaseStudioXmlBuilder {
             }
         }
 
-        return new ArrayList<AttributeCategory>(attributeCategoriesByName.values());
+        ArrayList<AttributeCategory> attributeCategories = new ArrayList<AttributeCategory>(attributeCategoriesByName.values());
+        for(AttributeCategory attributeCategory : attributeCategories) {
+            Collections.sort(attributeCategory.getGroup(), new GroupComparator());
+        }
+        return attributeCategories;
     }
 
     private AttributeCategory getOrCreateDefaultAttributeCategory(Map<String, AttributeCategory> attributeCategoriesByName) {

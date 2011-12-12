@@ -73,7 +73,7 @@
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/basic-connector-48x32.png" localId="passthru-long" icon="icons/small/basic-connector-24x16.png" caption="Passthru Long">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
-        <long step="1" min="0" required="true" description="Value to passthru." caption="Value" name="value"></long>
+        <integer step="1" min="0" required="true" description="Value to passthru." caption="Value" name="value"></integer>
       </group>
     </attribute-category>
   </cloud-connector>
@@ -101,7 +101,7 @@
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/basic-connector-48x32.png" localId="passthru-complex-long" icon="icons/small/basic-connector-24x16.png" caption="Passthru Complex Long">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
-        <long step="1" min="0" required="true" description="Value to passthru." caption="Value" name="value"></long>
+        <integer step="1" min="0" required="true" description="Value to passthru." caption="Value" name="value"></integer>
       </group>
     </attribute-category>
   </cloud-connector>
