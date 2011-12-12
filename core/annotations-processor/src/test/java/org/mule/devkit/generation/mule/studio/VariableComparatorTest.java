@@ -22,12 +22,14 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mule.devkit.utils.TypeMirrorUtils;
 
+import javax.lang.model.element.Name;
 import javax.lang.model.element.VariableElement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class VariableComparatorTest {
@@ -43,6 +45,8 @@ public class VariableComparatorTest {
     @Mock
     private VariableElement booleanVariable;
     @Mock
+    private VariableElement unknownTypeVariable;
+    @Mock
     private TypeMirrorUtils typeMirrorUtils;
 
     @Before
@@ -56,7 +60,7 @@ public class VariableComparatorTest {
     }
 
     @Test
-    public void testCompare() throws Exception {
+    public void compareByType() throws Exception {
         List<VariableElement> variables = new ArrayList<VariableElement>();
         variables.add(mapVariable);
         variables.add(enumVariable);
@@ -71,5 +75,29 @@ public class VariableComparatorTest {
         assertEquals(booleanVariable, variables.get(2));
         assertEquals(enumVariable, variables.get(3));
         assertEquals(mapVariable, variables.get(4));
+    }
+
+    @Test
+    public void testCompareUnknownType() throws Exception {
+        Name a = mockName("a");
+        Name b = mockName("b");
+
+        when(unknownTypeVariable.getSimpleName()).thenReturn(a);
+        when(booleanVariable.getSimpleName()).thenReturn(b);
+
+        List<VariableElement> variables = new ArrayList<VariableElement>();
+        variables.add(unknownTypeVariable);
+        variables.add(booleanVariable);
+
+        Collections.sort(variables, new VariableComparator(typeMirrorUtils));
+
+        assertEquals(unknownTypeVariable, variables.get(0));
+        assertEquals(booleanVariable, variables.get(1));
+    }
+
+    private Name mockName(String a) {
+        Name name = mock(Name.class);
+        when(name.toString()).thenReturn(a);
+        return name;
     }
 }
