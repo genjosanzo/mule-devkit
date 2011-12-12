@@ -11,8 +11,8 @@
     <properties>
         <!--<mule.version>@mule.version@</mule.version>-->
         <!--<devkit.version>@project.version@</devkit.version>-->
-        <mule.version>3.2.0</mule.version>
-        <devkit.version>3.1.1-SNAPSHOT</devkit.version>
+        <mule.version>@mule.version@</mule.version>
+        <devkit.version>3.1.1@project.version@</devkit.version>
         <dsl.version>0.7</dsl.version>
     </properties>
 
@@ -108,7 +108,7 @@
         <dependency>
             <groupId>org.mule.tools.devkit</groupId>
             <artifactId>mule-devkit-annotations</artifactId>
-            <version>3.1.1-SNAPSHOT</version>
+            <version>3.1.1@project.version@</version>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>

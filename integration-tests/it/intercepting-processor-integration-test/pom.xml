@@ -14,7 +14,7 @@
                 <plugin>
                     <groupId>org.mule.tools.devkit</groupId>
                     <artifactId>mule-devkit-maven-plugin</artifactId>
-                    <version>3.1.1-SNAPSHOT</version>
+                    <version>3.1.1@project.version@</version>
                     <extensions>true</extensions>
                 </plugin>
                 <plugin>
@@ -40,7 +40,7 @@
             <plugin>
                 <groupId>org.mule.tools.devkit</groupId>
                 <artifactId>mule-devkit-maven-plugin</artifactId>
-                <version>3.1.1-SNAPSHOT</version>
+                <version>3.1.1@project.version@</version>
                 <extensions>true</extensions>
             </plugin>
         </plugins>
@@ -83,7 +83,7 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>3.2.0</version>
+            <version>@mule.version@</version>
             <optional>true</optional>
             <exclusions>
                 <exclusion>
@@ -95,7 +95,7 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
-            <version>3.2.0</version>
+            <version>@mule.version@</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.safehaus.jug</groupId>
@@ -106,12 +106,12 @@
         <dependency>
             <groupId>org.mule.tools.devkit</groupId>
             <artifactId>mule-devkit-annotations</artifactId>
-            <version>3.1.1-SNAPSHOT</version>
+            <version>3.1.1@project.version@</version>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
-            <version>3.2.0</version>
+            <version>@mule.version@</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
