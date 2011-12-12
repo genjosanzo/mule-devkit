@@ -4,13 +4,13 @@
 	    <parent>
 	        <groupId>org.mule.tools.devkit</groupId>
 	        <artifactId>mule-devkit</artifactId>
-	        <version>3.1</version>
+	        <version>3.1.1-SNAPSHOT</version>
 	    </parent>
 	
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-module-dynamic</artifactId>
-    <version>3.1</version>
+    <version>3.1.1-SNAPSHOT</version>
     <packaging>mule-module</packaging>
     <name>Mule DevKit Dynamic</name>
 
@@ -116,7 +116,7 @@
                     <docletArtifact>
                         <groupId>org.mule.tools.devkit</groupId>
                         <artifactId>mule-devkit-doclet</artifactId>
-                        <version>3.1</version>
+                        <version>3.1.1-SNAPSHOT</version>
                     </docletArtifact>
                     <doclet>org.mule.devkit.doclet.Doclava</doclet>
                     <bootclasspath>${sun.boot.class.path}</bootclasspath>
