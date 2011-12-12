@@ -30,6 +30,8 @@ import javax.xml.bind.JAXBElement;
 
 public class ConfigRefBuilder extends BaseStudioXmlBuilder {
 
+    public static final String GLOBAL_REF_NAME = SchemaGenerator.ATTRIBUTE_NAME_CONFIG_REF;
+
     public ConfigRefBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
         super(context, typeElement);
     }
@@ -37,7 +39,7 @@ public class ConfigRefBuilder extends BaseStudioXmlBuilder {
     public JAXBElement<PatternType> build() {
         NewType globalRef = new NewType();
         globalRef.setRequiredType(MuleStudioXmlGenerator.URI_PREFIX + moduleName + '/' + MuleStudioXmlGenerator.GLOBAL_CLOUD_CONNECTOR_LOCAL_ID);
-        globalRef.setName(SchemaGenerator.ATTRIBUTE_NAME_CONFIG_REF);
+        globalRef.setName(GLOBAL_REF_NAME);
         globalRef.setCaption(helper.formatCaption("config reference"));
         globalRef.setDescription(helper.formatDescription("Specify which configuration to use for this invocation"));
 

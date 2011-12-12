@@ -55,4 +55,9 @@ public class GlobalEndpointTypeWithNameBuilder extends GlobalEndpointTypeBuilder
     protected String getNameDescriptionBasedOnType() {
         return "Endpoint name";
     }
+
+    @Override
+    protected String getDoNotInherit() {
+        return null;
+    }
 }

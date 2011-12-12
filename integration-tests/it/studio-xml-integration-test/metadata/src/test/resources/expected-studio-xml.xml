@@ -81,7 +81,7 @@
       </group>
     </attribute-category>
   </endpoint>
-  <global-endpoint extends="http://www.mulesoft.org/schema/mule/metadata/source" abstract="true" image="icons/large/metadata-connector-48x32.png" localId="source" icon="icons/small/metadata-connector-24x16.png" description="A source method with Studio metadata." caption="Source">
+  <global-endpoint extends="http://www.mulesoft.org/schema/mule/metadata/source" abstract="true" image="icons/large/metadata-connector-48x32.png" doNotInherit="config-ref" localId="source" icon="icons/small/metadata-connector-24x16.png" description="A source method with Studio metadata." caption="Source">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractEndpointGeneric">
         <name description="Endpoint name." caption="Name" name="name" required="true"></name>

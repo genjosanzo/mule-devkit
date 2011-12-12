@@ -37,6 +37,7 @@ public class GlobalEndpointTypeBuilder extends GlobalTypeBuilder {
     public GlobalType build() {
         GlobalType globalEndpoint = super.build();
         globalEndpoint.setAbstract(true);
+        globalEndpoint.setDoNotInherit(getDoNotInherit());
         return globalEndpoint;
     }
 
@@ -76,6 +77,10 @@ public class GlobalEndpointTypeBuilder extends GlobalTypeBuilder {
 
     protected String getNameDescriptionBasedOnType() {
         return "Endpoint name";
+    }
+
+    protected String getDoNotInherit() {
+        return ConfigRefBuilder.GLOBAL_REF_NAME;
     }
 
     private String getIdBasedOnType() {
