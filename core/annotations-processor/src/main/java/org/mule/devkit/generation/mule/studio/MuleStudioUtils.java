@@ -109,10 +109,7 @@ public class MuleStudioUtils {
         if (attributeType instanceof StringAttributeType) {
             return objectFactory.createGroupString((StringAttributeType) attributeType);
         }
-        if (attributeType instanceof LongType) {
-            return objectFactory.createGroupLong((LongType) attributeType);
-        }
-        if (attributeType instanceof IntegerType) {
+        if (attributeType instanceof IntegerType) { // TODO: Studio has a problem with LongType, until that's resolved map longs to integer
             return objectFactory.createGroupInteger((IntegerType) attributeType);
         }
         if (attributeType instanceof EnumType) {
