@@ -46,7 +46,6 @@ public class VariableComparator implements Comparator<VariableElement> {
 
         if (isKnownType(variable1) && isKnownType(variable2)) {
 
-
             if (typeMirrorUtils.isString(variable1) && typeMirrorUtils.isString(variable2)) {
                 return compareByName(variable1, variable2);
             } else if (typeMirrorUtils.isString(variable1)) {
@@ -88,6 +87,12 @@ public class VariableComparator implements Comparator<VariableElement> {
             }
         }
 
+        if(typeMirrorUtils.isCollection(variable1)) {
+            return VARIABLE2_FIRST;
+        }
+        if(typeMirrorUtils.isCollection(variable2)) {
+            return VARIABLE1_FIRST;
+        }
         return compareByName(variable1, variable2);
     }
 
