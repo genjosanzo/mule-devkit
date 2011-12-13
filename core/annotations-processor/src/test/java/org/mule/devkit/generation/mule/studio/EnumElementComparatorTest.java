@@ -55,8 +55,8 @@ public class EnumElementComparatorTest {
 
     @Test
     public void collectionNotOrdered() throws Exception {
-        when(enumElement1.getCaption()).thenReturn("b");
-        when(enumElement2.getCaption()).thenReturn("a");
+        when(enumElement1.getValue()).thenReturn("b");
+        when(enumElement2.getValue()).thenReturn("a");
         Collections.sort(enumElements, new EnumElementComparator());
         assertEquals(enumElement2, enumElements.get(0));
     }
