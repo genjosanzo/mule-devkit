@@ -265,7 +265,7 @@ public abstract class BaseStudioXmlBuilder {
                 iterator.remove();
             }
         }
-        Collections.sort(parameters, new VariableComparator(typeMirrorUtils));
+        Collections.sort(parameters, new VariableComparator(context));
         return parameters;
     }
 
@@ -315,17 +315,17 @@ public abstract class BaseStudioXmlBuilder {
             if (enumMember.getKind() == ElementKind.ENUM_CONSTANT) {
                 String enumConstant = enumMember.getSimpleName().toString();
                 EnumElement enumElement = new EnumElement();
-                enumElement.setCaption(helper.formatCaption(javaDocUtils.getSummary(enumMember)));
                 enumElement.setValue(enumConstant);
                 enumType.getOption().add(enumElement);
             }
         }
+        Collections.sort(enumType.getOption(), new EnumElementComparator());
         return enumType;
     }
 
     private List<VariableElement> getConfigurableFieldsSorted() {
         List<VariableElement> configurableFields = typeElement.getFieldsAnnotatedWith(Configurable.class);
-        Collections.sort(configurableFields, new VariableComparator(typeMirrorUtils));
+        Collections.sort(configurableFields, new VariableComparator(context));
         return configurableFields;
     }
 }

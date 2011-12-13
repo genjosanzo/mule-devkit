@@ -33,26 +33,26 @@
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="optional-params" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Optional Params">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
-        <string required="false" description="A optional string parameter." caption="A String" name="aString"></string>
-        <integer step="1" min="0" required="false" description="A optional integer parameter." caption="A Integer" name="aInteger"></integer>
-        <boolean required="false" description="A optional boolean parameter." caption="A Boolean" name="aBoolean"></boolean>
         <string required="false" description="A optional character parameter." caption="A Character" name="aCharacter"></string>
         <string required="false" description="A optional double parameter." caption="A Double" name="aDouble"></string>
         <string required="false" description="A optonal float parameter." caption="A Float" name="aFloat"></string>
-        <integer step="1" min="0" required="false" description="A optional long parameter." caption="A Long" name="aLong" />
+        <integer step="1" min="0" required="false" description="A optional integer parameter." caption="A Integer" name="aInteger"></integer>
+        <integer step="1" min="0" required="false" description="A optional long parameter." caption="A Long" name="aLong"></integer>
+        <string required="false" description="A optional string parameter." caption="A String" name="aString"></string>
+        <boolean required="false" description="A optional boolean parameter." caption="A Boolean" name="aBoolean"></boolean>
       </group>
     </attribute-category>
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="optional-params-with-defaults" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Optional Params With Defaults">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
-        <string defaultValue="fede" required="false" description="A optional string parameter with default value." caption="A String" name="aString"></string>
-        <integer step="1" min="0" defaultValue="1" required="false" description="A optional integer parameter with default value." caption="A Integer" name="aInteger"></integer>
-        <boolean defaultValue="false" required="false" description="A optional boolean parameter with default value." caption="A Boolean" name="aBoolean"></boolean>
         <string defaultValue="A" required="false" description="A optional character parameter with default value." caption="A Character" name="aCharacter"></string>
         <string defaultValue="5.3" required="false" description="A optional double parameter with default value." caption="A Double" name="aDouble"></string>
         <string defaultValue="3.2" required="false" description="A optonal float parameter with default value." caption="A Float" name="aFloat"></string>
-        <integer step="1" min="0" defaultValue="2" required="false" description="A optional long parameter with default value." caption="A Long" name="aLong" />
+        <integer step="1" min="0" defaultValue="1" required="false" description="A optional integer parameter with default value." caption="A Integer" name="aInteger"></integer>
+        <integer step="1" min="0" defaultValue="2" required="false" description="A optional long parameter with default value." caption="A Long" name="aLong"></integer>
+        <string defaultValue="fede" required="false" description="A optional string parameter with default value." caption="A String" name="aString"></string>
+        <boolean defaultValue="false" required="false" description="A optional boolean parameter with default value." caption="A Boolean" name="aBoolean"></boolean>
       </group>
     </attribute-category>
   </cloud-connector>

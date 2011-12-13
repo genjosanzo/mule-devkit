@@ -156,7 +156,7 @@ public class MuleStudioUtils {
 
     private AttributeType createAttributeTypeOfSupportedType(Element element) {
         Display display = element.getAnnotation(Display.class);
-        if(display != null && display.type().equals(Display.Type.PASSWORD)) {
+        if (display != null && display.type().equals(Display.Type.PASSWORD)) {
             return new PasswordType();
         }
         if (typeMirrorUtils.isString(element) || typeMirrorUtils.isDate(element) || typeMirrorUtils.isChar(element) ||
@@ -234,6 +234,24 @@ public class MuleStudioUtils {
         if (element instanceof DevKitTypeElement) {
             return formatCaption(((DevKitTypeElement) element).name().replaceAll("-", " "));
         }
+        if (element instanceof VariableElement && !isKnownType((VariableElement) element)) {
+            return formatCaption(nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString()) + " Reference");
+        }
         return formatCaption(nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString()));
+    }
+
+    public boolean isKnownType(VariableElement variable) {
+        return typeMirrorUtils.isString(variable) ||
+                typeMirrorUtils.isChar(variable) ||
+                typeMirrorUtils.isDate(variable) ||
+                typeMirrorUtils.isDouble(variable) ||
+                typeMirrorUtils.isFloat(variable) ||
+                typeMirrorUtils.isLong(variable) ||
+                typeMirrorUtils.isHttpCallback(variable) ||
+                typeMirrorUtils.isInteger(variable) ||
+                typeMirrorUtils.isBoolean(variable) ||
+                typeMirrorUtils.isEnum(variable) ||
+                typeMirrorUtils.isCollection(variable) ||
+                typeMirrorUtils.isURL(variable);
     }
 }

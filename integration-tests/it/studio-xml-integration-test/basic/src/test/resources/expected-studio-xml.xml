@@ -118,7 +118,7 @@
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/basic-connector-48x32.png" localId="passthru-complex-ref" icon="icons/small/basic-connector-24x16.png" caption="Passthru Complex Ref">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
-        <string required="true" description="Value to passthru." caption="My Complex Object" name="myComplexObject-ref"></string>
+        <string required="true" description="Value to passthru." caption="My Complex Object Reference" name="myComplexObject-ref"></string>
       </group>
     </attribute-category>
   </cloud-connector>

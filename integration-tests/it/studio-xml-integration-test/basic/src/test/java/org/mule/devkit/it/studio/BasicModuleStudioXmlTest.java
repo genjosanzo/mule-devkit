@@ -33,6 +33,7 @@ public class BasicModuleStudioXmlTest {
     @Test
     public void basicModuleStudioXml() throws Exception {
         XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setIgnoreAttributeOrder(true);
         String expectedXml = IOUtils.toString(BasicModuleStudioXmlTest.class.getClassLoader().getResourceAsStream(EXPECTED_STUDIO_XML));
         String actualXml = IOUtils.toString(BasicModuleStudioXmlTest.class.getClassLoader().getResourceAsStream(ACTUAL_STUDIO_XML));
         Diff diff = new Diff(expectedXml, actualXml);

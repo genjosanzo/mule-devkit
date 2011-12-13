@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.utils.TypeMirrorUtils;
 
 import javax.lang.model.element.Name;
@@ -47,11 +48,14 @@ public class VariableComparatorTest {
     @Mock
     private VariableElement unknownTypeVariable;
     @Mock
+    private GeneratorContext context;
+    @Mock
     private TypeMirrorUtils typeMirrorUtils;
 
     @Before
     public void setUpTests() throws Exception {
         MockitoAnnotations.initMocks(this);
+        when(context.getTypeMirrorUtils()).thenReturn(typeMirrorUtils);
         when(typeMirrorUtils.isString(stringVariable)).thenReturn(true);
         when(typeMirrorUtils.isInteger(intVariable)).thenReturn(true);
         when(typeMirrorUtils.isEnum(enumVariable)).thenReturn(true);
@@ -68,7 +72,7 @@ public class VariableComparatorTest {
         variables.add(intVariable);
         variables.add(stringVariable);
 
-        Collections.sort(variables, new VariableComparator(typeMirrorUtils));
+        Collections.sort(variables, new VariableComparator(context));
 
         assertEquals(stringVariable, variables.get(0));
         assertEquals(intVariable, variables.get(1));
@@ -89,10 +93,28 @@ public class VariableComparatorTest {
         variables.add(unknownTypeVariable);
         variables.add(booleanVariable);
 
-        Collections.sort(variables, new VariableComparator(typeMirrorUtils));
+        Collections.sort(variables, new VariableComparator(context));
 
         assertEquals(unknownTypeVariable, variables.get(0));
         assertEquals(booleanVariable, variables.get(1));
+    }
+
+    @Test
+    public void testCompareByNameAndType() throws Exception {
+        Name a = mockName("a");
+        Name b = mockName("b");
+
+        when(intVariable.getSimpleName()).thenReturn(a);
+        when(stringVariable.getSimpleName()).thenReturn(b);
+
+        List<VariableElement> variables = new ArrayList<VariableElement>();
+        variables.add(stringVariable);
+        variables.add(intVariable);
+
+        Collections.sort(variables, new VariableComparator(context));
+
+        assertEquals(intVariable, variables.get(0));
+        assertEquals(stringVariable, variables.get(1));
     }
 
     private Name mockName(String a) {
