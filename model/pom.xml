@@ -17,6 +17,5 @@
         <module>codemodel</module>
         <module>schemamodel</module>
         <module>studiomodel</module>
-        <module>metamodel</module>
     </modules>
 </project>
