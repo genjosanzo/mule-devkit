@@ -9,11 +9,7 @@
       <group caption="General" id="general">
         <url required="false" description="A URL." caption="Url" name="url"></url>
       </group>
-    </attribute-category>
-    <attribute-category description="Connection." caption="Connection">
       <group caption="Connection" id="connection">
-        <label caption="Use these fields to override the credentials defined in the Connector connector."></label>
-        <label caption=""></label>
         <string required="false" description="The username to use." caption="Username" name="username"></string>
         <string required="false" description="The password to use." caption="Password" name="password"></string>
       </group>

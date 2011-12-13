@@ -20,9 +20,12 @@ package org.mule.devkit.generation.mule.studio;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
+import org.mule.devkit.model.studio.AttributeType;
 import org.mule.devkit.model.studio.Group;
+import org.mule.util.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 
 public class GlobalCloudConnectorTypeBuilder extends GlobalTypeBuilder {
 
@@ -36,6 +39,23 @@ public class GlobalCloudConnectorTypeBuilder extends GlobalTypeBuilder {
         group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupName(createNameAttributeType()));
         group.setCaption(helper.formatCaption(MuleStudioXmlGenerator.GROUP_DEFAULT_CAPTION));
         return processConfigurableFields(group);
+    }
+
+    @Override
+    protected void processConnectionAttributes(Map<String, Group> groupsByName, Map<String, AttributeCategory> attributeCategoriesByName) {
+        if (typeElement.usesConnectionManager()) {
+            Group connectionAttributesGroup = new Group();
+            connectionAttributesGroup.setCaption(helper.formatCaption(CONNECTION_GROUP_NAME));
+            connectionAttributesGroup.setId(StringUtils.uncapitalize(CONNECTION_GROUP_NAME));
+
+            groupsByName.put(CONNECTION_GROUP_NAME, connectionAttributesGroup);
+
+            List<AttributeType> connectionAttributes = getConnectionAttributes(typeElement);
+            connectionAttributesGroup.getRegexpOrEncodingOrModeSwitch().addAll(helper.createJAXBElements(connectionAttributes));
+
+            AttributeCategory defaultAttributeCategory = attributeCategoriesByName.get(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION);
+            defaultAttributeCategory.getGroup().add(connectionAttributesGroup);
+        }
     }
 
     protected String getDescriptionBasedOnType() {

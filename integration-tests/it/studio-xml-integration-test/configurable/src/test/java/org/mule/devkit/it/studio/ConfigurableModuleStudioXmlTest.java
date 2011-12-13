@@ -33,6 +33,7 @@ public class ConfigurableModuleStudioXmlTest {
     @Test
     public void configurableModuleStudioXmlGeneration() throws Exception {
         XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setIgnoreAttributeOrder(true);
         String expectedXml = IOUtils.toString(ConfigurableModuleStudioXmlTest.class.getClassLoader().getResourceAsStream(EXPECTED_STUDIO_XML));
         String actualXml = IOUtils.toString(ConfigurableModuleStudioXmlTest.class.getClassLoader().getResourceAsStream(ACTUAL_STUDIO_XML));
         Diff diff = new Diff(expectedXml, actualXml);

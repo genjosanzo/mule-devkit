@@ -11,8 +11,8 @@
         <string required="false" description="Configurable optional String." caption="Optional Configurable String" name="optionalConfigurableString"></string>
         <string defaultValue="a default" required="false" description="Configurable optional String with default value." caption="Optional With Default Configurable String" name="optionalWithDefaultConfigurableString"></string>
         <enum allowsCustom="true" defaultValue="NO" required="false" supportsExpressions="true" description="Configurable enumerated." caption="Si No Enum" name="siNoEnum">
-          <option value="SI"></option>
-          <option value="NO"></option>
+            <option value="NO"></option>
+            <option value="SI"></option>
         </enum>
         <url required="false" description="Configurable URL." caption="Url" name="url"></url>
       </group>

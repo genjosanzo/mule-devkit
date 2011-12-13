@@ -33,6 +33,7 @@ public class ParameterAnnotationsModuleStudioXmlTest {
     @Test
     public void parameterAnnotationsModuleStudioXmlGeneration() throws Exception {
         XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setIgnoreAttributeOrder(true);
         String expectedXml = IOUtils.toString(ParameterAnnotationsModuleStudioXmlTest.class.getClassLoader().getResourceAsStream(EXPECTED_STUDIO_XML));
         String actualXml = IOUtils.toString(ParameterAnnotationsModuleStudioXmlTest.class.getClassLoader().getResourceAsStream(ACTUAL_STUDIO_XML));
         Diff diff = new Diff(expectedXml, actualXml);

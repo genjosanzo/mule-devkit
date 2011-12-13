@@ -17,6 +17,7 @@
 
 package org.mule.devkit.generation.mule.studio;
 
+import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.utils.TypeMirrorUtils;
 
 import javax.lang.model.element.VariableElement;
@@ -27,9 +28,11 @@ public class VariableComparator implements Comparator<VariableElement> {
     private static final int VARIABLE1_FIRST = -1;
     private static final int VARIABLE2_FIRST = 1;
     private TypeMirrorUtils typeMirrorUtils;
+    private MuleStudioUtils helper;
 
-    public VariableComparator(TypeMirrorUtils typeMirrorUtils) {
-        this.typeMirrorUtils = typeMirrorUtils;
+    public VariableComparator(GeneratorContext context) {
+        helper = new MuleStudioUtils(context);
+        typeMirrorUtils = context.getTypeMirrorUtils();
     }
 
     /**
@@ -44,62 +47,43 @@ public class VariableComparator implements Comparator<VariableElement> {
     @Override
     public int compare(VariableElement variable1, VariableElement variable2) {
 
-        if (isKnownType(variable1) && isKnownType(variable2)) {
+        if (bothOfSameType(variable1, variable2)) {
+            return compareByName(variable1, variable2);
+        }
 
+        if(typeMirrorUtils.isCollection(variable1)) {
+            return VARIABLE2_FIRST;
+        }
+        if(typeMirrorUtils.isCollection(variable2)) {
+            return VARIABLE1_FIRST;
+        }
 
-            if (typeMirrorUtils.isString(variable1) && typeMirrorUtils.isString(variable2)) {
-                return compareByName(variable1, variable2);
-            } else if (typeMirrorUtils.isString(variable1)) {
-                return VARIABLE1_FIRST;
-            } else if (typeMirrorUtils.isString(variable2)) {
-                return VARIABLE2_FIRST;
-            }
+        if(typeMirrorUtils.isBoolean(variable1)) {
+            return VARIABLE2_FIRST;
+        }
+        if(typeMirrorUtils.isBoolean(variable2)) {
+            return VARIABLE1_FIRST;
+        }
 
-            if (typeMirrorUtils.isInteger(variable1) && typeMirrorUtils.isInteger(variable2)) {
-                return compareByName(variable1, variable2);
-            } else if (typeMirrorUtils.isInteger(variable1)) {
-                return VARIABLE1_FIRST;
-            } else if (typeMirrorUtils.isInteger(variable2)) {
-                return VARIABLE2_FIRST;
-            }
-
-            if (typeMirrorUtils.isBoolean(variable1) && typeMirrorUtils.isBoolean(variable2)) {
-                return compareByName(variable1, variable2);
-            } else if (typeMirrorUtils.isBoolean(variable1)) {
-                return VARIABLE1_FIRST;
-            } else if (typeMirrorUtils.isBoolean(variable2)) {
-                return VARIABLE2_FIRST;
-            }
-
-            if (typeMirrorUtils.isEnum(variable1) && typeMirrorUtils.isEnum(variable2)) {
-                return compareByName(variable1, variable2);
-            } else if (typeMirrorUtils.isEnum(variable1)) {
-                return VARIABLE1_FIRST;
-            } else if (typeMirrorUtils.isEnum(variable2)) {
-                return VARIABLE2_FIRST;
-            }
-
-            if (typeMirrorUtils.isCollection(variable1) && typeMirrorUtils.isCollection(variable2)) {
-                return compareByName(variable1, variable2);
-            } else if (typeMirrorUtils.isCollection(variable1)) {
-                return VARIABLE1_FIRST;
-            } else if (typeMirrorUtils.isCollection(variable2)) {
-                return VARIABLE2_FIRST;
-            }
+        if(typeMirrorUtils.isEnum(variable1)) {
+            return VARIABLE2_FIRST;
+        }
+        if(typeMirrorUtils.isEnum(variable2)) {
+            return VARIABLE1_FIRST;
         }
 
         return compareByName(variable1, variable2);
     }
 
-    private int compareByName(VariableElement variable1, VariableElement variable2) {
-        return variable1.getSimpleName().toString().compareTo(variable2.getSimpleName().toString());
+    private boolean bothOfSameType(VariableElement variable1, VariableElement variable2) {
+        return typeMirrorUtils.isString(variable1) && typeMirrorUtils.isString(variable2) ||
+               typeMirrorUtils.isInteger(variable1) && typeMirrorUtils.isInteger(variable2) ||
+               typeMirrorUtils.isEnum(variable1) && typeMirrorUtils.isEnum(variable2) ||
+               typeMirrorUtils.isBoolean(variable1) && typeMirrorUtils.isBoolean(variable2) ||
+               typeMirrorUtils.isCollection(variable1) && typeMirrorUtils.isCollection(variable2);
     }
 
-    private boolean isKnownType(VariableElement variable) {
-        return typeMirrorUtils.isString(variable) ||
-                typeMirrorUtils.isInteger(variable) ||
-                typeMirrorUtils.isBoolean(variable) ||
-                typeMirrorUtils.isEnum(variable) ||
-                typeMirrorUtils.isCollection(variable);
+    private int compareByName(VariableElement variable1, VariableElement variable2) {
+        return variable1.getSimpleName().toString().compareTo(variable2.getSimpleName().toString());
     }
 }
