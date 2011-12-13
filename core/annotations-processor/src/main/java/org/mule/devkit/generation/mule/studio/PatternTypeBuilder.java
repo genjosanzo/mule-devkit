@@ -22,10 +22,15 @@ import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
+import org.mule.devkit.model.studio.AttributeType;
+import org.mule.devkit.model.studio.Group;
 import org.mule.devkit.model.studio.PatternType;
+import org.mule.util.StringUtils;
 
 import javax.lang.model.element.ExecutableElement;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public class PatternTypeBuilder extends BaseStudioXmlBuilder {
 
@@ -58,5 +63,34 @@ public class PatternTypeBuilder extends BaseStudioXmlBuilder {
         cloudConnector.setIcon(helper.getIcon(typeElement.name()));
         cloudConnector.setImage(helper.getImage(typeElement.name()));
         return cloudConnector;
+    }
+
+    @Override
+    protected void processConnectionAttributes(Map<String, Group> groupsByName, Map<String, AttributeCategory> attributeCategoriesByName) {
+        if (typeElement.usesConnectionManager()) {
+            Group connectionAttributesGroup = new Group();
+            connectionAttributesGroup.setCaption(helper.formatCaption(CONNECTION_GROUP_NAME));
+            connectionAttributesGroup.setId(StringUtils.uncapitalize(CONNECTION_GROUP_NAME));
+
+            AttributeType label = new AttributeType();
+            label.setCaption(String.format(CONNECTION_GROUP_LABEL, helper.getFormattedCaption(typeElement)));
+
+            AttributeType newLine = new AttributeType();
+            newLine.setCaption("");
+
+            connectionAttributesGroup.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupLabel(label));
+            connectionAttributesGroup.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupLabel(newLine));
+
+            groupsByName.put(CONNECTION_GROUP_NAME, connectionAttributesGroup);
+
+            List<AttributeType> connectionAttributes = getConnectionAttributes(typeElement);
+            connectionAttributesGroup.getRegexpOrEncodingOrModeSwitch().addAll(helper.createJAXBElements(connectionAttributes));
+
+            AttributeCategory connectionAttributeCategory = new AttributeCategory();
+            connectionAttributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.CONNECTION_ATTRIBUTE_CATEGORY_CAPTION));
+            connectionAttributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.CONNECTION_ATTRIBUTE_CATEGORY_CAPTION));
+            attributeCategoriesByName.put(MuleStudioXmlGenerator.CONNECTION_ATTRIBUTE_CATEGORY_CAPTION, connectionAttributeCategory);
+            connectionAttributeCategory.getGroup().add(connectionAttributesGroup);
+        }
     }
 }

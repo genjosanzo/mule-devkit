@@ -19,7 +19,6 @@ package org.mule.devkit.generation.mule.studio;
 
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connect;
-import org.mule.api.annotations.Transformer;
 import org.mule.api.annotations.studio.Display;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
@@ -53,8 +52,8 @@ import java.util.Map;
 public abstract class BaseStudioXmlBuilder {
 
     public static final String GENERAL_GROUP_NAME = "General";
-    private static final String CONNECTION_GROUP_NAME = "Connection";
-    private static final String CONNECTION_GROUP_LABEL = "Use these fields to override the credentials defined in the %s connector.";
+    public static final String CONNECTION_GROUP_NAME = "Connection";
+    public static final String CONNECTION_GROUP_LABEL = "Use these fields to override the credentials defined in the %s connector.";
     protected ObjectFactory objectFactory;
     protected MuleStudioUtils helper;
     protected DevKitTypeElement typeElement;
@@ -145,31 +144,7 @@ public abstract class BaseStudioXmlBuilder {
         Map<String, AttributeCategory> attributeCategoriesByName = new LinkedHashMap<String, AttributeCategory>();
         getOrCreateDefaultAttributeCategory(attributeCategoriesByName);
 
-        if (typeElement.usesConnectionManager() && (executableElement == null || executableElement.getAnnotation(Transformer.class) == null)) {
-            Group connectionAttributesGroup = new Group();
-            connectionAttributesGroup.setCaption(helper.formatCaption(CONNECTION_GROUP_NAME));
-            connectionAttributesGroup.setId(StringUtils.uncapitalize(CONNECTION_GROUP_NAME));
-
-            AttributeType label = new AttributeType();
-            label.setCaption(String.format(CONNECTION_GROUP_LABEL, helper.getFormattedCaption(typeElement)));
-
-            AttributeType newLine = new AttributeType();
-            newLine.setCaption("");
-
-            connectionAttributesGroup.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupLabel(label));
-            connectionAttributesGroup.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupLabel(newLine));
-
-            groupsByName.put(CONNECTION_GROUP_NAME, connectionAttributesGroup);
-
-            List<AttributeType> connectionAttributes = getConnectionAttributes(typeElement);
-            connectionAttributesGroup.getRegexpOrEncodingOrModeSwitch().addAll(helper.createJAXBElements(connectionAttributes));
-
-            AttributeCategory connectionAttributeCategory = new AttributeCategory();
-            connectionAttributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.CONNECTION_ATTRIBUTE_CATEGORY_CAPTION));
-            connectionAttributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.CONNECTION_ATTRIBUTE_CATEGORY_CAPTION));
-            attributeCategoriesByName.put(MuleStudioXmlGenerator.CONNECTION_ATTRIBUTE_CATEGORY_CAPTION, connectionAttributeCategory);
-            connectionAttributeCategory.getGroup().add(connectionAttributesGroup);
-        }
+        processConnectionAttributes(groupsByName, attributeCategoriesByName);
 
         for (VariableElement parameter : variableElements) {
             JAXBElement<? extends AttributeType> jaxbElement = createJaxbElement(parameter);
@@ -187,6 +162,10 @@ public abstract class BaseStudioXmlBuilder {
             Collections.sort(attributeCategory.getGroup(), new GroupComparator());
         }
         return attributeCategories;
+    }
+
+    protected void processConnectionAttributes(Map<String, Group> groupsByName, Map<String, AttributeCategory> attributeCategoriesByName) {
+         // override if necessary
     }
 
     private AttributeCategory getOrCreateDefaultAttributeCategory(Map<String, AttributeCategory> attributeCategoriesByName) {
@@ -277,7 +256,7 @@ public abstract class BaseStudioXmlBuilder {
         return attributeType;
     }
 
-    private List<AttributeType> getConnectionAttributes(DevKitTypeElement typeElement) {
+    protected List<AttributeType> getConnectionAttributes(DevKitTypeElement typeElement) {
         List<AttributeType> parameters = new ArrayList<AttributeType>();
         ExecutableElement connectMethod = typeElement.getMethodsAnnotatedWith(Connect.class).get(0);
         for (VariableElement connectAttributeType : connectMethod.getParameters()) {
