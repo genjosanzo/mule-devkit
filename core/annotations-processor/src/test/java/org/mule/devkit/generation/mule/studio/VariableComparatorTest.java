@@ -72,22 +72,25 @@ public class VariableComparatorTest {
         variables.add(intVariable);
         variables.add(stringVariable);
 
+        setName(mapVariable, "a");
+        setName(enumVariable, "b");
+        setName(booleanVariable, "c");
+        setName(intVariable, "d");
+        setName(stringVariable, "e");
+
         Collections.sort(variables, new VariableComparator(context));
 
-        assertEquals(stringVariable, variables.get(0));
-        assertEquals(intVariable, variables.get(1));
-        assertEquals(booleanVariable, variables.get(2));
-        assertEquals(enumVariable, variables.get(3));
+        assertEquals(intVariable, variables.get(0));
+        assertEquals(stringVariable, variables.get(1));
+        assertEquals(enumVariable, variables.get(2));
+        assertEquals(booleanVariable, variables.get(3));
         assertEquals(mapVariable, variables.get(4));
     }
 
     @Test
     public void testCompareUnknownType() throws Exception {
-        Name a = mockName("a");
-        Name b = mockName("b");
-
-        when(unknownTypeVariable.getSimpleName()).thenReturn(a);
-        when(booleanVariable.getSimpleName()).thenReturn(b);
+        setName(unknownTypeVariable, "a");
+        setName(booleanVariable, "b");
 
         List<VariableElement> variables = new ArrayList<VariableElement>();
         variables.add(unknownTypeVariable);
@@ -97,6 +100,12 @@ public class VariableComparatorTest {
 
         assertEquals(unknownTypeVariable, variables.get(0));
         assertEquals(booleanVariable, variables.get(1));
+    }
+
+    private void setName(VariableElement variableElement, String name) {
+        Name simpleName = mock(Name.class);
+        when(variableElement.getSimpleName()).thenReturn(simpleName);
+        when(simpleName.toString()).thenReturn(name);
     }
 
     @Test
