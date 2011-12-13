@@ -33,6 +33,8 @@ import javax.xml.bind.JAXBElement;
 public class AbstractTransformerBuilder extends BaseStudioXmlBuilder {
 
     public static final String ABSTRACT_TRANSFORMER_LOCAL_ID = "abstractTransformer";
+    public static final String ABSTRACT_TRANSFORMER_ATTRIBUTE_CATEGORY_CAPTION = "Advanced";
+    public static final String ABSTRACT_TRANSFORMER_ATTRIBUTE_CATEGORY_DESCRIPTION = "Advanced settings for transformer";
 
     public AbstractTransformerBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
         super(context, typeElement);
@@ -51,8 +53,8 @@ public class AbstractTransformerBuilder extends BaseStudioXmlBuilder {
         abstractTransformer.setExtends(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + "/" + typeElement.name() + "-transformer");
 
         AttributeCategory attributeCategory = new AttributeCategory();
-        attributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
-        attributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
+        attributeCategory.setCaption(helper.formatCaption(ABSTRACT_TRANSFORMER_ATTRIBUTE_CATEGORY_CAPTION));
+        attributeCategory.setDescription(helper.formatDescription(ABSTRACT_TRANSFORMER_ATTRIBUTE_CATEGORY_DESCRIPTION));
 
         attributeCategory.getGroup().add(createTransformerSettingsGroup());
         attributeCategory.getGroup().add(createMimeAttributesGroup());
