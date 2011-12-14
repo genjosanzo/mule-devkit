@@ -286,7 +286,7 @@ public class DynamicModule implements Disposable {
     }
 
     /**
-     * @param messageProcessor
+     * @param messageSource
      * @return a cached {@link Invoker} for {@link MessageProcessor}.
      * @throws InitialisationException
      * @throws MuleException
@@ -309,7 +309,7 @@ public class DynamicModule implements Disposable {
     }
 
     /**
-     * Subscribe {@link Listener} to `sourceName` {@link Source} with `overriddenParameters`.
+     * Subscribe {@link Listener} to `sourceName` {@link org.mule.api.annotations.Source} with `overriddenParameters`.
      * @param sourceName
      * @param overriddenParameters
      * @param listener
@@ -366,7 +366,7 @@ public class DynamicModule implements Disposable {
      * Cleanup all internal resources:
      * * call {@link Invoker#dispose()} for all cached {@link Invoker}
      * * call {@link Registrar#stop()} for all cached {@link Registrar}
-     * * call {@link MuleCOntext#dispose()}
+     * * call {@link MuleContext#dispose()}
      */
     @Override
     public final void dispose() {

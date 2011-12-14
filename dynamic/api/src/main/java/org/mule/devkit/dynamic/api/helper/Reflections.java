@@ -183,12 +183,12 @@ public final class Reflections {
      */
     public static <T> T invoke(final Object object, final String method, final Object argument) {
         try {
-            return Reflections.invoke(object, method, argument, argument.getClass());
+            return Reflections.<T>invoke(object, method, argument, argument.getClass());
         } catch (RuntimeException e) {
             if (!argument.getClass().isPrimitive()) {
                 throw e;
             } else {
-                return Reflections.invoke(object, method, argument, Reflections.toPrimitive(argument.getClass()));
+                return Reflections.<T>invoke(object, method, argument, Reflections.toPrimitive(argument.getClass()));
             }
         }
     }
