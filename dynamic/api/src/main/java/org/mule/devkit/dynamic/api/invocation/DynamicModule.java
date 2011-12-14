@@ -251,10 +251,10 @@ public class DynamicModule implements Disposable {
      */
     public final <T> T invoke(final String processorName, final Map<String, Object> overriddenParameters) throws InitialisationException, MuleException {
         if (processorName == null) {
-            throw new IllegalArgumentException("null processorName");
+            throw new IllegalArgumentException("The processor name cannot be null");
         }
         if (overriddenParameters == null) {
-            throw new IllegalArgumentException("null overriddenParameters");
+            throw new IllegalArgumentException("The overridenParameters cannot be null");
         }
 
         final Module.Processor processor = findProcessor(processorName);
@@ -265,11 +265,11 @@ public class DynamicModule implements Disposable {
         validateParameterTypeCorrectness(processor.getParameters(), overriddenParameters);
         ensureNoMissingParameters(processor.getParameters(), overriddenParameters);
 
-        return invoke(processor.getMessageProcessor(), allParameters(processor.getParameters(), overriddenParameters));
+        return this.<T>invoke(processor.getMessageProcessor(), allParameters(processor.getParameters(), overriddenParameters));
     }
 
     protected <T> T invoke(final MessageProcessor messageProcessor, final Map<String, Object> parameters) throws InitialisationException, MuleException {
-        return getInvoker(messageProcessor).invoke(parameters);
+        return getInvoker(messageProcessor).<T>invoke(parameters);
     }
 
     /**
