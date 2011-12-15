@@ -1084,7 +1084,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         simpleType.setUnion(union);
 
         union.getSimpleType().add(createSimpleType(base, minlen, maxlen));
-        union.getSimpleType().add(createExpressionSimpleType());
+        union.getSimpleType().add(createExpressionAndPropertyPlaceHolderSimpleType());
 
         schema.getSimpleTypeOrComplexTypeOrGroup().add(simpleType);
     }
@@ -1111,6 +1111,18 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         simpleType.setRestriction(restriction);
 
         return simpleType;
+    }
+
+    private LocalSimpleType createExpressionAndPropertyPlaceHolderSimpleType() {
+        LocalSimpleType expression = new LocalSimpleType();
+        Restriction restriction = new Restriction();
+        expression.setRestriction(restriction);
+        restriction.setBase(SchemaConstants.STRING);
+        Pattern pattern = new Pattern();
+        pattern.setValue("(\\#\\[[^\\]]+\\]|\\$\\{[^\\}]+\\})");
+        restriction.getFacets().add(pattern);
+
+        return expression;
     }
 
     private LocalSimpleType createExpressionSimpleType() {

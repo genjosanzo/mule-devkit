@@ -17,6 +17,7 @@
 
 package org.mule.devkit.it;
 
+import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 
@@ -27,6 +28,11 @@ import org.mule.api.annotations.Processor;
  */
 @Module(name = "basic")
 public class BasicModule {
+
+    @Configurable
+    private int myInt;
+    @Configurable
+    private long myLong;
     /**
      * Passthru char
      *
@@ -162,5 +168,13 @@ public class BasicModule {
     @Processor
     public String passthruComplexRef(MyComplexObject myComplexObject) {
         return myComplexObject.getValue();
+    }
+
+    public void setMyInt(int myInt) {
+        this.myInt = myInt;
+    }
+
+    public void setMyLong(long myLong) {
+        this.myLong = myLong;
     }
 }

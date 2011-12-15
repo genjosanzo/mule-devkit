@@ -19,6 +19,11 @@ package org.mule.devkit.it;
 
 public class BasicModuleTest extends AbstractModuleTest {
 
+    public BasicModuleTest() {
+        System.setProperty("my.int", "3 ");
+        System.setProperty("my.long", "4 ");
+    }
+
     @Override
     protected String getConfigResources() {
         return "basic.xml";
