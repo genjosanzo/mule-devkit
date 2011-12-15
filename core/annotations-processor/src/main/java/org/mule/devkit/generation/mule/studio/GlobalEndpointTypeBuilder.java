@@ -83,6 +83,16 @@ public class GlobalEndpointTypeBuilder extends GlobalTypeBuilder {
         return ConfigRefBuilder.GLOBAL_REF_NAME;
     }
 
+    @Override
+    protected String getImage() {
+        return helper.getEndpointImage(typeElement.name());
+    }
+
+    @Override
+    protected String getIcon() {
+        return helper.getEndpointIcon(typeElement.name());
+    }
+
     private String getIdBasedOnType() {
         return "abstractEndpointGeneric";
     }

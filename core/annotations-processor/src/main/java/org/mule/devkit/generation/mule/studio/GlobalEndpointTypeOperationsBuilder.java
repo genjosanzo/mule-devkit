@@ -78,4 +78,14 @@ public class GlobalEndpointTypeOperationsBuilder extends GlobalTypeBuilder {
     protected String getNameDescriptionBasedOnType() {
         return "Identifies the endpoint so that other elements can reference it.";
     }
+
+    @Override
+    protected String getImage() {
+        return helper.getEndpointImage(typeElement.name());
+    }
+
+    @Override
+    protected String getIcon() {
+        return helper.getEndpointIcon(typeElement.name());
+    }
 }

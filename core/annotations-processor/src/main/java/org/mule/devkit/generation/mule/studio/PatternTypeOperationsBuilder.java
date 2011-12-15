@@ -62,13 +62,29 @@ public class PatternTypeOperationsBuilder extends BaseStudioXmlBuilder {
         }
         patternType.setDescription(helper.getFormattedDescription(typeElement));
         patternType.setAliasId(ALIAS_ID_PREFIX + typeElement.name());
-        patternType.setIcon(helper.getIcon(typeElement.name()));
-        patternType.setImage(helper.getImage(typeElement.name()));
+        patternType.setIcon(getIcon());
+        patternType.setImage(getImage());
 
         if (patternTypeToUse.equals(PatternTypes.CLOUD_CONNECTOR)) {
             return objectFactory.createNamespaceTypeCloudConnector(patternType);
         } else {
             return objectFactory.createNamespaceTypeTransformer(patternType);
+        }
+    }
+
+    private String getImage() {
+        if (patternTypeToUse.equals(PatternTypes.TRANSFORMER)) {
+            return helper.getTransformerImage(typeElement.name());
+        } else {
+            return helper.getConnectorImage(typeElement.name());
+        }
+    }
+
+    private String getIcon() {
+        if (patternTypeToUse.equals(PatternTypes.TRANSFORMER)) {
+            return helper.getTransformerIcon(typeElement.name());
+        } else {
+            return helper.getConnectorIcon(typeElement.name());
         }
     }
 

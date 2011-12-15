@@ -22,7 +22,7 @@
       </group>
     </attribute-category>
   </cloud-connector>
-  <transformer image="icons/large/transformer-connector-48x32.png" localId="transformer-transformer" icon="icons/small/transformer-connector-24x16.png" description="Transformer class." caption="Transformer" aliasId="org.mule.tooling.ui.modules.core.pattern.transformer">
+  <transformer image="icons/large/transformer-transformer-48x32.png" localId="transformer-transformer" icon="icons/small/transformer-transformer-24x16.png" description="Transformer class." caption="Transformer" aliasId="org.mule.tooling.ui.modules.core.pattern.transformer">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="transformerConnectorGeneric">
         <modeSwitch description="Operation." caption="Operation" name="Transformer operations to execute">
@@ -60,7 +60,7 @@
       </group>
     </attribute-category>
   </transformer>
-  <global-transformer extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformer" image="icons/large/transformer-connector-48x32.png" localId="global-transformer" icon="icons/small/transformer-connector-24x16.png" description="Global transformer." caption="Transformer">
+  <global-transformer extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformer" image="icons/large/transformer-transformer-48x32.png" localId="global-transformer" icon="icons/small/transformer-transformer-24x16.png" description="Global transformer." caption="Transformer">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="transformerConnectorGeneric">
         <modeSwitch description="Operation." caption="Operation" name="Transformer operations to execute">
@@ -70,16 +70,16 @@
       </group>
     </attribute-category>
   </global-transformer>
-  <transformer extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformer" abstract="true" image="icons/large/transformer-connector-48x32.png" localId="string-to-char" icon="icons/small/transformer-connector-24x16.png" description="Transforms a String to a character." caption="String To Char"></transformer>
-  <global-transformer extends="http://www.mulesoft.org/schema/mule/transformer/string-to-char" abstract="true" image="icons/large/transformer-connector-48x32.png" localId="string-to-char" icon="icons/small/transformer-connector-24x16.png" description="Transforms a String to a character." caption="String To Char">
+  <transformer extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformer" abstract="true" image="icons/large/transformer-transformer-48x32.png" localId="string-to-char" icon="icons/small/transformer-transformer-24x16.png" description="Transforms a String to a character." caption="String To Char"></transformer>
+  <global-transformer extends="http://www.mulesoft.org/schema/mule/transformer/string-to-char" abstract="true" image="icons/large/transformer-transformer-48x32.png" localId="string-to-char" icon="icons/small/transformer-transformer-24x16.png" description="Transforms a String to a character." caption="String To Char">
     <attribute-category description="General." caption="General">
         <group caption="Generic">
         <name required="true" description="Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level." caption="Name" name="name"></name>
       </group>
     </attribute-category>
   </global-transformer>
-  <transformer extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformer" abstract="true" image="icons/large/transformer-connector-48x32.png" localId="string-to-url" icon="icons/small/transformer-connector-24x16.png" description="Transforms a String to a URL." caption="String To Url"></transformer>
-  <global-transformer extends="http://www.mulesoft.org/schema/mule/transformer/string-to-url" abstract="true" image="icons/large/transformer-connector-48x32.png" localId="string-to-url" icon="icons/small/transformer-connector-24x16.png" description="Transforms a String to a URL." caption="String To Url">
+  <transformer extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformer" abstract="true" image="icons/large/transformer-transformer-48x32.png" localId="string-to-url" icon="icons/small/transformer-transformer-24x16.png" description="Transforms a String to a URL." caption="String To Url"></transformer>
+  <global-transformer extends="http://www.mulesoft.org/schema/mule/transformer/string-to-url" abstract="true" image="icons/large/transformer-transformer-48x32.png" localId="string-to-url" icon="icons/small/transformer-transformer-24x16.png" description="Transforms a String to a URL." caption="String To Url">
     <attribute-category description="General." caption="General">
         <group caption="Generic">
         <name required="true" description="Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level." caption="Name" name="name"></name>

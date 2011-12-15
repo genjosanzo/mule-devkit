@@ -48,10 +48,14 @@ public abstract class GlobalTypeBuilder extends BaseStudioXmlBuilder {
 
     protected abstract String getNameDescriptionBasedOnType();
 
+    protected abstract String getImage();
+
+    protected abstract String getIcon();
+
     public GlobalType build() {
         GlobalType globalType = new GlobalType();
-        globalType.setImage(helper.getImage(typeElement.name()));
-        globalType.setIcon(helper.getIcon(typeElement.name()));
+        globalType.setImage(getImage());
+        globalType.setIcon(getIcon());
         globalType.setCaption(getCaptionBasedOnType());
         globalType.setLocalId(getLocalIdBasedOnType());
         globalType.setExtends(getExtendsBasedOnType());

@@ -70,4 +70,14 @@ public class GlobalTransformerTypeOperationsBuilder extends GlobalTypeBuilder {
     protected String getNameDescriptionBasedOnType() {
         return "Identifies the transformer so that other elements can reference it.";
     }
+
+    @Override
+    protected String getImage() {
+        return helper.getTransformerImage(typeElement.name());
+    }
+
+    @Override
+    protected String getIcon() {
+        return helper.getTransformerIcon(typeElement.name());
+    }
 }

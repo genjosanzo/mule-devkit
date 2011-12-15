@@ -51,8 +51,12 @@ import java.util.List;
 
 public class MuleStudioUtils {
 
-    private static final String IMAGE = "icons/large/%s-connector-48x32.png";
-    private static final String ICON = "icons/small/%s-connector-24x16.png";
+    private static final String CONNECTOR_IMAGE = "icons/large/%s-connector-48x32.png";
+    private static final String CONNECTOR_ICON = "icons/small/%s-connector-24x16.png";
+    private static final String ENDPOINT_IMAGE = "icons/large/%s-endpoint-48x32.png";
+    private static final String ENDPOINT_ICON = "icons/small/%s-endpoint-24x16.png";
+    private static final String TRANSFORMER_IMAGE = "icons/large/%s-transformer-48x32.png";
+    private static final String TRANSFORMER_ICON = "icons/small/%s-transformer-24x16.png";
     private NameUtils nameUtils;
     private JavaDocUtils javaDocUtils;
     private TypeMirrorUtils typeMirrorUtils;
@@ -77,12 +81,28 @@ public class MuleStudioUtils {
         return description.replaceAll("\\<.*?\\>", "");
     }
 
-    public String getImage(String moduleName) {
-        return String.format(IMAGE, moduleName);
+    public String getConnectorImage(String moduleName) {
+        return String.format(CONNECTOR_IMAGE, moduleName);
     }
 
-    public String getIcon(String moduleName) {
-        return String.format(ICON, moduleName);
+    public String getConnectorIcon(String moduleName) {
+        return String.format(CONNECTOR_ICON, moduleName);
+    }
+
+    public String getEndpointImage(String moduleName) {
+        return String.format(ENDPOINT_IMAGE, moduleName);
+    }
+
+    public String getEndpointIcon(String moduleName) {
+        return String.format(ENDPOINT_ICON, moduleName);
+    }
+
+    public String getTransformerImage(String moduleName) {
+        return String.format(TRANSFORMER_IMAGE, moduleName);
+    }
+
+    public String getTransformerIcon(String moduleName) {
+        return String.format(TRANSFORMER_ICON, moduleName);
     }
 
     public String getGlobalRefId(String moduleName) {

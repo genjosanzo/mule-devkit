@@ -77,4 +77,14 @@ public class GlobalCloudConnectorTypeBuilder extends GlobalTypeBuilder {
     protected String getNameDescriptionBasedOnType() {
         return helper.formatDescription("Give a name to this configuration so it can be later referenced by config-ref.");
     }
+
+    @Override
+    protected String getImage() {
+        return helper.getConnectorImage(typeElement.name());
+    }
+
+    @Override
+    protected String getIcon() {
+        return helper.getConnectorIcon(typeElement.name());
+    }
 }

@@ -60,9 +60,25 @@ public class PatternTypeBuilder extends BaseStudioXmlBuilder {
             cloudConnector.setDescription(helper.formatDescription(javaDocUtils.getSummary(executableElement)));
         }
 
-        cloudConnector.setIcon(helper.getIcon(typeElement.name()));
-        cloudConnector.setImage(helper.getImage(typeElement.name()));
+        cloudConnector.setIcon(getIcon());
+        cloudConnector.setImage(getImage());
         return cloudConnector;
+    }
+
+    private String getImage() {
+        if(executableElement.getAnnotation(Transformer.class) != null) {
+            return helper.getTransformerImage(typeElement.name());
+        } else {
+            return helper.getConnectorImage(typeElement.name());
+        }
+    }
+
+    private String getIcon() {
+        if(executableElement.getAnnotation(Transformer.class) != null) {
+            return helper.getTransformerIcon(typeElement.name());
+        } else {
+            return helper.getConnectorIcon(typeElement.name());
+        }
     }
 
     @Override

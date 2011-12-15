@@ -18,6 +18,9 @@
 package org.mule.devkit.generation.mule.studio;
 
 import org.mule.api.annotations.Configurable;
+import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.Source;
+import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.spring.SchemaGenerator;
@@ -71,8 +74,8 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
                         thirdLevelNestedElement.setLocalId(nameUtils.singularize(localId));
                         thirdLevelNestedElement.setXmlname(nameUtils.uncamel(nameUtils.singularize(variableElement.getSimpleName().toString())));
                         thirdLevelNestedElement.setDescription(helper.formatDescription(nameUtils.friendlyNameFromCamelCase(variableElement.getSimpleName().toString())));
-                        thirdLevelNestedElement.setIcon(helper.getIcon(moduleName));
-                        thirdLevelNestedElement.setImage(helper.getImage(moduleName));
+                        thirdLevelNestedElement.setIcon(getIcon());
+                        thirdLevelNestedElement.setImage(getImage());
                         NestedElementReference childElement1 = createChildElement(variableElement, SchemaGenerator.INNER_PREFIX + nameUtils.singularize(localId));
                         childElement1.setCaption(nameUtils.singularize(childElement1.getCaption()));
                         childElement1.setDescription(nameUtils.singularize(childElement1.getDescription()));
@@ -88,6 +91,36 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
             }
         }
         return nesteds;
+    }
+
+    private String getImage() {
+        if(executableElement != null) {
+            if(executableElement.getAnnotation(Processor.class) != null) {
+                return helper.getConnectorImage(moduleName);
+            }
+            if(executableElement.getAnnotation(Source.class) != null) {
+                return helper.getEndpointImage(moduleName);
+            }
+            if(executableElement.getAnnotation(Transformer.class) != null) {
+                return helper.getTransformerImage(moduleName);
+            }
+        }
+        return helper.getConnectorImage(moduleName);
+    }
+
+    private String getIcon() {
+        if(executableElement != null) {
+            if(executableElement.getAnnotation(Processor.class) != null) {
+                return helper.getConnectorIcon(moduleName);
+            }
+            if(executableElement.getAnnotation(Source.class) != null) {
+                return helper.getEndpointIcon(moduleName);
+            }
+            if(executableElement.getAnnotation(Transformer.class) != null) {
+                return helper.getTransformerIcon(moduleName);
+            }
+        }
+        return helper.getConnectorIcon(moduleName);
     }
 
     private List<? extends VariableElement> getVariableElements() {
@@ -160,8 +193,8 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
             nestedElement.setXmlname(nameUtils.uncamel(nameUtils.singularize(parameter.getSimpleName().toString())));
         }
         nestedElement.setDescription(helper.formatDescription(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
-        nestedElement.setIcon(helper.getIcon(moduleName));
-        nestedElement.setImage(helper.getImage(moduleName));
+        nestedElement.setIcon(getIcon());
+        nestedElement.setImage(getImage());
         return nestedElement;
     }
 
@@ -171,8 +204,8 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
         nestedElement.setXmlname(nameUtils.uncamel(parameter.getSimpleName().toString()));
         nestedElement.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
         nestedElement.setDescription(helper.formatDescription(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
-        nestedElement.setIcon(helper.getIcon(moduleName));
-        nestedElement.setImage(helper.getImage(moduleName));
+        nestedElement.setIcon(getIcon());
+        nestedElement.setImage(getImage());
         return nestedElement;
     }
 
