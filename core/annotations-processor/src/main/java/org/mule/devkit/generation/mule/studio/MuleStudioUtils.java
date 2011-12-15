@@ -163,7 +163,9 @@ public class MuleStudioUtils {
                 typeMirrorUtils.isFloat(element) || typeMirrorUtils.isDouble(element)) {
             return new StringAttributeType();
         } else if (typeMirrorUtils.isBoolean(element)) {
-            return new Booleantype();
+            Booleantype booleantype = new Booleantype();
+            booleantype.setSupportsExpressions(true);
+            return booleantype;
         } else if (typeMirrorUtils.isInteger(element) || typeMirrorUtils.isLong(element)) {
             IntegerType integerType = new IntegerType();
             integerType.setMin(0);
@@ -234,10 +236,14 @@ public class MuleStudioUtils {
         if (element instanceof DevKitTypeElement) {
             return formatCaption(((DevKitTypeElement) element).name().replaceAll("-", " "));
         }
-        if (element instanceof VariableElement && !isKnownType((VariableElement) element)) {
-            return formatCaption(nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString()) + " Reference");
+        String friendlyName = nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString());
+        if (typeMirrorUtils.isHttpCallback(element)) {
+            return formatCaption(friendlyName + " Flow");
         }
-        return formatCaption(nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString()));
+        if (element instanceof VariableElement && !isKnownType((VariableElement) element)) {
+            return formatCaption(friendlyName + " Reference");
+        }
+        return formatCaption(friendlyName);
     }
 
     public boolean isKnownType(VariableElement variable) {

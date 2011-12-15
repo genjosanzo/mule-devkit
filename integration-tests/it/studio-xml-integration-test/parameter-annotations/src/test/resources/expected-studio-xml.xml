@@ -39,7 +39,7 @@
         <integer step="1" min="0" required="false" description="A optional integer parameter." caption="A Integer" name="aInteger"></integer>
         <integer step="1" min="0" required="false" description="A optional long parameter." caption="A Long" name="aLong"></integer>
         <string required="false" description="A optional string parameter." caption="A String" name="aString"></string>
-        <boolean required="false" description="A optional boolean parameter." caption="A Boolean" name="aBoolean"></boolean>
+        <boolean required="false" description="A optional boolean parameter." caption="A Boolean" name="aBoolean" supportsExpressions="true"></boolean>
       </group>
     </attribute-category>
   </cloud-connector>
@@ -52,7 +52,7 @@
         <integer step="1" min="0" defaultValue="1" required="false" description="A optional integer parameter with default value." caption="A Integer" name="aInteger"></integer>
         <integer step="1" min="0" defaultValue="2" required="false" description="A optional long parameter with default value." caption="A Long" name="aLong"></integer>
         <string defaultValue="fede" required="false" description="A optional string parameter with default value." caption="A String" name="aString"></string>
-        <boolean defaultValue="false" required="false" description="A optional boolean parameter with default value." caption="A Boolean" name="aBoolean"></boolean>
+        <boolean defaultValue="false" required="false" description="A optional boolean parameter with default value." caption="A Boolean" name="aBoolean" supportsExpressions="true"></boolean>
       </group>
     </attribute-category>
   </cloud-connector>

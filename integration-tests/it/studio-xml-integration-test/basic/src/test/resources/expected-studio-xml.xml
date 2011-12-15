@@ -59,7 +59,7 @@
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/basic-connector-48x32.png" localId="passthru-boolean" icon="icons/small/basic-connector-24x16.png" caption="Passthru Boolean">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
-        <boolean required="true" description="Value to passthru." caption="Value" name="value"></boolean>
+        <boolean required="true" description="Value to passthru." caption="Value" name="value" supportsExpressions="true"></boolean>
       </group>
     </attribute-category>
   </cloud-connector>
@@ -87,7 +87,7 @@
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/basic-connector-48x32.png" localId="passthru-complex-boolean" icon="icons/small/basic-connector-24x16.png" caption="Passthru Complex Boolean">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
-        <boolean required="true" description="Value to passthru." caption="Value" name="value"></boolean>
+        <boolean required="true" description="Value to passthru." caption="Value" name="value" supportsExpressions="true"></boolean>
       </group>
     </attribute-category>
   </cloud-connector>
