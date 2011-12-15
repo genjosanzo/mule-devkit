@@ -125,14 +125,19 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
 
     private void handleSimpleList(VariableElement parameter, String localId, NestedElementType secondLevelNestedElement) {
         AttributeType attributeTypeForListValues;
-        if (((DeclaredType) parameter.asType()).getTypeArguments().isEmpty() || typeMirrorUtils.isString(typeUtils.asElement(((DeclaredType) parameter.asType()).getTypeArguments().get(0)))) {
-            TextType textType = new TextType();
-            textType.setIsToElement(true);
-            attributeTypeForListValues = textType;
-        } else {
-            TypeMirror typeParameter = ((DeclaredType) parameter.asType()).getTypeArguments().get(0);
-            attributeTypeForListValues = helper.createAttributeTypeIgnoreEnumsAndCollections(typeUtils.asElement(typeParameter));
-        }
+        // TODO: temporarily commented out and added follwing 3 lines until Studio supports the isToElement attribute for other attributes types different than text
+//        if (((DeclaredType) parameter.asType()).getTypeArguments().isEmpty() || typeMirrorUtils.isString(typeUtils.asElement(((DeclaredType) parameter.asType()).getTypeArguments().get(0)))) {
+//            TextType textType = new TextType();
+//            textType.setIsToElement(true);
+//            attributeTypeForListValues = textType;
+//        } else {
+//            TypeMirror typeParameter = ((DeclaredType) parameter.asType()).getTypeArguments().get(0);
+//            attributeTypeForListValues = helper.createAttributeTypeIgnoreEnumsAndCollections(typeUtils.asElement(typeParameter));
+//        }
+        TextType textType = new TextType();
+        textType.setIsToElement(true);
+        attributeTypeForListValues = textType;
+
         attributeTypeForListValues.setName(nameUtils.singularize(localId));
         attributeTypeForListValues.setCaption(helper.formatCaption(nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString())));
         if (executableElement != null) {
@@ -195,8 +200,8 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
             childElement.setCaption(helper.formatCaption(nameUtils.singularize(parameterFriendlyName)));
         } else {
             String singularizedLocalId = nameUtils.singularize(localId);
-            if(localId.equals(singularizedLocalId)) {
-                singularizedLocalId+= "-each";
+            if (localId.equals(singularizedLocalId)) {
+                singularizedLocalId += "-each";
             }
             childElement.setName(MuleStudioXmlGenerator.URI_PREFIX + moduleName + '/' + singularizedLocalId);
             childElement.setDescription(helper.formatDescription(parameterFriendlyName));
