@@ -1,1 +1,3 @@
 org.mule.devkit.apt.ModuleAnnotationProcessor
+org.mule.devkit.apt.ConnectorAnnotationProcessor
+org.mule.devkit.apt.ExpressionLanguageAnnotationProcessor

@@ -14,8 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.mule.devkit;
+package org.mule.devkit.apt;
 
 import org.mule.devkit.generation.Generator;
 import org.mule.devkit.generation.adapter.CapabilitiesAdapterGenerator;
@@ -26,7 +25,6 @@ import org.mule.devkit.generation.adapter.LifecycleAdapterFactoryGenerator;
 import org.mule.devkit.generation.adapter.LifecycleAdapterGenerator;
 import org.mule.devkit.generation.adapter.OAuth1AdapterGenerator;
 import org.mule.devkit.generation.adapter.OAuth2AdapterGenerator;
-import org.mule.devkit.generation.adapter.PoolAdapterGenerator;
 import org.mule.devkit.generation.callback.HttpCallbackGenerator;
 import org.mule.devkit.generation.mule.MessageProcessorGenerator;
 import org.mule.devkit.generation.mule.MessageSourceGenerator;
@@ -57,16 +55,20 @@ import org.mule.devkit.validation.SourceValidator;
 import org.mule.devkit.validation.TransformerValidator;
 import org.mule.devkit.validation.Validator;
 
+import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedSourceVersion;
+import javax.lang.model.SourceVersion;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ModulePlugin implements Plugin {
-
+@SupportedAnnotationTypes(value = {"org.mule.api.annotations.Connector"})
+@SupportedSourceVersion(SourceVersion.RELEASE_6)
+public class ConnectorAnnotationProcessor extends AbstractAnnotationProcessor {
     private List<Validator> validators;
     private List<Generator> generators;
 
-    public ModulePlugin() {
+    public ConnectorAnnotationProcessor() {
         generators = new ArrayList<Generator>();
         generators.add(new StringToDateTransformerGenerator());
         generators.add(new HttpCallbackGenerator());
@@ -78,7 +80,6 @@ public class ModulePlugin implements Plugin {
         generators.add(new OAuth2AdapterGenerator());
         generators.add(new LifecycleAdapterFactoryGenerator());
         generators.add(new ConnectionManagerGenerator()); // this should be the last on the chain of adapters
-        generators.add(new PoolAdapterGenerator());
         generators.add(new JaxbTransformerGenerator());
         generators.add(new TransformerGenerator());
         generators.add(new EnumTransformerGenerator());
@@ -97,7 +98,6 @@ public class ModulePlugin implements Plugin {
         generators.add(new RegistryBootstrapGenerator());
         generators.add(new MuleStudioXmlGenerator());
         generators.add(new SchemaGenerator());
-        //generators.add(new DSLWrapperGenerator());
 
         validators = new ArrayList<Validator>();
         validators.add(new JavaDocValidator());
@@ -110,6 +110,7 @@ public class ModulePlugin implements Plugin {
         validators.add(new InjectValidator());
 
     }
+
 
     @Override
     public List<Validator> getValidators() {

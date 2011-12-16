@@ -53,6 +53,7 @@ final class ArrayClass extends TypeReference {
 
     // array component type
     private final Type componentType;
+    private int size;
 
 
     ArrayClass(CodeModel owner, Type component) {

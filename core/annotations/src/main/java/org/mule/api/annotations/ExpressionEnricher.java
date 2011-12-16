@@ -14,26 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.mule.api.annotations;
 
-package org.mule.devkit;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.mule.devkit.generation.Generator;
-import org.mule.devkit.validation.Validator;
-
-import java.util.List;
-
-public interface Plugin {
-    /**
-     * Retrieve a list of validators for the specified object type
-     *
-     * @return A list of validators implementing Validator
-     */
-    List<Validator> getValidators();
-
-    /**
-     * Retrieve a list of generators for the specified object type
-     *
-     * @return A list of validators implementing Generator
-     */
-    List<Generator> getGenerators();
+/**
+ * This annotation marks a method inside a {@link org.mule.api.annotations.ExpressionLanguage} as the responsible
+ * for enriching mule messages based on an expression.
+ */
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface ExpressionEnricher {
 }
+

@@ -16,8 +16,8 @@
  */
 package org.mule.devkit.validation;
 
-import org.mule.devkit.Plugin;
 import org.mule.devkit.apt.AbstractAnnotationProcessorTest;
+import org.mule.devkit.apt.AbstractAnnotationProcessor;
 import org.mule.devkit.apt.ModuleAnnotationProcessor;
 import org.mule.devkit.generation.Generator;
 
@@ -33,13 +33,7 @@ public abstract class ModuleAnnotationProcessorTest extends AbstractAnnotationPr
 
     @Override
     protected Collection<Processor> getProcessors() {
-        ModuleAnnotationProcessor moduleAnnotationProcessor = new ModuleAnnotationProcessor();
-        moduleAnnotationProcessor.setPlugins(Arrays.asList(createPlugin()));
-        return Arrays.<Processor>asList(moduleAnnotationProcessor);
-    }
-
-    private Plugin createPlugin() {
-        return new Plugin() {
+        AbstractAnnotationProcessor abstractAnnotationProcessor = new AbstractAnnotationProcessor() {
             @Override
             public List<Validator> getValidators() {
                 return Arrays.asList(getValidatorToTest());
@@ -50,5 +44,6 @@ public abstract class ModuleAnnotationProcessorTest extends AbstractAnnotationPr
                 return Collections.emptyList();
             }
         };
+        return Arrays.<Processor>asList(abstractAnnotationProcessor);
     }
 }

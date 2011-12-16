@@ -308,37 +308,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         shouldTransform._else()._return(target);
     }
 
-    private void generateIsAssignableFrom(DefinedClass messageProcessorClass) {
-        Method isAssignableFrom = messageProcessorClass.method(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, "isAssignableFrom");
-        Variable expectedType = isAssignableFrom.param(ref(java.lang.reflect.Type.class), "expectedType");
-        Variable clazz = isAssignableFrom.param(ref(Class.class), "clazz");
 
-        Block isClass = isAssignableFrom.body()._if(Op._instanceof(expectedType, ref(Class.class)))._then();
-        isClass._return(
-                ExpressionFactory.cast(ref(Class.class), expectedType).invoke("isAssignableFrom").arg(clazz)
-        );
-
-        Block isParameterizedType = isAssignableFrom.body()._if(
-                Op._instanceof(expectedType, ref(ParameterizedType.class)))._then();
-        isParameterizedType._return(
-                ExpressionFactory.invoke("isAssignableFrom").arg(
-                        ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).invoke("getRawType")
-                ).arg(
-                        clazz
-                )
-        );
-
-        Block isWildcardType = isAssignableFrom.body()._if(
-                Op._instanceof(expectedType, ref(WildcardType.class)))._then();
-        Variable upperBounds = isWildcardType.decl(ref(java.lang.reflect.Type.class).array(), "upperBounds",
-                ExpressionFactory.cast(ref(WildcardType.class), expectedType).invoke("getUpperBounds"));
-        Block ifHasUpperBounds = isWildcardType._if(Op.ne(upperBounds.ref("length"), ExpressionFactory.lit(0)))._then();
-        ifHasUpperBounds._return(
-                ExpressionFactory.invoke("isAssignableFrom").arg(
-                        upperBounds.component(ExpressionFactory.lit(0))).arg(clazz));
-
-        isAssignableFrom.body()._return(ExpressionFactory.FALSE);
-    }
 
     private void generateEvaluateMethod(DefinedClass messageProcessorClass, FieldVariable patternInfo, FieldVariable expressionManager) {
         Method evaluate = messageProcessorClass.method(Modifier.PRIVATE, ref(Object.class), "evaluate");
@@ -356,108 +326,6 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         isPattern._else()._return(expressionManager.invoke("parse").arg(stringSource).arg(muleMessage));
 
         evaluate.body()._return(source);
-    }
-
-    private void generateIsListMethod(DefinedClass messageProcessorClass) {
-        Method isList = messageProcessorClass.method(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, "isList");
-        Variable type = isList.param(ref(java.lang.reflect.Type.class), "type");
-
-        Conditional isClass = isList.body()._if(Op.cand(Op._instanceof(type, ref(Class.class)),
-                ExpressionFactory.invoke("isListClass").arg(ExpressionFactory.cast(ref(Class.class), type))));
-        isClass._then()._return(ExpressionFactory.TRUE);
-
-        Conditional isParameterizedType = isList.body()._if(Op._instanceof(type, ref(ParameterizedType.class)));
-        isParameterizedType._then()._return(
-                ExpressionFactory.invoke("isList").arg(
-                        ExpressionFactory.cast(ref(ParameterizedType.class), type).invoke("getRawType")
-                )
-        );
-
-        Conditional isWildcardType = isList.body()._if(Op._instanceof(type, ref(WildcardType.class)));
-        Variable upperBounds = isWildcardType._then().decl(ref(java.lang.reflect.Type.class).array(), "upperBounds",
-                ExpressionFactory.cast(ref(WildcardType.class), type).invoke("getUpperBounds"));
-        isWildcardType._then()._return(Op.cand(
-                Op.ne(upperBounds.ref("length"), ExpressionFactory.lit(0)),
-                ExpressionFactory.invoke("isList").arg(upperBounds.component(ExpressionFactory.lit(0)))
-        ));
-
-        isList.body()._return(ExpressionFactory.FALSE);
-    }
-
-    private void generateIsMapMethod(DefinedClass messageProcessorClass) {
-        Method isMap = messageProcessorClass.method(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, "isMap");
-        Variable type = isMap.param(ref(java.lang.reflect.Type.class), "type");
-
-        Conditional isClass = isMap.body()._if(Op.cand(Op._instanceof(type, ref(Class.class)),
-                ExpressionFactory.invoke("isMapClass").arg(ExpressionFactory.cast(ref(Class.class), type))));
-        isClass._then()._return(ExpressionFactory.TRUE);
-
-        Conditional isParameterizedType = isMap.body()._if(Op._instanceof(type, ref(ParameterizedType.class)));
-        isParameterizedType._then()._return(
-                ExpressionFactory.invoke("isMap").arg(
-                        ExpressionFactory.cast(ref(ParameterizedType.class), type).invoke("getRawType")
-                )
-        );
-
-        Conditional isWildcardType = isMap.body()._if(Op._instanceof(type, ref(WildcardType.class)));
-        Variable upperBounds = isWildcardType._then().decl(ref(java.lang.reflect.Type.class).array(), "upperBounds",
-                ExpressionFactory.cast(ref(WildcardType.class), type).invoke("getUpperBounds"));
-        isWildcardType._then()._return(Op.cand(
-                Op.ne(upperBounds.ref("length"), ExpressionFactory.lit(0)),
-                ExpressionFactory.invoke("isMap").arg(upperBounds.component(ExpressionFactory.lit(0)))
-        ));
-
-        isMap.body()._return(ExpressionFactory.FALSE);
-    }
-
-    private void generateIsListClassMethod(DefinedClass messageProcessorClass) {
-        Method isListClass = messageProcessorClass.method(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, "isListClass");
-        isListClass.javadoc().add("Checks whether the specified class parameter is an instance of ");
-        isListClass.javadoc().add(ref(List.class));
-        isListClass.javadoc().addParam("clazz <code>Class</code> to check.");
-        isListClass.javadoc().addReturn("<code>true</code> is <code>clazz</code> is instance of a collection class, <code>false</code> otherwise.");
-
-        Variable clazz = isListClass.param(ref(Class.class), "clazz");
-        Variable classes = isListClass.body().decl(ref(List.class).narrow(ref(Class.class)), "classes", ExpressionFactory._new(ref(ArrayList.class).narrow(ref(Class.class))));
-        isListClass.body().invoke("computeClassHierarchy").arg(clazz).arg(classes);
-
-        isListClass.body()._return(classes.invoke("contains").arg(ref(List.class).dotclass()));
-    }
-
-    private void generateIsMapClassMethod(DefinedClass messageProcessorClass) {
-        Method isMapClass = messageProcessorClass.method(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, "isMapClass");
-        isMapClass.javadoc().add("Checks whether the specified class parameter is an instance of ");
-        isMapClass.javadoc().add(ref(Map.class));
-        isMapClass.javadoc().addParam("clazz <code>Class</code> to check.");
-        isMapClass.javadoc().addReturn("<code>true</code> is <code>clazz</code> is instance of a collection class, <code>false</code> otherwise.");
-
-        Variable clazz = isMapClass.param(ref(Class.class), "clazz");
-        Variable classes = isMapClass.body().decl(ref(List.class).narrow(ref(Class.class)), "classes", ExpressionFactory._new(ref(ArrayList.class).narrow(ref(Class.class))));
-        isMapClass.body().invoke("computeClassHierarchy").arg(clazz).arg(classes);
-
-        isMapClass.body()._return(classes.invoke("contains").arg(ref(Map.class).dotclass()));
-    }
-
-    private void generateComputeClassHierarchyMethod(DefinedClass messageProcessorClass) {
-        Method computeClassHierarchy = messageProcessorClass.method(Modifier.PRIVATE, context.getCodeModel().VOID, "computeClassHierarchy");
-        computeClassHierarchy.javadoc().add("Get all superclasses and interfaces recursively.");
-        computeClassHierarchy.javadoc().addParam("clazz   The class to start the search with.");
-        computeClassHierarchy.javadoc().addParam("classes List of classes to which to add all found super classes and interfaces.");
-        Variable clazz = computeClassHierarchy.param(Class.class, "clazz");
-        Variable classes = computeClassHierarchy.param(List.class, "classes");
-
-        ForLoop iterateClasses = computeClassHierarchy.body()._for();
-        Variable current = iterateClasses.init(ref(Class.class), "current", clazz);
-        iterateClasses.test(Op.ne(current, ExpressionFactory._null()));
-        iterateClasses.update(current.assign(current.invoke("getSuperclass")));
-
-        Block ifContains = iterateClasses.body()._if(classes.invoke("contains").arg(current))._then();
-        ifContains._return();
-
-        iterateClasses.body().add(classes.invoke("add").arg(current));
-
-        ForEach iterateInterfaces = iterateClasses.body().forEach(ref(Class.class), "currentInterface", current.invoke("getInterfaces"));
-        iterateInterfaces.body().invoke("computeClassHierarchy").arg(iterateInterfaces.var()).arg(classes);
     }
 
     private void generateMessageProcessorClassDoc(ExecutableElement executableElement, DefinedClass messageProcessorClass) {

@@ -32,10 +32,12 @@ import java.util.Set;
 @MojoGoal("generate-sources")
 @MojoRequiresDependencyResolution(value = "compile")
 @MojoPhase("generate-sources")
-public class ModuleAnnotationProcessorMojo extends AbstractAnnotationProcessorMojo {
+public class AnnotationProcessorMojo extends AbstractAnnotationProcessorMojo {
 
-    private static final Logger LOGGER = Logger.getLogger(ModuleAnnotationProcessorMojo.class);
-    private static String[] processors = {"org.mule.devkit.apt.ModuleAnnotationProcessor"};
+    private static final Logger LOGGER = Logger.getLogger(AnnotationProcessorMojo.class);
+    private static String[] processors = {"org.mule.devkit.apt.ModuleAnnotationProcessor",
+            "org.mule.devkit.apt.ConnectorAnnotationProcessor",
+            "org.mule.devkit.apt.ExpressionLanguageAnnotationProcessor"};
 
     /**
      * project classpath

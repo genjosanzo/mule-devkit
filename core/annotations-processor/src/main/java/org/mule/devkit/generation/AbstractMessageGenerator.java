@@ -45,6 +45,7 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.source.MessageSource;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.Flow;
@@ -57,6 +58,7 @@ import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.ForEach;
+import org.mule.devkit.model.code.ForLoop;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
@@ -78,13 +80,255 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.WildcardType;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
+    protected void generateIsListMethod(DefinedClass messageProcessorClass) {
+        Method isList = messageProcessorClass.method(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, "isList");
+        Variable type = isList.param(ref(java.lang.reflect.Type.class), "type");
+
+        Conditional isClass = isList.body()._if(Op.cand(Op._instanceof(type, ref(Class.class)),
+                ExpressionFactory.invoke("isListClass").arg(ExpressionFactory.cast(ref(Class.class), type))));
+        isClass._then()._return(ExpressionFactory.TRUE);
+
+        Conditional isParameterizedType = isList.body()._if(Op._instanceof(type, ref(ParameterizedType.class)));
+        isParameterizedType._then()._return(
+                ExpressionFactory.invoke("isList").arg(
+                        ExpressionFactory.cast(ref(ParameterizedType.class), type).invoke("getRawType")
+                )
+        );
+
+        Conditional isWildcardType = isList.body()._if(Op._instanceof(type, ref(WildcardType.class)));
+        Variable upperBounds = isWildcardType._then().decl(ref(java.lang.reflect.Type.class).array(), "upperBounds",
+                ExpressionFactory.cast(ref(WildcardType.class), type).invoke("getUpperBounds"));
+        isWildcardType._then()._return(Op.cand(
+                Op.ne(upperBounds.ref("length"), ExpressionFactory.lit(0)),
+                ExpressionFactory.invoke("isList").arg(upperBounds.component(ExpressionFactory.lit(0)))
+        ));
+
+        isList.body()._return(ExpressionFactory.FALSE);
+    }
+
+    protected void generateIsMapMethod(DefinedClass messageProcessorClass) {
+        Method isMap = messageProcessorClass.method(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, "isMap");
+        Variable type = isMap.param(ref(java.lang.reflect.Type.class), "type");
+
+        Conditional isClass = isMap.body()._if(Op.cand(Op._instanceof(type, ref(Class.class)),
+                ExpressionFactory.invoke("isMapClass").arg(ExpressionFactory.cast(ref(Class.class), type))));
+        isClass._then()._return(ExpressionFactory.TRUE);
+
+        Conditional isParameterizedType = isMap.body()._if(Op._instanceof(type, ref(ParameterizedType.class)));
+        isParameterizedType._then()._return(
+                ExpressionFactory.invoke("isMap").arg(
+                        ExpressionFactory.cast(ref(ParameterizedType.class), type).invoke("getRawType")
+                )
+        );
+
+        Conditional isWildcardType = isMap.body()._if(Op._instanceof(type, ref(WildcardType.class)));
+        Variable upperBounds = isWildcardType._then().decl(ref(java.lang.reflect.Type.class).array(), "upperBounds",
+                ExpressionFactory.cast(ref(WildcardType.class), type).invoke("getUpperBounds"));
+        isWildcardType._then()._return(Op.cand(
+                Op.ne(upperBounds.ref("length"), ExpressionFactory.lit(0)),
+                ExpressionFactory.invoke("isMap").arg(upperBounds.component(ExpressionFactory.lit(0)))
+        ));
+
+        isMap.body()._return(ExpressionFactory.FALSE);
+    }
+
+    protected void generateIsListClassMethod(DefinedClass messageProcessorClass) {
+        Method isListClass = messageProcessorClass.method(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, "isListClass");
+        isListClass.javadoc().add("Checks whether the specified class parameter is an instance of ");
+        isListClass.javadoc().add(ref(List.class));
+        isListClass.javadoc().addParam("clazz <code>Class</code> to check.");
+        isListClass.javadoc().addReturn("<code>true</code> is <code>clazz</code> is instance of a collection class, <code>false</code> otherwise.");
+
+        Variable clazz = isListClass.param(ref(Class.class), "clazz");
+        Variable classes = isListClass.body().decl(ref(List.class).narrow(ref(Class.class)), "classes", ExpressionFactory._new(ref(ArrayList.class).narrow(ref(Class.class))));
+        isListClass.body().invoke("computeClassHierarchy").arg(clazz).arg(classes);
+
+        isListClass.body()._return(classes.invoke("contains").arg(ref(List.class).dotclass()));
+    }
+
+    protected void generateIsAssignableFrom(DefinedClass messageProcessorClass) {
+        Method isAssignableFrom = messageProcessorClass.method(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, "isAssignableFrom");
+        Variable expectedType = isAssignableFrom.param(ref(java.lang.reflect.Type.class), "expectedType");
+        Variable clazz = isAssignableFrom.param(ref(Class.class), "clazz");
+
+        Block isClass = isAssignableFrom.body()._if(Op._instanceof(expectedType, ref(Class.class)))._then();
+        isClass._return(
+                ExpressionFactory.cast(ref(Class.class), expectedType).invoke("isAssignableFrom").arg(clazz)
+        );
+
+        Block isParameterizedType = isAssignableFrom.body()._if(
+                Op._instanceof(expectedType, ref(ParameterizedType.class)))._then();
+        isParameterizedType._return(
+                ExpressionFactory.invoke("isAssignableFrom").arg(
+                        ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).invoke("getRawType")
+                ).arg(
+                        clazz
+                )
+        );
+
+        Block isWildcardType = isAssignableFrom.body()._if(
+                Op._instanceof(expectedType, ref(WildcardType.class)))._then();
+        Variable upperBounds = isWildcardType.decl(ref(java.lang.reflect.Type.class).array(), "upperBounds",
+                ExpressionFactory.cast(ref(WildcardType.class), expectedType).invoke("getUpperBounds"));
+        Block ifHasUpperBounds = isWildcardType._if(Op.ne(upperBounds.ref("length"), ExpressionFactory.lit(0)))._then();
+        ifHasUpperBounds._return(
+                ExpressionFactory.invoke("isAssignableFrom").arg(
+                        upperBounds.component(ExpressionFactory.lit(0))).arg(clazz));
+
+        isAssignableFrom.body()._return(ExpressionFactory.FALSE);
+    }
+
+    protected void generateTransformMethod(DefinedClass messageProcessorClass) {
+        Method transform = messageProcessorClass.method(Modifier.PRIVATE, ref(Object.class), "transform");
+        transform._throws(ref(TransformerException.class));
+        Variable muleMessage = transform.param(ref(MuleMessage.class), "muleMessage");
+        Variable expectedType = transform.param(ref(java.lang.reflect.Type.class), "expectedType");
+        Variable source = transform.param(ref(Object.class), "source");
+
+        transform.body()._if(Op.eq(source, ExpressionFactory._null()))._then()._return(source);
+
+        Variable target = transform.body().decl(ref(Object.class), "target", ExpressionFactory._null());
+        Conditional isList = transform.body()._if(
+                ExpressionFactory.invoke("isList").arg(source.invoke("getClass")));
+        Conditional isExpectedList = isList._then()._if(
+                ExpressionFactory.invoke("isList").arg(expectedType));
+        Variable newList = isExpectedList._then().decl(ref(List.class), "newList", ExpressionFactory._new(ref(ArrayList.class)));
+        Variable listParameterizedType = isExpectedList._then().decl(ref(java.lang.reflect.Type.class), "valueType",
+                ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).
+                        invoke("getActualTypeArguments").component(ExpressionFactory.lit(0)));
+        Variable listIterator = isExpectedList._then().decl(ref(ListIterator.class), "iterator",
+                ExpressionFactory.cast(ref(List.class), source).
+                        invoke("listIterator"));
+
+        Block whileHasNext = isExpectedList._then()._while(listIterator.invoke("hasNext")).body();
+        Variable subTarget = whileHasNext.decl(ref(Object.class), "subTarget", listIterator.invoke("next"));
+        whileHasNext.add(newList.invoke("add").arg(
+                ExpressionFactory.invoke("transform").arg(muleMessage).arg(listParameterizedType).
+                        arg(subTarget)
+        ));
+        isExpectedList._then().assign(target, newList);
+        isExpectedList._else().assign(target, source);
+
+        Conditional isMap = isList._elseif(
+                ExpressionFactory.invoke("isMap").arg(source.invoke("getClass")));
+        Conditional isExpectedMap = isMap._then()._if(
+                ExpressionFactory.invoke("isMap").arg(expectedType));
+
+        Block isExpectedMapBlock = isExpectedMap._then();
+        Variable keyType = isExpectedMapBlock.decl(ref(java.lang.reflect.Type.class), "keyType",
+                ref(Object.class).dotclass());
+        Variable valueType = isExpectedMapBlock.decl(ref(java.lang.reflect.Type.class), "valueType",
+                ref(Object.class).dotclass());
+
+        Block isGenericMap = isExpectedMapBlock._if(Op._instanceof(expectedType, ref(ParameterizedType.class)))._then();
+
+        isGenericMap.assign(keyType, ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).
+                invoke("getActualTypeArguments").component(ExpressionFactory.lit(0)));
+        isGenericMap.assign(valueType, ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).
+                invoke("getActualTypeArguments").component(ExpressionFactory.lit(1)));
+
+        Variable map = isExpectedMapBlock.decl(ref(Map.class), "map", ExpressionFactory.cast(ref(Map.class), source));
+
+        //Conditional ifKeysNotOfSameType = isExpectedMapBlock._if(Op.cand(
+        //        Op.not(map.invoke("isEmpty")),
+        //        Op.not(ExpressionFactory.invoke(keyType.invoke("toString"), "equals").arg(ExpressionFactory.invoke(ExpressionFactory.invoke((ExpressionFactory.invoke(ExpressionFactory.invoke(map.invoke("keySet"), "iterator"), "next"), "getClass", "toString"))))));
+        //Block ifKeysNotOfSameTypeThen = ifKeysNotOfSameType._then().block();
+
+        Variable newMap = isExpectedMapBlock.decl(ref(Map.class), "newMap", ExpressionFactory._new(ref(HashMap.class)));
+        ForEach forEach = isExpectedMapBlock.forEach(ref(Object.class), "entryObj", map.invoke("entrySet"));
+        Block forEachBlock = forEach.body().block();
+        Variable entry = forEachBlock.decl(ref(Map.Entry.class), "entry", ExpressionFactory.cast(ref(Map.Entry.class), forEach.var()));
+        Variable newKey = forEachBlock.decl(ref(Object.class), "newKey", ExpressionFactory.invoke("transform").arg(muleMessage).arg(keyType).arg(entry.invoke("getKey")));
+        Variable newValue = forEachBlock.decl(ref(Object.class), "newValue", ExpressionFactory.invoke("transform").arg(muleMessage).arg(valueType).arg(entry.invoke("getValue")));
+        forEachBlock.invoke(newMap, "put").arg(newKey).arg(newValue);
+
+        isExpectedMapBlock.assign(target, newMap);
+
+        //Cast mapCast = ExpressionFactory.cast(ref(Map.class), source);
+
+        //ForEach keyLoop = ifKeysNotOfSameType._else().forEach(ref(Object.class), "key", mapCast.invoke("entrySet"));
+
+        //Cast entryCast = ExpressionFactory.cast(ref(Map.Entry.class), keyLoop.var());
+
+        //Variable value = keyLoop.body().decl(ref(Object.class), "value", mapCast.invoke("get").arg(entryCast.invoke("getKey")));
+        //keyLoop.body().add(entryCast.invoke("setValue").arg(
+        //        ExpressionFactory.invoke("transform").arg(muleMessage).arg(valueType).arg(value)
+        //));
+
+        isExpectedMap._else().assign(target, source);
+
+        isMap._else().assign(target, source);
+
+        Conditional shouldTransform = transform.body()._if(Op.cand(
+                Op.ne(target, ExpressionFactory._null()),
+                Op.not(ExpressionFactory.invoke("isAssignableFrom").arg(expectedType).arg(target.invoke("getClass")))
+        ));
+
+        Variable sourceDataType = shouldTransform._then().decl(ref(DataType.class), "sourceDataType",
+                ref(DataTypeFactory.class).staticInvoke("create").arg(target.invoke("getClass")));
+
+        Conditional ifParameterizedType = shouldTransform._then()._if(Op._instanceof(expectedType, ref(ParameterizedType.class)));
+        ifParameterizedType._then().assign(expectedType, ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).invoke("getRawType"));
+        
+        Variable targetDataType = shouldTransform._then().decl(ref(DataType.class), "targetDataType",
+                ref(DataTypeFactory.class).staticInvoke("create").arg(
+                        ExpressionFactory.cast(ref(Class.class), expectedType)));
+
+        Variable transformer = shouldTransform._then().decl(ref(Transformer.class), "t",
+                muleMessage.invoke("getMuleContext").invoke("getRegistry").invoke("lookupTransformer").arg(sourceDataType).arg(targetDataType));
+
+        shouldTransform._then()._return(transformer.invoke("transform").arg(target));
+
+        shouldTransform._else()._return(target);
+    }
+
+
+    protected void generateIsMapClassMethod(DefinedClass messageProcessorClass) {
+        Method isMapClass = messageProcessorClass.method(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, "isMapClass");
+        isMapClass.javadoc().add("Checks whether the specified class parameter is an instance of ");
+        isMapClass.javadoc().add(ref(Map.class));
+        isMapClass.javadoc().addParam("clazz <code>Class</code> to check.");
+        isMapClass.javadoc().addReturn("<code>true</code> is <code>clazz</code> is instance of a collection class, <code>false</code> otherwise.");
+
+        Variable clazz = isMapClass.param(ref(Class.class), "clazz");
+        Variable classes = isMapClass.body().decl(ref(List.class).narrow(ref(Class.class)), "classes", ExpressionFactory._new(ref(ArrayList.class).narrow(ref(Class.class))));
+        isMapClass.body().invoke("computeClassHierarchy").arg(clazz).arg(classes);
+
+        isMapClass.body()._return(classes.invoke("contains").arg(ref(Map.class).dotclass()));
+    }
+
+    protected void generateComputeClassHierarchyMethod(DefinedClass messageProcessorClass) {
+        Method computeClassHierarchy = messageProcessorClass.method(Modifier.PRIVATE, context.getCodeModel().VOID, "computeClassHierarchy");
+        computeClassHierarchy.javadoc().add("Get all superclasses and interfaces recursively.");
+        computeClassHierarchy.javadoc().addParam("clazz   The class to start the search with.");
+        computeClassHierarchy.javadoc().addParam("classes List of classes to which to add all found super classes and interfaces.");
+        Variable clazz = computeClassHierarchy.param(Class.class, "clazz");
+        Variable classes = computeClassHierarchy.param(List.class, "classes");
+
+        ForLoop iterateClasses = computeClassHierarchy.body()._for();
+        Variable current = iterateClasses.init(ref(Class.class), "current", clazz);
+        iterateClasses.test(Op.ne(current, ExpressionFactory._null()));
+        iterateClasses.update(current.assign(current.invoke("getSuperclass")));
+
+        Block ifContains = iterateClasses.body()._if(classes.invoke("contains").arg(current))._then();
+        ifContains._return();
+
+        iterateClasses.body().add(classes.invoke("add").arg(current));
+
+        ForEach iterateInterfaces = iterateClasses.body().forEach(ref(Class.class), "currentInterface", current.invoke("getInterfaces"));
+        iterateInterfaces.body().invoke("computeClassHierarchy").arg(iterateInterfaces.var()).arg(classes);
+    }
 
     protected FieldVariable generateFieldForPatternInfo(DefinedClass messageProcessorClass) {
         FieldVariable patternInfo = messageProcessorClass.field(Modifier.PRIVATE, ref(TemplateParser.PatternInfo.class), "patternInfo");
@@ -97,12 +341,12 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         expressionManager.javadoc().add("Mule Expression Manager");
         return expressionManager;
     }
-    
+
     protected FieldVariable generateFieldForMessageProcessor(DefinedClass messageProcessorClass, String name) {
         FieldVariable expressionManager = messageProcessorClass.field(Modifier.PRIVATE, ref(MessageProcessor.class), name);
         expressionManager.javadoc().add("Message Processor");
         return expressionManager;
-    }    
+    }
 
     protected FieldVariable generateFieldForBoolean(DefinedClass messageProcessorClass, String name) {
         FieldVariable expressionManager = messageProcessorClass.field(Modifier.PRIVATE, context.getCodeModel().BOOLEAN, name);
@@ -113,7 +357,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         FieldVariable expressionManager = messageProcessorClass.field(Modifier.PRIVATE, ref(String.class), name);
         return expressionManager;
     }
-    
+
     protected FieldVariable generateFieldForModuleObject(DefinedClass messageProcessorClass, TypeElement typeElement) {
         FieldVariable field = messageProcessorClass.field(Modifier.PRIVATE, ref(Object.class), "moduleObject");
         field.javadoc().add("Module object");
