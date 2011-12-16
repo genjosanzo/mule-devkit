@@ -107,6 +107,11 @@ public class ModuleAnnotationProcessor extends AbstractAnnotationProcessor {
 
     }
 
+    public ModuleAnnotationProcessor(List<Validator> validators, List<Generator> generators) {
+        this.validators = new ArrayList<Validator>(validators);
+        this.generators = new ArrayList<Generator>(generators);
+    }
+
     @Override
     public List<Validator> getValidators() {
         return Collections.unmodifiableList(validators);

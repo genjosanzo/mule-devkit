@@ -55,7 +55,7 @@ public abstract class AbstractAnnotationProcessorTest {
     /**
      * @return the processor instances that should be tested
      */
-    protected abstract Collection<Processor> getProcessors();
+    protected abstract List<? extends AbstractAnnotationProcessor> getProcessors();
 
     /**
      * Attempts to compile the given compilation units using the Java Compiler

@@ -26,40 +26,12 @@ import org.mule.devkit.tests.ConnectorWithDisconnectMethodNotPublic;
 import org.mule.devkit.tests.ConnectorWithDisconnectMethodWithParams;
 import org.mule.devkit.tests.ConnectorWithTwoConnectMethods;
 import org.mule.devkit.tests.ConnectorWithTwoDisconnectMethods;
-import org.mule.devkit.tests.ModuleWithConnectMethod;
-import org.mule.devkit.tests.ModuleWithConnectionIdentifierMethod;
-import org.mule.devkit.tests.ModuleWithDisconnectMethod;
-import org.mule.devkit.tests.ModuleWithValidateConnectionMethod;
 
-public class ConnectorValidatorTest extends ModuleAnnotationProcessorTest {
+public class ConnectorValidatorTest extends ConnectorAnnotationProcessorTest {
 
     @Override
     protected Validator getValidatorToTest() {
         return new ConnectorValidator();
-    }
-
-    @Test
-    public void moduleWithConnectMethod() throws Exception {
-        compileTestCase(ModuleWithConnectMethod.class);
-        assertCompilationFailed();
-    }
-
-    @Test
-    public void moduleWithConnectionIdentifierMethod() throws Exception {
-        compileTestCase(ModuleWithConnectionIdentifierMethod.class);
-        assertCompilationFailed();
-    }
-
-    @Test
-    public void moduleWithDisconnectMethod() throws Exception {
-        compileTestCase(ModuleWithDisconnectMethod.class);
-        assertCompilationFailed();
-    }
-
-    @Test
-    public void moduleWithValidateConnectionMethod() throws Exception {
-        compileTestCase(ModuleWithValidateConnectionMethod.class);
-        assertCompilationFailed();
     }
 
     @Test

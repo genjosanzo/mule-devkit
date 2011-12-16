@@ -111,6 +111,10 @@ public class ConnectorAnnotationProcessor extends AbstractAnnotationProcessor {
 
     }
 
+    public ConnectorAnnotationProcessor(List<Validator> validators, List<Generator> generators) {
+        this.validators = new ArrayList<Validator>(validators);
+        this.generators = new ArrayList<Generator>(generators);
+    }
 
     @Override
     public List<Validator> getValidators() {

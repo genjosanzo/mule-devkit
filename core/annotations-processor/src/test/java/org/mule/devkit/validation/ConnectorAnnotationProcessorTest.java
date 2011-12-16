@@ -17,21 +17,21 @@
 package org.mule.devkit.validation;
 
 import org.mule.devkit.apt.AbstractAnnotationProcessorTest;
-import org.mule.devkit.apt.ModuleAnnotationProcessor;
+import org.mule.devkit.apt.ConnectorAnnotationProcessor;
 import org.mule.devkit.generation.Generator;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class ModuleAnnotationProcessorTest extends AbstractAnnotationProcessorTest {
+public abstract class ConnectorAnnotationProcessorTest extends AbstractAnnotationProcessorTest {
 
     protected abstract Validator getValidatorToTest();
 
     @Override
-    protected List<ModuleAnnotationProcessor> getProcessors() {
+    protected List<ConnectorAnnotationProcessor> getProcessors() {
         List<Validator> validators = Arrays.asList(getValidatorToTest());
         List<Generator> generators = Collections.emptyList();
-        return Arrays.asList(new ModuleAnnotationProcessor(validators, generators));
+        return Arrays.asList(new ConnectorAnnotationProcessor(validators, generators));
     }
 }
