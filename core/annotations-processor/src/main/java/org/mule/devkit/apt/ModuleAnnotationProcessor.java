@@ -25,7 +25,6 @@ import org.mule.devkit.generation.adapter.LifecycleAdapterFactoryGenerator;
 import org.mule.devkit.generation.adapter.LifecycleAdapterGenerator;
 import org.mule.devkit.generation.adapter.OAuth1AdapterGenerator;
 import org.mule.devkit.generation.adapter.OAuth2AdapterGenerator;
-import org.mule.devkit.generation.adapter.PoolAdapterGenerator;
 import org.mule.devkit.generation.callback.HttpCallbackGenerator;
 import org.mule.devkit.generation.mule.MessageProcessorGenerator;
 import org.mule.devkit.generation.mule.MessageSourceGenerator;

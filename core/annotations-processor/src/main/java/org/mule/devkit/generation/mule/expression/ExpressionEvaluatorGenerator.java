@@ -130,7 +130,6 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
                             )));
                 }
             } else if (parameter.getAnnotation(OutboundHeaders.class) != null) {
-                OutboundHeaders outboundHeaders = parameter.getAnnotation(OutboundHeaders.class);
                 evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()),
                         ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                 ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("OUTBOUND:*").arg(message).arg(ref(Map.class).dotclass())
@@ -153,7 +152,8 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INVOCATION:" + invocationHeaders.value()).arg(message)
                             )));
                 }
-            }            argCount++;
+            }
+            argCount++;
         }
 
         tryStatement.body()._return(evaluateInvoke);

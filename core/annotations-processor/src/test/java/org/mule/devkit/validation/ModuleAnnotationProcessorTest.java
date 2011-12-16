@@ -16,9 +16,8 @@
  */
 package org.mule.devkit.validation;
 
-import org.mule.devkit.apt.AbstractAnnotationProcessorTest;
 import org.mule.devkit.apt.AbstractAnnotationProcessor;
-import org.mule.devkit.apt.ModuleAnnotationProcessor;
+import org.mule.devkit.apt.AbstractAnnotationProcessorTest;
 import org.mule.devkit.generation.Generator;
 
 import javax.annotation.processing.Processor;
