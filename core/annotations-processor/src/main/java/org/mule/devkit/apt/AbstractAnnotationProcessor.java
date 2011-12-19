@@ -60,47 +60,53 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
         for (TypeElement annotation : annotations) {
             Set<? extends Element> elements = env.getElementsAnnotatedWith(annotation);
             Set<TypeElement> typeElements = ElementFilter.typesIn(elements);
-            for (TypeElement e : typeElements) {
+            for (Validator validator : getValidators()) {
+                for (TypeElement e : typeElements) {
 
-                DevKitTypeElement devKitTypeElement = new DefaultDevKitTypeElement(e);
-                try {
-                    for (Validator validator : getValidators()) {
+                    DevKitTypeElement devKitTypeElement = new DefaultDevKitTypeElement(e);
+                    try {
                         if (validator.shouldValidate(devKitTypeElement, context)) {
                             validator.validate(devKitTypeElement, context);
                         }
+                    } catch (ValidationException tve) {
+                        error(tve.getMessage(), tve.getElement());
+                        return false;
                     }
-                    for (Generator generator : getGenerators()) {
-                        generator.generate(devKitTypeElement, context);
-                    }
-                } catch (ValidationException tve) {
-                    error(tve.getMessage(), tve.getElement());
-                    return false;
-                } catch (GenerationException ge) {
-                    error(ge.getMessage());
-                    return false;
                 }
             }
-        }
+            for (Generator generator : getGenerators()) {
+                for (TypeElement e : typeElements) {
 
-        try {
-            context.getCodeModel().build();
-        } catch (IOException e) {
-            error(e.getMessage());
-            return false;
-        }
+                    DevKitTypeElement devKitTypeElement = new DefaultDevKitTypeElement(e);
+                    try {
+                        generator.generate(devKitTypeElement, context);
+                    } catch (GenerationException ge) {
+                        error(ge.getMessage());
+                        return false;
+                    }
+                }
+            }
 
-        try {
-            context.getSchemaModel().build();
-        } catch (IOException e) {
-            error(e.getMessage());
-            return false;
-        }
+            try {
+                context.getCodeModel().build();
+            } catch (IOException e) {
+                error(e.getMessage());
+                return false;
+            }
 
-        try {
-            context.getStudioModel().build();
-        } catch (IOException e) {
-            error(e.getMessage());
-            return false;
+            try {
+                context.getSchemaModel().build();
+            } catch (IOException e) {
+                error(e.getMessage());
+                return false;
+            }
+
+            try {
+                context.getStudioModel().build();
+            } catch (IOException e) {
+                error(e.getMessage());
+                return false;
+            }
         }
 
         return true;

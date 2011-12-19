@@ -124,6 +124,18 @@ public class NameUtils {
     private static void uncountable(String word) {
         uncountable.add(word);
     }
+    
+    public String camel(String uncamelCaseName) {
+        String result = "";
+        String[] parts = uncamelCaseName.split("-");
+
+        for (int i = 0; i < parts.length; i++) {
+            result += StringUtils.capitalize(parts[i].toLowerCase());
+        }
+
+        return result;
+    }
+    
 
     public String uncamel(String camelCaseName) {
         String result = "";

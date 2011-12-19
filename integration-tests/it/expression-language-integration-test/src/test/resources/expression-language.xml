@@ -29,8 +29,10 @@
         </message-properties-transformer>
     </flow>
 
-    <flow name="appendEnrich">
-        <enricher target="#[append]" source="World"/>
+    <flow name="enrich">
+        <enricher target="#[map-payload:hello]">
+            <expression-transformer evaluator="string" expression="world"/>
+        </enricher>
     </flow>
     
 </mule>

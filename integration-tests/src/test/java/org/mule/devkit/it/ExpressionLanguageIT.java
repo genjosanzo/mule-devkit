@@ -17,24 +17,23 @@
 
 package org.mule.devkit.it;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
 
-public class MyExpressionLanguageModuleTest extends AbstractModuleTest {
+public class ExpressionLanguageIT extends AbstractMavenIT {
 
-    @Override
-    protected String getConfigResources() {
-        return "expression-language.xml";
+    protected String getArtifactVersion() {
+        return "1.0";
     }
 
-    public void testEvaluate() throws Exception {
-        runFlowWithPayloadAndExpectProperty("evaluate", "evaluated", "hello", "mulesoft");
+    protected String getArtifactId() {
+        return "expression-language-integration-test";
     }
 
-    public void testEnrichMapPayload() throws Exception {
-        Map payload = new HashMap<String, String>();
-        runFlowWithPayload("enrich", payload);
-        
-        assertEquals("world", payload.get("hello"));
+    protected String getGroupId() {
+        return "org.mule.devkit.it";
+    }
+
+    protected File getRoot() {
+        return new File("target/integration-tests/" + getArtifactId());
     }
 }

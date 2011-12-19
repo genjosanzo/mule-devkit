@@ -27,7 +27,7 @@ import org.mule.api.annotations.param.Payload;
 import java.util.Map;
 
 @ExpressionLanguage(name = "expr")
-public class MyExpressionLanguageModule {
+public class ExprExpressionLanguage {
 
     @ExpressionEvaluator
     public Object evaluate(String expression,

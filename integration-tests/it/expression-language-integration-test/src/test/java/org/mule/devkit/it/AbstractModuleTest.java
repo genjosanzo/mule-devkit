@@ -38,6 +38,14 @@ public abstract class AbstractModuleTest extends FunctionalTestCase {
         assertEquals(expect, responseEvent.getMessage().getPayload());
     }
 
+    protected <U> MuleEvent runFlowWithPayload(String flowName, U payload) throws Exception {
+        Flow flow = lookupFlowConstruct(flowName);
+        MuleEvent event = AbstractMuleTestCase.getTestEvent(payload);
+        MuleEvent responseEvent = flow.process(event);
+
+        return responseEvent;
+    }
+
     protected <T, U> void runFlowWithPayload(String flowName, T expect, U payload) throws Exception {
         Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = AbstractMuleTestCase.getTestEvent(payload);
