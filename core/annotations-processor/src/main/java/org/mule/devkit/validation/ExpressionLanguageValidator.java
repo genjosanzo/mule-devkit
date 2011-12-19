@@ -51,6 +51,10 @@ public class ExpressionLanguageValidator implements Validator {
                 throw new ValidationException(executableElement, "An @ExpressionEvaluator must receive at least a String that represents the expression to evaluate.");
             }
 
+            if (executableElement.getReturnType().toString().equals("void")) {
+                throw new ValidationException(executableElement, "@ExpressionEvaluator cannot be void");
+            }
+
             boolean expressionStringFound = false;
             for (VariableElement parameter : executableElement.getParameters()) {
                 if (parameter.getAnnotation(Payload.class) == null &&
@@ -67,6 +71,40 @@ public class ExpressionLanguageValidator implements Validator {
                     }
                 }
             }
+        }
+
+        for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(ExpressionEnricher.class)) {
+            if (executableElement.getParameters().size() == 0) {
+                throw new ValidationException(executableElement, "An @ExpressionEnricher must receive at least a String that represents the expression and Object that represents the object to be used for enrichment.");
+            }
+
+            if (!executableElement.getReturnType().toString().equals("void")) {
+                throw new ValidationException(executableElement, "@ExpressionEnricher must be void");
+            }
+
+            boolean expressionStringFound = false;
+            boolean enrichObjectFound = false;
+            for (VariableElement parameter : executableElement.getParameters()) {
+                if (parameter.getAnnotation(Payload.class) == null &&
+                        parameter.getAnnotation(OutboundHeaders.class) == null &&
+                        parameter.getAnnotation(InboundHeaders.class) == null &&
+                        parameter.getAnnotation(InvocationHeaders.class) == null) {
+                    if (parameter.asType().toString().contains("String")) {
+                        if (expressionStringFound) {
+                            throw new ValidationException(executableElement, "An @ExpressionEnricher can receive only one Object and one String and the rest of the arguments must be annotated with either @Payload, @InboundHeaders, @OutboundHeaders or @InvocationHeaders.");
+                        }
+                        expressionStringFound = true;
+                    } else if (parameter.asType().toString().contains("Object")) {
+                        if (enrichObjectFound) {
+                            throw new ValidationException(executableElement, "An @ExpressionEnricher can receive only one Object and one String and the rest of the arguments must be annotated with either @Payload, @InboundHeaders, @OutboundHeaders or @InvocationHeaders.");
+                        }
+                        enrichObjectFound = true;
+                    } else {
+                        throw new ValidationException(executableElement, "An @ExpressionEnricher can receive only one Object and one String and the rest of the arguments must be annotated with either @Payload, @InboundHeaders, @OutboundHeaders or @InvocationHeaders.");
+                    }
+                }
+            }
+
         }
     }
 }

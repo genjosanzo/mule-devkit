@@ -18,6 +18,7 @@ package org.mule.devkit.apt;
 
 import org.mule.devkit.generation.Generator;
 import org.mule.devkit.generation.mule.RegistryBootstrapGenerator;
+import org.mule.devkit.generation.mule.expression.ExpressionEnricherGenerator;
 import org.mule.devkit.generation.mule.expression.ExpressionEvaluatorGenerator;
 import org.mule.devkit.validation.ExpressionLanguageValidator;
 import org.mule.devkit.validation.JavaDocValidator;
@@ -39,14 +40,13 @@ public class ExpressionLanguageAnnotationProcessor extends AbstractAnnotationPro
     public ExpressionLanguageAnnotationProcessor() {
         generators = new ArrayList<Generator>();
         generators.add(new ExpressionEvaluatorGenerator());
+        generators.add(new ExpressionEnricherGenerator());
         generators.add(new RegistryBootstrapGenerator());
 
         validators = new ArrayList<Validator>();
         validators.add(new JavaDocValidator());
         validators.add(new ExpressionLanguageValidator());
-
     }
-
 
     @Override
     public List<Validator> getValidators() {

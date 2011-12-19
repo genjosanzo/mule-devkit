@@ -17,7 +17,6 @@
 
 package org.mule.devkit.it;
 
-import org.mule.api.annotations.ExpressionEnricher;
 import org.mule.api.annotations.ExpressionEvaluator;
 import org.mule.api.annotations.ExpressionLanguage;
 import org.mule.api.annotations.param.InboundHeaders;
@@ -47,10 +46,4 @@ public class MyExpressionLanguageModule {
         }
         return expression;
     }
-
-    @ExpressionEnricher
-    public Object enrich(String expression, @Payload Object payload) {
-        return null;
-    }
-
 }
