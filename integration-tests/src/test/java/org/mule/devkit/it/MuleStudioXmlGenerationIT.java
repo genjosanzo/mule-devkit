@@ -47,6 +47,6 @@ public class MuleStudioXmlGenerationIT extends AbstractMavenIT {
     @Override
     protected void setSystemProperties(Verifier verifier) throws IOException {
         super.setSystemProperties(verifier);
-        verifier.getSystemProperties().setProperty("devkit.studio.xml.skip", "false");
+        verifier.getSystemProperties().setProperty("devkit.studio.package.skip", "false");
     }
 }

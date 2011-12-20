@@ -87,7 +87,7 @@ public abstract class BaseStudioXmlBuilder {
         for (ExecutableElement method : methods) {
             ModeElementType mode = new ModeElementType();
             String methodName = method.getSimpleName().toString();
-            mode.setModeId(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + nameUtils.uncamel(methodName));
+            mode.setModeId(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + nameUtils.uncamel(methodName));
             mode.setModeLabel(nameUtils.friendlyNameFromCamelCase(methodName));
             modes.add(mode);
         }
@@ -101,7 +101,7 @@ public abstract class BaseStudioXmlBuilder {
         Group group = new Group();
         group.setId(typeElement.name() + "ConnectorGeneric");
         group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupModeSwitch(modeSwitch));
-        group.setCaption(helper.formatCaption(MuleStudioXmlGenerator.GROUP_DEFAULT_CAPTION));
+        group.setCaption(helper.formatCaption(MuleStudioEditorXmlGenerator.GROUP_DEFAULT_CAPTION));
         return group;
     }
 
@@ -117,7 +117,7 @@ public abstract class BaseStudioXmlBuilder {
     protected List<AttributeCategory> processConfigurableFields(Group defaultGroup) {
         List<AttributeCategory> attributeCategories = processVariableElements(getConfigurableFieldsSorted());
         for (AttributeCategory attributeCategory : attributeCategories) {
-            if (attributeCategory.getCaption().equals(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION)) {
+            if (attributeCategory.getCaption().equals(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION)) {
                 attributeCategory.setCaption(helper.getFormattedCaption(typeElement));
                 attributeCategory.setDescription(helper.formatDescription(typeElement.name() + " configuration properties"));
                 List<Group> groups = attributeCategory.getGroup();
@@ -175,19 +175,19 @@ public abstract class BaseStudioXmlBuilder {
 
     private AttributeCategory getOrCreateAttributeCategory(Map<String, AttributeCategory> attributeCategoriesByName, Display display) {
         if (display == null || StringUtils.isBlank(display.tab())) {
-            if (!attributeCategoriesByName.containsKey(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION)) {
+            if (!attributeCategoriesByName.containsKey(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION)) {
                 AttributeCategory attributeCategoryGeneral = new AttributeCategory();
-                attributeCategoryGeneral.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
-                attributeCategoryGeneral.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
-                attributeCategoriesByName.put(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION, attributeCategoryGeneral);
+                attributeCategoryGeneral.setCaption(helper.formatCaption(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
+                attributeCategoryGeneral.setDescription(helper.formatDescription(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
+                attributeCategoriesByName.put(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION, attributeCategoryGeneral);
             }
-            return attributeCategoriesByName.get(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION);
+            return attributeCategoriesByName.get(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION);
         } else {
             String attributeCategoryName;
             if (StringUtils.isNotBlank(display.tab())) {
                 attributeCategoryName = display.tab();
             } else {
-                attributeCategoryName = MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION;
+                attributeCategoryName = MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION;
             }
             if (!attributeCategoriesByName.containsKey(attributeCategoryName)) {
                 AttributeCategory attributeCategory = new AttributeCategory();
@@ -278,7 +278,7 @@ public abstract class BaseStudioXmlBuilder {
             prefix = "configurable";
             childElement.setDescription(helper.formatDescription(javaDocUtils.getSummary(parameter)));
         }
-        childElement.setName(MuleStudioXmlGenerator.URI_PREFIX + moduleName + '/' + prefix + '-' + nameUtils.uncamel(parameter.getSimpleName().toString()));
+        childElement.setName(MuleStudioEditorXmlGenerator.URI_PREFIX + moduleName + '/' + prefix + '-' + nameUtils.uncamel(parameter.getSimpleName().toString()));
         childElement.setAllowMultiple(false);
         childElement.setCaption(helper.getFormattedCaption(parameter));
         childElement.setInplace(true);

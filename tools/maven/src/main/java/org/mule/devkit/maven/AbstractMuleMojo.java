@@ -50,6 +50,12 @@ public abstract class AbstractMuleMojo extends AbstractMojo {
     @MojoParameter(required = true, expression = "${project}", readonly = true)
     protected MavenProject project;
 
+    /**
+     * Whether to skip the creating of a Mule Studio plugin.
+     */
+    @MojoParameter(expression = "${devkit.studio.package.skip}", defaultValue = "false")
+    protected boolean skipStudioPluginPackage;
+
     protected File getMuleZipFile() {
         return new File(this.outputDirectory, this.finalName + ".zip");
     }

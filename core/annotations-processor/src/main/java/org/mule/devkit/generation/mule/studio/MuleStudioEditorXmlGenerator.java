@@ -31,8 +31,9 @@ import org.mule.devkit.model.studio.PatternType;
 import javax.lang.model.element.ExecutableElement;
 import java.util.List;
 
-public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
+public class MuleStudioEditorXmlGenerator extends AbstractMessageGenerator {
 
+    public static final String EDITOR_XML_FILE_NAME = "editors.xml";
     public static final String URI_PREFIX = "http://www.mulesoft.org/schema/mule/";
     public static final String GLOBAL_CLOUD_CONNECTOR_LOCAL_ID = "config";
     public static final String ATTRIBUTE_CATEGORY_DEFAULT_CAPTION = "General";
@@ -43,7 +44,7 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return !context.hasOption("skipStudioXmlGeneration");
+        return !context.hasOption("skipStudioPluginPackage");
     }
 
     @Override
@@ -65,7 +66,7 @@ public class MuleStudioXmlGenerator extends AbstractMessageGenerator {
         processSourceMethods(typeElement, namespace);
 
         context.getStudioModel().setNamespaceType(namespace);
-        context.getStudioModel().setModuleName(moduleName);
+        context.getStudioModel().setOutputFileName(EDITOR_XML_FILE_NAME);
     }
 
     private void processProcessorMethods(DevKitTypeElement typeElement, NamespaceType namespace) {

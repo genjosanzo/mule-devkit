@@ -58,9 +58,6 @@ public class AnnotationProcessorMojo extends AbstractAnnotationProcessorMojo {
     @MojoParameter(required = false, expression = "${devkit.javadoc.check.skip}", description = "Skip JavaDoc validation", defaultValue = "false")
     private boolean skipJavaDocValidation;
 
-    @MojoParameter(required = false, expression = "${devkit.studio.xml.skip}", description = "Skip Mule Studio XML generation", defaultValue = "true")
-    private boolean skipStudioXmlGeneration;
-
     @Override
     public File getSourceDirectory() {
         return sourceDirectory;
@@ -108,9 +105,9 @@ public class AnnotationProcessorMojo extends AbstractAnnotationProcessorMojo {
             LOGGER.warn("Javadoc validation will be skipped");
             options.add("-AskipJavaDocValidation=true");
         }
-        if (skipStudioXmlGeneration) {
+        if (skipStudioPluginPackage) {
             LOGGER.info("Studio XML will be skipped");
-            options.add("-AskipStudioXmlGeneration=true");
+            options.add("-AskipStudioPluginPackage=true");
         }
 
         super.addCompilerArguments(options);

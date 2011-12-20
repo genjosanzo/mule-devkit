@@ -37,7 +37,7 @@ public class GlobalCloudConnectorTypeBuilder extends GlobalTypeBuilder {
         Group group = new Group();
         group.setId(moduleName + "GenericProperties");
         group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupName(createNameAttributeType()));
-        group.setCaption(helper.formatCaption(MuleStudioXmlGenerator.GROUP_DEFAULT_CAPTION));
+        group.setCaption(helper.formatCaption(MuleStudioEditorXmlGenerator.GROUP_DEFAULT_CAPTION));
         return processConfigurableFields(group);
     }
 
@@ -53,7 +53,7 @@ public class GlobalCloudConnectorTypeBuilder extends GlobalTypeBuilder {
             List<AttributeType> connectionAttributes = getConnectionAttributes(typeElement);
             connectionAttributesGroup.getRegexpOrEncodingOrModeSwitch().addAll(helper.createJAXBElements(connectionAttributes));
 
-            AttributeCategory defaultAttributeCategory = attributeCategoriesByName.get(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION);
+            AttributeCategory defaultAttributeCategory = attributeCategoriesByName.get(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION);
             defaultAttributeCategory.getGroup().add(connectionAttributesGroup);
         }
     }
@@ -63,11 +63,11 @@ public class GlobalCloudConnectorTypeBuilder extends GlobalTypeBuilder {
     }
 
     protected String getExtendsBasedOnType() {
-        return MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name());
+        return MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name());
     }
 
     protected String getLocalIdBasedOnType() {
-        return MuleStudioXmlGenerator.GLOBAL_CLOUD_CONNECTOR_LOCAL_ID;
+        return MuleStudioEditorXmlGenerator.GLOBAL_CLOUD_CONNECTOR_LOCAL_ID;
     }
 
     protected String getCaptionBasedOnType() {

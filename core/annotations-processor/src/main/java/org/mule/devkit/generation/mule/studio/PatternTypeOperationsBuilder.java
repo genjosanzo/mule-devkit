@@ -46,8 +46,8 @@ public class PatternTypeOperationsBuilder extends BaseStudioXmlBuilder {
     public JAXBElement<PatternType> build() {
 
         AttributeCategory attributeCategory = new AttributeCategory();
-        attributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
-        attributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
+        attributeCategory.setCaption(helper.formatCaption(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
+        attributeCategory.setDescription(helper.formatDescription(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
         attributeCategory.getGroup().add(createGroupWithModeSwitch(getMethods()));
 
         PatternType patternType = new PatternType();
@@ -56,7 +56,7 @@ public class PatternTypeOperationsBuilder extends BaseStudioXmlBuilder {
 
         if (patternTypeToUse.equals(PatternTypes.CLOUD_CONNECTOR)) {
             patternType.setLocalId(typeElement.name() + "-connector");
-            patternType.setExtends(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
+            patternType.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
         } else {
             patternType.setLocalId(typeElement.name() + "-transformer");
         }

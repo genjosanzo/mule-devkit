@@ -42,7 +42,7 @@ public class EndpointTypeBuilder extends BaseStudioXmlBuilder {
         endpointType.setSupportsOutbound(false);
         endpointType.setInboundLocalName(getLocalId());
         endpointType.setAbstract(true);
-        endpointType.setExtends(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
+        endpointType.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
 
         processMethodParameters(endpointType);
 

@@ -37,14 +37,14 @@ public class GlobalEndpointTypeOperationsBuilder extends GlobalTypeBuilder {
     @Override
     public GlobalType build() {
         GlobalType globalEndpointListingOps = super.build();
-        globalEndpointListingOps.setExtends(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + GlobalEndpointTypeWithNameBuilder.ABSTRACT_GLOBAL_ENDPOINT_LOCAL_ID);
+        globalEndpointListingOps.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + GlobalEndpointTypeWithNameBuilder.ABSTRACT_GLOBAL_ENDPOINT_LOCAL_ID);
         return globalEndpointListingOps;
     }
 
     protected List<AttributeCategory> getAttributeCategories() {
         AttributeCategory attributeCategory = new AttributeCategory();
-        attributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
-        attributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
+        attributeCategory.setCaption(helper.formatCaption(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
+        attributeCategory.setDescription(helper.formatDescription(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
 
         attributeCategory.getGroup().add(createGroupWithModeSwitch(getTransformerMethodsSorted()));
 

@@ -38,7 +38,7 @@ public class ConfigRefBuilder extends BaseStudioXmlBuilder {
 
     public JAXBElement<PatternType> build() {
         NewType globalRef = new NewType();
-        globalRef.setRequiredType(MuleStudioXmlGenerator.URI_PREFIX + moduleName + '/' + MuleStudioXmlGenerator.GLOBAL_CLOUD_CONNECTOR_LOCAL_ID);
+        globalRef.setRequiredType(MuleStudioEditorXmlGenerator.URI_PREFIX + moduleName + '/' + MuleStudioEditorXmlGenerator.GLOBAL_CLOUD_CONNECTOR_LOCAL_ID);
         globalRef.setName(GLOBAL_REF_NAME);
         globalRef.setCaption(helper.formatCaption("config reference"));
         globalRef.setDescription(helper.formatDescription("Specify which configuration to use for this invocation"));
@@ -46,11 +46,11 @@ public class ConfigRefBuilder extends BaseStudioXmlBuilder {
         Group group = new Group();
         group.setId(helper.getGlobalRefId(moduleName));
         group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupGlobalRef(globalRef));
-        group.setCaption(helper.formatCaption(MuleStudioXmlGenerator.GROUP_DEFAULT_CAPTION));
+        group.setCaption(helper.formatCaption(MuleStudioEditorXmlGenerator.GROUP_DEFAULT_CAPTION));
 
         AttributeCategory attributeCategory = new AttributeCategory();
-        attributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
-        attributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
+        attributeCategory.setCaption(helper.formatCaption(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
+        attributeCategory.setDescription(helper.formatDescription(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
         attributeCategory.getGroup().add(group);
 
         PatternType cloudConnector = new PatternType();

@@ -228,7 +228,7 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
         NestedElementReference childElement = new NestedElementReference();
         String parameterFriendlyName = nameUtils.friendlyNameFromCamelCase(parameter.getSimpleName().toString());
         if (isListOfMaps(parameter)) {
-            childElement.setName(MuleStudioXmlGenerator.URI_PREFIX + moduleName + '/' + localId);
+            childElement.setName(MuleStudioEditorXmlGenerator.URI_PREFIX + moduleName + '/' + localId);
             childElement.setDescription(helper.formatDescription(nameUtils.singularize(parameterFriendlyName)));
             childElement.setCaption(helper.formatCaption(nameUtils.singularize(parameterFriendlyName)));
         } else {
@@ -236,7 +236,7 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
             if (localId.equals(singularizedLocalId)) {
                 singularizedLocalId += "-each";
             }
-            childElement.setName(MuleStudioXmlGenerator.URI_PREFIX + moduleName + '/' + singularizedLocalId);
+            childElement.setName(MuleStudioEditorXmlGenerator.URI_PREFIX + moduleName + '/' + singularizedLocalId);
             childElement.setDescription(helper.formatDescription(parameterFriendlyName));
             childElement.setCaption(helper.formatCaption(parameterFriendlyName));
         }

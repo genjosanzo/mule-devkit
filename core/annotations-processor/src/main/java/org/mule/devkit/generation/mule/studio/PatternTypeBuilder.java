@@ -54,9 +54,9 @@ public class PatternTypeBuilder extends BaseStudioXmlBuilder {
         cloudConnector.setAbstract(true);
 
         if (executableElement.getAnnotation(Processor.class) != null) {
-            cloudConnector.setExtends(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
+            cloudConnector.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
         } else if (executableElement.getAnnotation(Transformer.class) != null) {
-            cloudConnector.setExtends(MuleStudioXmlGenerator.URI_PREFIX + typeElement.name() + '/' + AbstractTransformerBuilder.ABSTRACT_TRANSFORMER_LOCAL_ID);
+            cloudConnector.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + AbstractTransformerBuilder.ABSTRACT_TRANSFORMER_LOCAL_ID);
             cloudConnector.setDescription(helper.formatDescription(javaDocUtils.getSummary(executableElement)));
         }
 
@@ -103,9 +103,9 @@ public class PatternTypeBuilder extends BaseStudioXmlBuilder {
             connectionAttributesGroup.getRegexpOrEncodingOrModeSwitch().addAll(helper.createJAXBElements(connectionAttributes));
 
             AttributeCategory connectionAttributeCategory = new AttributeCategory();
-            connectionAttributeCategory.setCaption(helper.formatCaption(MuleStudioXmlGenerator.CONNECTION_ATTRIBUTE_CATEGORY_CAPTION));
-            connectionAttributeCategory.setDescription(helper.formatDescription(MuleStudioXmlGenerator.CONNECTION_ATTRIBUTE_CATEGORY_CAPTION));
-            attributeCategoriesByName.put(MuleStudioXmlGenerator.CONNECTION_ATTRIBUTE_CATEGORY_CAPTION, connectionAttributeCategory);
+            connectionAttributeCategory.setCaption(helper.formatCaption(MuleStudioEditorXmlGenerator.CONNECTION_ATTRIBUTE_CATEGORY_CAPTION));
+            connectionAttributeCategory.setDescription(helper.formatDescription(MuleStudioEditorXmlGenerator.CONNECTION_ATTRIBUTE_CATEGORY_CAPTION));
+            attributeCategoriesByName.put(MuleStudioEditorXmlGenerator.CONNECTION_ATTRIBUTE_CATEGORY_CAPTION, connectionAttributeCategory);
             connectionAttributeCategory.getGroup().add(connectionAttributesGroup);
         }
     }
