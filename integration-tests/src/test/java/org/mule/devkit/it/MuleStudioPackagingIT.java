@@ -36,7 +36,7 @@ public class MuleStudioPackagingIT extends AbstractMavenIT {
     @Override
     public void buildExecutable() throws Exception {
         super.buildExecutable();
-        File zipFile = new File(getRoot().getAbsolutePath(), "target/studio-plugin.zip");
+        File zipFile = new File(getRoot().getAbsolutePath(), "target/" + getArtifactId() + '-' + getArtifactVersion() + "-studio.zip");
         assertTrue("Cannot find Mule Studio plugin package in path: " + zipFile.getAbsolutePath(), zipFile.exists());
         for(String expectedFile : EXPECTED_FILES_IN_STUDIO_PACKAGE) {
             assertZipContains(zipFile, expectedFile);
