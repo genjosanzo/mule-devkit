@@ -29,7 +29,7 @@ import org.mule.api.callback.SourceCallback;
  *
  * @author MuleSoft inc
  */
-@Module(name = "metadata", description = "This description overrides class-level javadoc")
+@Module(name = "metadata", description = "This description overrides class-level javadoc.")
 public class MetadataModule {
 
     /**
