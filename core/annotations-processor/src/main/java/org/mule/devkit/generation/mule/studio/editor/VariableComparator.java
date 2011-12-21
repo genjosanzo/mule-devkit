@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.generation.mule.studio;
+package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.utils.TypeMirrorUtils;

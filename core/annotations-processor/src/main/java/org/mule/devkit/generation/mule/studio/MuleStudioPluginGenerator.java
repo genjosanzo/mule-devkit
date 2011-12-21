@@ -21,6 +21,7 @@ import org.mule.devkit.generation.AbstractGenerator;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.generation.mule.studio.editor.MuleStudioEditorXmlGenerator;
 
 import java.util.Arrays;
 import java.util.List;

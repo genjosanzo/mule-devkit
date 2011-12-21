@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mule.devkit.generation.mule.studio;
+package org.mule.devkit.generation.mule.studio.editor;
 
 import org.apache.commons.lang.WordUtils;
 import org.mule.api.annotations.Processor;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.generation.mule.studio;
+package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connect;

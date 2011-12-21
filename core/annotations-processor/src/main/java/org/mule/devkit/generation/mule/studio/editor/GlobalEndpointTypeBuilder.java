@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.generation.mule.studio;
+package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
@@ -27,17 +27,18 @@ import javax.lang.model.element.ExecutableElement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GlobalTransformerTypeBuilder extends GlobalTypeBuilder {
+public class GlobalEndpointTypeBuilder extends GlobalTypeBuilder {
 
-    public GlobalTransformerTypeBuilder(GeneratorContext context, ExecutableElement executableElement, DevKitTypeElement typeElement) {
+    public GlobalEndpointTypeBuilder(GeneratorContext context, ExecutableElement executableElement, DevKitTypeElement typeElement) {
         super(context, executableElement, typeElement);
     }
 
     @Override
     public GlobalType build() {
-        GlobalType globalTransformer = super.build();
-        globalTransformer.setAbstract(true);
-        return globalTransformer;
+        GlobalType globalEndpoint = super.build();
+        globalEndpoint.setAbstract(true);
+        globalEndpoint.setDoNotInherit(getDoNotInherit());
+        return globalEndpoint;
     }
 
     protected List<AttributeCategory> getAttributeCategories() {
@@ -47,9 +48,11 @@ public class GlobalTransformerTypeBuilder extends GlobalTypeBuilder {
 
         Group group = new Group();
         group.setCaption(helper.formatCaption(MuleStudioEditorXmlGenerator.GROUP_DEFAULT_CAPTION));
-        group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupName(createNameAttributeType()));
+        group.setId(getIdBasedOnType());
 
         attributeCategory.getGroup().add(group);
+
+        group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupName(createNameAttributeType()));
 
         List<AttributeCategory> attributeCategories = new ArrayList<AttributeCategory>();
         attributeCategories.add(attributeCategory);
@@ -73,16 +76,24 @@ public class GlobalTransformerTypeBuilder extends GlobalTypeBuilder {
     }
 
     protected String getNameDescriptionBasedOnType() {
-        return "Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level.";
+        return "Endpoint name";
+    }
+
+    protected String getDoNotInherit() {
+        return ConfigRefBuilder.GLOBAL_REF_NAME;
     }
 
     @Override
     protected String getImage() {
-        return helper.getTransformerImage(typeElement.name());
+        return helper.getEndpointImage(typeElement.name());
     }
 
     @Override
     protected String getIcon() {
-        return helper.getTransformerIcon(typeElement.name());
+        return helper.getEndpointIcon(typeElement.name());
+    }
+
+    private String getIdBasedOnType() {
+        return "abstractEndpointGeneric";
     }
 }

@@ -15,30 +15,29 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.generation.mule.studio;
+package org.mule.devkit.generation.mule.studio.editor;
 
-import org.mule.api.annotations.Source;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.GlobalType;
+import org.mule.devkit.model.studio.Group;
 
 import javax.lang.model.element.ExecutableElement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class GlobalEndpointTypeOperationsBuilder extends GlobalTypeBuilder {
+public class GlobalTransformerTypeBuilder extends GlobalTypeBuilder {
 
-    public GlobalEndpointTypeOperationsBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
-        super(context, typeElement);
+    public GlobalTransformerTypeBuilder(GeneratorContext context, ExecutableElement executableElement, DevKitTypeElement typeElement) {
+        super(context, executableElement, typeElement);
     }
 
     @Override
     public GlobalType build() {
-        GlobalType globalEndpointListingOps = super.build();
-        globalEndpointListingOps.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + GlobalEndpointTypeWithNameBuilder.ABSTRACT_GLOBAL_ENDPOINT_LOCAL_ID);
-        return globalEndpointListingOps;
+        GlobalType globalTransformer = super.build();
+        globalTransformer.setAbstract(true);
+        return globalTransformer;
     }
 
     protected List<AttributeCategory> getAttributeCategories() {
@@ -46,46 +45,44 @@ public class GlobalEndpointTypeOperationsBuilder extends GlobalTypeBuilder {
         attributeCategory.setCaption(helper.formatCaption(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
         attributeCategory.setDescription(helper.formatDescription(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
 
-        attributeCategory.getGroup().add(createGroupWithModeSwitch(getTransformerMethodsSorted()));
+        Group group = new Group();
+        group.setCaption(helper.formatCaption(MuleStudioEditorXmlGenerator.GROUP_DEFAULT_CAPTION));
+        group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupName(createNameAttributeType()));
+
+        attributeCategory.getGroup().add(group);
 
         List<AttributeCategory> attributeCategories = new ArrayList<AttributeCategory>();
         attributeCategories.add(attributeCategory);
         return attributeCategories;
     }
 
-    private List<ExecutableElement> getTransformerMethodsSorted() {
-        List<ExecutableElement> transformer = typeElement.getMethodsAnnotatedWith(Source.class);
-        Collections.sort(transformer, new MethodComparator());
-        return transformer;
-    }
-
     protected String getDescriptionBasedOnType() {
-        return helper.formatDescription("Global endpoint");
+        return helper.formatDescription(javaDocUtils.getSummary(executableElement));
     }
 
     protected String getExtendsBasedOnType() {
-        return "";
+        return MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + getLocalIdBasedOnType();
     }
 
     protected String getLocalIdBasedOnType() {
-        return "global-endpoint";
+        return nameUtils.uncamel(executableElement.getSimpleName().toString());
     }
 
     protected String getCaptionBasedOnType() {
-        return helper.getFormattedCaption(typeElement);
+        return helper.formatCaption(nameUtils.friendlyNameFromCamelCase(executableElement.getSimpleName().toString()));
     }
 
     protected String getNameDescriptionBasedOnType() {
-        return "Identifies the endpoint so that other elements can reference it.";
+        return "Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level.";
     }
 
     @Override
     protected String getImage() {
-        return helper.getEndpointImage(typeElement.name());
+        return helper.getTransformerImage(typeElement.name());
     }
 
     @Override
     protected String getIcon() {
-        return helper.getEndpointIcon(typeElement.name());
+        return helper.getTransformerIcon(typeElement.name());
     }
 }

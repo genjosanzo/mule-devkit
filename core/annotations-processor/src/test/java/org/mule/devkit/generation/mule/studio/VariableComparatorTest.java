@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mule.devkit.GeneratorContext;
+import org.mule.devkit.generation.mule.studio.editor.VariableComparator;
 import org.mule.devkit.utils.TypeMirrorUtils;
 
 import javax.lang.model.element.Name;

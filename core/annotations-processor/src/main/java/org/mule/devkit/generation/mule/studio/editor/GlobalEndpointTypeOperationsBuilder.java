@@ -15,30 +15,30 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.generation.mule.studio;
+package org.mule.devkit.generation.mule.studio.editor;
 
+import org.mule.api.annotations.Source;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
 import org.mule.devkit.model.studio.GlobalType;
-import org.mule.devkit.model.studio.Group;
 
 import javax.lang.model.element.ExecutableElement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class GlobalEndpointTypeBuilder extends GlobalTypeBuilder {
+public class GlobalEndpointTypeOperationsBuilder extends GlobalTypeBuilder {
 
-    public GlobalEndpointTypeBuilder(GeneratorContext context, ExecutableElement executableElement, DevKitTypeElement typeElement) {
-        super(context, executableElement, typeElement);
+    public GlobalEndpointTypeOperationsBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
+        super(context, typeElement);
     }
 
     @Override
     public GlobalType build() {
-        GlobalType globalEndpoint = super.build();
-        globalEndpoint.setAbstract(true);
-        globalEndpoint.setDoNotInherit(getDoNotInherit());
-        return globalEndpoint;
+        GlobalType globalEndpointListingOps = super.build();
+        globalEndpointListingOps.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + GlobalEndpointTypeWithNameBuilder.ABSTRACT_GLOBAL_ENDPOINT_LOCAL_ID);
+        return globalEndpointListingOps;
     }
 
     protected List<AttributeCategory> getAttributeCategories() {
@@ -46,41 +46,37 @@ public class GlobalEndpointTypeBuilder extends GlobalTypeBuilder {
         attributeCategory.setCaption(helper.formatCaption(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
         attributeCategory.setDescription(helper.formatDescription(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_DESCRIPTION));
 
-        Group group = new Group();
-        group.setCaption(helper.formatCaption(MuleStudioEditorXmlGenerator.GROUP_DEFAULT_CAPTION));
-        group.setId(getIdBasedOnType());
-
-        attributeCategory.getGroup().add(group);
-
-        group.getRegexpOrEncodingOrModeSwitch().add(objectFactory.createGroupName(createNameAttributeType()));
+        attributeCategory.getGroup().add(createGroupWithModeSwitch(getTransformerMethodsSorted()));
 
         List<AttributeCategory> attributeCategories = new ArrayList<AttributeCategory>();
         attributeCategories.add(attributeCategory);
         return attributeCategories;
     }
 
+    private List<ExecutableElement> getTransformerMethodsSorted() {
+        List<ExecutableElement> transformer = typeElement.getMethodsAnnotatedWith(Source.class);
+        Collections.sort(transformer, new MethodComparator());
+        return transformer;
+    }
+
     protected String getDescriptionBasedOnType() {
-        return helper.formatDescription(javaDocUtils.getSummary(executableElement));
+        return helper.formatDescription("Global endpoint");
     }
 
     protected String getExtendsBasedOnType() {
-        return MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + getLocalIdBasedOnType();
+        return "";
     }
 
     protected String getLocalIdBasedOnType() {
-        return nameUtils.uncamel(executableElement.getSimpleName().toString());
+        return "global-endpoint";
     }
 
     protected String getCaptionBasedOnType() {
-        return helper.formatCaption(nameUtils.friendlyNameFromCamelCase(executableElement.getSimpleName().toString()));
+        return helper.getFormattedCaption(typeElement);
     }
 
     protected String getNameDescriptionBasedOnType() {
-        return "Endpoint name";
-    }
-
-    protected String getDoNotInherit() {
-        return ConfigRefBuilder.GLOBAL_REF_NAME;
+        return "Identifies the endpoint so that other elements can reference it.";
     }
 
     @Override
@@ -91,9 +87,5 @@ public class GlobalEndpointTypeBuilder extends GlobalTypeBuilder {
     @Override
     protected String getIcon() {
         return helper.getEndpointIcon(typeElement.name());
-    }
-
-    private String getIdBasedOnType() {
-        return "abstractEndpointGeneric";
     }
 }

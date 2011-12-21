@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.mule.devkit.generation.mule.studio;
+package org.mule.devkit.generation.mule.studio.editor;
 
 import javax.lang.model.element.ExecutableElement;
 import java.util.Comparator;
