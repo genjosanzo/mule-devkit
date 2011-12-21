@@ -39,4 +39,9 @@ public @interface Source {
      * will be derived from the name of the method.
      */
     String name() default "";
+
+    /**
+     * A user-friendly name for this processor.
+     */
+    String friendlyName() default "";
 }

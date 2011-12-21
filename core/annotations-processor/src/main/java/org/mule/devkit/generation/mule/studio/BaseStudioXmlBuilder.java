@@ -19,7 +19,7 @@ package org.mule.devkit.generation.mule.studio;
 
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connect;
-import org.mule.api.annotations.studio.Display;
+import org.mule.api.annotations.display.VariableDisplay;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
@@ -148,7 +148,7 @@ public abstract class BaseStudioXmlBuilder {
 
         for (VariableElement parameter : variableElements) {
             JAXBElement<? extends AttributeType> jaxbElement = createJaxbElement(parameter);
-            AttributeCategory attributeCategory = getOrCreateAttributeCategory(attributeCategoriesByName, parameter.getAnnotation(Display.class));
+            AttributeCategory attributeCategory = getOrCreateAttributeCategory(attributeCategoriesByName, parameter.getAnnotation(VariableDisplay.class));
             Group group = getOrCreateGroup(groupsByName, parameter);
             group.getRegexpOrEncodingOrModeSwitch().add(jaxbElement);
 
@@ -173,7 +173,7 @@ public abstract class BaseStudioXmlBuilder {
 
     }
 
-    private AttributeCategory getOrCreateAttributeCategory(Map<String, AttributeCategory> attributeCategoriesByName, Display display) {
+    private AttributeCategory getOrCreateAttributeCategory(Map<String, AttributeCategory> attributeCategoriesByName, VariableDisplay display) {
         if (display == null || StringUtils.isBlank(display.tab())) {
             if (!attributeCategoriesByName.containsKey(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION)) {
                 AttributeCategory attributeCategoryGeneral = new AttributeCategory();
@@ -200,7 +200,7 @@ public abstract class BaseStudioXmlBuilder {
     }
 
     private Group getOrCreateGroup(Map<String, Group> groupsByName, VariableElement parameter) {
-        Display display = parameter.getAnnotation(Display.class);
+        VariableDisplay display = parameter.getAnnotation(VariableDisplay.class);
         if (display == null || StringUtils.isBlank(display.inputGroup())) {
             if (!groupsByName.containsKey(GENERAL_GROUP_NAME)) {
                 Group groupGeneral = new Group();

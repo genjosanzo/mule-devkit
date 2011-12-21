@@ -56,14 +56,15 @@ public class MuleStudioManifestGenerator extends AbstractMessageGenerator {
         manfiestContentBuilder.append("Bundle-ManifestVersion: 2\n");
         manfiestContentBuilder.append("Bundle-Name: ").append(context.getNameUtils().friendlyNameFromCamelCase(typeElement.name())).append("\n");
         manfiestContentBuilder.append("Bundle-SymbolicName: org.mule.tooling.ui.contribution.").append(typeElement.name()).append(";singleton:=true\n");
-        manfiestContentBuilder.append("Bundle-Activator: org.mule.tooling.ui.contribution.").append(typeElement.name()).append(".Activator\n");
+        manfiestContentBuilder.append("Bundle-Version: 1.0.0.qualifier\n");
+        manfiestContentBuilder.append("Bundle-Activator: org.mule.tooling.ui.contribution.Activator\n");
         manfiestContentBuilder.append("Bundle-Vendor: ").append(context.getJavaDocUtils().getTagContent("author", typeElement.getInnerTypeElement())).append("\n");
         manfiestContentBuilder.append("Require-Bundle: org.eclipse.ui,\n");
         manfiestContentBuilder.append(" org.eclipse.core.runtime,\n");
         manfiestContentBuilder.append(" org.mule.tooling.core;bundle-version=\"1.0.0\"\n");
         manfiestContentBuilder.append("Bundle-RequiredExecutionEnvironment: JavaSE-1.6\n");
         manfiestContentBuilder.append("Bundle-ActivationPolicy: lazy\n");
-        manfiestContentBuilder.append("Eclipse-BundleShape: dir");
+        manfiestContentBuilder.append("Eclipse-BundleShape: dir\n");
         return manfiestContentBuilder.toString();
     }
 }

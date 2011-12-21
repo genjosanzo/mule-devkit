@@ -66,4 +66,8 @@ public interface DevKitTypeElement extends TypeElement {
     String schemaVersion();
 
     boolean usesConnectionManager();
+
+    String friendlyName();
+
+    String description();
 }

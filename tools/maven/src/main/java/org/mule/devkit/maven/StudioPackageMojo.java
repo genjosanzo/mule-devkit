@@ -41,6 +41,7 @@ import java.util.List;
 @MojoRequiresDependencyResolution("runtime")
 public class StudioPackageMojo extends AbstractMuleMojo {
 
+    public static final String STUDIO_PACKAGE_SUFFIX = "-studio.zip";
     @MojoComponent
     private MavenProjectHelper projectHelper;
 
@@ -55,7 +56,7 @@ public class StudioPackageMojo extends AbstractMuleMojo {
             return;
         }
 
-        File studioPlugin = new File(outputDirectory, "studio-plugin.zip");
+        File studioPlugin = new File(outputDirectory, finalName + STUDIO_PACKAGE_SUFFIX);
         try {
             createStudioPlugin(studioPlugin);
         } catch (ArchiverException e) {

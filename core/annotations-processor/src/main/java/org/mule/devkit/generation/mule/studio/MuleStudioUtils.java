@@ -17,9 +17,12 @@
 package org.mule.devkit.generation.mule.studio;
 
 import org.apache.commons.lang.WordUtils;
+import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.Source;
+import org.mule.api.annotations.display.Password;
+import org.mule.api.annotations.display.VariableDisplay;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
-import org.mule.api.annotations.studio.Display;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.spring.SchemaGenerator;
@@ -175,8 +178,7 @@ public class MuleStudioUtils {
     }
 
     private AttributeType createAttributeTypeOfSupportedType(Element element) {
-        Display display = element.getAnnotation(Display.class);
-        if (display != null && display.type().equals(Display.Type.PASSWORD)) {
+        if (element.getAnnotation(Password.class) != null) {
             return new PasswordType();
         }
         if (typeMirrorUtils.isString(element) || typeMirrorUtils.isDate(element) || typeMirrorUtils.isChar(element) ||
@@ -236,31 +238,55 @@ public class MuleStudioUtils {
         }
     }
 
-    public String getFormattedDescription(Element element) {
-        Display display = element.getAnnotation(Display.class);
+    public String getFormattedDescription(VariableElement element) {
+        VariableDisplay display = element.getAnnotation(VariableDisplay.class);
         if (display != null && StringUtils.isNotBlank(display.description())) {
             return formatDescription(display.description());
         }
-        if (element instanceof VariableElement && element.getKind() == ElementKind.PARAMETER) {
+        if (element.getKind() == ElementKind.PARAMETER) {
             Element executableElement = element.getEnclosingElement();
             return formatDescription(javaDocUtils.getParameterSummary(element.getSimpleName().toString(), executableElement));
         }
         return formatDescription(javaDocUtils.getSummary(element));
     }
 
-    public String getFormattedCaption(Element element) {
-        Display display = element.getAnnotation(Display.class);
+    public String getFormattedDescription(DevKitTypeElement typeElement) {
+        if(StringUtils.isNotBlank(typeElement.description())) {
+            return typeElement.description();
+        }
+        return formatDescription(javaDocUtils.getSummary(typeElement));
+    }
+
+    public String getFormattedCaption(DevKitTypeElement typeElement) {
+        if(StringUtils.isNotBlank(typeElement.friendlyName())) {
+            return typeElement.friendlyName();
+        }
+        return formatCaption(typeElement.name().replaceAll("-", " "));
+    }
+
+    public String getFormattedCaption(ExecutableElement element) {
+        Processor processor = element.getAnnotation(Processor.class);
+        if(processor != null && StringUtils.isNotBlank(processor.friendlyName())) {
+            return processor.friendlyName();
+        }
+        Source source = element.getAnnotation(Source.class);
+        if(source != null && StringUtils.isNotBlank(source.friendlyName())) {
+            return source.friendlyName();
+        }
+        String friendlyName = nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString());
+        return formatCaption(friendlyName);
+    }
+
+    public String getFormattedCaption(VariableElement element) {
+        VariableDisplay display = element.getAnnotation(VariableDisplay.class);
         if (display != null && StringUtils.isNotBlank(display.caption())) {
             return display.caption();
-        }
-        if (element instanceof DevKitTypeElement) {
-            return formatCaption(((DevKitTypeElement) element).name().replaceAll("-", " "));
         }
         String friendlyName = nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString());
         if (typeMirrorUtils.isHttpCallback(element)) {
             return formatCaption(friendlyName + " Flow");
         }
-        if (element instanceof VariableElement && !isKnownType((VariableElement) element)) {
+        if (!isKnownType(element)) {
             return formatCaption(friendlyName + " Reference");
         }
         return formatCaption(friendlyName);

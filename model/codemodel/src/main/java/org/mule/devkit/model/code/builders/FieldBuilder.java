@@ -89,6 +89,11 @@ public class FieldBuilder {
         return this;
     }
 
+    public FieldBuilder publicVisibility() {
+        modifiers = Modifier.PUBLIC;
+        return this;
+    }
+
     public FieldBuilder getterAndSetter() {
         getter = true;
         setter = true;

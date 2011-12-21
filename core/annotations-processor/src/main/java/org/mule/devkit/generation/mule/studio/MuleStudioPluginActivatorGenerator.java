@@ -21,7 +21,6 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
-import org.mule.devkit.model.code.ClassAlreadyExistsException;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
@@ -48,7 +47,10 @@ public class MuleStudioPluginActivatorGenerator extends AbstractMessageGenerator
     protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass activatorClass = getActivatorClass();
         activatorClass.javadoc().add("The activator class controls the plug-in life cycle");
-        FieldBuilder.newConstantFieldBuilder(activatorClass).
+        new FieldBuilder(activatorClass).
+                publicVisibility().
+                staticField().
+                finalField().
                 type(String.class).
                 name("PLUGIN_ID").
                 initialValue("org.mule.tooling.ui.contribution." + typeElement.name()).build();
@@ -68,12 +70,8 @@ public class MuleStudioPluginActivatorGenerator extends AbstractMessageGenerator
         String activatorFQN = ACTIVATOR_FQN;
         Package pkg = context.getCodeModel()._package(nameUtils.getPackageName(activatorFQN));
         DefinedClass clazz;
-        try {
-            clazz = pkg._class(Modifier.ABSTRACT, context.getNameUtils().getClassName(activatorFQN));
-            clazz._extends(AbstractUIPlugin.class);
-        } catch (ClassAlreadyExistsException e) {
-            clazz = e.getExistingClass();
-        }
+        clazz = pkg._class(context.getNameUtils().getClassName(activatorFQN));
+        clazz._extends(AbstractUIPlugin.class);
         return clazz;
     }
 
