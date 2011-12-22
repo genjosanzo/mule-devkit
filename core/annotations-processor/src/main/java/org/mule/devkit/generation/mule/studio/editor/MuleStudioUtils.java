@@ -19,8 +19,9 @@ package org.mule.devkit.generation.mule.studio.editor;
 import org.apache.commons.lang.WordUtils;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
+import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Password;
-import org.mule.api.annotations.display.VariableDisplay;
+import org.mule.api.annotations.display.Summary;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.devkit.GeneratorContext;
@@ -239,9 +240,9 @@ public class MuleStudioUtils {
     }
 
     public String getFormattedDescription(VariableElement element) {
-        VariableDisplay display = element.getAnnotation(VariableDisplay.class);
-        if (display != null && StringUtils.isNotBlank(display.description())) {
-            return formatDescription(display.description());
+        Summary description = element.getAnnotation(Summary.class);
+        if (description != null && StringUtils.isNotBlank(description.value())) {
+            return formatDescription(description.value());
         }
         if (element.getKind() == ElementKind.PARAMETER) {
             Element executableElement = element.getEnclosingElement();
@@ -278,9 +279,9 @@ public class MuleStudioUtils {
     }
 
     public String getFormattedCaption(VariableElement element) {
-        VariableDisplay display = element.getAnnotation(VariableDisplay.class);
-        if (display != null && StringUtils.isNotBlank(display.caption())) {
-            return display.caption();
+        FriendlyName caption = element.getAnnotation(FriendlyName.class);
+        if (caption != null && StringUtils.isNotBlank(caption.value())) {
+            return caption.value();
         }
         String friendlyName = nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString());
         if (typeMirrorUtils.isHttpCallback(element)) {

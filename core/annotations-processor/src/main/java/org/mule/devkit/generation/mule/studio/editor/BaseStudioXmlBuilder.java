@@ -19,7 +19,7 @@ package org.mule.devkit.generation.mule.studio.editor;
 
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connect;
-import org.mule.api.annotations.display.VariableDisplay;
+import org.mule.api.annotations.display.Placement;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.studio.AttributeCategory;
@@ -148,7 +148,7 @@ public abstract class BaseStudioXmlBuilder {
 
         for (VariableElement parameter : variableElements) {
             JAXBElement<? extends AttributeType> jaxbElement = createJaxbElement(parameter);
-            AttributeCategory attributeCategory = getOrCreateAttributeCategory(attributeCategoriesByName, parameter.getAnnotation(VariableDisplay.class));
+            AttributeCategory attributeCategory = getOrCreateAttributeCategory(attributeCategoriesByName, parameter.getAnnotation(Placement.class));
             Group group = getOrCreateGroup(groupsByName, parameter);
             group.getRegexpOrEncodingOrModeSwitch().add(jaxbElement);
 
@@ -173,8 +173,8 @@ public abstract class BaseStudioXmlBuilder {
 
     }
 
-    private AttributeCategory getOrCreateAttributeCategory(Map<String, AttributeCategory> attributeCategoriesByName, VariableDisplay display) {
-        if (display == null || StringUtils.isBlank(display.tab())) {
+    private AttributeCategory getOrCreateAttributeCategory(Map<String, AttributeCategory> attributeCategoriesByName, Placement placement) {
+        if (placement == null || StringUtils.isBlank(placement.tab())) {
             if (!attributeCategoriesByName.containsKey(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION)) {
                 AttributeCategory attributeCategoryGeneral = new AttributeCategory();
                 attributeCategoryGeneral.setCaption(helper.formatCaption(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION));
@@ -184,8 +184,8 @@ public abstract class BaseStudioXmlBuilder {
             return attributeCategoriesByName.get(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION);
         } else {
             String attributeCategoryName;
-            if (StringUtils.isNotBlank(display.tab())) {
-                attributeCategoryName = display.tab();
+            if (StringUtils.isNotBlank(placement.tab())) {
+                attributeCategoryName = placement.tab();
             } else {
                 attributeCategoryName = MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION;
             }
@@ -200,8 +200,8 @@ public abstract class BaseStudioXmlBuilder {
     }
 
     private Group getOrCreateGroup(Map<String, Group> groupsByName, VariableElement parameter) {
-        VariableDisplay display = parameter.getAnnotation(VariableDisplay.class);
-        if (display == null || StringUtils.isBlank(display.inputGroup())) {
+        Placement placement = parameter.getAnnotation(Placement.class);
+        if (placement == null || StringUtils.isBlank(placement.group())) {
             if (!groupsByName.containsKey(GENERAL_GROUP_NAME)) {
                 Group groupGeneral = new Group();
                 groupGeneral.setCaption(helper.formatCaption(GENERAL_GROUP_NAME));
@@ -210,7 +210,7 @@ public abstract class BaseStudioXmlBuilder {
             }
             return groupsByName.get(GENERAL_GROUP_NAME);
         } else {
-            String groupName = display.inputGroup();
+            String groupName = placement.group();
             if (!groupsByName.containsKey(groupName)) {
                 Group group = new Group();
                 group.setCaption(groupName);

@@ -21,7 +21,7 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.junit.Test;
-import org.mule.devkit.generation.mule.studio.MuleStudioEditorXmlGenerator;
+import org.mule.devkit.generation.mule.studio.editor.MuleStudioEditorXmlGenerator;
 import org.mule.util.IOUtils;
 
 import static org.junit.Assert.assertTrue;

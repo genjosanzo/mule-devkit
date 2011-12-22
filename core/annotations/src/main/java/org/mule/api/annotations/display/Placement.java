@@ -23,14 +23,14 @@ import java.lang.annotation.Target;
  * Adds displaying information to a field or parameter.
  */
 @Target({ElementType.PARAMETER, ElementType.FIELD})
-public @interface VariableDisplay {
+public @interface Placement {
 
     /**
      * A group is a logical way to display one or more input fields together. If no inputGroup is specified then a
      * dafult input group is assumed. To place more than one element in the same input group, use the same value for
      * inputGroup attribute
      */
-    String inputGroup() default "";
+    String group() default "";
 
     /**
      * A tab is a logical way to group input groups together. This attributes specifies the name of the tab in which the
@@ -38,16 +38,4 @@ public @interface VariableDisplay {
      * more than one parameter or field in the same the tab then this value should be exactly the same for all of them.
      */
     String tab() default "";
-
-    /**
-     * The caption is a short name for the annotated element. If this value is not specified it will
-     * inferred from the annotated element name.
-     */
-    String caption() default "";
-
-    /**
-     * The description is a friendly explanation for the annotated element. If this value is not specified
-     * the javadoc of the annotated element.
-     */
-    String description() default "";
 }
