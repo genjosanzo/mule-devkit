@@ -38,6 +38,11 @@ public @interface Processor {
     String name() default "";
 
     /**
+     * A user-friendly name for this processor.
+     */
+    String friendlyName() default "";
+
+    /**
      * Setting this value to true will trigger the generation of an {@link org.mule.api.processor.InterceptingMessageProcessor} rather than
      * a {@link org.mule.api.processor.MessageProcessor}. An intercepting processor must receive a {@link org.mule.api.callback.SourceCallback} to trigger the
      * next portion of the chain.

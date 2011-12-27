@@ -29,10 +29,9 @@ import java.io.UnsupportedEncodingException;
 
 public class StudioModel {
 
-    private static final String XML_FILE_NAME = "META-INF/%s-studio.xml";
     private CodeWriter codeWriter;
-    private String moduleName;
     private NamespaceType namespaceType;
+    private String outputFileName;
 
     public StudioModel(CodeWriter codeWriter) {
         this.codeWriter = codeWriter;
@@ -57,17 +56,17 @@ public class StudioModel {
         OutputFormat format = new OutputFormat();
         format.setIndent(true);
         format.setNewlines(true);
-        OutputStream schemaStream = codeWriter.openBinary(null, String.format(XML_FILE_NAME, moduleName));
+        OutputStream schemaStream = codeWriter.openBinary(null, outputFileName);
         XMLWriter writer = new XMLWriter(schemaStream, format);
         outFilter.setContentHandler(writer);
         marshaller.marshal(namespaceType, outFilter);
     }
 
-    public void setModuleName(String moduleName) {
-        this.moduleName = moduleName;
-    }
-
     public void setNamespaceType(NamespaceType namespaceType) {
         this.namespaceType = namespaceType;
+    }
+
+    public void setOutputFileName(String outputFileName) {
+        this.outputFileName = outputFileName;
     }
 }

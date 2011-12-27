@@ -65,7 +65,8 @@
                     <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
                     <package>org.mule.tools.devkit:mule-devkit-maven-plugin:attach-schema,
                         org.apache.maven.plugins:maven-jar-plugin:jar,
-                        org.mule.tools.devkit:mule-devkit-maven-plugin:package
+                        org.mule.tools.devkit:mule-devkit-maven-plugin:package,
+                        org.mule.tools.devkit:mule-devkit-maven-plugin:studio-package
                     </package>
                     <pre-integration-test></pre-integration-test>
                     <integration-test>

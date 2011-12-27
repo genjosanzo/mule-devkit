@@ -53,7 +53,7 @@ public abstract class AbstractMavenIT {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void buildExecutable() throws VerificationException {
+    public void buildExecutable() throws Exception {
         try {
             Verifier verifier = new Verifier(getRoot().getAbsolutePath(), null, DEBUG);
             verifier.setAutoclean(false);

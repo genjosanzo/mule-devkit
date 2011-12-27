@@ -228,4 +228,26 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
     public boolean usesConnectionManager() {
         return hasMethodsAnnotatedWith(Connect.class) && hasMethodsAnnotatedWith(Disconnect.class);
     }
+
+    @Override
+    public String friendlyName() {
+        if(hasAnnotation(Module.class)) {
+            return getAnnotation(Module.class).friendlyName();
+        }
+        if(hasAnnotation(Connector.class)) {
+            return getAnnotation(Connector.class).friendlyName();
+        }
+        return null;
+    }
+
+    @Override
+    public String description() {
+        if(hasAnnotation(Module.class)) {
+            return getAnnotation(Module.class).description();
+        }
+        if(hasAnnotation(Connector.class)) {
+            return getAnnotation(Connector.class).description();
+        }
+        return null;
+    }
 }

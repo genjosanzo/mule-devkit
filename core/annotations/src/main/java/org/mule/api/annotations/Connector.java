@@ -60,5 +60,15 @@ public @interface Connector {
      */
     String minMuleVersion() default "3.2";
 
+    /**
+     * Provides a friendly name for the module.
+     */
+    String friendlyName() default "";
+
+    /**
+     * Short description about the annotated module.
+     */
+    String description() default "";
+
     String DEFAULT_VERSION = "1.0";
 }

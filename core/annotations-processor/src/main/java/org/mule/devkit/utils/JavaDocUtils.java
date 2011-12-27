@@ -20,7 +20,6 @@ import org.apache.commons.lang.StringUtils;
 import org.mule.devkit.generation.DevKitTypeElement;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.util.Elements;
 import java.util.StringTokenizer;
 
@@ -100,8 +99,8 @@ public class JavaDocUtils {
         return false;
     }
 
-    public String getTagContent(String tagName, ExecutableElement method) {
-        String comment = elements.getDocComment(method);
+    public String getTagContent(String tagName, Element element) {
+        String comment = elements.getDocComment(element);
         if (StringUtils.isBlank(comment)) {
             return "";
         }

@@ -19,7 +19,6 @@ package org.mule.devkit.maven;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Resource;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.FileUtils;
@@ -42,7 +41,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-public abstract class AbstractAnnotationProcessorMojo extends AbstractMojo {
+public abstract class AbstractAnnotationProcessorMojo extends AbstractMuleMojo {
     @MojoParameter(expression = "${project}", readonly = true, required = true)
     protected MavenProject project;
 

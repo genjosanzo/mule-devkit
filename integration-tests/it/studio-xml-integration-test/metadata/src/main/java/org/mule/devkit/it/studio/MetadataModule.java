@@ -20,7 +20,10 @@ import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
-import org.mule.api.annotations.studio.Display;
+import org.mule.api.annotations.display.FriendlyName;
+import org.mule.api.annotations.display.Password;
+import org.mule.api.annotations.display.Placement;
+import org.mule.api.annotations.display.Summary;
 import org.mule.api.callback.SourceCallback;
 
 /**
@@ -28,27 +31,30 @@ import org.mule.api.callback.SourceCallback;
  *
  * @author MuleSoft inc
  */
-@Module(name = "metadata")
-@Display(description = "This description overrides class-level javadoc")
+@Module(name = "metadata", description = "This description overrides class-level javadoc.")
 public class MetadataModule {
 
     /**
      * Configurable field in group 1
      */
     @Configurable
-    @Display(inputGroup = "Group1", caption = "non-default caption")
+    @Placement(group = "Group1")
+    @FriendlyName("non-default caption")
     private String configurable1;
     /**
      * Configurable field in group 2
      */
     @Configurable
-    @Display(inputGroup = "Group2", description = "non-default description")
+    @Placement(group = "Group2")
+    @Summary("non-default description")
     private String configurable2;
     /**
      * Configurable field in group 1
      */
     @Configurable
-    @Display(inputGroup = "Group1", caption = "non-default caption", description = "non-default description")
+    @Placement(group = "Group1")
+    @FriendlyName("non-default caption")
+    @Summary("non-default description")
     private String configurable3;
 
     /**
@@ -61,11 +67,11 @@ public class MetadataModule {
      * @param password             password parameter
      */
     @Processor
-    public void processor(@Display(caption = "non-default caption", description = "non-default description") String noInputGroupExplicit,
-                          @Display(inputGroup = "Advanced", caption = "non-default caption") String advanced1,
-                          @Display(inputGroup = "Advanced", description = "non-default description") String advanced2,
+    public void processor(@FriendlyName("non-default caption") @Summary("non-default description") String noInputGroupExplicit,
+                          @Placement(group = "Advanced") @FriendlyName("non-default caption") String advanced1,
+                          @Placement(group = "Advanced") @Summary("non-default description") String advanced2,
                           String general,
-                          @Display(type = Display.Type.PASSWORD) String password) {
+                          @Password String password) {
     }
 
     /**
@@ -79,9 +85,9 @@ public class MetadataModule {
      */
     @Source
     public void source(SourceCallback sourceCallback,
-                       @Display(caption = "non-default caption", description = "non-default description") String noInputGroupExplicit,
-                       @Display(inputGroup = "Advanced", caption = "non-default caption") String advanced1,
-                       @Display(inputGroup = "Advanced", description = "non-default description") String advanced2,
+                       @FriendlyName("non-default caption") @Summary("non-default description") String noInputGroupExplicit,
+                       @Placement(group = "Advanced") @FriendlyName("non-default caption") String advanced1,
+                       @Placement(group = "Advanced") @Summary("non-default description") String advanced2,
                        String general) {
     }
 }

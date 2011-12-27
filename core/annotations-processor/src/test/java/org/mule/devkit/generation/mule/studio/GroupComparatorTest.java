@@ -20,6 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mule.devkit.generation.mule.studio.editor.BaseStudioXmlBuilder;
+import org.mule.devkit.generation.mule.studio.editor.GroupComparator;
 import org.mule.devkit.model.studio.Group;
 
 import java.util.ArrayList;
