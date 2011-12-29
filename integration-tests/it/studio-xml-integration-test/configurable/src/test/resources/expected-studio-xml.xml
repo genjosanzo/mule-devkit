@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="configurable" url="http://www.mulesoft.org/schema/mule/configurable">
-  <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/configurable/abstractConfigurableConnectorGeneric" image="icons/large/configurable-connector-48x32.png" localId="config" icon="icons/small/configurable-connector-24x16.png" description="Global Configurable configuration information." caption="Configurable">
+  <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/configurable/abstractConfigurableConnectorGeneric" image="icons/large/configurable-connector-48x32.png" localId="config" icon="icons/small/configurable-connector-24x16.png" description="Global Configurable configuration information." caption="General">
     <attribute-category description="Configurable configuration properties." caption="Configurable">
       <group caption="Generic" id="configurableGenericProperties">
         <name required="true" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
@@ -10,11 +10,11 @@
         <string required="true" description="Configurable String." caption="Configurable String" name="configurableString"></string>
         <string required="false" description="Configurable optional String." caption="Optional Configurable String" name="optionalConfigurableString"></string>
         <string defaultValue="a default" required="false" description="Configurable optional String with default value." caption="Optional With Default Configurable String" name="optionalWithDefaultConfigurableString"></string>
-        <enum allowsCustom="true" defaultValue="NO" required="false" supportsExpressions="true" description="Configurable enumerated." caption="Si No Enum" name="siNoEnum">
-            <option value="NO"></option>
-            <option value="SI"></option>
-        </enum>
         <url required="false" description="Configurable URL." caption="Url" name="url"></url>
+        <enum allowsCustom="true" defaultValue="NO" required="false" supportsExpressions="true" description="Configurable enumerated." caption="Si No Enum" name="siNoEnum">
+          <option value="NO"></option>
+          <option value="SI"></option>
+        </enum>
       </group>
     </attribute-category>
   </global-cloud-connector>

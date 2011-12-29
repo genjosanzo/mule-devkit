@@ -67,9 +67,9 @@ public class MetadataModule {
      * @param password  password parameter
      */
     @Processor
-    public void processor(@Placement(order = Placement.FIRST) @FriendlyName("non-default caption") @Summary("non-default description") String showFirst,
-                          @Placement(group = "Advanced", order = Placement.LAST) @FriendlyName("non-default caption") String advanced1,
-                          @Placement(group = "Advanced", order = Placement.FIRST) @Summary("non-default description") String advanced2,
+    public void processor(@Placement(order = 1) @FriendlyName("non-default caption") @Summary("non-default description") String showFirst,
+                          @Placement(group = "Advanced", order = 2) @FriendlyName("non-default caption") String advanced1,
+                          @Placement(group = "Advanced", order = 1) @Summary("non-default description") String advanced2,
                           String general,
                           @Password String password) {
     }

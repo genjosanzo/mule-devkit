@@ -17,6 +17,7 @@
 
 package org.mule.devkit.generation.mule.studio.editor;
 
+import org.apache.commons.lang.StringUtils;
 import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Placement;
 import org.mule.devkit.GeneratorContext;
@@ -50,12 +51,16 @@ public class VariableComparator implements Comparator<VariableElement> {
         Placement placementVar1 = variable1.getAnnotation(Placement.class);
         Placement placementVar2 = variable2.getAnnotation(Placement.class);
 
+        if (!sameGroup(placementVar1, placementVar2)) {
+            return 0;
+        }
+
         if (placementVar1 != null && placementVar2 != null) {
             return new Integer(placementVar1.order()).compareTo(placementVar2.order());
         } else if (placementVar1 != null) {
-            return new Integer(placementVar1.order()).compareTo(Placement.LAST);
+            return new Integer(placementVar1.order()).compareTo(Placement.DEFAULT_ORDER);
         } else if (placementVar2 != null) {
-            return new Integer(Placement.LAST).compareTo(placementVar2.order());
+            return new Integer(Placement.DEFAULT_ORDER).compareTo(placementVar2.order());
         }
 
         if (bothOfSameType(variable1, variable2)) {
@@ -83,7 +88,20 @@ public class VariableComparator implements Comparator<VariableElement> {
             return VARIABLE1_FIRST;
         }
 
-        return compareByName(variable1, variable2);
+        return 0;
+    }
+
+    private boolean sameGroup(Placement placementVar1, Placement placementVar2) {
+        String group1 = extractGroup(placementVar1);
+        String group2 = extractGroup(placementVar2);
+        return group1.equals(group2);
+    }
+
+    private String extractGroup(Placement placement) {
+        if (placement != null && StringUtils.isNotBlank(placement.group())) {
+            return placement.group();
+        }
+        return BaseStudioXmlBuilder.GENERAL_GROUP_NAME;
     }
 
     private boolean bothOfSameType(VariableElement variable1, VariableElement variable2) {

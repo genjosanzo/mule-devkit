@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="metadata" url="http://www.mulesoft.org/schema/mule/metadata">
-  <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/metadata/abstractMetadataConnectorGeneric" image="icons/large/metadata-connector-48x32.png" localId="config" icon="icons/small/metadata-connector-24x16.png" description="Global Metadata configuration information." caption="Metadata">
+  <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/metadata/abstractMetadataConnectorGeneric" image="icons/large/metadata-connector-48x32.png" localId="config" icon="icons/small/metadata-connector-24x16.png" description="Global Metadata configuration information." caption="General">
     <attribute-category description="Metadata configuration properties." caption="Metadata">
       <group caption="Generic" id="metadataGenericProperties">
         <name required="true" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>

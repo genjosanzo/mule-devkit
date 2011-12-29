@@ -116,8 +116,8 @@ public class VariableComparatorTest {
         Name a = mockName("a");
         Name b = mockName("b");
 
-        when(intVariable.getSimpleName()).thenReturn(a);
         when(stringVariable.getSimpleName()).thenReturn(b);
+        when(intVariable.getSimpleName()).thenReturn(a);
 
         List<VariableElement> variables = new ArrayList<VariableElement>();
         variables.add(stringVariable);
@@ -125,8 +125,8 @@ public class VariableComparatorTest {
 
         Collections.sort(variables, new VariableComparator(context));
 
-        assertEquals(intVariable, variables.get(0));
-        assertEquals(stringVariable, variables.get(1));
+        assertEquals(stringVariable, variables.get(0));
+        assertEquals(intVariable, variables.get(1));
     }
 
     @Test

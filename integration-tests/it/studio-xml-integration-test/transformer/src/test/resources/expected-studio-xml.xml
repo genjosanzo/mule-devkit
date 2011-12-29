@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="transformer" url="http://www.mulesoft.org/schema/mule/transformer">
-  <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformerConnectorGeneric" image="icons/large/transformer-connector-48x32.png" localId="config" icon="icons/small/transformer-connector-24x16.png" description="Global Transformer configuration information." caption="Transformer">
+  <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformerConnectorGeneric" image="icons/large/transformer-connector-48x32.png" localId="config" icon="icons/small/transformer-connector-24x16.png" description="Global Transformer configuration information." caption="General">
     <attribute-category description="Transformer configuration properties." caption="Transformer">
       <group caption="Generic" id="transformerGenericProperties">
         <name required="true" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>

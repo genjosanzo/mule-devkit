@@ -25,16 +25,14 @@ import java.lang.annotation.Target;
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 public @interface Placement {
 
-    int FIRST = 1;
-    int LAST = Integer.MAX_VALUE;
+    int DEFAULT_ORDER = 1;
 
     /**
      * Gives the annotated element a relative order within its {@link this#group()}. The value provided may be repeated
      * and in that case the order is not guaranteed.
-     * The value is relative meaning that an element with order 10 has higher precence than one with value 25. For
-     * convenience you may use {@link this#FIRST} or {@link this#LAST}
+     * The value is relative meaning that an element with order 10 has higher precence than one with value 25.
      */
-    int order();
+    int order() default DEFAULT_ORDER;
 
     /**
      * A group is a logical way to display one or more variables together. If no group is specified then a

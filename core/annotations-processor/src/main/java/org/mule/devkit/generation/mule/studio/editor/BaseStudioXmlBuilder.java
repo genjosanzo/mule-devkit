@@ -157,11 +157,7 @@ public abstract class BaseStudioXmlBuilder {
             }
         }
 
-        ArrayList<AttributeCategory> attributeCategories = new ArrayList<AttributeCategory>(attributeCategoriesByName.values());
-        for(AttributeCategory attributeCategory : attributeCategories) {
-            Collections.sort(attributeCategory.getGroup(), new GroupComparator());
-        }
-        return attributeCategories;
+        return new ArrayList<AttributeCategory>(attributeCategoriesByName.values());
     }
 
     protected void processConnectionAttributes(Map<String, Group> groupsByName, Map<String, AttributeCategory> attributeCategoriesByName) {
