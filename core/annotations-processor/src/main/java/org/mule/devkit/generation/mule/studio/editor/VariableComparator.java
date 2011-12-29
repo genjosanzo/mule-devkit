@@ -17,6 +17,8 @@
 
 package org.mule.devkit.generation.mule.studio.editor;
 
+import org.mule.api.annotations.display.FriendlyName;
+import org.mule.api.annotations.display.Placement;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.utils.TypeMirrorUtils;
 
@@ -28,10 +30,8 @@ public class VariableComparator implements Comparator<VariableElement> {
     private static final int VARIABLE1_FIRST = -1;
     private static final int VARIABLE2_FIRST = 1;
     private TypeMirrorUtils typeMirrorUtils;
-    private MuleStudioUtils helper;
 
     public VariableComparator(GeneratorContext context) {
-        helper = new MuleStudioUtils(context);
         typeMirrorUtils = context.getTypeMirrorUtils();
     }
 
@@ -47,28 +47,39 @@ public class VariableComparator implements Comparator<VariableElement> {
     @Override
     public int compare(VariableElement variable1, VariableElement variable2) {
 
+        Placement placementVar1 = variable1.getAnnotation(Placement.class);
+        Placement placementVar2 = variable2.getAnnotation(Placement.class);
+
+        if (placementVar1 != null && placementVar2 != null) {
+            return new Integer(placementVar1.order()).compareTo(placementVar2.order());
+        } else if (placementVar1 != null) {
+            return new Integer(placementVar1.order()).compareTo(Placement.LAST);
+        } else if (placementVar2 != null) {
+            return new Integer(Placement.LAST).compareTo(placementVar2.order());
+        }
+
         if (bothOfSameType(variable1, variable2)) {
             return compareByName(variable1, variable2);
         }
 
-        if(typeMirrorUtils.isCollection(variable1)) {
+        if (typeMirrorUtils.isCollection(variable1)) {
             return VARIABLE2_FIRST;
         }
-        if(typeMirrorUtils.isCollection(variable2)) {
+        if (typeMirrorUtils.isCollection(variable2)) {
             return VARIABLE1_FIRST;
         }
 
-        if(typeMirrorUtils.isBoolean(variable1)) {
+        if (typeMirrorUtils.isBoolean(variable1)) {
             return VARIABLE2_FIRST;
         }
-        if(typeMirrorUtils.isBoolean(variable2)) {
+        if (typeMirrorUtils.isBoolean(variable2)) {
             return VARIABLE1_FIRST;
         }
 
-        if(typeMirrorUtils.isEnum(variable1)) {
+        if (typeMirrorUtils.isEnum(variable1)) {
             return VARIABLE2_FIRST;
         }
-        if(typeMirrorUtils.isEnum(variable2)) {
+        if (typeMirrorUtils.isEnum(variable2)) {
             return VARIABLE1_FIRST;
         }
 
@@ -77,13 +88,23 @@ public class VariableComparator implements Comparator<VariableElement> {
 
     private boolean bothOfSameType(VariableElement variable1, VariableElement variable2) {
         return typeMirrorUtils.isString(variable1) && typeMirrorUtils.isString(variable2) ||
-               typeMirrorUtils.isInteger(variable1) && typeMirrorUtils.isInteger(variable2) ||
-               typeMirrorUtils.isEnum(variable1) && typeMirrorUtils.isEnum(variable2) ||
-               typeMirrorUtils.isBoolean(variable1) && typeMirrorUtils.isBoolean(variable2) ||
-               typeMirrorUtils.isCollection(variable1) && typeMirrorUtils.isCollection(variable2);
+                typeMirrorUtils.isInteger(variable1) && typeMirrorUtils.isInteger(variable2) ||
+                typeMirrorUtils.isEnum(variable1) && typeMirrorUtils.isEnum(variable2) ||
+                typeMirrorUtils.isBoolean(variable1) && typeMirrorUtils.isBoolean(variable2) ||
+                typeMirrorUtils.isCollection(variable1) && typeMirrorUtils.isCollection(variable2);
     }
 
     private int compareByName(VariableElement variable1, VariableElement variable2) {
-        return variable1.getSimpleName().toString().compareTo(variable2.getSimpleName().toString());
+        String name1 = extractName(variable1);
+        String name2 = extractName(variable2);
+        return name1.compareTo(name2);
+    }
+
+    private String extractName(VariableElement variableElement) {
+        if (variableElement.getAnnotation(FriendlyName.class) != null) {
+            return variableElement.getAnnotation(FriendlyName.class).value();
+        } else {
+            return variableElement.getSimpleName().toString();
+        }
     }
 }

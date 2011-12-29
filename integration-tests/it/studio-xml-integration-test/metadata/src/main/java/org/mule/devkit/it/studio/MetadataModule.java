@@ -38,21 +38,21 @@ public class MetadataModule {
      * Configurable field in group 1
      */
     @Configurable
-    @Placement(group = "Group1")
+    @Placement(group = "Group1", order = 1)
     @FriendlyName("non-default caption")
     private String configurable1;
     /**
      * Configurable field in group 2
      */
     @Configurable
-    @Placement(group = "Group2")
+    @Placement(group = "Group2", order = 2)
     @Summary("non-default description")
     private String configurable2;
     /**
      * Configurable field in group 1
      */
     @Configurable
-    @Placement(group = "Group1")
+    @Placement(group = "Group1", order = 3)
     @FriendlyName("non-default caption")
     @Summary("non-default description")
     private String configurable3;
@@ -60,16 +60,16 @@ public class MetadataModule {
     /**
      * A processor method with Studio metadata
      *
-     * @param noInputGroupExplicit parameter with no input group
-     * @param advanced1            parameter in Advanced input group
-     * @param advanced2            parameter in Advanced input group
-     * @param general              parameter in General input group
-     * @param password             password parameter
+     * @param showFirst parameter with no input group
+     * @param advanced1 parameter in Advanced input group
+     * @param advanced2 parameter in Advanced input group
+     * @param general   parameter in General input group
+     * @param password  password parameter
      */
     @Processor
-    public void processor(@FriendlyName("non-default caption") @Summary("non-default description") String noInputGroupExplicit,
-                          @Placement(group = "Advanced") @FriendlyName("non-default caption") String advanced1,
-                          @Placement(group = "Advanced") @Summary("non-default description") String advanced2,
+    public void processor(@Placement(order = Placement.FIRST) @FriendlyName("non-default caption") @Summary("non-default description") String showFirst,
+                          @Placement(group = "Advanced", order = Placement.LAST) @FriendlyName("non-default caption") String advanced1,
+                          @Placement(group = "Advanced", order = Placement.FIRST) @Summary("non-default description") String advanced2,
                           String general,
                           @Password String password) {
     }
@@ -78,16 +78,14 @@ public class MetadataModule {
      * A source method with Studio metadata
      *
      * @param sourceCallback       the source callback
-     * @param noInputGroupExplicit parameter with no input group
      * @param advanced1            parameter in Advanced input group
      * @param advanced2            parameter in Advanced input group
      * @param general              parameter in General input group
      */
     @Source
     public void source(SourceCallback sourceCallback,
-                       @FriendlyName("non-default caption") @Summary("non-default description") String noInputGroupExplicit,
-                       @Placement(group = "Advanced") @FriendlyName("non-default caption") String advanced1,
-                       @Placement(group = "Advanced") @Summary("non-default description") String advanced2,
-                       String general) {
+                       @Placement(group = "Advanced", order = 1) @FriendlyName("non-default caption") String advanced1,
+                       @Placement(group = "Advanced", order = 2) @Summary("non-default description") String advanced2,
+                       @Placement(order = 1) String general) {
     }
 }

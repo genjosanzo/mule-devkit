@@ -20,21 +20,32 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
 /**
- * Adds displaying information to a field or parameter.
+ * Adds placement information to a field or parameter.
  */
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 public @interface Placement {
 
+    int FIRST = 1;
+    int LAST = Integer.MAX_VALUE;
+
     /**
-     * A group is a logical way to display one or more input fields together. If no inputGroup is specified then a
-     * dafult input group is assumed. To place more than one element in the same input group, use the same value for
-     * inputGroup attribute
+     * Gives the annotated element a relative order within its {@link this#group()}. The value provided may be repeated
+     * and in that case the order is not guaranteed.
+     * The value is relative meaning that an element with order 10 has higher precence than one with value 25. For
+     * convenience you may use {@link this#FIRST} or {@link this#LAST}
+     */
+    int order();
+
+    /**
+     * A group is a logical way to display one or more variables together. If no group is specified then a
+     * dafult group is assumed. To place more than one element in the same group, use the exact same values for
+     * the this attribute
      */
     String group() default "";
 
     /**
-     * A tab is a logical way to group input groups together. This attributes specifies the name of the tab in which the
-     * annotated element should be displayed rendered. If no tab is specified then a default tab is assumed. To display
+     * A tab is a logical way to groups together. This attributes specifies the name of the tab in which the
+     * annotated element should be displayed. If no tab is specified then a default tab is assumed. To display
      * more than one parameter or field in the same the tab then this value should be exactly the same for all of them.
      */
     String tab() default "";

@@ -20,6 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mule.api.annotations.display.FriendlyName;
+import org.mule.api.annotations.display.Placement;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.mule.studio.editor.VariableComparator;
 import org.mule.devkit.utils.TypeMirrorUtils;
@@ -124,6 +126,75 @@ public class VariableComparatorTest {
         Collections.sort(variables, new VariableComparator(context));
 
         assertEquals(intVariable, variables.get(0));
+        assertEquals(stringVariable, variables.get(1));
+    }
+
+    @Test
+    public void testCompareByOrder() throws Exception {
+        Placement mapVariablePlacement = mock(Placement.class);
+        Placement intVariablePlacement = mock(Placement.class);
+
+        when(mapVariable.getAnnotation(Placement.class)).thenReturn(mapVariablePlacement);
+        when(intVariable.getAnnotation(Placement.class)).thenReturn(intVariablePlacement);
+
+        when(mapVariablePlacement.order()).thenReturn(4);
+        when(intVariablePlacement.order()).thenReturn(5);
+
+        List<VariableElement> variables = new ArrayList<VariableElement>();
+        variables.add(intVariable);
+        variables.add(mapVariable);
+
+        Collections.sort(variables, new VariableComparator(context));
+
+        assertEquals(mapVariable, variables.get(0));
+        assertEquals(intVariable, variables.get(1));
+    }
+
+    @Test
+    public void testCompareBothWithFriendlyNames() throws Exception {
+        VariableElement stringVariable2 = mock(VariableElement.class);
+        when(typeMirrorUtils.isString(stringVariable2)).thenReturn(true);
+
+        FriendlyName friendlyName1 = mock(FriendlyName.class);
+        FriendlyName friendlyName2 = mock(FriendlyName.class);
+
+        when(stringVariable.getAnnotation(FriendlyName.class)).thenReturn(friendlyName1);
+        when(stringVariable2.getAnnotation(FriendlyName.class)).thenReturn(friendlyName2);
+
+        when(friendlyName1.value()).thenReturn("b");
+        when(friendlyName2.value()).thenReturn("a");
+
+        List<VariableElement> variables = new ArrayList<VariableElement>();
+        variables.add(stringVariable);
+        variables.add(stringVariable2);
+
+        Collections.sort(variables, new VariableComparator(context));
+
+        assertEquals(stringVariable2, variables.get(0));
+        assertEquals(stringVariable, variables.get(1));
+    }
+
+    @Test
+    public void testCompareFriendlyName() throws Exception {
+        VariableElement stringVariable2 = mock(VariableElement.class);
+        when(typeMirrorUtils.isString(stringVariable2)).thenReturn(true);
+
+        FriendlyName friendlyName1 = mock(FriendlyName.class);
+        when(friendlyName1.value()).thenReturn("b");
+
+        Name a = mockName("a");
+
+        when(stringVariable.getAnnotation(FriendlyName.class)).thenReturn(friendlyName1);
+        when(stringVariable2.getSimpleName()).thenReturn(a);
+
+
+        List<VariableElement> variables = new ArrayList<VariableElement>();
+        variables.add(stringVariable);
+        variables.add(stringVariable2);
+
+        Collections.sort(variables, new VariableComparator(context));
+
+        assertEquals(stringVariable2, variables.get(0));
         assertEquals(stringVariable, variables.get(1));
     }
 
