@@ -201,6 +201,11 @@
             <id>oss-sonatype-snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
         </repository>
+        <repository>
+            <id>codehaus-snaphosts</id>
+            <name>Codehaus Snapshots</name>
+            <url>http://snapshots.repository.codehaus.org/</url>
+        </repository>
     </repositories>
 
     <distributionManagement>

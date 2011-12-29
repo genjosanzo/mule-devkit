@@ -18,12 +18,14 @@
 package org.mule.devkit.generation.mule;
 
 import org.apache.commons.lang.StringUtils;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NestedProcessor;
 import org.mule.api.annotations.InvalidateConnectionOn;
+import org.mule.api.annotations.Mime;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
@@ -209,6 +211,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         evaluateAndTransform._throws(ref(TransformerException.class));
         Variable muleMessage = evaluateAndTransform.param(ref(MuleMessage.class), "muleMessage");
         Variable expectedType = evaluateAndTransform.param(ref(java.lang.reflect.Type.class), "expectedType");
+        Variable expectedMimeType = evaluateAndTransform.param(ref(String.class), "expectedMimeType");
         Variable source = evaluateAndTransform.param(ref(Object.class), "source");
 
         evaluateAndTransform.body()._if(Op.eq(source, ExpressionFactory._null()))._then()._return(source);
@@ -230,6 +233,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         Variable subTarget = whileHasNext.decl(ref(Object.class), "subTarget", listIterator.invoke("next"));
         whileHasNext.add(newList.invoke("add").arg(
                 ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(listParameterizedType).
+                        arg(expectedMimeType).
                         arg(subTarget)
         ));
         isExpectedList._then().assign(target, newList);
@@ -264,8 +268,8 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         ForEach forEach = isExpectedMapBlock.forEach(ref(Object.class), "entryObj", map.invoke("entrySet"));
         Block forEachBlock = forEach.body().block();
         Variable entry = forEachBlock.decl(ref(Map.Entry.class), "entry", ExpressionFactory.cast(ref(Map.Entry.class), forEach.var()));
-        Variable newKey = forEachBlock.decl(ref(Object.class), "newKey", ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(keyType).arg(entry.invoke("getKey")));
-        Variable newValue = forEachBlock.decl(ref(Object.class), "newValue", ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(valueType).arg(entry.invoke("getValue")));
+        Variable newKey = forEachBlock.decl(ref(Object.class), "newKey", ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(keyType).arg(expectedMimeType).arg(entry.invoke("getKey")));
+        Variable newValue = forEachBlock.decl(ref(Object.class), "newValue", ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(valueType).arg(expectedMimeType).arg(entry.invoke("getValue")));
         forEachBlock.invoke(newMap, "put").arg(newKey).arg(newValue);
 
         isExpectedMapBlock.assign(target, newMap);
@@ -294,10 +298,15 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         Variable sourceDataType = shouldTransform._then().decl(ref(DataType.class), "sourceDataType",
                 ref(DataTypeFactory.class).staticInvoke("create").arg(target.invoke("getClass")));
-        Variable targetDataType = shouldTransform._then().decl(ref(DataType.class), "targetDataType",
-                ref(DataTypeFactory.class).staticInvoke("create").arg(
-                        ExpressionFactory.cast(ref(Class.class), expectedType)));
+        Variable targetDataType = shouldTransform._then().decl(ref(DataType.class), "targetDataType", ExpressionFactory._null());
+        
+        Conditional ifExpectedMimeTypeNotNull = shouldTransform._then()._if(Op.ne(expectedMimeType, ExpressionFactory._null()));
+        ifExpectedMimeTypeNotNull._then().assign(targetDataType, ref(DataTypeFactory.class).staticInvoke("create").arg(
+                                ExpressionFactory.cast(ref(Class.class), expectedType)).arg(expectedMimeType));
 
+        ifExpectedMimeTypeNotNull._else().assign(targetDataType, ref(DataTypeFactory.class).staticInvoke("create").arg(
+                                ExpressionFactory.cast(ref(Class.class), expectedType)));
+        
         Variable transformer = shouldTransform._then().decl(ref(Transformer.class), "t",
                 muleContext.invoke("getRegistry").invoke("lookupTransformer").arg(sourceDataType).arg(targetDataType));
 
@@ -390,7 +399,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 Invocation getGenericType = messageProcessorClass.dotclass().invoke("getDeclaredField").arg(
                         ExpressionFactory.lit(connectionFields.get(fieldName).getFieldType().name())
                 ).invoke("getGenericType");
-                Invocation evaluateAndTransform = ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(getGenericType);
+                Invocation evaluateAndTransform = ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(getGenericType).arg(ExpressionFactory._null());
 
                 evaluateAndTransform.arg(connectionFields.get(fieldName).getField());
 
@@ -398,7 +407,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
                 ifNotNull._then().assign(transformed, cast);
 
-                Invocation evaluateAndTransformLocal = ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(getGenericType);
+                Invocation evaluateAndTransformLocal = ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(getGenericType).arg(ExpressionFactory._null());
 
                 evaluateAndTransformLocal.arg(moduleObject.invoke("get" + StringUtils.capitalize(fieldName)));
 
@@ -511,6 +520,14 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 ifNotEmpty._then().add(event.invoke("getMessage").invoke("addProperties").arg(outboundHeadersMap)
                         .arg(ref(PropertyScope.class).staticRef("OUTBOUND")));
             }
+        }
+        
+        if( executableElement.getAnnotation(Mime.class) != null ) {
+            Cast defaultMuleMessage = ExpressionFactory.cast(ref(DefaultMuleMessage.class), event.invoke("getMessage"));
+            Invocation setMimeType = defaultMuleMessage.invoke("setMimeType").arg(
+                    ExpressionFactory.lit(executableElement.getAnnotation(Mime.class).value())
+            );
+            callProcessor.body().add(setMimeType);
         }
 
         callProcessor.body()._return(event);
@@ -655,6 +672,13 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                     ExpressionFactory.lit(fields.get(fieldName).getFieldType().name())
             ).invoke("getGenericType");
             Invocation evaluateAndTransform = ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(getGenericType);
+            
+            Mime mime = fields.get(fieldName).getVariableElement().getAnnotation(Mime.class);
+            if( mime != null ) {
+                evaluateAndTransform.arg(ExpressionFactory.lit(mime.value()));
+            } else {
+                evaluateAndTransform.arg(ExpressionFactory._null());
+            }
 
             if (inboundHeaders != null) {
                 if (context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {

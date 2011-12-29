@@ -147,5 +147,10 @@
             <name>MuleSoft Releases</name>
             <url>http://repository.mulesoft.org/releases/</url>
         </repository>
+        <repository>
+            <id>codehaus-snaphosts</id>
+            <name>Codehaus Snapshots</name>
+            <url>http://snapshots.repository.codehaus.org/</url>
+        </repository>
     </repositories>
 </project>
