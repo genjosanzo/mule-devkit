@@ -7,7 +7,7 @@
         <name required="true" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
       </group>
       <group caption="General" id="general">
-        <url required="false" description="A URL." caption="Url" name="url"></url>
+        <url defaultValue="http://www.mulesoft.org" required="false" description="A URL." caption="Url" name="url"></url>
       </group>
       <group caption="Connection" id="connection">
         <string required="false" description="The username to use." caption="Username" name="username"></string>

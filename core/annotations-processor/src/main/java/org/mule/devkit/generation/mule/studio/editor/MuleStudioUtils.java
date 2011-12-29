@@ -129,6 +129,9 @@ public class MuleStudioUtils {
         if (attributeType instanceof PasswordType) {
             return objectFactory.createGroupPassword((PasswordType) attributeType);
         }
+        if (attributeType instanceof UrlType) {
+            return objectFactory.createGroupUrl((UrlType) attributeType);
+        }
         if (attributeType instanceof StringAttributeType) {
             return objectFactory.createGroupString((StringAttributeType) attributeType);
         }
@@ -146,9 +149,6 @@ public class MuleStudioUtils {
         }
         if (attributeType instanceof FlowRefType) {
             return objectFactory.createGroupFlowRef((FlowRefType) attributeType);
-        }
-        if (attributeType instanceof UrlType) {
-            return objectFactory.createGroupUrl((UrlType) attributeType);
         }
         if (attributeType instanceof EncodingType) {
             return objectFactory.createGroupEncoding((EncodingType) attributeType);

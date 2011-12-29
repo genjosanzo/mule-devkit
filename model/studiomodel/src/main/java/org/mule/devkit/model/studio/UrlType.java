@@ -36,6 +36,6 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "UrlType")
 public class UrlType
-        extends AttributeType {
+        extends StringAttributeType {
 
 }
