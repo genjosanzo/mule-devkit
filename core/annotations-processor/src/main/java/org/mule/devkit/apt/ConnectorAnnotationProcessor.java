@@ -52,6 +52,7 @@ import org.mule.devkit.validation.JavaDocValidator;
 import org.mule.devkit.validation.OAuthValidator;
 import org.mule.devkit.validation.ProcessorValidator;
 import org.mule.devkit.validation.SourceValidator;
+import org.mule.devkit.validation.StudioValidator;
 import org.mule.devkit.validation.TransformerValidator;
 import org.mule.devkit.validation.Validator;
 
@@ -101,6 +102,7 @@ public class ConnectorAnnotationProcessor extends AbstractAnnotationProcessor {
 
         validators = new ArrayList<Validator>();
         validators.add(new JavaDocValidator());
+        validators.add(new StudioValidator());
         validators.add(new BasicValidator());
         validators.add(new OAuthValidator());
         validators.add(new ProcessorValidator());

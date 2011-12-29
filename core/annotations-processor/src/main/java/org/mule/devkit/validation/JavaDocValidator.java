@@ -94,10 +94,6 @@ public class JavaDocValidator implements Validator {
             throw new ValidationException(method, "Method " + method.getSimpleName().toString() + " is not properly documented. A description of what it can do is missing.");
         }
 
-        if (!context.getJavaDocUtils().hasTag("sample.xml", method)) {
-            throw new ValidationException(typeElement, "Method " + method.getSimpleName().toString() + " does not contain an example using {@sample.xml} tag.");
-        }
-
         if (!method.getReturnType().toString().equals("void")) {
             if (!context.getJavaDocUtils().hasTag("return", method)) {
                 throw new ValidationException(typeElement, "The return type of a non-void method must be documented. Method " + method.getSimpleName().toString() + " is at fault. Missing @return.");
@@ -122,7 +118,12 @@ public class JavaDocValidator implements Validator {
         return StringUtils.isNotBlank(comment);
     }
 
-    private boolean exampleDoesNotExist(GeneratorContext context, ExecutableElement method) throws ValidationException {
+    protected boolean exampleDoesNotExist(GeneratorContext context, ExecutableElement method) throws ValidationException {
+
+        if (!context.getJavaDocUtils().hasTag("sample.xml", method)) {
+            throw new ValidationException(method, "Method " + method.getSimpleName().toString() + " does not contain an example using {@sample.xml} tag.");
+        }
+
         boolean found = false;
         String sample = context.getJavaDocUtils().getTagContent("sample.xml", method);
         String[] split = sample.split(" ");
