@@ -44,8 +44,6 @@ public abstract class GlobalTypeBuilder extends BaseStudioXmlBuilder {
 
     protected abstract String getLocalIdBasedOnType();
 
-    protected abstract String getCaptionBasedOnType();
-
     protected abstract String getNameDescriptionBasedOnType();
 
     protected abstract String getImage();
@@ -73,5 +71,9 @@ public abstract class GlobalTypeBuilder extends BaseStudioXmlBuilder {
         name.setDescription(helper.formatDescription(getNameDescriptionBasedOnType()));
         name.setRequired(true);
         return name;
+    }
+
+    protected String getCaptionBasedOnType() {
+        return BaseStudioXmlBuilder.GENERAL_GROUP_NAME;
     }
 }

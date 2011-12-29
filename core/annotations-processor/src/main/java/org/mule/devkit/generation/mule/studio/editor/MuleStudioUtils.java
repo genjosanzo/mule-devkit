@@ -266,6 +266,10 @@ public class MuleStudioUtils {
     }
 
     public String getFormattedCaption(ExecutableElement element) {
+        return formatCaption(getFriendlyName(element));
+    }
+
+    public String getFriendlyName(ExecutableElement element) {
         Processor processor = element.getAnnotation(Processor.class);
         if(processor != null && StringUtils.isNotBlank(processor.friendlyName())) {
             return processor.friendlyName();
@@ -274,8 +278,7 @@ public class MuleStudioUtils {
         if(source != null && StringUtils.isNotBlank(source.friendlyName())) {
             return source.friendlyName();
         }
-        String friendlyName = nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString());
-        return formatCaption(friendlyName);
+        return nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString());
     }
 
     public String getFormattedCaption(VariableElement element) {

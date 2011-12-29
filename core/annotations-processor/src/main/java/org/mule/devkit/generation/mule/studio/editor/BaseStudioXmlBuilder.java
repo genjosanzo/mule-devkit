@@ -88,7 +88,7 @@ public abstract class BaseStudioXmlBuilder {
             ModeElementType mode = new ModeElementType();
             String methodName = method.getSimpleName().toString();
             mode.setModeId(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + nameUtils.uncamel(methodName));
-            mode.setModeLabel(nameUtils.friendlyNameFromCamelCase(methodName));
+            mode.setModeLabel(StringUtils.capitalize(helper.getFriendlyName(method)));
             modes.add(mode);
         }
 
@@ -118,7 +118,6 @@ public abstract class BaseStudioXmlBuilder {
         List<AttributeCategory> attributeCategories = processVariableElements(getConfigurableFieldsSorted());
         for (AttributeCategory attributeCategory : attributeCategories) {
             if (attributeCategory.getCaption().equals(MuleStudioEditorXmlGenerator.ATTRIBUTE_CATEGORY_DEFAULT_CAPTION)) {
-                attributeCategory.setCaption(helper.getFormattedCaption(typeElement));
                 attributeCategory.setDescription(helper.formatDescription(typeElement.name() + " configuration properties"));
                 List<Group> groups = attributeCategory.getGroup();
                 if (groups.isEmpty()) {

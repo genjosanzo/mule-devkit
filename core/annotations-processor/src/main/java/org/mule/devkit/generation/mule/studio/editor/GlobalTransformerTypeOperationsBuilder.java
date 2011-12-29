@@ -64,7 +64,7 @@ public class GlobalTransformerTypeOperationsBuilder extends GlobalTypeBuilder {
     }
 
     protected String getCaptionBasedOnType() {
-        return helper.formatCaption(nameUtils.friendlyNameFromCamelCase(typeElement.name()));
+        return helper.getFormattedCaption(typeElement);
     }
 
     protected String getNameDescriptionBasedOnType() {

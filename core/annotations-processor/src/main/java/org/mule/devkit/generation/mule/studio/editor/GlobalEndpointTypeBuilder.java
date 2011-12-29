@@ -72,7 +72,7 @@ public class GlobalEndpointTypeBuilder extends GlobalTypeBuilder {
     }
 
     protected String getCaptionBasedOnType() {
-        return helper.formatCaption(nameUtils.friendlyNameFromCamelCase(executableElement.getSimpleName().toString()));
+        return helper.getFormattedCaption(executableElement);
     }
 
     protected String getNameDescriptionBasedOnType() {

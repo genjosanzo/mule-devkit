@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="configurable" url="http://www.mulesoft.org/schema/mule/configurable">
-  <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/configurable/abstractConfigurableConnectorGeneric" image="icons/large/configurable-connector-48x32.png" localId="config" icon="icons/small/configurable-connector-24x16.png" description="Global Configurable configuration information." caption="General">
-    <attribute-category description="Configurable configuration properties." caption="Configurable">
+  <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/configurable/abstractConfigurableConnectorGeneric" image="icons/large/configurable-connector-48x32.png" localId="config" icon="icons/small/configurable-connector-24x16.png" description="Global Configurable configuration information." caption="Configurable">
+    <attribute-category description="Configurable configuration properties." caption="General">
       <group caption="Generic" id="configurableGenericProperties">
         <name required="true" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
       </group>

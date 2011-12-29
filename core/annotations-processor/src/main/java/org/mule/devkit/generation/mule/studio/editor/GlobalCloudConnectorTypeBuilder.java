@@ -71,7 +71,7 @@ public class GlobalCloudConnectorTypeBuilder extends GlobalTypeBuilder {
     }
 
     protected String getCaptionBasedOnType() {
-        return BaseStudioXmlBuilder.GENERAL_GROUP_NAME;
+        return helper.getFormattedCaption(typeElement);
     }
 
     protected String getNameDescriptionBasedOnType() {

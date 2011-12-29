@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="source" url="http://www.mulesoft.org/schema/mule/source">
-  <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/source/abstractSourceConnectorGeneric" image="icons/large/source-connector-48x32.png" localId="config" icon="icons/small/source-connector-24x16.png" description="Global Source configuration information." caption="General">
-    <attribute-category description="Source configuration properties." caption="Source">
+  <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/source/abstractSourceConnectorGeneric" image="icons/large/source-connector-48x32.png" localId="config" icon="icons/small/source-connector-24x16.png" description="Global Source configuration information." caption="Source">
+    <attribute-category description="Source configuration properties." caption="General">
       <group caption="Generic" id="sourceGenericProperties">
         <name required="true" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
       </group>
