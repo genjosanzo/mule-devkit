@@ -23,7 +23,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <mule.version>3.2.0</mule.version>
+        <mule.version>3.2.1</mule.version>
     </properties>
 
     <modules>
