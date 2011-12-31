@@ -146,7 +146,7 @@ public class JavaDocUtils {
         StringTokenizer st = new StringTokenizer(comment, "\n\r");
         while (st.hasMoreTokens()) {
             String nextToken = st.nextToken().trim();
-            if (nextToken.startsWith("@param " + paramName + " ")) {
+            if (nextToken.startsWith("@param " + paramName + " " ) || nextToken.equals("@param " + paramName)) {
                 insideParameter = true;
             } else if (nextToken.startsWith("@")) {
                 insideParameter = false;

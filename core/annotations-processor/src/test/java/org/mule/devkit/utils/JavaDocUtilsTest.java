@@ -20,12 +20,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mule.util.StringUtils;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.util.Elements;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 public class JavaDocUtilsTest {
@@ -72,7 +73,7 @@ public class JavaDocUtilsTest {
 
     @Test
     public void getParameterSummary() throws Exception {
-         when(elements.getDocComment(executableElement)).thenReturn("\n" +
+        when(elements.getDocComment(executableElement)).thenReturn("\n" +
                 "     Bla bla bla\n" +
                 "     \n" +
                 "     @param name the name\n" +
@@ -83,7 +84,7 @@ public class JavaDocUtilsTest {
 
     @Test
     public void getParameterSummaryMultiline() throws Exception {
-         when(elements.getDocComment(executableElement)).thenReturn("\n" +
+        when(elements.getDocComment(executableElement)).thenReturn("\n" +
                 "     Bla bla bla\n" +
                 "     \n" +
                 "     @param name the name\n" +
@@ -95,34 +96,46 @@ public class JavaDocUtilsTest {
 
     @Test
     public void getParameterSummaryParameterNamesDontMatch() throws Exception {
-         when(elements.getDocComment(executableElement)).thenReturn("\n" +
+        when(elements.getDocComment(executableElement)).thenReturn("\n" +
                 "     Bla bla bla\n" +
                 "     \n" +
                 "     @param name the name\n" +
                 "     @param content the content");
         JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
-        assertNull(javaDocUtils.getParameterSummary("cont", executableElement));
+        assertTrue(StringUtils.isBlank(javaDocUtils.getParameterSummary("cont", executableElement)));
     }
 
     @Test
     public void getParameterSummaryParameterNotDocumented() throws Exception {
-         when(elements.getDocComment(executableElement)).thenReturn("\n" +
+        when(elements.getDocComment(executableElement)).thenReturn("\n" +
                 "     Bla bla bla\n" +
                 "     \n" +
                 "     @param name the name\n" +
                 "     @param content the content");
         JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
-        assertNull(javaDocUtils.getParameterSummary("value", executableElement));
+        assertTrue(StringUtils.isBlank(javaDocUtils.getParameterSummary("value", executableElement)));
     }
 
     @Test
     public void getParameterSummaryParameterWithEmptyComment() throws Exception {
-         when(elements.getDocComment(executableElement)).thenReturn("\n" +
+        when(elements.getDocComment(executableElement)).thenReturn("\n" +
                 "     Bla bla bla\n" +
                 "     \n" +
                 "     @param name the name\n" +
                 "     @param content");
         JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
-        assertNull(javaDocUtils.getParameterSummary("content", executableElement));
+        assertTrue(StringUtils.isBlank(javaDocUtils.getParameterSummary("content", executableElement)));
+    }
+
+    @Test
+    public void getParameterSummaryStartingAtNextLine() throws Exception {
+        when(elements.getDocComment(executableElement)).thenReturn("\n" +
+                "     Authorize a payment\n" +
+                "     \n" +
+                "     {@sample.xml ../../../doc/mule-module-paypal.xml.sample paypal:authorize}\n" +
+                "     @param transactionId\n" +
+                "              The value of the order's transaction identification number");
+        JavaDocUtils javaDocUtils = new JavaDocUtils(elements);
+        assertEquals("The value of the order's transaction identification number", javaDocUtils.getParameterSummary("transactionId", executableElement));
     }
 }
