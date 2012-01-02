@@ -10,8 +10,8 @@
     <name>Mule Cloud Connector</name>
 
     <properties>
-        <mule.version>3.2.0</mule.version>
-        <mule.devkit.version>3.1</mule.devkit.version>
+        <mule.version>3.2.1</mule.version>
+        <mule.devkit.version>3.1.1-SNAPSHOT</mule.devkit.version>
         <junit.version>4.8.2</junit.version>
         <mockito.version>1.8.2</mockito.version>
     </properties>
@@ -108,6 +108,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <excludePackageNames>org.mule.tooling.ui.contribution:*</excludePackageNames>
                     <docletArtifact>
                         <groupId>org.mule.tools.devkit</groupId>
                         <artifactId>mule-devkit-doclet</artifactId>
@@ -149,6 +150,12 @@
     </build>
 
     <dependencies>
+         <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.mule.dsl</groupId>
             <artifactId>dsl-api</artifactId>
@@ -175,6 +182,24 @@
             <groupId>oauth.signpost</groupId>
             <artifactId>signpost-core</artifactId>
             <version>1.2.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>eclipse-workbench</artifactId>
+            <version>3.6.1.M20100826-1330</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>eclipse-runtime</artifactId>
+            <version>3.6.0.v20100505</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>core</artifactId>
+            <version>4.3.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
