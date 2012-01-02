@@ -44,7 +44,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
@@ -119,16 +119,16 @@
                         -quiet
                         -federate JDK http://download.oracle.com/javase/6/docs/api/index.html?
                         -federationxml JDK http://doclava.googlecode.com/svn/static/api/openjdk-6.xml
-						-hdf project.artifactId "${project.artifactId}"
-						-hdf project.groupId "${project.groupId}"
-						-hdf project.version "${project.version}"
+                        -hdf project.artifactId "${project.artifactId}"
+                        -hdf project.groupId "${project.groupId}"
+                        -hdf project.version "${project.version}"
                         -hdf project.name "${project.name}"
-						-hdf project.repo.name "${project.distributionManagement.repository.name}"
-						-hdf project.repo.id "${project.distributionManagement.repository.id}"
-						-hdf project.repo.url "${project.distributionManagement.repository.url}"
-						-hdf project.snapshotRepo.name "${project.distributionManagement.snapshotRepository.name}"
-						-hdf project.snapshotRepo.id "${project.distributionManagement.snapshotRepository.id}"
-						-hdf project.snapshotRepo.url "${project.distributionManagement.snapshotRepository.url}"
+                        -hdf project.repo.name "${project.distributionManagement.repository.name}"
+                        -hdf project.repo.id "${project.distributionManagement.repository.id}"
+                        -hdf project.repo.url "${project.distributionManagement.repository.url}"
+                        -hdf project.snapshotRepo.name "${project.distributionManagement.snapshotRepository.name}"
+                        -hdf project.snapshotRepo.id "${project.distributionManagement.snapshotRepository.id}"
+                        -hdf project.snapshotRepo.url "${project.distributionManagement.snapshotRepository.url}"
                         -d ${project.build.directory}/apidocs
                     </additionalparam>
                     <useStandardDocletOptions>false</useStandardDocletOptions>
@@ -150,17 +150,32 @@
 
     <dependencies>
         <dependency>
-           <groupId>org.mule.dsl</groupId>
-           <artifactId>dsl-api</artifactId>
-           <version>0.7</version>
-           <exclusions>
-               <exclusion>
-                   <groupId>org.mule</groupId>
-                   <artifactId>core</artifactId>
-               </exclusion>
-           </exclusions>
-           <scope>provided</scope>
-       </dependency>
+            <groupId>org.mule.dsl</groupId>
+            <artifactId>dsl-api</artifactId>
+            <version>0.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mule</groupId>
+                    <artifactId>core</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${D}{mule.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tools.devkit</groupId>
+            <artifactId>mule-devkit-annotations</artifactId>
+            <version>${mule.devkit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>oauth.signpost</groupId>
+            <artifactId>signpost-core</artifactId>
+            <version>1.2.1.1</version>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -172,16 +187,6 @@
             <artifactId>mockito-all</artifactId>
             <version>${D}{mockito.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-spring-config</artifactId>
-            <version>${D}{mule.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tools.devkit</groupId>
-            <artifactId>mule-devkit-annotations</artifactId>
-            <version>${mule.devkit.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
