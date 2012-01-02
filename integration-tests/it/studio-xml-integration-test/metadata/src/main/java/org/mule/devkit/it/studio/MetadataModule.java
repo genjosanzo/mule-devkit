@@ -21,6 +21,7 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.display.FriendlyName;
+import org.mule.api.annotations.display.Icons;
 import org.mule.api.annotations.display.Password;
 import org.mule.api.annotations.display.Placement;
 import org.mule.api.annotations.display.Summary;
@@ -32,6 +33,9 @@ import org.mule.api.callback.SourceCallback;
  * @author MuleSoft inc
  */
 @Module(name = "metadata", description = "This description overrides class-level javadoc.")
+@Icons(processorSmall = "../../../my-icons/my-cloud-connector-24x16.png", processorLarge = "../../../my-icons/my-cloud-connector-48x32.png",
+       sourceSmall = "../../../my-icons/my-endpoint-24x16.png", sourceLarge = "../../../my-icons/my-endpoint-48x32.png",
+       transformerSmall = "../../../my-icons/my-transformer-24x16.png", transformerLarge = "../../../my-icons/my-transformer-48x32.png")
 public class MetadataModule {
 
     /**

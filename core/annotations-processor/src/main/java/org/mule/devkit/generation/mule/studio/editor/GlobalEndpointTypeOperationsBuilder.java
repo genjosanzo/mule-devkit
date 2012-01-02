@@ -81,11 +81,11 @@ public class GlobalEndpointTypeOperationsBuilder extends GlobalTypeBuilder {
 
     @Override
     protected String getImage() {
-        return helper.getEndpointImage(typeElement.name());
+        return helper.getEndpointImage(typeElement);
     }
 
     @Override
     protected String getIcon() {
-        return helper.getEndpointIcon(typeElement.name());
+        return helper.getEndpointIcon(typeElement);
     }
 }

@@ -31,7 +31,9 @@ import static org.junit.Assert.fail;
 public class MuleStudioPackagingIT extends AbstractMavenIT {
 
     private String[] EXPECTED_FILES_IN_STUDIO_PACKAGE = new String[] {"MANIFEST.MF", "Activator.class", "editors.xml",
-            "plugin.xml", "studio-packaging-integration-test-1.0.jar", "studio-packaging-integration-test-1.0.zip"};
+            "plugin.xml", "studio-packaging-integration-test-1.0.jar", "studio-packaging-integration-test-1.0.zip",
+             "generic-cloud-connector-24x16.png", "generic-cloud-connector-48x32.png", "generic-transformer-24x16.png",
+             "generic-transformer-48x32.png", "generic-endpoint-24x16.png", "generic-endpoint-48x32.png" };
 
     @Override
     public void buildExecutable() throws Exception {

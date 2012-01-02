@@ -35,8 +35,8 @@ public class EndpointTypeBuilder extends BaseStudioXmlBuilder {
         EndpointType endpointType = new EndpointType();
         endpointType.setLocalId(getLocalId());
         endpointType.setCaption(getCaption());
-        endpointType.setIcon(helper.getEndpointIcon(typeElement.name()));
-        endpointType.setImage(helper.getEndpointImage(typeElement.name()));
+        endpointType.setIcon(helper.getEndpointIcon(typeElement));
+        endpointType.setImage(helper.getEndpointImage(typeElement));
         endpointType.setDescription(getDescription());
         endpointType.setSupportsInbound(true);
         endpointType.setSupportsOutbound(false);

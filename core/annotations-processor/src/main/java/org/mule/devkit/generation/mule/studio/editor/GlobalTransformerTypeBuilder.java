@@ -78,11 +78,11 @@ public class GlobalTransformerTypeBuilder extends GlobalTypeBuilder {
 
     @Override
     protected String getImage() {
-        return helper.getTransformerImage(typeElement.name());
+        return helper.getTransformerImage(typeElement);
     }
 
     @Override
     protected String getIcon() {
-        return helper.getTransformerIcon(typeElement.name());
+        return helper.getTransformerIcon(typeElement);
     }
 }

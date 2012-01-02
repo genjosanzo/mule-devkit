@@ -48,7 +48,8 @@ public class MuleStudioPluginGenerator extends AbstractMessageGenerator {
                 new MuleStudioManifestGenerator(),
                 new MuleStudioEditorXmlGenerator(),
                 new MuleStudioPluginActivatorGenerator(),
-                new MuleStudioPluginXmlGenerator());
+                new MuleStudioPluginXmlGenerator(),
+                new MuleStudioIconsGenerator());
         for (AbstractGenerator muleStudioGenerator : muleStudioGenerators) {
             muleStudioGenerator.generate(typeElement, context);
         }

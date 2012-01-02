@@ -96,31 +96,31 @@ public class NestedsBuilder extends BaseStudioXmlBuilder {
     private String getImage() {
         if(executableElement != null) {
             if(executableElement.getAnnotation(Processor.class) != null) {
-                return helper.getConnectorImage(moduleName);
+                return helper.getConnectorImage(typeElement);
             }
             if(executableElement.getAnnotation(Source.class) != null) {
-                return helper.getEndpointImage(moduleName);
+                return helper.getEndpointImage(typeElement);
             }
             if(executableElement.getAnnotation(Transformer.class) != null) {
-                return helper.getTransformerImage(moduleName);
+                return helper.getTransformerImage(typeElement);
             }
         }
-        return helper.getConnectorImage(moduleName);
+        return helper.getConnectorImage(typeElement);
     }
 
     private String getIcon() {
         if(executableElement != null) {
             if(executableElement.getAnnotation(Processor.class) != null) {
-                return helper.getConnectorIcon(moduleName);
+                return helper.getConnectorIcon(typeElement);
             }
             if(executableElement.getAnnotation(Source.class) != null) {
-                return helper.getEndpointIcon(moduleName);
+                return helper.getEndpointIcon(typeElement);
             }
             if(executableElement.getAnnotation(Transformer.class) != null) {
-                return helper.getTransformerIcon(moduleName);
+                return helper.getTransformerIcon(typeElement);
             }
         }
-        return helper.getConnectorIcon(moduleName);
+        return helper.getConnectorIcon(typeElement);
     }
 
     private List<? extends VariableElement> getVariableElements() {

@@ -80,11 +80,11 @@ public class GlobalCloudConnectorTypeBuilder extends GlobalTypeBuilder {
 
     @Override
     protected String getImage() {
-        return helper.getConnectorImage(typeElement.name());
+        return helper.getConnectorImage(typeElement);
     }
 
     @Override
     protected String getIcon() {
-        return helper.getConnectorIcon(typeElement.name());
+        return helper.getConnectorIcon(typeElement);
     }
 }

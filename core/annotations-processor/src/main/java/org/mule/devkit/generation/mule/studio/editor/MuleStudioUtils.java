@@ -20,6 +20,7 @@ import org.apache.commons.lang.WordUtils;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.display.FriendlyName;
+import org.mule.api.annotations.display.Icons;
 import org.mule.api.annotations.display.Password;
 import org.mule.api.annotations.display.Summary;
 import org.mule.api.annotations.param.Default;
@@ -55,12 +56,8 @@ import java.util.List;
 
 public class MuleStudioUtils {
 
-    private static final String CONNECTOR_IMAGE = "icons/large/%s-connector-48x32.png";
-    private static final String CONNECTOR_ICON = "icons/small/%s-connector-24x16.png";
-    private static final String ENDPOINT_IMAGE = "icons/large/%s-endpoint-48x32.png";
-    private static final String ENDPOINT_ICON = "icons/small/%s-endpoint-24x16.png";
-    private static final String TRANSFORMER_IMAGE = "icons/large/%s-transformer-48x32.png";
-    private static final String TRANSFORMER_ICON = "icons/small/%s-transformer-24x16.png";
+    private static final String IMAGE_PREFIX = "icons/large/";
+    private static final String ICON_PREFIX = "icons/small/";
     private NameUtils nameUtils;
     private JavaDocUtils javaDocUtils;
     private TypeMirrorUtils typeMirrorUtils;
@@ -85,28 +82,88 @@ public class MuleStudioUtils {
         return description.replaceAll("\\<.*?\\>", "");
     }
 
-    public String getConnectorImage(String moduleName) {
-        return String.format(CONNECTOR_IMAGE, moduleName);
+    public String getConnectorImage(DevKitTypeElement typeElement) {
+        Icons icons = typeElement.getAnnotation(Icons.class);
+        String image;
+        if(icons != null) {
+            image = icons.processorLarge();
+        } else {
+            image = Icons.GENERIC_CLOUD_CONNECTOR_LARGE;
+        }
+        if(image.contains("/")) {
+            image = image.substring(image.lastIndexOf("/") +1);
+        }
+        return IMAGE_PREFIX + image;
     }
 
-    public String getConnectorIcon(String moduleName) {
-        return String.format(CONNECTOR_ICON, moduleName);
+    public String getConnectorIcon(DevKitTypeElement typeElement) {
+        Icons icons = typeElement.getAnnotation(Icons.class);
+        String icon;
+        if(icons != null) {
+            icon = icons.processorSmall();
+        } else {
+            icon = Icons.GENERIC_CLOUD_CONNECTOR_SMALL;
+        }
+        if(icon.contains("/")) {
+            icon = icon.substring(icon.lastIndexOf("/") +1);
+        }
+        return ICON_PREFIX + icon;
     }
 
-    public String getEndpointImage(String moduleName) {
-        return String.format(ENDPOINT_IMAGE, moduleName);
+    public String getEndpointImage(DevKitTypeElement typeElement) {
+        Icons icons = typeElement.getAnnotation(Icons.class);
+        String image;
+        if(icons != null) {
+            image = icons.sourceLarge();
+        } else {
+            image = Icons.GENERIC_ENDPOINT_LARGE;
+        }
+        if(image.contains("/")) {
+            image = image.substring(image.lastIndexOf("/") +1);
+        }
+        return IMAGE_PREFIX + image;
     }
 
-    public String getEndpointIcon(String moduleName) {
-        return String.format(ENDPOINT_ICON, moduleName);
+    public String getEndpointIcon(DevKitTypeElement typeElement) {
+        Icons icons = typeElement.getAnnotation(Icons.class);
+        String icon;
+        if(icons != null) {
+            icon = icons.sourceSmall();
+        } else {
+            icon = Icons.GENERIC_ENDPOINT_SMALL;
+        }
+        if(icon.contains("/")) {
+            icon = icon.substring(icon.lastIndexOf("/") +1);
+        }
+        return ICON_PREFIX + icon;
     }
 
-    public String getTransformerImage(String moduleName) {
-        return String.format(TRANSFORMER_IMAGE, moduleName);
+    public String getTransformerImage(DevKitTypeElement typeElement) {
+        Icons icons = typeElement.getAnnotation(Icons.class);
+        String image;
+        if(icons != null) {
+            image = icons.transformerLarge();
+        } else {
+            image = Icons.GENERIC_TRANSFORMER_LARGE;
+        }
+        if(image.contains("/")) {
+            image = image.substring(image.lastIndexOf("/") +1);
+        }
+        return IMAGE_PREFIX + image;
     }
 
-    public String getTransformerIcon(String moduleName) {
-        return String.format(TRANSFORMER_ICON, moduleName);
+    public String getTransformerIcon(DevKitTypeElement typeElement) {
+        Icons icons = typeElement.getAnnotation(Icons.class);
+        String icon;
+        if(icons != null) {
+            icon = icons.transformerSmall();
+        } else {
+            icon = Icons.GENERIC_TRANSFORMER_SMALL;
+        }
+        if(icon.contains("/")) {
+            icon = icon.substring(icon.lastIndexOf("/") +1);
+        }
+        return ICON_PREFIX + icon;
     }
 
     public String getGlobalRefId(String moduleName) {

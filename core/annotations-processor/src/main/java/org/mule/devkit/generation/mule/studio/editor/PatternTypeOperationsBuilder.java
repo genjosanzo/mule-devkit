@@ -74,17 +74,17 @@ public class PatternTypeOperationsBuilder extends BaseStudioXmlBuilder {
 
     private String getImage() {
         if (patternTypeToUse.equals(PatternTypes.TRANSFORMER)) {
-            return helper.getTransformerImage(typeElement.name());
+            return helper.getTransformerImage(typeElement);
         } else {
-            return helper.getConnectorImage(typeElement.name());
+            return helper.getConnectorImage(typeElement);
         }
     }
 
     private String getIcon() {
         if (patternTypeToUse.equals(PatternTypes.TRANSFORMER)) {
-            return helper.getTransformerIcon(typeElement.name());
+            return helper.getTransformerIcon(typeElement);
         } else {
-            return helper.getConnectorIcon(typeElement.name());
+            return helper.getConnectorIcon(typeElement);
         }
     }
 

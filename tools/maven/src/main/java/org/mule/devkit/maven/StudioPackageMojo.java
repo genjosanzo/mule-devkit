@@ -27,6 +27,7 @@ import org.jfrog.maven.annomojo.annotations.MojoGoal;
 import org.jfrog.maven.annomojo.annotations.MojoParameter;
 import org.jfrog.maven.annomojo.annotations.MojoPhase;
 import org.jfrog.maven.annomojo.annotations.MojoRequiresDependencyResolution;
+import org.mule.devkit.generation.mule.studio.MuleStudioIconsGenerator;
 import org.mule.devkit.generation.mule.studio.MuleStudioPluginGenerator;
 
 import java.io.File;
@@ -44,10 +45,6 @@ public class StudioPackageMojo extends AbstractMuleMojo {
     public static final String STUDIO_PACKAGE_SUFFIX = "-studio.zip";
     @MojoComponent
     private MavenProjectHelper projectHelper;
-
-    /**
-     * Directory containing the classes.
-     */
     @MojoParameter(expression = "${project.build.outputDirectory}", required = true)
     private File classesDirectory;
 
@@ -94,6 +91,8 @@ public class StudioPackageMojo extends AbstractMuleMojo {
             }
             archiver.addFile(file, file.getPath().substring(file.getPath().indexOf(classesDirectory.getPath()) + classesDirectory.getPath().length()));
         }
+
+        archiver.addDirectory(new File(classesDirectory, MuleStudioIconsGenerator.ICONS_FOLDER), MuleStudioIconsGenerator.ICONS_FOLDER, null, null);
 
         archiver.setDestFile(studioPlugin);
 

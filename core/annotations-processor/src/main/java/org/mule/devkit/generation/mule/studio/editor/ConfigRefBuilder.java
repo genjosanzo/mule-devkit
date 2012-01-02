@@ -59,8 +59,8 @@ public class ConfigRefBuilder extends BaseStudioXmlBuilder {
         cloudConnector.setLocalId(helper.getGlobalRefId(moduleName));
         cloudConnector.setDescription(helper.formatDescription("Interact with " + StringUtils.capitalize(moduleName)));
         cloudConnector.setAbstract(true);
-        cloudConnector.setIcon(helper.getConnectorIcon(moduleName));
-        cloudConnector.setImage(helper.getConnectorImage(moduleName));
+        cloudConnector.setIcon(helper.getConnectorIcon(typeElement));
+        cloudConnector.setImage(helper.getConnectorImage(typeElement));
 
         return objectFactory.createNamespaceTypeCloudConnector(cloudConnector);
     }
