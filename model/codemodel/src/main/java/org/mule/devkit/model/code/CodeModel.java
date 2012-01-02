@@ -47,6 +47,7 @@ import org.mule.devkit.model.code.writer.ProgressCodeWriter;
 import javax.lang.model.type.TypeMirror;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -106,6 +107,8 @@ public final class CodeModel {
     private final HashMap<Class<?>, ReferencedClass> refClasses = new HashMap<Class<?>, ReferencedClass>();
 
     private CodeWriter codeWriter;
+    
+    private OutputStream registryBootstrapStream;
 
     /**
      * Obtains a reference to the special "null" type.
@@ -566,6 +569,13 @@ public final class CodeModel {
             }
 
         }
+    }
+
+    public OutputStream getRegistryBootstrapStream() throws IOException {
+        if( registryBootstrapStream == null ) {
+            registryBootstrapStream = getCodeWriter().openBinary(null, "META-INF/services/org/mule/config/registry-bootstrap.properties");
+        }
+        return registryBootstrapStream;
     }
 
     /**

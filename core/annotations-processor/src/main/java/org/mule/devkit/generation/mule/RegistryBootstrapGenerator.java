@@ -40,7 +40,7 @@ public class RegistryBootstrapGenerator extends AbstractModuleGenerator {
     protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
         OutputStreamWriter registryBootstrapStreamOut = null;
         try {
-            OutputStream registryBootstrapStream = context.getCodeModel().getCodeWriter().openBinary(null, "META-INF/services/org/mule/config/registry-bootstrap.properties");
+            OutputStream registryBootstrapStream = context.getCodeModel().getRegistryBootstrapStream();
             registryBootstrapStreamOut = new OutputStreamWriter(registryBootstrapStream, "UTF-8");
             for (DefinedClass clazz : context.getRegisterAtBoot()) {
                 registryBootstrapStreamOut.write(clazz.name() + "=" + clazz.fullName() + "\n");
