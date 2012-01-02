@@ -63,5 +63,11 @@
                 <include>**/*.xml.sample</include>
             </includes>
         </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+            <directory>icons</directory>
+            <includes>
+                <include>**/*.png</include>
+            </includes>
+        </fileSet>
     </fileSets>
 </archetype-descriptor>
