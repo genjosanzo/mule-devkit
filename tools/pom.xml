@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.tools.devkit</groupId>
         <artifactId>mule-devkit</artifactId>
-        <version>3.2</version>
+        <version>3.3-SNAPSHOT</version>
     </parent>
 
     <name>Mule DevKit Tools</name>
