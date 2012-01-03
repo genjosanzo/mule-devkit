@@ -86,7 +86,7 @@ public class MuleStudioUtils {
         Icons icons = typeElement.getAnnotation(Icons.class);
         String image;
         if(icons != null) {
-            image = icons.processorLarge();
+            image = icons.connectorLarge();
         } else {
             image = String.format(Icons.GENERIC_CLOUD_CONNECTOR_LARGE, typeElement.name());
         }
@@ -100,7 +100,7 @@ public class MuleStudioUtils {
         Icons icons = typeElement.getAnnotation(Icons.class);
         String icon;
         if(icons != null) {
-            icon = icons.processorSmall();
+            icon = icons.connectorSmall();
         } else {
             icon = String.format(Icons.GENERIC_CLOUD_CONNECTOR_SMALL, typeElement.name());
         }
@@ -114,7 +114,7 @@ public class MuleStudioUtils {
         Icons icons = typeElement.getAnnotation(Icons.class);
         String image;
         if(icons != null) {
-            image = icons.sourceLarge();
+            image = icons.endpointLarge();
         } else {
             image = String.format(Icons.GENERIC_ENDPOINT_LARGE, typeElement.name());
         }
@@ -128,7 +128,7 @@ public class MuleStudioUtils {
         Icons icons = typeElement.getAnnotation(Icons.class);
         String icon;
         if(icons != null) {
-            icon = icons.sourceSmall();
+            icon = icons.endpointSmall();
         } else {
             icon = String.format(Icons.GENERIC_ENDPOINT_SMALL, typeElement.name());
         }

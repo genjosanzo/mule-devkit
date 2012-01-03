@@ -33,8 +33,8 @@ import org.mule.api.callback.SourceCallback;
  * @author MuleSoft inc
  */
 @Module(name = "metadata", description = "This description overrides class-level javadoc.")
-@Icons(processorSmall = "../../../my-icons/my-cloud-connector-24x16.png", processorLarge = "../../../my-icons/my-cloud-connector-48x32.png",
-       sourceSmall = "../../../my-icons/my-endpoint-24x16.png", sourceLarge = "../../../my-icons/my-endpoint-48x32.png",
+@Icons(connectorSmall = "../../../my-icons/my-cloud-connector-24x16.png", connectorLarge = "../../../my-icons/my-cloud-connector-48x32.png",
+       endpointSmall = "../../../my-icons/my-endpoint-24x16.png", endpointLarge = "../../../my-icons/my-endpoint-48x32.png",
        transformerSmall = "../../../my-icons/my-transformer-24x16.png", transformerLarge = "../../../my-icons/my-transformer-48x32.png")
 public class MetadataModule {
 

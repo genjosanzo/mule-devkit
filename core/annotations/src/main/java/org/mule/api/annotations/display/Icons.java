@@ -39,15 +39,15 @@ public @interface Icons {
     String GENERIC_ENDPOINT_SMALL = "../../../icons/%s-endpoint-24x16.png";
     String GENERIC_ENDPOINT_LARGE = "../../../icons/%s-endpoint-48x32.png";
 
-    String processorSmall() default GENERIC_CLOUD_CONNECTOR_SMALL;
+    String connectorSmall() default GENERIC_CLOUD_CONNECTOR_SMALL;
 
-    String processorLarge() default GENERIC_CLOUD_CONNECTOR_LARGE;
+    String connectorLarge() default GENERIC_CLOUD_CONNECTOR_LARGE;
 
     String transformerSmall() default GENERIC_TRANSFORMER_SMALL;
 
     String transformerLarge() default GENERIC_TRANSFORMER_LARGE;
 
-    String sourceSmall() default GENERIC_ENDPOINT_SMALL;
+    String endpointSmall() default GENERIC_ENDPOINT_SMALL;
 
-    String sourceLarge() default GENERIC_ENDPOINT_LARGE;
+    String endpointLarge() default GENERIC_ENDPOINT_LARGE;
 }

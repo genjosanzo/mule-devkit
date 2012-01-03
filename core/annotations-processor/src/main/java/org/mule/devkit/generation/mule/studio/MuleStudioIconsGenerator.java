@@ -42,11 +42,11 @@ public class MuleStudioIconsGenerator extends AbstractMessageGenerator {
     protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
         Icons icons = typeElement.getAnnotation(Icons.class);
         if (icons != null) {
-            copyFile(icons.processorSmall(), "icons/small", typeElement);
-            copyFile(icons.sourceSmall(), "icons/small", typeElement);
+            copyFile(icons.connectorSmall(), "icons/small", typeElement);
+            copyFile(icons.endpointSmall(), "icons/small", typeElement);
             copyFile(icons.transformerSmall(), "icons/small", typeElement);
-            copyFile(icons.processorLarge(), "icons/large", typeElement);
-            copyFile(icons.sourceLarge(), "icons/large", typeElement);
+            copyFile(icons.connectorLarge(), "icons/large", typeElement);
+            copyFile(icons.endpointLarge(), "icons/large", typeElement);
             copyFile(icons.transformerLarge(), "icons/large", typeElement);
         } else {
             copyFile(String.format(Icons.GENERIC_CLOUD_CONNECTOR_SMALL, typeElement.name()), "icons/small", typeElement);
