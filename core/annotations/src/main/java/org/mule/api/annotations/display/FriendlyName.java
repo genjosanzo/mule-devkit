@@ -16,6 +16,7 @@
  */
 package org.mule.api.annotations.display;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
@@ -23,6 +24,7 @@ import java.lang.annotation.Target;
  * Adds displaying information to a field or parameter.
  */
 @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
+@Documented
 public @interface FriendlyName {
 
     /**

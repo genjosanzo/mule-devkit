@@ -16,14 +16,19 @@
  */
 package org.mule.api.annotations.display;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
 /**
  * Used in {@link org.mule.api.annotations.Module} and {@link org.mule.api.annotations.Connector} annotated classes
- * to associate icons with them.
+ * to associate icons with them. Provided values are relative the annotated type location. If values are not provided
+ * {@link this#GENERIC_CLOUD_CONNECTOR_LARGE}, {@link this#GENERIC_CLOUD_CONNECTOR_SMALL},
+ * {@link this#GENERIC_ENDPOINT_LARGE}, {@link this#GENERIC_ENDPOINT_SMALL}, {@link this#GENERIC_TRANSFORMER_LARGE} and
+ * {@link this#GENERIC_TRANSFORMER_SMALL} will be used as needed.
  */
 @Target(ElementType.TYPE)
+@Documented
 public @interface Icons {
 
     String GENERIC_CLOUD_CONNECTOR_SMALL = "../../../icons/generic-cloud-connector-24x16.png";

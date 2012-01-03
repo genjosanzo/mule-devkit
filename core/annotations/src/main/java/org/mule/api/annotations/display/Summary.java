@@ -16,6 +16,7 @@
  */
 package org.mule.api.annotations.display;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
@@ -23,10 +24,11 @@ import java.lang.annotation.Target;
  * Adds displaying information to a field or parameter.
  */
 @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
+@Documented
 public @interface Summary {
 
     /**
-     * The description is a friendly explanation for the annotated element. If this value is not specified
+     * The description is a a brief description for the annotated element. If this value is not specified
      * the javadoc of the annotated element.
      */
     String value() default "";
