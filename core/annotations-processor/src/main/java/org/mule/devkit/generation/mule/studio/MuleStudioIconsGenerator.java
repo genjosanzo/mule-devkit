@@ -49,12 +49,12 @@ public class MuleStudioIconsGenerator extends AbstractMessageGenerator {
             copyFile(icons.sourceLarge(), "icons/large", typeElement);
             copyFile(icons.transformerLarge(), "icons/large", typeElement);
         } else {
-            copyFile(Icons.GENERIC_CLOUD_CONNECTOR_SMALL, "icons/small", typeElement);
-            copyFile(Icons.GENERIC_ENDPOINT_SMALL, "icons/small", typeElement);
-            copyFile(Icons.GENERIC_TRANSFORMER_SMALL, "icons/small", typeElement);
-            copyFile(Icons.GENERIC_CLOUD_CONNECTOR_LARGE, "icons/large", typeElement);
-            copyFile(Icons.GENERIC_ENDPOINT_LARGE, "icons/large", typeElement);
-            copyFile(Icons.GENERIC_TRANSFORMER_LARGE, "icons/large", typeElement);
+            copyFile(String.format(Icons.GENERIC_CLOUD_CONNECTOR_SMALL, typeElement.name()), "icons/small", typeElement);
+            copyFile(String.format(Icons.GENERIC_ENDPOINT_SMALL, typeElement.name()), "icons/small", typeElement);
+            copyFile(String.format(Icons.GENERIC_TRANSFORMER_SMALL, typeElement.name()), "icons/small", typeElement);
+            copyFile(String.format(Icons.GENERIC_CLOUD_CONNECTOR_LARGE, typeElement.name()), "icons/large", typeElement);
+            copyFile(String.format(Icons.GENERIC_ENDPOINT_LARGE, typeElement.name()), "icons/large", typeElement);
+            copyFile(String.format(Icons.GENERIC_TRANSFORMER_LARGE, typeElement.name()), "icons/large", typeElement);
         }
     }
 

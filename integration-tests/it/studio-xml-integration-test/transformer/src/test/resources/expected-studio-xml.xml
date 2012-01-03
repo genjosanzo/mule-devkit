@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="transformer" url="http://www.mulesoft.org/schema/mule/transformer">
-  <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformerConnectorGeneric" image="icons/large/generic-cloud-connector-48x32.png" localId="config" icon="icons/small/generic-cloud-connector-24x16.png" description="Global Transformer configuration information." caption="Transformer">
+  <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformerConnectorGeneric" image="icons/large/transformer-connector-48x32.png" localId="config" icon="icons/small/transformer-connector-24x16.png" description="Global Transformer configuration information." caption="Transformer">
     <attribute-category description="Transformer configuration properties." caption="General">
       <group caption="Generic" id="transformerGenericProperties">
         <name required="true" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
       </group>
     </attribute-category>
   </global-cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformerConnectorGeneric" image="icons/large/generic-cloud-connector-48x32.png" localId="transformer-connector" icon="icons/small/generic-cloud-connector-24x16.png" description="Transformer class." caption="Transformer" aliasId="org.mule.tooling.ui.modules.core.pattern.transformer">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformerConnectorGeneric" image="icons/large/transformer-connector-48x32.png" localId="transformer-connector" icon="icons/small/transformer-connector-24x16.png" description="Transformer class." caption="Transformer" aliasId="org.mule.tooling.ui.modules.core.pattern.transformer">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="transformerConnectorGeneric">
         <modeSwitch description="Operation." caption="Operation" name="Transformer operations to execute"></modeSwitch>
       </group>
     </attribute-category>
   </cloud-connector>
-  <cloud-connector abstract="true" image="icons/large/generic-cloud-connector-48x32.png" localId="abstractTransformerConnectorGeneric" icon="icons/small/generic-cloud-connector-24x16.png" description="Interact with Transformer." caption="Abstracttransformerconnectorgeneric">
+  <cloud-connector abstract="true" image="icons/large/transformer-connector-48x32.png" localId="abstractTransformerConnectorGeneric" icon="icons/small/transformer-connector-24x16.png" description="Interact with Transformer." caption="Abstracttransformerconnectorgeneric">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractTransformerConnectorGeneric">
         <globalRef requiredType="http://www.mulesoft.org/schema/mule/transformer/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref"></globalRef>
       </group>
     </attribute-category>
   </cloud-connector>
-  <transformer image="icons/large/generic-transformer-48x32.png" localId="transformer-transformer" icon="icons/small/generic-transformer-24x16.png" description="Transformer class." caption="Transformer" aliasId="org.mule.tooling.ui.modules.core.pattern.transformer">
+  <transformer image="icons/large/transformer-transformer-48x32.png" localId="transformer-transformer" icon="icons/small/transformer-transformer-24x16.png" description="Transformer class." caption="Transformer" aliasId="org.mule.tooling.ui.modules.core.pattern.transformer">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="transformerConnectorGeneric">
         <modeSwitch description="Operation." caption="Operation" name="Transformer operations to execute">
@@ -60,7 +60,7 @@
       </group>
     </attribute-category>
   </transformer>
-  <global-transformer extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformer" image="icons/large/generic-transformer-48x32.png" localId="global-transformer" icon="icons/small/generic-transformer-24x16.png" description="Global transformer." caption="Transformer">
+  <global-transformer extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformer" image="icons/large/transformer-transformer-48x32.png" localId="global-transformer" icon="icons/small/transformer-transformer-24x16.png" description="Global transformer." caption="Transformer">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="transformerConnectorGeneric">
         <modeSwitch description="Operation." caption="Operation" name="Transformer operations to execute">
@@ -70,16 +70,16 @@
       </group>
     </attribute-category>
   </global-transformer>
-  <transformer extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformer" abstract="true" image="icons/large/generic-transformer-48x32.png" localId="string-to-char" icon="icons/small/generic-transformer-24x16.png" description="Transforms a String to a character." caption="String To Char"></transformer>
-  <global-transformer extends="http://www.mulesoft.org/schema/mule/transformer/string-to-char" abstract="true" image="icons/large/generic-transformer-48x32.png" localId="string-to-char" icon="icons/small/generic-transformer-24x16.png" description="Transforms a String to a character." caption="String To Char">
+  <transformer extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformer" abstract="true" image="icons/large/transformer-transformer-48x32.png" localId="string-to-char" icon="icons/small/transformer-transformer-24x16.png" description="Transforms a String to a character." caption="String To Char"></transformer>
+  <global-transformer extends="http://www.mulesoft.org/schema/mule/transformer/string-to-char" abstract="true" image="icons/large/transformer-transformer-48x32.png" localId="string-to-char" icon="icons/small/transformer-transformer-24x16.png" description="Transforms a String to a character." caption="String To Char">
     <attribute-category description="General." caption="General">
         <group caption="Generic">
         <name required="true" description="Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level." caption="Name" name="name"></name>
       </group>
     </attribute-category>
   </global-transformer>
-  <transformer extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformer" abstract="true" image="icons/large/generic-transformer-48x32.png" localId="string-to-url" icon="icons/small/generic-transformer-24x16.png" description="Transforms a String to a URL." caption="String To Url"></transformer>
-  <global-transformer extends="http://www.mulesoft.org/schema/mule/transformer/string-to-url" abstract="true" image="icons/large/generic-transformer-48x32.png" localId="string-to-url" icon="icons/small/generic-transformer-24x16.png" description="Transforms a String to a URL." caption="String To Url">
+  <transformer extends="http://www.mulesoft.org/schema/mule/transformer/abstractTransformer" abstract="true" image="icons/large/transformer-transformer-48x32.png" localId="string-to-url" icon="icons/small/transformer-transformer-24x16.png" description="Transforms a String to a URL." caption="String To Url"></transformer>
+  <global-transformer extends="http://www.mulesoft.org/schema/mule/transformer/string-to-url" abstract="true" image="icons/large/transformer-transformer-48x32.png" localId="string-to-url" icon="icons/small/transformer-transformer-24x16.png" description="Transforms a String to a URL." caption="String To Url">
     <attribute-category description="General." caption="General">
         <group caption="Generic">
         <name required="true" description="Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level." caption="Name" name="name"></name>

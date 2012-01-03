@@ -88,7 +88,7 @@ public class MuleStudioUtils {
         if(icons != null) {
             image = icons.processorLarge();
         } else {
-            image = Icons.GENERIC_CLOUD_CONNECTOR_LARGE;
+            image = String.format(Icons.GENERIC_CLOUD_CONNECTOR_LARGE, typeElement.name());
         }
         if(image.contains("/")) {
             image = image.substring(image.lastIndexOf("/") +1);
@@ -102,7 +102,7 @@ public class MuleStudioUtils {
         if(icons != null) {
             icon = icons.processorSmall();
         } else {
-            icon = Icons.GENERIC_CLOUD_CONNECTOR_SMALL;
+            icon = String.format(Icons.GENERIC_CLOUD_CONNECTOR_SMALL, typeElement.name());
         }
         if(icon.contains("/")) {
             icon = icon.substring(icon.lastIndexOf("/") +1);
@@ -116,7 +116,7 @@ public class MuleStudioUtils {
         if(icons != null) {
             image = icons.sourceLarge();
         } else {
-            image = Icons.GENERIC_ENDPOINT_LARGE;
+            image = String.format(Icons.GENERIC_ENDPOINT_LARGE, typeElement.name());
         }
         if(image.contains("/")) {
             image = image.substring(image.lastIndexOf("/") +1);
@@ -130,7 +130,7 @@ public class MuleStudioUtils {
         if(icons != null) {
             icon = icons.sourceSmall();
         } else {
-            icon = Icons.GENERIC_ENDPOINT_SMALL;
+            icon = String.format(Icons.GENERIC_ENDPOINT_SMALL, typeElement.name());
         }
         if(icon.contains("/")) {
             icon = icon.substring(icon.lastIndexOf("/") +1);
@@ -144,7 +144,7 @@ public class MuleStudioUtils {
         if(icons != null) {
             image = icons.transformerLarge();
         } else {
-            image = Icons.GENERIC_TRANSFORMER_LARGE;
+            image = String.format(Icons.GENERIC_TRANSFORMER_LARGE, typeElement.name());
         }
         if(image.contains("/")) {
             image = image.substring(image.lastIndexOf("/") +1);
@@ -158,7 +158,7 @@ public class MuleStudioUtils {
         if(icons != null) {
             icon = icons.transformerSmall();
         } else {
-            icon = Icons.GENERIC_TRANSFORMER_SMALL;
+            icon = String.format(Icons.GENERIC_TRANSFORMER_SMALL, typeElement.name());
         }
         if(icon.contains("/")) {
             icon = icon.substring(icon.lastIndexOf("/") +1);

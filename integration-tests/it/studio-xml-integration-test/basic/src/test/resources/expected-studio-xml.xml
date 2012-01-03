@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="basic" url="http://www.mulesoft.org/schema/mule/basic">
-  <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" image="icons/large/generic-cloud-connector-48x32.png" localId="config" icon="icons/small/generic-cloud-connector-24x16.png" description="Global Basic configuration information." caption="Basic">
+  <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" image="icons/large/basic-connector-48x32.png" localId="config" icon="icons/small/basic-connector-24x16.png" description="Global Basic configuration information." caption="Basic">
     <attribute-category description="Basic configuration properties." caption="General">
       <group caption="Generic" id="basicGenericProperties">
         <name description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name" required="true"></name>
       </group>
     </attribute-category>
   </global-cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" image="icons/large/generic-cloud-connector-48x32.png" localId="basic-connector" icon="icons/small/generic-cloud-connector-24x16.png" description="Basic module." caption="Basic" aliasId="org.mule.tooling.ui.modules.core.pattern.basic">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" image="icons/large/basic-connector-48x32.png" localId="basic-connector" icon="icons/small/basic-connector-24x16.png" description="Basic module." caption="Basic" aliasId="org.mule.tooling.ui.modules.core.pattern.basic">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="basicConnectorGeneric">
         <modeSwitch description="Operation." caption="Operation" name="Basic operations to execute">
@@ -28,84 +28,84 @@
       </group>
     </attribute-category>
   </cloud-connector>
-  <cloud-connector abstract="true" image="icons/large/generic-cloud-connector-48x32.png" localId="abstractBasicConnectorGeneric" icon="icons/small/generic-cloud-connector-24x16.png" description="Interact with Basic." caption="Abstractbasicconnectorgeneric">
+  <cloud-connector abstract="true" image="icons/large/basic-connector-48x32.png" localId="abstractBasicConnectorGeneric" icon="icons/small/basic-connector-24x16.png" description="Interact with Basic." caption="Abstractbasicconnectorgeneric">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractBasicConnectorGeneric">
         <globalRef requiredType="http://www.mulesoft.org/schema/mule/basic/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref"></globalRef>
       </group>
     </attribute-category>
   </cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/generic-cloud-connector-48x32.png" localId="passthru-char" icon="icons/small/generic-cloud-connector-24x16.png" caption="Passthru Char">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/basic-connector-48x32.png" localId="passthru-char" icon="icons/small/basic-connector-24x16.png" caption="Passthru Char">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
         <string required="true" description="Value to passthru." caption="Value" name="value"></string>
       </group>
     </attribute-category>
   </cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/generic-cloud-connector-48x32.png" localId="passthru-string" icon="icons/small/generic-cloud-connector-24x16.png" caption="Passthru String">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/basic-connector-48x32.png" localId="passthru-string" icon="icons/small/basic-connector-24x16.png" caption="Passthru String">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
         <string required="true" description="Value to passthru." caption="Value" name="value"></string>
       </group>
     </attribute-category>
   </cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/generic-cloud-connector-48x32.png" localId="passthru-float" icon="icons/small/generic-cloud-connector-24x16.png" caption="Passthru Float">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/basic-connector-48x32.png" localId="passthru-float" icon="icons/small/basic-connector-24x16.png" caption="Passthru Float">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
         <string required="true" description="Value to passthru." caption="Value" name="value"></string>
       </group>
     </attribute-category>
   </cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/generic-cloud-connector-48x32.png" localId="passthru-boolean" icon="icons/small/generic-cloud-connector-24x16.png" caption="Passthru Boolean">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/basic-connector-48x32.png" localId="passthru-boolean" icon="icons/small/basic-connector-24x16.png" caption="Passthru Boolean">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
         <boolean required="true" description="Value to passthru." caption="Value" name="value" supportsExpressions="true"></boolean>
       </group>
     </attribute-category>
   </cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/generic-cloud-connector-48x32.png" localId="passthru-integer" icon="icons/small/generic-cloud-connector-24x16.png" caption="Passthru Integer">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/basic-connector-48x32.png" localId="passthru-integer" icon="icons/small/basic-connector-24x16.png" caption="Passthru Integer">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
         <integer step="1" min="0" required="true" description="Value to passthru." caption="Value" name="value"></integer>
       </group>
     </attribute-category>
   </cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/generic-cloud-connector-48x32.png" localId="passthru-long" icon="icons/small/generic-cloud-connector-24x16.png" caption="Passthru Long">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/basic-connector-48x32.png" localId="passthru-long" icon="icons/small/basic-connector-24x16.png" caption="Passthru Long">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
         <integer step="1" min="0" required="true" description="Value to passthru." caption="Value" name="value"></integer>
       </group>
     </attribute-category>
   </cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/generic-cloud-connector-48x32.png" localId="passthru-complex-float" icon="icons/small/generic-cloud-connector-24x16.png" caption="Passthru Complex Float">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/basic-connector-48x32.png" localId="passthru-complex-float" icon="icons/small/basic-connector-24x16.png" caption="Passthru Complex Float">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
         <string required="true" description="Value to passthru." caption="Value" name="value"></string>
       </group>
     </attribute-category>
   </cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/generic-cloud-connector-48x32.png" localId="passthru-complex-boolean" icon="icons/small/generic-cloud-connector-24x16.png" caption="Passthru Complex Boolean">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/basic-connector-48x32.png" localId="passthru-complex-boolean" icon="icons/small/basic-connector-24x16.png" caption="Passthru Complex Boolean">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
         <boolean required="true" description="Value to passthru." caption="Value" name="value" supportsExpressions="true"></boolean>
       </group>
     </attribute-category>
   </cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/generic-cloud-connector-48x32.png" localId="passthru-complex-integer" icon="icons/small/generic-cloud-connector-24x16.png" caption="Passthru Complex Integer">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/basic-connector-48x32.png" localId="passthru-complex-integer" icon="icons/small/basic-connector-24x16.png" caption="Passthru Complex Integer">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
         <integer step="1" min="0" required="true" description="Value to passthru." caption="Value" name="value"></integer>
       </group>
     </attribute-category>
   </cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/generic-cloud-connector-48x32.png" localId="passthru-complex-long" icon="icons/small/generic-cloud-connector-24x16.png" caption="Passthru Complex Long">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/basic-connector-48x32.png" localId="passthru-complex-long" icon="icons/small/basic-connector-24x16.png" caption="Passthru Complex Long">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
         <integer step="1" min="0" required="true" description="Value to passthru." caption="Value" name="value"></integer>
       </group>
     </attribute-category>
   </cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/generic-cloud-connector-48x32.png" localId="passthru-enum" icon="icons/small/generic-cloud-connector-24x16.png" caption="Passthru Enum">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/basic-connector-48x32.png" localId="passthru-enum" icon="icons/small/basic-connector-24x16.png" caption="Passthru Enum">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
         <enum allowsCustom="true" required="true" supportsExpressions="true" description="Value to passthru." caption="Mode" name="mode">
@@ -115,7 +115,7 @@
       </group>
     </attribute-category>
   </cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/generic-cloud-connector-48x32.png" localId="passthru-complex-ref" icon="icons/small/generic-cloud-connector-24x16.png" caption="Passthru Complex Ref">
+  <cloud-connector extends="http://www.mulesoft.org/schema/mule/basic/abstractBasicConnectorGeneric" abstract="true" image="icons/large/basic-connector-48x32.png" localId="passthru-complex-ref" icon="icons/small/basic-connector-24x16.png" caption="Passthru Complex Ref">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
         <string required="true" description="Value to passthru." caption="My Complex Object Reference" name="myComplexObject-ref"></string>

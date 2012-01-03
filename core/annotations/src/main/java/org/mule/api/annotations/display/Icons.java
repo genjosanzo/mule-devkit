@@ -23,20 +23,21 @@ import java.lang.annotation.Target;
 /**
  * Used in {@link org.mule.api.annotations.Module} and {@link org.mule.api.annotations.Connector} annotated classes
  * to associate icons with them. Provided values are relative the annotated type location. If values are not provided
- * {@link this#GENERIC_CLOUD_CONNECTOR_LARGE}, {@link this#GENERIC_CLOUD_CONNECTOR_SMALL},
+ * then {@link this#GENERIC_CLOUD_CONNECTOR_LARGE}, {@link this#GENERIC_CLOUD_CONNECTOR_SMALL},
  * {@link this#GENERIC_ENDPOINT_LARGE}, {@link this#GENERIC_ENDPOINT_SMALL}, {@link this#GENERIC_TRANSFORMER_LARGE} and
- * {@link this#GENERIC_TRANSFORMER_SMALL} will be used as needed.
+ * {@link this#GENERIC_TRANSFORMER_SMALL} will be used as needed formatting the strings with
+ * {@link org.mule.api.annotations.Module#name()} or {@link org.mule.api.annotations.Connector#name()}
  */
 @Target(ElementType.TYPE)
 @Documented
 public @interface Icons {
 
-    String GENERIC_CLOUD_CONNECTOR_SMALL = "../../../icons/generic-cloud-connector-24x16.png";
-    String GENERIC_CLOUD_CONNECTOR_LARGE = "../../../icons/generic-cloud-connector-48x32.png";
-    String GENERIC_TRANSFORMER_SMALL = "../../../icons/generic-transformer-24x16.png";
-    String GENERIC_TRANSFORMER_LARGE = "../../../icons/generic-transformer-48x32.png";
-    String GENERIC_ENDPOINT_SMALL = "../../../icons/generic-endpoint-24x16.png";
-    String GENERIC_ENDPOINT_LARGE = "../../../icons/generic-endpoint-48x32.png";
+    String GENERIC_CLOUD_CONNECTOR_SMALL = "../../../icons/%s-connector-24x16.png";
+    String GENERIC_CLOUD_CONNECTOR_LARGE = "../../../icons/%s-connector-48x32.png";
+    String GENERIC_TRANSFORMER_SMALL = "../../../icons/%s-transformer-24x16.png";
+    String GENERIC_TRANSFORMER_LARGE = "../../../icons/%s-transformer-48x32.png";
+    String GENERIC_ENDPOINT_SMALL = "../../../icons/%s-endpoint-24x16.png";
+    String GENERIC_ENDPOINT_LARGE = "../../../icons/%s-endpoint-48x32.png";
 
     String processorSmall() default GENERIC_CLOUD_CONNECTOR_SMALL;
 
