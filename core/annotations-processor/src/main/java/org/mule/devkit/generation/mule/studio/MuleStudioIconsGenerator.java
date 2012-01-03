@@ -68,9 +68,13 @@ public class MuleStudioIconsGenerator extends AbstractMessageGenerator {
         OutputStream outputStream = null;
         try {
             outputStream = createFile(folder, fileName);
-            IOUtils.copy(new FileInputStream(new File(sourcePath, fileName)), outputStream);
+            File fileToCopy = new File(sourcePath, fileName);
+            if(!fileToCopy.exists()) {
+                throw new GenerationException("The following icon file does not exist: " + fileToCopy.getAbsolutePath());
+            }
+            IOUtils.copy(new FileInputStream(fileToCopy), outputStream);
         } catch (IOException e) {
-            throw new GenerationException("Error copy icons to output folder", e);
+            throw new GenerationException("Error copying icons to output folder: " + e.getMessage(), e);
         } finally {
             IOUtils.closeQuietly(outputStream);
         }
@@ -83,7 +87,7 @@ public class MuleStudioIconsGenerator extends AbstractMessageGenerator {
         try {
             return context.getCodeModel().getCodeWriter().openBinary(null, folder + '/' + fileName);
         } catch (IOException e) {
-            throw new GenerationException("Could not create file or folder: " + fileName, e);
+            throw new GenerationException("Could not create file or folder " + fileName + ": " + e.getMessage(), e);
         }
     }
 }

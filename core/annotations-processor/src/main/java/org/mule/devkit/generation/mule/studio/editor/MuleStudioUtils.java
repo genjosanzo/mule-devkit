@@ -326,18 +326,6 @@ public class MuleStudioUtils {
         return formatCaption(getFriendlyName(element));
     }
 
-    public String getFriendlyName(ExecutableElement element) {
-        Processor processor = element.getAnnotation(Processor.class);
-        if(processor != null && StringUtils.isNotBlank(processor.friendlyName())) {
-            return processor.friendlyName();
-        }
-        Source source = element.getAnnotation(Source.class);
-        if(source != null && StringUtils.isNotBlank(source.friendlyName())) {
-            return source.friendlyName();
-        }
-        return nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString());
-    }
-
     public String getFormattedCaption(VariableElement element) {
         FriendlyName caption = element.getAnnotation(FriendlyName.class);
         if (caption != null && StringUtils.isNotBlank(caption.value())) {
@@ -351,6 +339,18 @@ public class MuleStudioUtils {
             return formatCaption(friendlyName + " Reference");
         }
         return formatCaption(friendlyName);
+    }
+
+    public String getFriendlyName(ExecutableElement element) {
+        Processor processor = element.getAnnotation(Processor.class);
+        if(processor != null && StringUtils.isNotBlank(processor.friendlyName())) {
+            return processor.friendlyName();
+        }
+        Source source = element.getAnnotation(Source.class);
+        if(source != null && StringUtils.isNotBlank(source.friendlyName())) {
+            return source.friendlyName();
+        }
+        return nameUtils.friendlyNameFromCamelCase(element.getSimpleName().toString());
     }
 
     public boolean isKnownType(VariableElement variable) {

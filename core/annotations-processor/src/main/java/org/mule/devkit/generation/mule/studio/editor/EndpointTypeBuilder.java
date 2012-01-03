@@ -59,7 +59,7 @@ public class EndpointTypeBuilder extends BaseStudioXmlBuilder {
     }
 
     protected String getCaption() {
-        return helper.formatCaption(nameUtils.friendlyNameFromCamelCase(executableElement.getSimpleName().toString()));
+        return helper.getFormattedCaption(executableElement);
     }
 
     protected String getLocalId() {

@@ -51,7 +51,7 @@
       </group>
     </attribute-category>
   </global-endpoint>
-  <endpoint supportsOutbound="false" supportsInbound="true" extends="http://www.mulesoft.org/schema/mule/metadata/abstractMetadataConnectorGeneric" abstract="false" image="icons/large/my-endpoint-48x32.png" localId="endpoint" icon="icons/small/my-endpoint-24x16.png" description="This description overrides class-level javadoc." caption="Metadata">
+  <endpoint supportsOutbound="false" supportsInbound="true" extends="http://www.mulesoft.org/schema/mule/metadata/abstractMetadataConnectorGeneric" abstract="false" image="icons/large/my-endpoint-48x32.png" localId="endpoint" icon="icons/small/my-endpoint-24x16.png" description="This description overrides class-level javadoc." caption="Metadata (Streaming)">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="metadataConnectorGeneric">
         <modeSwitch description="Operation." caption="Operation" name="Metadata operations to execute">

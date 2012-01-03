@@ -29,7 +29,7 @@
       </group>
     </attribute-category>
   </global-endpoint>
-  <endpoint supportsOutbound="false" supportsInbound="true" extends="http://www.mulesoft.org/schema/mule/source/abstractSourceConnectorGeneric" abstract="false" image="icons/large/generic-endpoint-48x32.png" localId="endpoint" icon="icons/small/generic-endpoint-24x16.png" description="Source class." caption="Source">
+  <endpoint supportsOutbound="false" supportsInbound="true" extends="http://www.mulesoft.org/schema/mule/source/abstractSourceConnectorGeneric" abstract="false" image="icons/large/generic-endpoint-48x32.png" localId="endpoint" icon="icons/small/generic-endpoint-24x16.png" description="Source class." caption="Source (Streaming)">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="sourceConnectorGeneric">
         <modeSwitch description="Operation." caption="Operation" name="Source operations to execute">

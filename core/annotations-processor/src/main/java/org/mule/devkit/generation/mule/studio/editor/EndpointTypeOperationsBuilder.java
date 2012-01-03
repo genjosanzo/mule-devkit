@@ -62,7 +62,7 @@ public class EndpointTypeOperationsBuilder extends EndpointTypeBuilder {
 
     @Override
     protected String getCaption() {
-        return helper.getFormattedCaption(typeElement);
+        return helper.getFormattedCaption(typeElement) + " (Streaming)";
     }
 
     @Override
