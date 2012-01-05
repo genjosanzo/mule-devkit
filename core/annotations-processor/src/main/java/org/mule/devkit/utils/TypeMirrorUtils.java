@@ -17,6 +17,7 @@
 
 package org.mule.devkit.utils;
 
+import org.mule.api.MuleMessage;
 import org.mule.api.NestedProcessor;
 import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
@@ -41,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 public class TypeMirrorUtils {
-    private static final List<Class<?>> PARAMETER_TYPES_TO_IGNORE = Arrays.asList(new Class<?>[]{SourceCallback.class});
+    private static final List<Class<?>> PARAMETER_TYPES_TO_IGNORE = Arrays.asList(SourceCallback.class, MuleMessage.class);
     private static final List<Class<? extends Annotation>> PARAMETERS_ANNOTATIONS_TO_IGNORE =
             Arrays.asList(InboundHeaders.class, InvocationHeaders.class, OutboundHeaders.class, Payload.class, OAuthAccessToken.class, OAuthAccessTokenSecret.class);
 
