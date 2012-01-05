@@ -11,7 +11,7 @@
 
     <properties>
         <mule.version>3.2.1</mule.version>
-        <mule.devkit.version>3.2</mule.devkit.version>
+        <mule.devkit.version>@project.version@</mule.devkit.version>
         <junit.version>4.8.2</junit.version>
         <mockito.version>1.8.2</mockito.version>
     </properties>
