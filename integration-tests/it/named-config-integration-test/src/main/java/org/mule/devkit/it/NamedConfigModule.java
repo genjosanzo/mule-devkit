@@ -20,6 +20,8 @@ package org.mule.devkit.it;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.param.Optional;
+import org.mule.api.callback.HttpCallback;
 
 @Module(name = "nc")
 public class NamedConfigModule {
@@ -27,7 +29,7 @@ public class NamedConfigModule {
     private String append;
 
     @Processor
-    public String passthruString(String value) {
+    public String passthruString(String value, @Optional HttpCallback httpCallback) {
         return value + this.append;
     }
 
