@@ -1075,14 +1075,19 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
         ifIsPoll._then().add(propertyValues.invoke("addPropertyValue").arg("messageProcessor").arg(definition));
 
-        Variable messageProcessors = ifIsPoll._else().decl(ref(PropertyValue.class), "messageProcessors",
+        Conditional ifIsEnricher = ifIsPoll._else()._if(parserContext.invoke("getContainingBeanDefinition").invoke("getBeanClassName")
+                .invoke("equals").arg("org.mule.enricher.MessageEnricher"));
+
+        ifIsEnricher._then().add(propertyValues.invoke("addPropertyValue").arg("enrichmentProcessor").arg(definition));
+
+        Variable messageProcessors = ifIsEnricher._else().decl(ref(PropertyValue.class), "messageProcessors",
                 propertyValues.invoke("getPropertyValue").arg("messageProcessors"));
-        Conditional noList = ifIsPoll._else()._if(Op.cor(Op.eq(messageProcessors, ExpressionFactory._null()), Op.eq(messageProcessors.invoke("getValue"),
+        Conditional noList = ifIsEnricher._else()._if(Op.cor(Op.eq(messageProcessors, ExpressionFactory._null()), Op.eq(messageProcessors.invoke("getValue"),
                 ExpressionFactory._null())));
         noList._then().add(propertyValues.invoke("addPropertyValue").arg("messageProcessors").arg(ExpressionFactory._new(ref(ManagedList.class))));
-        Variable listMessageProcessors = ifIsPoll._else().decl(ref(List.class), "listMessageProcessors",
+        Variable listMessageProcessors = ifIsEnricher._else().decl(ref(List.class), "listMessageProcessors",
                 ExpressionFactory.cast(ref(List.class), propertyValues.invoke("getPropertyValue").arg("messageProcessors").invoke("getValue")));
-        ifIsPoll._else().add(listMessageProcessors.invoke("add").arg(
+        ifIsEnricher._else().add(listMessageProcessors.invoke("add").arg(
                 definition
         ));
     }

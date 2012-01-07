@@ -50,7 +50,7 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.getMethodsAnnotatedWith(ExpressionEnricher.class).size() > 0;
+        return typeElement.hasAnnotation(ExpressionLanguage.class) && typeElement.getMethodsAnnotatedWith(ExpressionEnricher.class).size() > 0;
     }
 
     @Override

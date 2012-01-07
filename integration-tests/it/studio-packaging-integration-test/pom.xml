@@ -9,7 +9,7 @@
     <name>Mule Studio Packaging Integration Tests</name>
 
     <properties>
-        <devkit.version>3.1.1-SNAPSHOT</devkit.version>
+        <devkit.version>@project.version@</devkit.version>
         <mule.version>3.2.0</mule.version>
     </properties>
 

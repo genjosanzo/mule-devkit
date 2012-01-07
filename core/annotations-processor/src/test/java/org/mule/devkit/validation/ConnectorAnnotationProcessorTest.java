@@ -17,7 +17,7 @@
 package org.mule.devkit.validation;
 
 import org.mule.devkit.apt.AbstractAnnotationProcessorTest;
-import org.mule.devkit.apt.ConnectorAnnotationProcessor;
+import org.mule.devkit.apt.DevKitAnnotationProcessor;
 import org.mule.devkit.generation.Generator;
 
 import java.util.Arrays;
@@ -29,9 +29,9 @@ public abstract class ConnectorAnnotationProcessorTest extends AbstractAnnotatio
     protected abstract Validator getValidatorToTest();
 
     @Override
-    protected List<ConnectorAnnotationProcessor> getProcessors() {
+    protected List<DevKitAnnotationProcessor> getProcessors() {
         List<Validator> validators = Arrays.asList(getValidatorToTest());
         List<Generator> generators = Collections.emptyList();
-        return Arrays.asList(new ConnectorAnnotationProcessor(validators, generators));
+        return Arrays.asList(new DevKitAnnotationProcessor(validators, generators));
     }
 }

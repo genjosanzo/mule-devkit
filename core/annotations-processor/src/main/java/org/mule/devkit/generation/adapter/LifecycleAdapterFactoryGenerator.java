@@ -20,6 +20,8 @@ package org.mule.devkit.generation.adapter;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleContext;
 import org.mule.api.annotations.Configurable;
+import org.mule.api.annotations.Connector;
+import org.mule.api.annotations.Module;
 import org.mule.api.lifecycle.InitialisationCallback;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.object.ObjectFactory;
@@ -39,7 +41,7 @@ public class LifecycleAdapterFactoryGenerator extends AbstractModuleGenerator {
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.isPoolable();
+        return (typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class)) && typeElement.isPoolable();
     }
 
     @Override

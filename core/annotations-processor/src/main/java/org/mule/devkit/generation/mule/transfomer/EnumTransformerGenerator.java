@@ -17,6 +17,8 @@
 
 package org.mule.devkit.generation.mule.transfomer;
 
+import org.mule.api.annotations.Connector;
+import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.context.MuleContextAware;
@@ -45,7 +47,7 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return true;
+        return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
     }
 
     @Override

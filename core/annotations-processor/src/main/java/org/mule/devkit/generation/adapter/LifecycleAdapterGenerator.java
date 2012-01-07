@@ -19,6 +19,8 @@ package org.mule.devkit.generation.adapter;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
+import org.mule.api.annotations.Connector;
+import org.mule.api.annotations.Module;
 import org.mule.api.annotations.lifecycle.Start;
 import org.mule.api.annotations.lifecycle.Stop;
 import org.mule.api.lifecycle.Disposable;
@@ -55,7 +57,7 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return true;
+        return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
     }
 
     @Override

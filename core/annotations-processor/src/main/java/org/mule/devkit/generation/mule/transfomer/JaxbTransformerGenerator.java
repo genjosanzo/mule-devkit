@@ -18,6 +18,8 @@
 package org.mule.devkit.generation.mule.transfomer;
 
 import org.apache.commons.lang.StringUtils;
+import org.mule.api.annotations.Connector;
+import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
@@ -57,7 +59,7 @@ public class JaxbTransformerGenerator extends AbstractModuleGenerator {
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return true;
+        return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
     }
 
     @Override

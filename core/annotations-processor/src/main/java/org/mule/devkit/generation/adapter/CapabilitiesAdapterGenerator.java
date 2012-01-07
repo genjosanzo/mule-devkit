@@ -18,6 +18,8 @@
 package org.mule.devkit.generation.adapter;
 
 import org.mule.api.Capabilities;
+import org.mule.api.annotations.Connector;
+import org.mule.api.annotations.Module;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.code.DefinedClass;
@@ -29,7 +31,7 @@ public class CapabilitiesAdapterGenerator extends AbstractModuleGenerator {
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return true;
+        return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
     }
 
     @Override

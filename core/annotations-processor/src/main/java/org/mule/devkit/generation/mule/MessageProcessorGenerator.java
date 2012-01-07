@@ -24,8 +24,10 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NestedProcessor;
+import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.InvalidateConnectionOn;
 import org.mule.api.annotations.Mime;
+import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
@@ -89,7 +91,8 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return true;
+        return (typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class)) &&
+                typeElement.hasMethodsAnnotatedWith(Processor.class);
     }
 
     @Override

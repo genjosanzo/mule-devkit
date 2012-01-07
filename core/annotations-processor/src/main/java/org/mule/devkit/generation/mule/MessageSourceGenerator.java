@@ -21,6 +21,8 @@ import org.apache.commons.lang.StringUtils;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.annotations.Connector;
+import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Source;
 import org.mule.api.callback.SourceCallback;
 import org.mule.config.i18n.CoreMessages;
@@ -56,7 +58,8 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return true;
+        return (typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class)) &&
+                typeElement.hasMethodsAnnotatedWith(Source.class);
     }
 
     @Override

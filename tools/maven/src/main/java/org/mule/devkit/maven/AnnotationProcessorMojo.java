@@ -35,9 +35,7 @@ import java.util.Set;
 public class AnnotationProcessorMojo extends AbstractAnnotationProcessorMojo {
 
     private static final Logger LOGGER = Logger.getLogger(AnnotationProcessorMojo.class);
-    private static String[] processors = {"org.mule.devkit.apt.ModuleAnnotationProcessor",
-            "org.mule.devkit.apt.ConnectorAnnotationProcessor",
-            "org.mule.devkit.apt.ExpressionLanguageAnnotationProcessor"};
+    private static String[] processors = {"org.mule.devkit.apt.DevKitAnnotationProcessor"};
 
     /**
      * project classpath

@@ -17,6 +17,8 @@
 
 package org.mule.devkit.generation.mule.transfomer;
 
+import org.mule.api.annotations.Connector;
+import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Transformer;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
@@ -50,7 +52,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return true;
+        return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
     }
 
     @Override
