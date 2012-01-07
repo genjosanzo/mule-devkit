@@ -27,10 +27,13 @@ import org.mule.devkit.utils.NameUtils;
 import org.mule.devkit.utils.SourceUtils;
 import org.mule.devkit.utils.TypeMirrorUtils;
 
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import javax.tools.Diagnostic;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,6 +44,7 @@ import java.util.Set;
 
 public class GeneratorContext {
 
+    private Messager messager;
     private CodeModel codeModel;
     private SchemaModel schemaModel;
     private StudioModel studioModel;
@@ -71,6 +75,7 @@ public class GeneratorContext {
         sourceUtils = new SourceUtils(env);
         registeredEnums = new HashSet<TypeMirror>();
         envOptions = Collections.unmodifiableMap(env.getOptions());
+        messager = env.getMessager();
     }
 
     public CodeModel getCodeModel() {
@@ -139,5 +144,21 @@ public class GeneratorContext {
 
     public boolean isEnvOptionSet(String envOption) {
         return envOptions.containsKey(envOption);
+    }
+
+    public void note(String msg) {
+        messager.printMessage(Diagnostic.Kind.NOTE, msg);
+    }
+
+    public void warn(String msg) {
+        messager.printMessage(Diagnostic.Kind.WARNING, msg);
+    }
+
+    public void error(String msg) {
+        messager.printMessage(Diagnostic.Kind.ERROR, msg);
+    }
+
+    public void error(String msg, Element element) {
+        messager.printMessage(Diagnostic.Kind.ERROR, msg, element);
     }
 }

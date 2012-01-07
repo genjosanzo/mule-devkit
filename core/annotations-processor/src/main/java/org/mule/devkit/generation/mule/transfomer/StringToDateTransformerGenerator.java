@@ -57,6 +57,9 @@ public class StringToDateTransformerGenerator extends AbstractMessageGenerator {
     @Override
     protected void doGenerate(DevKitTypeElement typeElement) {
         DefinedClass transformerClass = getTransformerClass(typeElement);
+
+        context.note("Generating String to Date transformer as " + transformerClass.fullName());
+
         FieldVariable muleContext = generateFieldForMuleContext(transformerClass);
         FieldVariable simpleDateFormat = generateSimpleDateFormatField(transformerClass);
         FieldVariable weighting = transformerClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "weighting", ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"));

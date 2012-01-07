@@ -93,6 +93,9 @@ public class HttpCallbackGenerator extends AbstractModuleGenerator {
     @Override
     protected void doGenerate(DevKitTypeElement typeElement) {
         DefinedClass callbackClass = getDefaultHttpCallbackClass(typeElement);
+
+        context.note("Generating HTTP callback implementation as " + callbackClass.fullName());
+
         generateFields(callbackClass);
         generateConstructorArgSimpleFlowConstruct(callbackClass);
         generateConstructorArgMessageProcessor(callbackClass);

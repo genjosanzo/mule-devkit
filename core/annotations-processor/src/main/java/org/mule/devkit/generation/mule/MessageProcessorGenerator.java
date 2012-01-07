@@ -113,6 +113,8 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             messageProcessorClass = getMessageProcessorClass(executableElement);
         }
 
+        context.note("Generating message processor as " + messageProcessorClass.fullName() + " for method " + executableElement.getSimpleName().toString() + " in " + typeElement.getSimpleName().toString());
+
         // add javadoc
         generateMessageProcessorClassDoc(executableElement, messageProcessorClass);
 

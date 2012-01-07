@@ -30,7 +30,6 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
-import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -58,55 +57,57 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
         createContext();
 
         for (TypeElement annotation : annotations) {
+            context.note("Searching for classes annotated with @" + annotation.getSimpleName().toString());
             Set<? extends Element> elements = env.getElementsAnnotatedWith(annotation);
             Set<TypeElement> typeElements = ElementFilter.typesIn(elements);
-            for (Validator validator : getValidators()) {
-                for (TypeElement e : typeElements) {
-
-                    DevKitTypeElement devKitTypeElement = new DefaultDevKitTypeElement(e);
+            for (TypeElement e : typeElements) {
+                DevKitTypeElement devKitTypeElement = new DefaultDevKitTypeElement(e);
+                context.note("Validating " + devKitTypeElement.getSimpleName().toString() + " class");
+                for (Validator validator : getValidators()) {
                     try {
                         if (validator.shouldValidate(devKitTypeElement, context)) {
                             validator.validate(devKitTypeElement, context);
                         }
                     } catch (ValidationException tve) {
-                        error(tve.getMessage(), tve.getElement());
+                        context.error(tve.getMessage(), tve.getElement());
                         return false;
                     }
                 }
             }
-            for (Generator generator : getGenerators()) {
-                for (TypeElement e : typeElements) {
-
-                    DevKitTypeElement devKitTypeElement = new DefaultDevKitTypeElement(e);
+            for (TypeElement e : typeElements) {
+                DevKitTypeElement devKitTypeElement = new DefaultDevKitTypeElement(e);
+                context.note("Generating code for " + devKitTypeElement.getSimpleName().toString() + " class");
+                for (Generator generator : getGenerators()) {
                     try {
                         generator.generate(devKitTypeElement, context);
                     } catch (GenerationException ge) {
-                        error(ge.getMessage());
+                        context.error(ge.getMessage());
                         return false;
                     }
                 }
             }
+        }
 
-            try {
-                context.getCodeModel().build();
-            } catch (IOException e) {
-                error(e.getMessage());
-                return false;
-            }
 
-            try {
-                context.getSchemaModel().build();
-            } catch (IOException e) {
-                error(e.getMessage());
-                return false;
-            }
+        try {
+            context.getCodeModel().build();
+        } catch (IOException e) {
+            context.error(e.getMessage());
+            return false;
+        }
 
-            try {
-                context.getStudioModel().build();
-            } catch (IOException e) {
-                error(e.getMessage());
-                return false;
-            }
+        try {
+            context.getSchemaModel().build();
+        } catch (IOException e) {
+            context.error(e.getMessage());
+            return false;
+        }
+
+        try {
+            context.getStudioModel().build();
+        } catch (IOException e) {
+            context.error(e.getMessage());
+            return false;
         }
 
         return true;
@@ -118,21 +119,5 @@ public abstract class AbstractAnnotationProcessor extends AbstractProcessor {
 
     protected GeneratorContext getContext() {
         return context;
-    }
-
-    protected void note(String msg) {
-        processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, msg);
-    }
-
-    protected void warn(String msg) {
-        processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, msg);
-    }
-
-    protected void error(String msg) {
-        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, msg);
-    }
-
-    protected void error(String msg, Element element) {
-        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, msg, element);
     }
 }

@@ -102,6 +102,8 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         DefinedClass beanDefinitionparser = getConfigBeanDefinitionParserClass(typeElement);
         DefinedClass pojo = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
 
+        context.note("Generating config element definition parser as " + beanDefinitionparser.fullName() + " for class " + typeElement.getSimpleName().toString());
+
         FieldVariable patternInfo = generateFieldForPatternInfo(beanDefinitionparser);
 
         Method constructor = beanDefinitionparser.constructor(Modifier.PUBLIC);
@@ -298,6 +300,8 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
         FieldVariable patternInfo = generateFieldForPatternInfo(beanDefinitionparser);
 
+        context.note("Generating bean definition parser as " + beanDefinitionparser.fullName() + " for message source " + messageSourceClass.fullName());
+
         Method constructor = beanDefinitionparser.constructor(Modifier.PUBLIC);
         constructor.body().assign(patternInfo, ref(TemplateParser.class).staticInvoke("createMuleStyleParser").invoke("getStyle"));
 
@@ -315,6 +319,8 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         } else {
             messageProcessorClass = getMessageProcessorClass(executableElement);
         }
+
+        context.note("Generating bean definition parser as " + beanDefinitionparser.fullName() + " for message processor " + messageProcessorClass.fullName());
 
         FieldVariable patternInfo = generateFieldForPatternInfo(beanDefinitionparser);
 

@@ -234,13 +234,15 @@ public abstract class AbstractAnnotationProcessorMojo extends AbstractMuleMojo {
                 public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
                     switch (diagnostic.getKind()) {
                         case ERROR:
-                            getLog().error(diagnostic.toString());
+                            getLog().error(diagnostic.toString().replace("error: ", "").replace("error on execute: ", ""));
                             break;
                         case WARNING:
                         case MANDATORY_WARNING:
-                            getLog().warn(diagnostic.toString());
+                            getLog().warn(diagnostic.toString().replace("warning: ", ""));
                             break;
                         case NOTE:
+                            getLog().info(diagnostic.toString().replace("Note: ", ""));
+                            break;
                         case OTHER:
                             getLog().info(diagnostic.toString());
                             break;
