@@ -60,8 +60,7 @@ public class StudioPackageMojo extends AbstractMuleMojo {
             throw new MojoExecutionException("Exception creating the Mule Plugin", e);
         }
 
-        projectHelper.attachArtifact(project, "zip", studioPlugin);
-
+        projectHelper.attachArtifact(project, "zip", "studio", studioPlugin);
     }
 
     protected void createStudioPlugin(File studioPlugin) throws MojoExecutionException, ArchiverException {

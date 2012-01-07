@@ -17,7 +17,17 @@
 
 package org.mule.devkit.it;
 
+import org.mule.api.MuleContext;
+import org.mule.transport.http.HttpConnector;
+
 public class NamedConfigModuleTest extends AbstractModuleTest {
+
+    @Override
+    protected MuleContext createMuleContext() throws Exception {
+        MuleContext muleContext = super.createMuleContext();
+        muleContext.getRegistry().registerObject("connector.http.mule.default", new HttpConnector(muleContext));
+        return muleContext;
+    }
 
     @Override
     protected String getConfigResources() {

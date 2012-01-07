@@ -262,11 +262,6 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         Variable map = isExpectedMapBlock.decl(ref(Map.class), "map", ExpressionFactory.cast(ref(Map.class), source));
 
-        //Conditional ifKeysNotOfSameType = isExpectedMapBlock._if(Op.cand(
-        //        Op.not(map.invoke("isEmpty")),
-        //        Op.not(ExpressionFactory.invoke(keyType.invoke("toString"), "equals").arg(ExpressionFactory.invoke(ExpressionFactory.invoke((ExpressionFactory.invoke(ExpressionFactory.invoke(map.invoke("keySet"), "iterator"), "next"), "getClass", "toString"))))));
-        //Block ifKeysNotOfSameTypeThen = ifKeysNotOfSameType._then().block();
-
         Variable newMap = isExpectedMapBlock.decl(ref(Map.class), "newMap", ExpressionFactory._new(ref(HashMap.class)));
         ForEach forEach = isExpectedMapBlock.forEach(ref(Object.class), "entryObj", map.invoke("entrySet"));
         Block forEachBlock = forEach.body().block();
@@ -276,17 +271,6 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         forEachBlock.invoke(newMap, "put").arg(newKey).arg(newValue);
 
         isExpectedMapBlock.assign(target, newMap);
-
-        //Cast mapCast = ExpressionFactory.cast(ref(Map.class), source);
-
-        //ForEach keyLoop = ifKeysNotOfSameType._else().forEach(ref(Object.class), "key", mapCast.invoke("entrySet"));
-
-        //Cast entryCast = ExpressionFactory.cast(ref(Map.Entry.class), keyLoop.var());
-
-        //Variable value = keyLoop.body().decl(ref(Object.class), "value", mapCast.invoke("get").arg(entryCast.invoke("getKey")));
-        //keyLoop.body().add(entryCast.invoke("setValue").arg(
-        //        ExpressionFactory.invoke("evaluateAndTransform").arg(muleMessage).arg(valueType).arg(value)
-        //));
 
         isExpectedMap._else().assign(target, source);
 
@@ -371,7 +355,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         process._throws(MuleException.class);
         Variable event = process.param(muleEvent, "event");
-        Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage", event.invoke("getMessage"));
+        Variable muleMessage = process.body().decl(ref(MuleMessage.class), "_muleMessage", event.invoke("getMessage"));
 
         DefinedClass moduleObjectClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey((TypeElement) executableElement.getEnclosingElement()));
         Variable moduleObject = process.body().decl(moduleObjectClass, "castedModuleObject", ExpressionFactory._null());
@@ -451,6 +435,8 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 declareOAuthAccessTokenSecretParameter(callProcessor, moduleObject, parameters);
             } else if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
                 declareNestedProcessorParameter(fields, muleContext, event, callProcessor, parameters, variable, fieldName);
+            } else if (variable.asType().toString().startsWith(MuleMessage.class.getName())) {
+                parameters.add(muleMessage);
             } else {
                 outboundHeadersMap = declareStandardParameter(messageProcessorClass, fields, muleMessage, callProcessor, parameters, outboundHeadersMap, variable, fieldName);
             }

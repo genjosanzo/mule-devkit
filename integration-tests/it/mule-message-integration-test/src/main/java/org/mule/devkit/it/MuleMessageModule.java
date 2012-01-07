@@ -17,23 +17,17 @@
 
 package org.mule.devkit.it;
 
-import org.mule.api.annotations.Configurable;
+import org.mule.api.MuleMessage;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
-import org.mule.api.annotations.param.Optional;
-import org.mule.api.callback.HttpCallback;
 
-@Module(name = "nc")
-public class NamedConfigModule {
-    @Configurable
-    private String append;
+@Module(name = "mule-message")
+public class MuleMessageModule {
 
     @Processor
-    public String passthruString(String value, @Optional HttpCallback httpCallback) {
-        return value + this.append;
-    }
-
-    public void setAppend(String app) {
-        this.append = app;
+    public void acceptMuleMessage(MuleMessage muleMessage) {
+        if(muleMessage == null) {
+            throw new RuntimeException("MuleMessage cannot be null");
+        }
     }
 }

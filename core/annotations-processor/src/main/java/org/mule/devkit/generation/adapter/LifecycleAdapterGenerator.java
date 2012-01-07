@@ -110,6 +110,10 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
             Block ifKnownVersion = ifUnkownVersion._else();
 
             Variable expectedMinVersion = ifKnownVersion.decl(ref(String[].class), "expectedMinVersion", ExpressionFactory.lit(typeElement.minMuleVersion()).invoke("split").arg("\\."));
+
+            Block ifKnownVersionContainsDash = ifKnownVersion._if(ExpressionFactory.invoke(runtimeVersion, "contains").arg("-"))._then();
+            ifKnownVersionContainsDash.assign(runtimeVersion, runtimeVersion.invoke("split").arg("-").component(ExpressionFactory.lit(0)));
+
             Variable currentRuntimeVersion = ifKnownVersion.decl(ref(String[].class), "currentRuntimeVersion", runtimeVersion.invoke("split").arg("\\."));
 
             ForLoop forEachVersionComponent = ifKnownVersion._for();
@@ -117,10 +121,14 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
             forEachVersionComponent.test(Op.lt(i, expectedMinVersion.ref("length")));
             forEachVersionComponent.update(Op.incr(i));
 
-            forEachVersionComponent.body()._if(Op.lt(
+            TryStatement tryToParseMuleVersion = forEachVersionComponent.body()._try();
+            tryToParseMuleVersion.body()._if(Op.lt(
                     ref(Integer.class).staticInvoke("parseInt").arg(currentRuntimeVersion.component(i)),
                     ref(Integer.class).staticInvoke("parseInt").arg(expectedMinVersion.component(i))))._then()
                     ._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg("This module is only valid for Mule " + typeElement.minMuleVersion()));
+            CatchBlock catchBlock = tryToParseMuleVersion._catch(ref(NumberFormatException.class));
+            catchBlock.param("nfe");
+            catchBlock.body().invoke(log, "warn").arg("Error parsing Mule version, cannot validate current Mule version");
         }
 
         if (catchException != null &&

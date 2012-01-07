@@ -280,7 +280,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
         Conditional ifParameterizedType = shouldTransform._then()._if(Op._instanceof(expectedType, ref(ParameterizedType.class)));
         ifParameterizedType._then().assign(expectedType, ExpressionFactory.cast(ref(ParameterizedType.class), expectedType).invoke("getRawType"));
-        
+
         Variable targetDataType = shouldTransform._then().decl(ref(DataType.class), "targetDataType",
                 ref(DataTypeFactory.class).staticInvoke("create").arg(
                         ExpressionFactory.cast(ref(Class.class), expectedType)));
@@ -565,6 +565,13 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             catchBlock.body()._throw(messageException);
         }
 
+        Conditional ifObjectIsString = initialise.body()._if(Op._instanceof(object, ref(String.class)));
+        ifObjectIsString._then().assign(object, muleContext.invoke("getRegistry").invoke("lookupObject").arg(ExpressionFactory.cast(ref(String.class), object)));
+        ifObjectIsString._then()._if(Op.eq(object, ExpressionFactory._null()))._then().
+                    _throw(ExpressionFactory._new(ref(InitialisationException.class)).
+                            arg(ref(MessageFactory.class).staticInvoke("createStaticMessage").
+                                    arg("Cannot find object by config name")).arg(ExpressionFactory._this()));
+
         if (fields != null) {
             for (String fieldName : fields.keySet()) {
                 FieldVariableElement variableElement = fields.get(fieldName);
@@ -588,10 +595,11 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
                 } else if (variableElement.getVariableElement().asType().toString().startsWith(HttpCallback.class.getName())) {
                     FieldVariable callbackFlowName = fields.get(fieldName).getField();
                     Block ifCallbackFlowNameIsNull = initialise.body()._if(Op.ne(callbackFlowName, ExpressionFactory._null()))._then();
-                    Invocation domain = ExpressionFactory.cast(pojoClass, object).invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.DOMAIN_FIELD_NAME));
-                    Invocation localPort = ExpressionFactory.cast(pojoClass, object).invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.LOCAL_PORT_FIELD_NAME));
-                    Invocation remotePort = ExpressionFactory.cast(pojoClass, object).invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.REMOTE_PORT_FIELD_NAME));
-                    Invocation async = ExpressionFactory.cast(pojoClass, object).invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.ASYNC_FIELD_NAME));
+                    Variable castedModuleObject = ifCallbackFlowNameIsNull.decl(pojoClass, "castedModuleObject", ExpressionFactory.cast(pojoClass, object));
+                    Invocation domain = castedModuleObject.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.DOMAIN_FIELD_NAME));
+                    Invocation localPort = castedModuleObject.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.LOCAL_PORT_FIELD_NAME));
+                    Invocation remotePort = castedModuleObject.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.REMOTE_PORT_FIELD_NAME));
+                    Invocation async = castedModuleObject.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.ASYNC_FIELD_NAME));
                     ifCallbackFlowNameIsNull.assign(variableElement.getFieldType(), ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
                             arg(callbackFlowName).arg(muleContext).arg(domain).arg(localPort).arg(remotePort).arg(async));
                 }
