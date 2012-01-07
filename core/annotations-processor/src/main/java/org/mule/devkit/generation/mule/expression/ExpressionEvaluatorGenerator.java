@@ -60,6 +60,8 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
         ExecutableElement executableElement = typeElement.getMethodsAnnotatedWith(ExpressionEvaluator.class).get(0);
         DefinedClass evaluatorClass = getEvaluatorClass(name, typeElement);
 
+        context.note("Generating expression evaluator " + evaluatorClass.fullName() + " for language at class " + typeElement.getSimpleName().toString());
+
         FieldVariable module = generateModuleField(typeElement, evaluatorClass);
 
         generateConstructor(typeElement, evaluatorClass, module);

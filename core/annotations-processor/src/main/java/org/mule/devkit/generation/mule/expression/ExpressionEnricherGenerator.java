@@ -60,6 +60,8 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
         ExecutableElement executableElement = typeElement.getMethodsAnnotatedWith(ExpressionEnricher.class).get(0);
         DefinedClass enricherClass = getEnricherClass(name, typeElement);
 
+        context.note("Generating message enricher " + enricherClass.fullName() + " for language at class " + typeElement.getSimpleName().toString());
+
         FieldVariable module = generateModuleField(typeElement, enricherClass);
 
         generateConstructor(typeElement, enricherClass, module);

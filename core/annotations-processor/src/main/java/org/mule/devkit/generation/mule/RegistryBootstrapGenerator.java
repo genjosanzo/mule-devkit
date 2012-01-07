@@ -28,11 +28,9 @@ import java.io.OutputStreamWriter;
 
 public class RegistryBootstrapGenerator extends AbstractModuleGenerator {
 
-    private boolean executed;
-
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return !executed;
+        return true;
     }
 
     @Override
@@ -46,7 +44,6 @@ public class RegistryBootstrapGenerator extends AbstractModuleGenerator {
                 registryBootstrapStreamOut.write(clazz.name() + "=" + clazz.fullName() + "\n");
             }
             registryBootstrapStreamOut.flush();
-            executed = true;
         } catch (IOException ioe) {
             throw new GenerationException(ioe);
         } finally {
