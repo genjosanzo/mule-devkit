@@ -1086,7 +1086,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         Conditional ifIsEnricher = ifIsPoll._else()._if(parserContext.invoke("getContainingBeanDefinition").invoke("getBeanClassName")
                 .invoke("equals").arg("org.mule.enricher.MessageEnricher"));
 
-        ifIsEnricher._then().add(propertyValues.invoke("addPropertyValue").arg("enrichmentProcessor").arg(definition));
+        ifIsEnricher._then().add(propertyValues.invoke("addPropertyValue").arg("enrichmentMessageProcessor").arg(definition));
 
         Variable messageProcessors = ifIsEnricher._else().decl(ref(PropertyValue.class), "messageProcessors",
                 propertyValues.invoke("getPropertyValue").arg("messageProcessors"));
