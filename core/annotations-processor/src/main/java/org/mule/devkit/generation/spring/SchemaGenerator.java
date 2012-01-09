@@ -130,10 +130,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
     @Override
     protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
-        String targetNamespace = typeElement.namespace();
-        if (targetNamespace == null || targetNamespace.length() == 0) {
-            targetNamespace = SchemaConstants.BASE_NAMESPACE + typeElement.name();
-        }
+        String targetNamespace = getNamespace(typeElement);
 
         Schema schema = new Schema();
         schema.setTargetNamespace(targetNamespace);
@@ -153,11 +150,10 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         String fileName = "META-INF/mule-" + typeElement.name() + XSD_EXTENSION;
 
-        String versionedLocation = typeElement.schemaLocation();
+        String versionedLocation = getVersionedLocation(typeElement);
         String currentLocation = null;
-        if (versionedLocation == null || versionedLocation.length() == 0) {
-            versionedLocation = schema.getTargetNamespace() + "/" + typeElement.schemaVersion() + "/mule-" + typeElement.name() + XSD_EXTENSION;
-            currentLocation = schema.getTargetNamespace() + "/current/mule-" + typeElement.name() + XSD_EXTENSION;
+        if (typeElement.schemaLocation() == null || typeElement.schemaLocation().length() == 0) {
+              currentLocation = schema.getTargetNamespace() + "/current/mule-" + typeElement.name() + XSD_EXTENSION;
         }
 
         // TODO: replace with a class role
@@ -172,6 +168,22 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             SchemaLocation currentSchemaLocation = new SchemaLocation(null, schema.getTargetNamespace(), fileName, currentLocation, namespaceHandlerName, className);
             context.getSchemaModel().addSchemaLocation(currentSchemaLocation);
         }
+    }
+
+    public static String getVersionedLocation(DevKitTypeElement typeElement) {
+        String versionedLocation = typeElement.schemaLocation();
+        if (typeElement.schemaLocation() == null || typeElement.schemaLocation().length() == 0) {
+            versionedLocation = getNamespace(typeElement) + "/" + typeElement.schemaVersion() + "/mule-" + typeElement.name() + XSD_EXTENSION;
+        }
+        return versionedLocation;
+    }
+
+    public static String getNamespace(DevKitTypeElement typeElement) {
+        String targetNamespace = typeElement.namespace();
+        if (targetNamespace == null || targetNamespace.length() == 0) {
+            targetNamespace = SchemaConstants.BASE_NAMESPACE + typeElement.name();
+        }
+        return targetNamespace;
     }
 
     private void registerEnums(Schema schema, DevKitTypeElement typeElement) {
