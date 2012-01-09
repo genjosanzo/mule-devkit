@@ -42,7 +42,7 @@ import javax.transaction.TransactionManager;
 @Module(name = "inject")
 public class InjectModule {
     @Inject
-    protected MuleContext context;
+    protected MuleContext muleContext;
     @Inject
     protected ObjectStoreManager objectStoreManager;
     @Inject
@@ -71,7 +71,7 @@ public class InjectModule {
      */
     @Processor
     public void verify() throws Exception {
-        if (context == null ||
+        if (muleContext == null ||
                 objectStoreManager == null ||
                 queueManager == null ||
                 transactionManager == null ||
@@ -87,8 +87,8 @@ public class InjectModule {
         }
     }
 
-    public void setContext(MuleContext context) {
-        this.context = context;
+    public void setMuleContext(MuleContext context) {
+        this.muleContext = context;
     }
 
     public void setObjectStoreManager(ObjectStoreManager objectStoreManager) {

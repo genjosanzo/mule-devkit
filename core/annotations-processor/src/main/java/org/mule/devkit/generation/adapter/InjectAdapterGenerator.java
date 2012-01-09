@@ -57,50 +57,51 @@ public class InjectAdapterGenerator extends AbstractModuleGenerator {
         DefinedClass adapter = getMuleContextAwareAdapter(typeElement);
 
         Method setMuleContext = adapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setMuleContext");
+        setMuleContext.annotate(Override.class);
         Variable context = setMuleContext.param(ref(MuleContext.class), "context");
 
         for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Inject.class)) {
             if (variable.asType().toString().startsWith(MuleContext.class.getName())) {
-                setMuleContext.body().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(context);
+                setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(context));
             } else if (variable.asType().toString().startsWith(ObjectStoreManager.class.getName())) {
                 Cast getObjectStoreManager = ExpressionFactory.cast(ref(ObjectStoreManager.class), context.invoke("getRegistry").invoke("get").arg(ref(MuleProperties.class).staticRef("OBJECT_STORE_MANAGER")));
-                setMuleContext.body().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getObjectStoreManager);
+                setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getObjectStoreManager));
             } else if (variable.asType().toString().startsWith(TransactionManager.class.getName())) {
                 Invocation getTransactionManager = context.invoke("getTransactionManager");
-                setMuleContext.body().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getTransactionManager);
+                setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getTransactionManager));
             } else if (variable.asType().toString().startsWith(QueueManager.class.getName())) {
                 Invocation getQueueManager = context.invoke("getQueueManager");
-                setMuleContext.body().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getQueueManager);
+                setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getQueueManager));
             } else if (variable.asType().toString().startsWith(MuleConfiguration.class.getName())) {
                 Invocation getConfiguration = context.invoke("getConfiguration");
-                setMuleContext.body().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getConfiguration);
+                setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getConfiguration));
             } else if (variable.asType().toString().startsWith(LifecycleManager.class.getName())) {
                 Invocation getLifecycleManager = context.invoke("getLifecycleManager");
-                setMuleContext.body().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getLifecycleManager);
+                setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getLifecycleManager));
             } else if (variable.asType().toString().startsWith(ClassLoader.class.getName())) {
                 Invocation getExecutionClassLoader = context.invoke("getExecutionClassLoader");
-                setMuleContext.body().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getExecutionClassLoader);
+                setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getExecutionClassLoader));
             } else if (variable.asType().toString().startsWith(ExpressionManager.class.getName())) {
                 Invocation getExpressionManager = context.invoke("getExpressionManager");
-                setMuleContext.body().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getExpressionManager);
+                setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getExpressionManager));
             } else if (variable.asType().toString().startsWith(EndpointFactory.class.getName())) {
                 Invocation getEndpointFactory = context.invoke("getEndpointFactory");
-                setMuleContext.body().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getEndpointFactory);
+                setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getEndpointFactory));
             } else if (variable.asType().toString().startsWith(MuleClient.class.getName())) {
                 Invocation getClient = context.invoke("getClient");
-                setMuleContext.body().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getClient);
+                setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getClient));
             } else if (variable.asType().toString().startsWith(SystemExceptionHandler.class.getName())) {
                 Invocation getExceptionListener = context.invoke("getExceptionListener");
-                setMuleContext.body().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getExceptionListener);
+                setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getExceptionListener));
             } else if (variable.asType().toString().startsWith(SecurityManager.class.getName())) {
                 Invocation getSecurityManager = context.invoke("getSecurityManager");
-                setMuleContext.body().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getSecurityManager);
+                setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getSecurityManager));
             } else if (variable.asType().toString().startsWith(WorkManager.class.getName())) {
                 Invocation getWorkManager = context.invoke("getWorkManager");
-                setMuleContext.body().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getWorkManager);
+                setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getWorkManager));
             } else if (variable.asType().toString().startsWith(Registry.class.getName())) {
                 Invocation getRegistry = context.invoke("getRegistry");
-                setMuleContext.body().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getRegistry);
+                setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getRegistry));
             }
         }
     }
