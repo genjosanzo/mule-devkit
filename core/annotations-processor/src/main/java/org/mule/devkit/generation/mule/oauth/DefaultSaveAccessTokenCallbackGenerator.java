@@ -75,10 +75,12 @@ public class DefaultSaveAccessTokenCallbackGenerator extends AbstractMessageGene
         Variable accessTokenSecret = saveAccessTokenMethod.param(ref(String.class), "accessTokenSecret");
 
         Variable event = saveAccessTokenMethod.body().decl(ref(MuleEvent.class), "event", ref(RequestContext.class).staticInvoke("getEvent"));
-        saveAccessTokenMethod.body().add(
+        Conditional ifAccessTokenNotNull = saveAccessTokenMethod.body()._if(Op.ne(accessToken, ExpressionFactory._null());
+        ifAccessTokenNotNull._then().add(
                 event.invoke("getMessage").invoke("setInvocationProperty").arg("OAuthAccessToken").arg(accessToken)
         );
-        saveAccessTokenMethod.body().add(
+        Conditional ifAccessTokenSecretNotNull = saveAccessTokenMethod.body()._if(Op.ne(accessTokenSecret, ExpressionFactory._null());
+        ifAccessTokenSecretNotNull._then().add(
                 event.invoke("getMessage").invoke("setInvocationProperty").arg("OAuthAccessTokenSecret").arg(accessTokenSecret)
         );
 
