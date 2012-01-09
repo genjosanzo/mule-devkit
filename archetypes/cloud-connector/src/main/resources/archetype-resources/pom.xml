@@ -157,18 +157,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.dsl</groupId>
-            <artifactId>dsl-api</artifactId>
-            <version>0.7</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mule</groupId>
-                    <artifactId>core</artifactId>
-                </exclusion>
-            </exclusions>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${D}{mule.version}</version>
