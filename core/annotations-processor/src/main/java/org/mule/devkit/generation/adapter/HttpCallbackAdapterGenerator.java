@@ -83,11 +83,11 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private void initialiseLocalPort(FieldVariable localPort, FieldVariable logger, Block ifPortIsNull) {
-        Variable portSystemVar = ifPortIsNull.decl(ref(String.class), "portSystemVar", ref(System.class).staticInvoke("getProperty").arg("http.localPort"));
+        Variable portSystemVar = ifPortIsNull.decl(ref(String.class), "portSystemVar", ref(System.class).staticInvoke("getProperty").arg("http.port"));
         Conditional conditional = ifPortIsNull._if(ref(NumberUtils.class).staticInvoke("isDigits").arg(portSystemVar));
         conditional._then().block().assign(localPort, ref(Integer.class).staticInvoke("parseInt").arg(portSystemVar));
         Block thenBlock = conditional._else().block();
-        thenBlock.invoke(logger, "warn").arg(ExpressionFactory.lit("Environment variable 'http.localPort' not found, using default localPort: 8080"));
+        thenBlock.invoke(logger, "warn").arg(ExpressionFactory.lit("Environment variable 'http.port' not found, using default localPort: 8080"));
         thenBlock.assign(localPort, ExpressionFactory.lit(DEFAULT_LOCAL_PORT));
     }
 
