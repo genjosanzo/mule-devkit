@@ -30,7 +30,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.devkit.generation.callback.HttpCallbackGenerator;
+import org.mule.devkit.generation.callback.DefaultHttpCallbackGenerator;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.ClassAlreadyExistsException;
 import org.mule.devkit.model.code.Conditional;
@@ -143,17 +143,18 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
         if (ref(Initialisable.class).isAssignableFrom(oauthAdapter._extends())) {
             initialise.body().invoke(ExpressionFactory._super(), Initialisable.PHASE_NAME);
         }
-        Invocation domain = ExpressionFactory.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.DOMAIN_FIELD_NAME));
-        Invocation localPort = ExpressionFactory.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.LOCAL_PORT_FIELD_NAME));
-        Invocation remotePort = ExpressionFactory.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.REMOTE_PORT_FIELD_NAME));
-        Invocation async = ExpressionFactory.invoke("get" + StringUtils.capitalize(HttpCallbackGenerator.ASYNC_FIELD_NAME));
+        Invocation domain = ExpressionFactory.invoke("get" + StringUtils.capitalize(DefaultHttpCallbackGenerator.DOMAIN_FIELD_NAME));
+        Invocation localPort = ExpressionFactory.invoke("get" + StringUtils.capitalize(DefaultHttpCallbackGenerator.LOCAL_PORT_FIELD_NAME));
+        Invocation remotePort = ExpressionFactory.invoke("get" + StringUtils.capitalize(DefaultHttpCallbackGenerator.REMOTE_PORT_FIELD_NAME));
+        Invocation async = ExpressionFactory.invoke("get" + StringUtils.capitalize(DefaultHttpCallbackGenerator.ASYNC_FIELD_NAME));
+        Invocation connector = ExpressionFactory.invoke("get" + StringUtils.capitalize(DefaultHttpCallbackGenerator.CONNECTOR_FIELD_NAME));
         FieldVariable callback = oauthAdapter.fields().get(CALLBACK_FIELD_NAME);
         FieldVariable muleContext = oauthAdapter.fields().get(MULE_CONTEXT_FIELD_NAME);
         if (StringUtils.isEmpty(callbackPath)) {
-            initialise.body().assign(callback, ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
-                    arg(ExpressionFactory._new(messageProcessor)).arg(muleContext).arg(domain).arg(localPort).arg(remotePort).arg(async));
+            initialise.body().assign(callback, ExpressionFactory._new(context.getClassForRole(DefaultHttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
+                    arg(ExpressionFactory._new(messageProcessor)).arg(muleContext).arg(domain).arg(localPort).arg(remotePort).arg(async).arg(connector));
         } else {
-            initialise.body().assign(callback, ExpressionFactory._new(context.getClassForRole(HttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
+            initialise.body().assign(callback, ExpressionFactory._new(context.getClassForRole(DefaultHttpCallbackGenerator.HTTP_CALLBACK_ROLE)).
                     arg(ExpressionFactory._new(messageProcessor)).arg(muleContext).arg(domain).arg(localPort).arg(remotePort).arg(callbackPath).arg(async));
         }
         return initialise;

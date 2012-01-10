@@ -248,13 +248,22 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
     }
 
     private void generateParseHttpCallback(String elementName, Method parse, Variable element, Variable builder) {
-        Variable listElement = parse.body().decl(ref(org.w3c.dom.Element.class), "httpCallbackConfigElement", ref(DomUtils.class).staticInvoke("getChildElementByTagName").
+        Variable httpCallbackConfigElement = parse.body().decl(ref(org.w3c.dom.Element.class), "httpCallbackConfigElement", ref(DomUtils.class).staticInvoke("getChildElementByTagName").
                 arg(element).arg(elementName));
-        Block ifHttpCallbackConfigPresent = parse.body()._if(Op.ne(listElement, ExpressionFactory._null()))._then();
-        generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.DOMAIN_FIELD_NAME);
-        generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.LOCAL_PORT_FIELD_NAME);
-        generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.REMOTE_PORT_FIELD_NAME);
-        generateParseSupportedType(ifHttpCallbackConfigPresent, listElement, builder, HttpCallbackAdapterGenerator.ASYNC_FIELD_NAME);
+        Block ifHttpCallbackConfigPresent = parse.body()._if(Op.ne(httpCallbackConfigElement, ExpressionFactory._null()))._then();
+        generateParseSupportedType(ifHttpCallbackConfigPresent, httpCallbackConfigElement, builder, HttpCallbackAdapterGenerator.DOMAIN_FIELD_NAME);
+        generateParseSupportedType(ifHttpCallbackConfigPresent, httpCallbackConfigElement, builder, HttpCallbackAdapterGenerator.LOCAL_PORT_FIELD_NAME);
+        generateParseSupportedType(ifHttpCallbackConfigPresent, httpCallbackConfigElement, builder, HttpCallbackAdapterGenerator.REMOTE_PORT_FIELD_NAME);
+        generateParseSupportedType(ifHttpCallbackConfigPresent, httpCallbackConfigElement, builder, HttpCallbackAdapterGenerator.ASYNC_FIELD_NAME);
+
+        Invocation getAttribute = httpCallbackConfigElement.invoke("getAttribute").arg(HttpCallbackAdapterGenerator.CONNECTOR_FIELD_NAME + "-ref");
+        Conditional ifNotNull = ifHttpCallbackConfigPresent._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
+                Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(
+                        getAttribute
+                ))));
+        ifNotNull._then().add(builder.invoke("addPropertyValue").arg(HttpCallbackAdapterGenerator.CONNECTOR_FIELD_NAME).arg(
+                ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(httpCallbackConfigElement.invoke("getAttribute").arg(HttpCallbackAdapterGenerator.CONNECTOR_FIELD_NAME + "-ref"))
+        ));
     }
 
     private void generateParsePoolingProfile(String elementName, String propertyName, Method parse, Variable element, Variable builder) {

@@ -22,9 +22,9 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:oauth="http://www.mulesoft.org/schema/mule/oauth"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/current/mule-oauth.xsd
-        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd">
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd">
 
     <oauth:config name="default-oauth" consumerKey="consumerKey123" consumerSecret="consumerSecret123">
         <oauth:oauth-callback-config domain="localhost" localPort="${http.port}" remotePort="${http.port}" async="true"/>

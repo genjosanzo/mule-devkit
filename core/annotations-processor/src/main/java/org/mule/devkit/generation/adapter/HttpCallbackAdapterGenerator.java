@@ -21,6 +21,7 @@ import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.transport.Connector;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.model.code.Block;
@@ -44,6 +45,7 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
     public static final String REMOTE_PORT_FIELD_NAME = "remotePort";
     public static final String DOMAIN_FIELD_NAME = "domain";
     public static final String ASYNC_FIELD_NAME = "async";
+    public static final String CONNECTOR_FIELD_NAME = "connector";
     private static final int DEFAULT_LOCAL_PORT = 8080;
     private static final int DEFAULT_REMOTE_PORT = 80;
 
@@ -60,6 +62,7 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
         FieldVariable localPort = localPortFieldWithGetterAndSetter(httpCallbackAdapter);
         FieldVariable remotePort = remotePortFieldWithGetterAndSetter(httpCallbackAdapter);
         FieldVariable domain = domainFieldWithGetterAndSetter(httpCallbackAdapter);
+        connectorFieldWithGetterAndSetter(httpCallbackAdapter);
         FieldVariable logger = FieldBuilder.newLoggerField(httpCallbackAdapter);
         asyncFieldWithGetterAndSetter(httpCallbackAdapter);
         generateInitialiseMethod(httpCallbackAdapter, localPort, remotePort, domain, logger);
@@ -124,6 +127,10 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
 
     private FieldVariable domainFieldWithGetterAndSetter(DefinedClass oauthAdapter) {
         return new FieldBuilder(oauthAdapter).type(String.class).name(DOMAIN_FIELD_NAME).getterAndSetter().build();
+    }
+
+    private FieldVariable connectorFieldWithGetterAndSetter(DefinedClass oauthAdapter) {
+        return new FieldBuilder(oauthAdapter).type(Connector.class).name(CONNECTOR_FIELD_NAME).getterAndSetter().build();
     }
 
     private FieldVariable asyncFieldWithGetterAndSetter(DefinedClass oauthAdapter) {

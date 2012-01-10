@@ -9,8 +9,8 @@
     <name>Mule DevKit Named Configuration Integration Tests</name>
 
     <properties>
-        <devkit.version>@project.version@</devkit.version>
-        <mule.version>@devkit.version@</mule.version>
+        <devkit.version>3.3-SNAPSHOT</devkit.version>
+        <mule.version>3.2.1</mule.version>
     </properties>
 
     <build>
@@ -21,9 +21,6 @@
                     <artifactId>mule-devkit-maven-plugin</artifactId>
                     <version>${devkit.version}</version>
                     <extensions>true</extensions>
-                    <configuration>
-                        <schemaVersion>1.0</schemaVersion>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
