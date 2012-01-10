@@ -63,7 +63,7 @@
                 <include>**/*.xml.sample</include>
             </includes>
         </fileSet>
-        <fileSet filtered="true" encoding="UTF-8">
+        <fileSet filtered="false" encoding="UTF-8">
             <directory>icons</directory>
             <includes>
                 <include>**/*.png</include>
