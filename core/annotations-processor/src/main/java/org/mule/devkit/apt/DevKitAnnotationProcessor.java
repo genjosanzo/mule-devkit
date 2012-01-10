@@ -26,7 +26,7 @@ import org.mule.devkit.generation.adapter.LifecycleAdapterGenerator;
 import org.mule.devkit.generation.adapter.OAuth1AdapterGenerator;
 import org.mule.devkit.generation.adapter.OAuth2AdapterGenerator;
 import org.mule.devkit.generation.adapter.PoolAdapterGenerator;
-import org.mule.devkit.generation.callback.HttpCallbackGenerator;
+import org.mule.devkit.generation.callback.DefaultHttpCallbackGenerator;
 import org.mule.devkit.generation.mule.MessageProcessorGenerator;
 import org.mule.devkit.generation.mule.MessageSourceGenerator;
 import org.mule.devkit.generation.mule.NestedProcessorChainGenerator;
@@ -77,7 +77,7 @@ public class DevKitAnnotationProcessor extends AbstractAnnotationProcessor {
     public DevKitAnnotationProcessor() {
         generators = new ArrayList<Generator>();
         generators.add(new StringToDateTransformerGenerator());
-        generators.add(new HttpCallbackGenerator());
+        generators.add(new DefaultHttpCallbackGenerator());
         generators.add(new CapabilitiesAdapterGenerator());
         generators.add(new LifecycleAdapterGenerator());
         generators.add(new InjectAdapterGenerator());

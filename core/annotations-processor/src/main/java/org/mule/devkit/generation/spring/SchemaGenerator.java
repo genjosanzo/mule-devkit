@@ -854,6 +854,11 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         asyncAttribute.setType(SchemaConstants.BOOLEAN);
         asyncAttribute.setDefault(ASYNC_DEFAULT_VALUE);
 
+        Attribute connectorRefAttribute = new Attribute();
+        connectorRefAttribute.setUse(SchemaConstants.USE_OPTIONAL);
+        connectorRefAttribute.setName("connector-ref");
+        connectorRefAttribute.setType(SchemaConstants.STRING);
+
         TopLevelElement httpCallbackConfig = new TopLevelElement();
         httpCallbackConfig.setName(elementName);
         httpCallbackConfig.setMinOccurs(BigInteger.ZERO);
@@ -871,6 +876,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         extensionType.getAttributeOrAttributeGroup().add(remotePortAttribute);
         extensionType.getAttributeOrAttributeGroup().add(domainAttribute);
         extensionType.getAttributeOrAttributeGroup().add(asyncAttribute);
+        extensionType.getAttributeOrAttributeGroup().add(connectorRefAttribute);
 
         ComplexContent complextContent = new ComplexContent();
         complextContent.setExtension(extensionType);
