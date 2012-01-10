@@ -29,9 +29,13 @@ import org.jfrog.maven.annomojo.annotations.MojoPhase;
 import org.jfrog.maven.annomojo.annotations.MojoRequiresDependencyResolution;
 import org.mule.devkit.generation.mule.studio.MuleStudioIconsGenerator;
 import org.mule.devkit.generation.mule.studio.MuleStudioPluginGenerator;
+import org.mule.util.IOUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.List;
 
 /**
@@ -88,6 +92,9 @@ public class StudioPackageMojo extends AbstractMuleMojo {
             if (!file.exists()) {
                 throw new MojoExecutionException("Error while packagin Mule Studio plugin: " + file.getName() + " does not exist");
             }
+            if (fileName.endsWith(".xml")) {
+                replaceTokens(file);
+            }
             archiver.addFile(file, file.getPath().substring(file.getPath().indexOf(classesDirectory.getPath()) + classesDirectory.getPath().length()));
         }
 
@@ -100,6 +107,20 @@ public class StudioPackageMojo extends AbstractMuleMojo {
             archiver.createArchive();
         } catch (IOException e) {
             throw new MojoExecutionException("Error while packaging Studio plugin", e);
+        }
+    }
+
+    private void replaceTokens(File file) throws MojoExecutionException {
+        try {
+            String fileContents = IOUtils.toString(new FileInputStream(file)).
+                    replaceAll("%JAR_NAME%", finalName + ".jar").
+                    replaceAll("%ZIP_NAME%", finalName + ".zip").
+                    replaceAll("%PROJECT_VERSION%", project.getVersion()).
+                    replaceAll("%SOURCES_JAR%", finalName + "-sources.jar").
+                    replaceAll("%JAVADOC_JAR%", finalName + "-javadoc.jar");
+            IOUtils.copy(new StringReader(fileContents), new FileOutputStream(file), "UTF-8");
+        } catch (IOException e) {
+            throw new MojoExecutionException("Error replacing tokens in file: " + file.getAbsolutePath(), e);
         }
     }
 

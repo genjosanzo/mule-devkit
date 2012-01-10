@@ -20,6 +20,8 @@ package org.mule.devkit.generation.mule.studio;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.generation.mule.studio.editor.MuleStudioEditorXmlGenerator;
+import org.mule.devkit.generation.spring.SchemaGenerator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -56,15 +58,17 @@ public class MuleStudioPluginXmlGenerator extends AbstractMessageGenerator {
             pluginElement.appendChild(extensionElement);
 
             Element externalContributionElement = document.createElement("externalContribution");
-            externalContributionElement.setAttribute("contributionJar", "");
+            externalContributionElement.setAttribute("contributionJar", "%JAR_NAME%");
             externalContributionElement.setAttribute("contributionLibPathInMule", "/plugins");
-            externalContributionElement.setAttribute("contributionLibs", "");
-            externalContributionElement.setAttribute("contributionNamespace", "");
-            externalContributionElement.setAttribute("contributionNamespaceFile", "");
-            externalContributionElement.setAttribute("contributionNamespacePrefix", "");
-            externalContributionElement.setAttribute("contributionType", "");
-            externalContributionElement.setAttribute("path", "");
-            externalContributionElement.setAttribute("version", "");
+            externalContributionElement.setAttribute("contributionLibs", "%ZIP_NAME%");
+            externalContributionElement.setAttribute("contributionSources", "%SOURCES_JAR%");
+            externalContributionElement.setAttribute("contributionJavaDocs", "%JAVADOC_JAR%");
+            externalContributionElement.setAttribute("contributionNamespace", SchemaGenerator.getNamespace(typeElement));
+            externalContributionElement.setAttribute("contributionNamespaceFile", SchemaGenerator.getVersionedLocation(typeElement));
+            externalContributionElement.setAttribute("contributionNamespacePrefix", typeElement.name());
+            externalContributionElement.setAttribute("contributionType", "cloud-connector");
+            externalContributionElement.setAttribute("path", MuleStudioEditorXmlGenerator.EDITOR_XML_FILE_NAME);
+            externalContributionElement.setAttribute("version", "%PROJECT_VERSION%");
 
             extensionElement.appendChild(externalContributionElement);
 
