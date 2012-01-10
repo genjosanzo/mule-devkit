@@ -9,8 +9,8 @@
     <name>Mule DevKit Named Configuration Integration Tests</name>
 
     <properties>
-        <devkit.version>3.2</devkit.version>
-        <mule.version>3.2.1</mule.version>
+        <mule.version>@mule.version@</mule.version>
+        <devkit.version>@project.version@</devkit.version>
     </properties>
 
     <build>
