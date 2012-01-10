@@ -9,7 +9,7 @@
     <name>Mule DevKit Named Configuration Integration Tests</name>
 
     <properties>
-        <devkit.version>3.3-SNAPSHOT</devkit.version>
+        <devkit.version>3.2</devkit.version>
         <mule.version>3.2.1</mule.version>
     </properties>
 
