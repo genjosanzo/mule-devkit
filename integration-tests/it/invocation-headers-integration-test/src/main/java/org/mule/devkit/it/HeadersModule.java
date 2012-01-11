@@ -117,7 +117,7 @@ public class HeadersModule {
         return headers;
     }
 
-    @Transformer
+    @Transformer(sourceTypes = {String.class})
     public static URL transformStringToUrl(String url) {
         try {
             return new URL(url);
