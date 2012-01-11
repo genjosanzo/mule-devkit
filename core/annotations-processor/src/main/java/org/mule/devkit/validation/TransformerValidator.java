@@ -21,8 +21,12 @@ import org.mule.api.annotations.Transformer;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import java.util.List;
+import java.util.Map;
 
 public class TransformerValidator implements Validator {
 
@@ -54,6 +58,26 @@ public class TransformerValidator implements Validator {
             if (method.getParameters().size() != 1) {
                 throw new ValidationException(method, "@Transformer must receive exactly one argument.");
             }
+
+            List<? extends AnnotationValue> sourceTypes = getSourceTypes(method);
+            if (sourceTypes == null || sourceTypes.isEmpty()) {
+                throw new ValidationException(method, "@Transformer must have at declare at least one element in the sourceTypes attribute");
+            }
         }
+    }
+
+    private List<? extends AnnotationValue> getSourceTypes(ExecutableElement method) {
+        String transformerAnnotationName = Transformer.class.getName();
+        List<? extends AnnotationMirror> annotationMirrors = method.getAnnotationMirrors();
+        for (AnnotationMirror annotationMirror : annotationMirrors) {
+            if (transformerAnnotationName.equals(annotationMirror.getAnnotationType().toString())) {
+                for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
+                    if ("sourceTypes".equals(entry.getKey().getSimpleName().toString())) {
+                        return (List<? extends AnnotationValue>) entry.getValue().getValue();
+                    }
+                }
+            }
+        }
+        return null;
     }
 }

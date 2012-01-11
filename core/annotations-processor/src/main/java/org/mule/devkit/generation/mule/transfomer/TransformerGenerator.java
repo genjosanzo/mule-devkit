@@ -155,8 +155,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         for (AnnotationMirror annotationMirror : annotationMirrors) {
             if (transformerAnnotationName.equals(annotationMirror.getAnnotationType().toString())) {
                 for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
-                    if ("sourceTypes".equals(
-                            entry.getKey().getSimpleName().toString())) {
+                    if ("sourceTypes".equals(entry.getKey().getSimpleName().toString())) {
                         sourceTypes = (List<? extends AnnotationValue>) entry.getValue().getValue();
                         break;
                     }
@@ -164,12 +163,9 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             }
         }
 
-        Invocation registerSourceType = constructor.body().invoke("registerSourceType");
-        registerSourceType.arg(ref(DataTypeFactory.class).staticInvoke("create").arg(ref(executableElement.getParameters().get(0).asType()).boxify().dotclass()));
-
         if (sourceTypes != null) {
             for (AnnotationValue sourceType : sourceTypes) {
-                registerSourceType = constructor.body().invoke("registerSourceType");
+                Invocation registerSourceType = constructor.body().invoke("registerSourceType");
                 registerSourceType.arg(ref(DataTypeFactory.class).staticInvoke("create").arg(ref((TypeMirror) sourceType.getValue()).boxify().dotclass()));
             }
         }
