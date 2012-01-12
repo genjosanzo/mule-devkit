@@ -6,7 +6,7 @@
 
     <groupId>org.mule.tools.devkit</groupId>
     <artifactId>mule-devkit-idea-plugin</artifactId>
-    <version>3.2</version>
+    <version>3.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
