@@ -19,7 +19,7 @@
 
     <groupId>org.mule.tools.devkit</groupId>
     <artifactId>mule-devkit</artifactId>
-    <version>3.3-SNAPSHOT</version>
+    <version>3.2</version>
     <packaging>pom</packaging>
 
     <properties>
