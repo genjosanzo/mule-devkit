@@ -16,8 +16,6 @@
  */
 package org.mule.devkit.dynamic.api.invocation;
 
-import java.util.Map;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -28,6 +26,8 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.devkit.dynamic.api.helper.LifeCycles;
 import org.mule.devkit.dynamic.api.helper.MuleEvents;
 import org.mule.devkit.dynamic.api.helper.Reflections;
+
+import java.util.Map;
 
 public class Invoker implements Disposable {
 

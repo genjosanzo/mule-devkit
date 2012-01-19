@@ -16,17 +16,17 @@
  */
 package org.mule.devkit.dynamic.api.model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.mule.api.Capabilities;
 import org.mule.api.Capability;
 import org.mule.api.ConnectionManager;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
 import org.mule.devkit.dynamic.api.helper.ConnectionManagers;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 //TODO Add support for OAuth1 and OAuth2
 public class Module {

@@ -21,16 +21,20 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.oauth.RestoreAccessTokenCallback;
-import org.mule.api.oauth.SaveAccessTokenCallback;
+import org.mule.api.annotations.oauth.OAuthAccessToken;
+import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.oauth.NotAuthorizedException;
+import org.mule.api.oauth.RestoreAccessTokenCallback;
+import org.mule.api.oauth.SaveAccessTokenCallback;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.devkit.generation.callback.DefaultHttpCallbackGenerator;
+import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.ClassAlreadyExistsException;
 import org.mule.devkit.model.code.Conditional;
@@ -45,8 +49,12 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.builders.FieldBuilder;
 
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -197,4 +205,61 @@ public abstract class AbstractOAuthAdapterGenerator extends AbstractModuleGenera
     protected void muleContextField(DefinedClass oauthAdapter) {
         new FieldBuilder(oauthAdapter).name(MULE_CONTEXT_FIELD_NAME).type(MuleContext.class).setter().build();
     }
+
+
+    protected void generateOverrides(DevKitTypeElement typeElement, DefinedClass oauthAdapter, FieldVariable oauthAccessToken, FieldVariable oauthAccessTokenSecret) {
+        Map<String, Variable> variables = new HashMap<String, Variable>();
+        for (ExecutableElement executableElement : typeElement.getMethodsWhoseParametersAreAnnotatedWith(OAuthAccessToken.class)) {
+            Method override = oauthAdapter.method(Modifier.PUBLIC, ref(executableElement.getReturnType()), executableElement.getSimpleName().toString());
+            //override.annotate(Override.class);
+            override._throws(ref(NotAuthorizedException.class));
+
+            override.body().invoke("hasBeenAuthorized");
+
+            for (VariableElement parameter : executableElement.getParameters()) {
+                if (parameter.getAnnotation(OAuthAccessToken.class) != null ||
+                        parameter.getAnnotation(OAuthAccessTokenSecret.class) != null) {
+                    continue;
+                }
+
+                variables.put(
+                        parameter.getSimpleName().toString(),
+                        override.param(ref(parameter.asType()), parameter.getSimpleName().toString())
+                );
+            }
+
+            Invocation callSuper = ExpressionFactory._super().invoke(executableElement.getSimpleName().toString());
+            for (VariableElement parameter : executableElement.getParameters()) {
+                if (parameter.getAnnotation(OAuthAccessToken.class) != null) {
+                    callSuper.arg(oauthAccessToken);
+                } else if (parameter.getAnnotation(OAuthAccessTokenSecret.class) != null) {
+                    callSuper.arg(oauthAccessTokenSecret);
+                } else {
+                    callSuper.arg(variables.get(parameter.getSimpleName().toString()));
+                }
+            }
+
+            if (ref(executableElement.getReturnType()) != context.getCodeModel().VOID) {
+                override.body()._return(callSuper);
+            } else {
+                override.body().add(callSuper);
+            }
+        }
+    }
+
+    protected void generateHasBeenAuthorizedMethod(DefinedClass oauthAdapter, FieldVariable oauthAccessToken) {
+        Method hasBeenAuthorized = oauthAdapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, "hasBeenAuthorized");
+        hasBeenAuthorized._throws(ref(NotAuthorizedException.class));
+        Block ifAccessTokenIsNull = hasBeenAuthorized.body()._if(isNull(oauthAccessToken))._then();
+
+        ifAccessTokenIsNull.invoke("restoreAccessToken");
+
+        Block ifAccessTokenIsNull2 = ifAccessTokenIsNull._if(isNull(oauthAccessToken))._then();
+
+        Invocation newNotAuthorizedException = ExpressionFactory._new(ref(NotAuthorizedException.class));
+        newNotAuthorizedException.arg("This connector has not yet been authorized, please authorize by calling \"authorize\".");
+
+        ifAccessTokenIsNull2._throw(newNotAuthorizedException);
+    }
+
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes"
-           xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="collection"
+           prefix="collection"
            url="http://www.mulesoft.org/schema/mule/collection">
     <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/collection/abstractCollectionConnectorGeneric"
                             image="icons/large/collection-connector-48x32.png" localId="config"

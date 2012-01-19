@@ -29,8 +29,6 @@ import org.mule.api.annotations.InvalidateConnectionOn;
 import org.mule.api.annotations.Mime;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
-import org.mule.api.annotations.oauth.OAuth;
-import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.param.InboundHeaders;
@@ -39,7 +37,6 @@ import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
-import org.mule.api.oauth.NotAuthorizedException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
@@ -48,7 +45,6 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
-import org.mule.devkit.generation.adapter.OAuth1AdapterGenerator;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.CatchBlock;
@@ -365,8 +361,6 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         Variable poolObject = declarePoolObjectIfClassNotNull(poolObjectClass, process);
 
-        addOAuthFieldIfNeeded(executableElement, process, event, moduleObject);
-
         Map<String, Expression> connectionParameters = declareConnectionParametersVariables(executableElement, connectionFields, process);
         Variable connection = addConnectionVariableIfNeeded(executableElement, process);
 
@@ -432,9 +426,9 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             } else if (variable.asType().toString().startsWith(SourceCallback.class.getName())) {
                 parameters.add(ExpressionFactory._this());
             } else if (variable.getAnnotation(OAuthAccessToken.class) != null) {
-                declareOAuthAccessTokenParameter(callProcessor, moduleObject, parameters);
+                continue;
             } else if (variable.getAnnotation(OAuthAccessTokenSecret.class) != null) {
-                declareOAuthAccessTokenSecretParameter(callProcessor, moduleObject, parameters);
+                continue;
             } else if (context.getTypeMirrorUtils().isNestedProcessor(variable.asType())) {
                 declareNestedProcessorParameter(fields, muleContext, event, callProcessor, parameters, variable, fieldName);
             } else if (variable.asType().toString().startsWith(MuleMessage.class.getName())) {
@@ -768,18 +762,6 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
     }
 
-    private void declareOAuthAccessTokenSecretParameter(TryStatement callProcessor, Variable moduleObject, List<Expression> parameters) {
-        Invocation getAccessToken = moduleObject.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_ACCESS_TOKEN_SECRET_FIELD_NAME));
-        Variable accessTokenSecret = callProcessor.body().decl(ref(String.class), "accessTokenSecret", getAccessToken);
-        parameters.add(accessTokenSecret);
-    }
-
-    private void declareOAuthAccessTokenParameter(TryStatement callProcessor, Variable moduleObject, List<Expression> parameters) {
-        Invocation getAccessToken = moduleObject.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_ACCESS_TOKEN_FIELD_NAME));
-        Variable accessToken = callProcessor.body().decl(ref(String.class), "accessToken", getAccessToken);
-        parameters.add(accessToken);
-    }
-
     private Map<String, Expression> declareConnectionParametersVariables(ExecutableElement executableElement, Map<String, FieldVariableElement> connectionFields, Method process) {
         Map<String, Expression> connectionParameters = new HashMap<String, Expression>();
         ExecutableElement connectMethod = connectForMethod(executableElement);
@@ -806,38 +788,11 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         return null;
     }
 
-    private void addOAuthFieldIfNeeded(ExecutableElement executableElement, Method process, Variable event, Variable moduleObject) {
-        if (executableElement.getEnclosingElement().getAnnotation(OAuth.class) != null ||
-                executableElement.getEnclosingElement().getAnnotation(OAuth2.class) != null) {
-            for (VariableElement variable : executableElement.getParameters()) {
-                if (variable.getAnnotation(OAuthAccessToken.class) != null || variable.getAnnotation(OAuthAccessTokenSecret.class) != null) {
-                    addOAuth(process, event, moduleObject, executableElement);
-                    break;
-                }
-            }
-        }
-    }
-
     private Variable declarePoolObjectIfClassNotNull(DefinedClass poolObjectClass, Method process) {
         if (poolObjectClass != null) {
             return process.body().decl(poolObjectClass, "poolObject", ExpressionFactory._null());
         }
         return null;
-    }
-
-    private void addOAuth(Method process, Variable event, Variable object, ExecutableElement executableElement) {
-        Invocation accessToken = object.invoke("get" + StringUtils.capitalize(OAuth1AdapterGenerator.OAUTH_ACCESS_TOKEN_FIELD_NAME));
-        Block ifAccessTokenIsNull = process.body()._if(isNull(accessToken))._then();
-
-        Invocation failedToInvoke = ref(CoreMessages.class).staticInvoke("failedToInvoke").arg(executableElement.getSimpleName().toString());
-        Invocation newNotAuthorizedException = ExpressionFactory._new(ref(NotAuthorizedException.class));
-        newNotAuthorizedException.arg("This connector has not yet been authorized, please authorize by calling \"authorize\".");
-        Invocation messagingException = ExpressionFactory._new(ref(MessagingException.class));
-        messagingException.arg(failedToInvoke);
-        messagingException.arg(event);
-        messagingException.arg(newNotAuthorizedException);
-
-        ifAccessTokenIsNull._throw(messagingException);
     }
 
     private Variable generateMethodCall(Block body, Variable object, String methodName, List<Expression> parameters, Variable event, Type returnType, Variable poolObject, Variable interceptCallback, FieldVariable messageProcessorListener) {

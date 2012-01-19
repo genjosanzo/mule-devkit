@@ -16,10 +16,10 @@
  */
 package org.mule.devkit.dynamic.api.helper;
 
-import java.lang.reflect.Field;
-
-import java.util.Map;
 import org.mule.util.StringUtils;
+
+import java.lang.reflect.Field;
+import java.util.Map;
 
 /**
  * Helper methods for reflection.
