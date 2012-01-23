@@ -14,6 +14,7 @@
         <mule.devkit.version>@project.version@</mule.devkit.version>
         <junit.version>4.8.2</junit.version>
         <mockito.version>1.8.2</mockito.version>
+        <jdk.version>1.6</jdk.version>
     </properties>
 
     <build>
@@ -63,16 +64,16 @@
                         <id>default-compile</id>
                         <configuration>
                             <compilerArgument>-proc:none</compilerArgument>
-                            <source>1.6</source>
-                            <target>1.6</target>
+                            <source>${jdk.version}</source>
+                            <target>${jdk.version}</target>
                         </configuration>
                     </execution>
                     <execution>
                         <id>default-testCompile</id>
                         <configuration>
                             <compilerArgument>-proc:none</compilerArgument>
-                            <source>1.6</source>
-                            <target>1.6</target>
+                            <source>${jdk.version}</source>
+                            <target>${jdk.version}</target>
                         </configuration>
                     </execution>
                 </executions>
@@ -112,7 +113,7 @@
                     <docletArtifact>
                         <groupId>org.mule.tools.devkit</groupId>
                         <artifactId>mule-devkit-doclet</artifactId>
-                        <version>3.1.1-SNAPSHOT</version>
+                        <version>@project.version@</version>
                     </docletArtifact>
                     <doclet>org.mule.devkit.doclet.Doclava</doclet>
                     <bootclasspath>${sun.boot.class.path}</bootclasspath>
