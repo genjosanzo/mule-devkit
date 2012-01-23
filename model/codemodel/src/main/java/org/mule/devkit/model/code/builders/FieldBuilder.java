@@ -154,9 +154,11 @@ public class FieldBuilder {
     }
 
     public FieldVariable build() {
-        Validate.notNull(name, "The name must be set");
         if (typeRef == null) {
             this.typeRef = targetClass.owner().ref(type);
+        }
+        if(name == null) {
+            name = StringUtils.uncapitalize(type.getName());
         }
         FieldVariable field = targetClass.field(modifiers, typeRef, name);
         if (javadoc != null && !javadoc.isEmpty()) {

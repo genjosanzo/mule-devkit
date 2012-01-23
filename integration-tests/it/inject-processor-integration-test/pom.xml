@@ -12,7 +12,6 @@
         <devkit.version>@project.version@</devkit.version>
         <mule.version>@mule.version@</mule.version>
     </properties>
-
     <build>
         <pluginManagement>
             <plugins>

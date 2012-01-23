@@ -93,7 +93,7 @@ public class InjectAdapterGenerator extends AbstractModuleGenerator {
             } else if (variable.asType().toString().startsWith(SystemExceptionHandler.class.getName())) {
                 Invocation getExceptionListener = context.invoke("getExceptionListener");
                 setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getExceptionListener));
-            } else if (variable.asType().toString().startsWith(SecurityManager.class.getName())) {
+            } else if (variable.asType().toString().startsWith(org.mule.api.security.SecurityManager.class.getName())) {
                 Invocation getSecurityManager = context.invoke("getSecurityManager");
                 setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getSecurityManager));
             } else if (variable.asType().toString().startsWith(WorkManager.class.getName())) {
