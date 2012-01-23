@@ -356,7 +356,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         Variable muleMessage = process.body().decl(ref(MuleMessage.class), "_muleMessage", event.invoke("getMessage"));
 
         DefinedClass moduleObjectClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey((TypeElement) executableElement.getEnclosingElement()));
-        Variable moduleObject = process.body().decl(moduleObjectClass, "castedModuleObject", ExpressionFactory._null());
+        Variable moduleObject = process.body().decl(moduleObjectClass, "_castedModuleObject", ExpressionFactory._null());
         findConfig(process.body(), muleContext, object, methodName, event, moduleObjectClass, moduleObject);
 
         Variable poolObject = declarePoolObjectIfClassNotNull(poolObjectClass, process);
@@ -442,7 +442,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             DefinedClass connectionKey = context.getClassForRole(context.getNameUtils().generateConnectionParametersRoleKey((TypeElement) executableElement.getEnclosingElement()));
 
             Conditional ifDebugEnabled = callProcessor.body()._if(logger.invoke("isDebugEnabled"));
-            Variable messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+            Variable messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "_messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
             ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Attempting to acquire a connection using "));
             for (String field : connectionParameters.keySet()) {
                 ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("[" + field + " = ")));
@@ -475,7 +475,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             ifConnectionIsNull._then()._throw(messageException);
 
             ifDebugEnabled = ifConnectionIsNull._else()._if(logger.invoke("isDebugEnabled"));
-            messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+            messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "_messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
             ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Connection has been acquired with "));
             ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ExpressionFactory.lit("[id = ")));
             ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(
@@ -539,7 +539,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             CatchBlock catchBlock = callProcessor._catch(ref(exception).boxify());
 
             Conditional ifDebugEnabled = catchBlock.body()._if(logger.invoke("isDebugEnabled"));
-            Variable messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+            Variable messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "_messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
             ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("An exception ("));
             ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(ref(exception).boxify().fullName()));
             ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(") has been thrown while executing "));
@@ -573,7 +573,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
             Conditional ifRetryMaxNotReached = catchBlock.body()._if(Op.lte(retryCount.invoke("get"), retryMax));
             ifDebugEnabled = ifRetryMaxNotReached._then()._if(logger.invoke("isDebugEnabled"));
-            messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+            messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "_messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
             ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Forcing a retry [time="));
             ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(retryCount));
             ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(" out of  "));
@@ -616,7 +616,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
 
             Conditional ifDebugEnabled = ifConnectionNotNull._then()._if(logger.invoke("isDebugEnabled"));
-            Variable messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
+            Variable messageStringBuilder = ifDebugEnabled._then().decl(ref(StringBuilder.class), "_messageStringBuilder", ExpressionFactory._new(ref(StringBuilder.class)));
             ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg("Releasing the connection back into the pool [id="));
             ifDebugEnabled._then().add(messageStringBuilder.invoke("append").arg(
                     connection.invoke(connectionIdentifierMethod.getSimpleName().toString())
@@ -652,7 +652,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
         if (outboundHeaders == null) {
             Type type = ref(fields.get(fieldName).getVariableElement().asType()).boxify();
-            String name = "transformed" + StringUtils.capitalize(fieldName);
+            String name = "_transformed" + StringUtils.capitalize(fieldName);
             Invocation getGenericType = messageProcessorClass.dotclass().invoke("getDeclaredField").arg(
                     ExpressionFactory.lit(fields.get(fieldName).getFieldType().name())
             ).invoke("getGenericType");
@@ -693,7 +693,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
             parameters.add(transformed);
         } else {
             Type type = ref(HashMap.class).narrow(ref(String.class), ref(Object.class));
-            String name = "transformed" + StringUtils.capitalize(fieldName);
+            String name = "_transformed" + StringUtils.capitalize(fieldName);
 
             outboundHeadersMap = callProcessor.body().decl(type, name, ExpressionFactory._new(type));
             parameters.add(outboundHeadersMap);
@@ -708,7 +708,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         boolean isList = context.getTypeMirrorUtils().isArrayOrList(variable.asType());
 
         if (!isList) {
-            Variable transformed = callProcessor.body().decl(ref(NestedProcessor.class), "transformed" + StringUtils.capitalize(fieldName),
+            Variable transformed = callProcessor.body().decl(ref(NestedProcessor.class), "_transformed" + StringUtils.capitalize(fieldName),
                     ExpressionFactory._null());
 
             Conditional ifMessageProcessor = callProcessor.body()._if(Op.cand(
@@ -732,7 +732,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
             parameters.add(transformed);
         } else {
-            Variable transformed = callProcessor.body().decl(ref(List.class).narrow(NestedProcessor.class), "transformed" + StringUtils.capitalize(fieldName),
+            Variable transformed = callProcessor.body().decl(ref(List.class).narrow(NestedProcessor.class), "_transformed" + StringUtils.capitalize(fieldName),
                     ExpressionFactory._new(ref(ArrayList.class).narrow(NestedProcessor.class)));
 
             Conditional ifMessageProcessor = callProcessor.body()._if(Op.cand(
@@ -770,7 +770,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 String fieldName = variable.getSimpleName().toString();
 
                 Type type = ref(connectionFields.get(fieldName).getVariableElement().asType()).boxify();
-                String name = "transformed" + StringUtils.capitalize(fieldName);
+                String name = "_transformed" + StringUtils.capitalize(fieldName);
 
                 Variable transformed = process.body().decl(type, name, ExpressionFactory._null());
                 connectionParameters.put(fieldName, transformed);
@@ -790,7 +790,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
 
     private Variable declarePoolObjectIfClassNotNull(DefinedClass poolObjectClass, Method process) {
         if (poolObjectClass != null) {
-            return process.body().decl(poolObjectClass, "poolObject", ExpressionFactory._null());
+            return process.body().decl(poolObjectClass, "_poolObject", ExpressionFactory._null());
         }
         return null;
     }
