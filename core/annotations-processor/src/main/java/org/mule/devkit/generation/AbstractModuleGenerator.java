@@ -32,7 +32,6 @@ import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldRef;
 import org.mule.devkit.model.code.FieldVariable;
-import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
@@ -96,8 +95,8 @@ public abstract class AbstractModuleGenerator extends AbstractGenerator {
         return muleContext;
     }
 
-    protected Expression isNull(Invocation invocation) {
-        return Op.eq(invocation, ExpressionFactory._null());
+    protected Expression isNull(Expression expression) {
+        return Op.eq(expression, ExpressionFactory._null());
     }
 
     protected String getterMethodForFieldAnnotatedWith(TypeElement typeElement, Class<? extends Annotation> annotation) {

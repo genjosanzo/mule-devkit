@@ -16,6 +16,13 @@
  */
 package org.mule.devkit.dynamic.api.loader;
 
+import org.mule.api.Capabilities;
+import org.mule.api.Capability;
+import org.mule.api.ConnectionManager;
+import org.mule.devkit.dynamic.api.helper.Classes;
+import org.mule.devkit.dynamic.api.helper.Jars;
+import org.mule.devkit.dynamic.api.model.Module;
+
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -25,13 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.mule.api.Capabilities;
-import org.mule.api.Capability;
-import org.mule.api.ConnectionManager;
-import org.mule.devkit.dynamic.api.helper.Classes;
-import org.mule.devkit.dynamic.api.helper.Jars;
-import org.mule.devkit.dynamic.api.model.Module;
 
 public class JarLoader extends Loader {
 

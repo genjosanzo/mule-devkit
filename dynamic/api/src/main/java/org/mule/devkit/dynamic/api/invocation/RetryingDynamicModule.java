@@ -16,17 +16,17 @@
  */
 package org.mule.devkit.dynamic.api.invocation;
 
-import java.util.Map;
-
-import java.util.concurrent.atomic.AtomicReference;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.retry.policies.AbstractPolicyTemplate;
 import org.mule.devkit.dynamic.api.model.Module;
+import org.mule.retry.policies.AbstractPolicyTemplate;
+
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * {@link DynamicModule} specialization relying on a {@link RetryPolicyTemplate} to implement retry capacity.

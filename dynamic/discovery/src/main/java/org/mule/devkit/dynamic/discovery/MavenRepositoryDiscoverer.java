@@ -16,15 +16,6 @@
  */
 package org.mule.devkit.dynamic.discovery;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.apache.maven.repository.internal.DefaultServiceLocator;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.mule.devkit.dynamic.discovery.wagon.ManualWagonProvider;
@@ -43,6 +34,15 @@ import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sonatype.aether.spi.connector.RepositoryConnectorFactory;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Helper methods for listing dependencies of MuleForge artifact.

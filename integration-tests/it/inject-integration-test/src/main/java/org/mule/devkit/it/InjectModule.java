@@ -27,8 +27,8 @@ import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.registry.Registry;
-import org.mule.api.store.ObjectStoreManager;
 import org.mule.api.security.SecurityManager;
+import org.mule.api.store.ObjectStoreManager;
 import org.mule.util.queue.QueueManager;
 
 import javax.inject.Inject;

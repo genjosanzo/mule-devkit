@@ -17,8 +17,6 @@
 
 package org.mule.devkit.it;
 
-import org.junit.Test;
-import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.config.MuleProperties;
 

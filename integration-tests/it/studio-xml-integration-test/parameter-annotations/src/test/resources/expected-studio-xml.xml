@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="parameter-annotations" url="http://www.mulesoft.org/schema/mule/parameter-annotations">
+<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" prefix="parameter-annotations"
+           url="http://www.mulesoft.org/schema/mule/parameter-annotations">
   <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" image="icons/large/parameter-annotations-connector-48x32.png" localId="config" icon="icons/small/parameter-annotations-connector-24x16.png" description="Global Parameter Annotations configuration information." caption="Parameter Annotations">
     <attribute-category description="Parameter-annotations configuration properties." caption="General">
       <group caption="Generic" id="parameter-annotationsGenericProperties">

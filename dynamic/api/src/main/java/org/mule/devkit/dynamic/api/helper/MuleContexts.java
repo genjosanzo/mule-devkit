@@ -16,9 +16,6 @@
  */
 package org.mule.devkit.dynamic.api.helper;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
@@ -31,6 +28,9 @@ import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.devkit.dynamic.api.transformer.StringToURL;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *Helper methods for {@link MuleContext}.

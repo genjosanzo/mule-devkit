@@ -85,6 +85,19 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
     }
 
     @Override
+    public List<ExecutableElement> getMethodsWhoseParametersAreAnnotatedWith(Class<? extends Annotation> annotation) {
+        List<ExecutableElement> result = new ArrayList<ExecutableElement>();
+        for (ExecutableElement method : getMethods()) {
+            for( VariableElement parameter : method.getParameters() ) {
+                if (parameter.getAnnotation(annotation) != null) {
+                    result.add(method);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<VariableElement> getFieldsAnnotatedWith(Class<? extends Annotation> annotation) {
         List<VariableElement> result = new ArrayList<VariableElement>();
         for (VariableElement field : getFields()) {

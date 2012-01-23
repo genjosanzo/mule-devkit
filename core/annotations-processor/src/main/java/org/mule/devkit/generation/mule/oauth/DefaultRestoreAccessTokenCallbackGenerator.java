@@ -126,13 +126,13 @@ public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageG
         ifNotStarted._then().assign(hasBeenStarted, ExpressionFactory.TRUE);
 
         TryStatement tryProcess = restoreAccessTokenMethod.body()._try();
-        tryProcess.body().add(
+        tryProcess.body().assign(event,
                 messageProcessor.invoke("process").arg(event)
         );
         tryProcess.body().assign(accessToken,
                 event.invoke("getMessage").invoke("getInvocationProperty").arg("OAuthAccessToken")
         );
-        tryProcess.body().assign(accessToken,
+        tryProcess.body().assign(accessTokenSecret,
                 event.invoke("getMessage").invoke("getInvocationProperty").arg("OAuthAccessTokenSecret")
         );
         CatchBlock catchProcess = tryProcess._catch(ref(Exception.class));

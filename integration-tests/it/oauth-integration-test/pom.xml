@@ -9,8 +9,8 @@
     <name>Mule DevKit OAuth Integration Tests</name>
 
     <properties>
-        <mule.version>@mule.version@</mule.version>
-        <devkit.version>@project.version@</devkit.version>
+        <mule.version>3.2.1</mule.version>
+        <devkit.version>3.3-SNAPSHOT</devkit.version>
     </properties>
 
     <build>
@@ -19,7 +19,7 @@
                 <plugin>
                     <groupId>org.mule.tools.devkit</groupId>
                     <artifactId>mule-devkit-maven-plugin</artifactId>
-                    <version>@project.version@</version>
+                    <version>${devkit.version}</version>
                     <extensions>true</extensions>
                 </plugin>
                 <plugin>
@@ -45,7 +45,7 @@
             <plugin>
                 <groupId>org.mule.tools.devkit</groupId>
                 <artifactId>mule-devkit-maven-plugin</artifactId>
-                <version>@project.version@</version>
+                <version>${devkit.version}</version>
                 <extensions>true</extensions>
             </plugin>
         </plugins>
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>@mule.version@</version>
+            <version>${mule.version}</version>
             <optional>true</optional>
             <exclusions>
                 <exclusion>
@@ -100,7 +100,7 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
-            <version>@mule.version@</version>
+            <version>${mule.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.safehaus.jug</groupId>
@@ -111,25 +111,25 @@
         <dependency>
             <groupId>org.mule.tools.devkit</groupId>
             <artifactId>mule-devkit-annotations</artifactId>
-            <version>@project.version@</version>
+            <version>${devkit.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
-            <version>@mule.version@</version>
+            <version>${mule.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-scripting</artifactId>
-            <version>@mule.version@</version>
+            <version>${mule.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
-            <version>@mule.version@</version>
+            <version>${mule.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
