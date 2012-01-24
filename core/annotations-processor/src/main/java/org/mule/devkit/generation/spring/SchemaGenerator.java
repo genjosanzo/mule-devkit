@@ -730,7 +730,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Inject.class)) {
             if( variable.asType().toString().equals("org.mule.api.store.ObjectStore") ) {
-                config.getAttributeOrAttributeGroup().add(createObjectStoreRefAttribute(schema, variable));
+                config.getAttributeOrAttributeGroup().add(createObjectStoreRefAttribute(variable));
             }
         }
 
@@ -907,7 +907,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         all.getParticle().add(objectFactory.createElement(httpCallbackConfig));
     }
 
-    private Attribute createObjectStoreRefAttribute(Schema schema, VariableElement variable) {
+    private Attribute createObjectStoreRefAttribute(VariableElement variable) {
         Attribute attribute = new Attribute();
 
         // set whenever or not is optional

@@ -64,16 +64,16 @@
                         <id>default-compile</id>
                         <configuration>
                             <compilerArgument>-proc:none</compilerArgument>
-                            <source>${jdk.version}</source>
-                            <target>${jdk.version}</target>
+                            <source>${D}{jdk.version}</source>
+                            <target>${D}{jdk.version}</target>
                         </configuration>
                     </execution>
                     <execution>
                         <id>default-testCompile</id>
                         <configuration>
                             <compilerArgument>-proc:none</compilerArgument>
-                            <source>${jdk.version}</source>
-                            <target>${jdk.version}</target>
+                            <source>${D}{jdk.version}</source>
+                            <target>${D}{jdk.version}</target>
                         </configuration>
                     </execution>
                 </executions>
@@ -113,7 +113,7 @@
                     <docletArtifact>
                         <groupId>org.mule.tools.devkit</groupId>
                         <artifactId>mule-devkit-doclet</artifactId>
-                        <version>@project.version@</version>
+                        <version>${D}{mule.devkit.version}</version>
                     </docletArtifact>
                     <doclet>org.mule.devkit.doclet.Doclava</doclet>
                     <bootclasspath>${sun.boot.class.path}</bootclasspath>
@@ -177,7 +177,7 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -188,7 +188,7 @@
         <dependency>
             <groupId>org.mule.tools.devkit</groupId>
             <artifactId>mule-devkit-annotations</artifactId>
-            <version>${mule.devkit.version}</version>
+            <version>${D}{mule.devkit.version}</version>
         </dependency>
         <dependency>
             <groupId>oauth.signpost</groupId>
