@@ -35,6 +35,7 @@ import org.mule.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.construct.Flow;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -399,7 +400,7 @@ public class DefaultHttpCallbackGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getDefaultHttpCallbackClass(TypeElement type) {
-        String httpCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, ".config.spring", CLASS_NAME);
+        String httpCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, CLASS_NAME);
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(httpCallbackClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(httpCallbackClassName), new Class[]{HttpCallback.class});
 

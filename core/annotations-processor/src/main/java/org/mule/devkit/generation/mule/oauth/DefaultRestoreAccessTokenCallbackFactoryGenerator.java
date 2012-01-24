@@ -23,6 +23,7 @@ import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.Method;
@@ -64,7 +65,7 @@ public class DefaultRestoreAccessTokenCallbackFactoryGenerator extends AbstractM
     }
 
     private DefinedClass getDefaultRestoreAccessTokenCallbackFactoryClass(TypeElement type) {
-        String callbackClassName = context.getNameUtils().generateClassNameInPackage(type, ".config", "RestoreAccessTokenCallbackFactoryBean");
+        String callbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.RESTORE_ACCESS_TOKEN_CALLBACK_FACTORY_BEAN_CLASS_NAME);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(callbackClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(callbackClassName));
         clazz._extends(ref(MessageProcessorChainFactoryBean.class));

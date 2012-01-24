@@ -27,6 +27,7 @@ import org.mule.api.annotations.param.Payload;
 import org.mule.api.transformer.TransformerException;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -195,8 +196,8 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getEnricherClass(String name, Element variableElement) {
-        String evaluatorClassName = context.getNameUtils().generateClassNameInPackage(variableElement, context.getNameUtils().camel(name) + "ExpressionEnricher");
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(evaluatorClassName) + ".config");
+        String evaluatorClassName = context.getNameUtils().generateClassNameInPackage(variableElement, context.getNameUtils().camel(name) + NamingContants.EXPRESSION_ENRICHER_CLASS_NAME_SUFFIX);
+        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(evaluatorClassName) + NamingContants.EXPRESSIONS_NAMESPACE);
         DefinedClass enricherClass = pkg._class(context.getNameUtils().getClassName(evaluatorClassName), new Class<?>[]{org.mule.api.expression.ExpressionEnricher.class});
 
         return enricherClass;

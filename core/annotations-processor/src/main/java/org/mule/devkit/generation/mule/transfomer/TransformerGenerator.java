@@ -26,6 +26,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -172,8 +173,8 @@ public class TransformerGenerator extends AbstractMessageGenerator {
     }
 
     public DefinedClass getTransformerClass(ExecutableElement executableElement) {
-        String transformerClassName = context.getNameUtils().generateClassName(executableElement, "Transformer");
-        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(transformerClassName) + ".config");
+        String transformerClassName = context.getNameUtils().generateClassName(executableElement, NamingContants.TRANSFORMER_CLASS_NAME_SUFFIX);
+        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(transformerClassName) + NamingContants.TRANSFORMERS_NAMESPACE);
         DefinedClass transformer = pkg._class(context.getNameUtils().getClassName(transformerClassName), AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class});
 
         return transformer;

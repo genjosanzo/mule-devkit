@@ -26,6 +26,7 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
@@ -173,8 +174,8 @@ public class EnumTransformerGenerator extends AbstractMessageGenerator {
 
     private DefinedClass getEnumTransformerClass(Element variableElement) {
         javax.lang.model.element.Element enumElement = context.getTypeUtils().asElement(variableElement.asType());
-        String transformerClassName = context.getNameUtils().generateClassNameInPackage(variableElement, enumElement.getSimpleName().toString() + "EnumTransformer");
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(transformerClassName) + ".config");
+        String transformerClassName = context.getNameUtils().generateClassNameInPackage(variableElement, enumElement.getSimpleName().toString() + NamingContants.ENUM_TRANSFORMER_CLASS_NAME_SUFFIX);
+        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(transformerClassName) + NamingContants.TRANSFORMERS_NAMESPACE);
         DefinedClass transformer = pkg._class(context.getNameUtils().getClassName(transformerClassName), AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class, MuleContextAware.class});
 
         return transformer;

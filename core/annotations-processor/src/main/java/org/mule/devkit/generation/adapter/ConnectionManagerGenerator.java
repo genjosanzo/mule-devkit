@@ -32,6 +32,7 @@ import org.mule.config.PoolingProfile;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.ClassAlreadyExistsException;
@@ -387,7 +388,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getConnectionManagerAdapterClass(TypeElement typeElement) {
-        String connectionManagerName = context.getNameUtils().generateClassName(typeElement, ".config", "ConnectionManager");
+        String connectionManagerName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.CONNECTION_MANAGER_ADAPTER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(connectionManagerName));
 
         DefinedClass classToExtend = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));

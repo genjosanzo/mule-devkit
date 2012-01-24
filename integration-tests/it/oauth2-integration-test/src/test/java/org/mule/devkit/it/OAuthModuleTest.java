@@ -24,7 +24,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.construct.Flow;
-import org.mule.devkit.it.config.OAuthModuleOAuth2Adapter;
+import org.mule.devkit.it.adapters.OAuthModuleOAuth2Adapter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.FunctionalTestCase;
 

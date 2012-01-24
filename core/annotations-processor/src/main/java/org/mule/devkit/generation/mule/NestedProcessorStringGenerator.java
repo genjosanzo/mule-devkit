@@ -21,6 +21,7 @@ import org.mule.api.NestedProcessor;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
@@ -100,7 +101,7 @@ public class NestedProcessorStringGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getNestedProcessorStringClass(TypeElement type) {
-        String processorCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, ".config.spring", "NestedProcessorString");
+        String processorCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.NESTED_PROCESSOR_STRING_CLASS_NAME);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(processorCallbackClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(processorCallbackClassName));
 

@@ -372,15 +372,15 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected DefinedClass getBeanDefinitionParserClass(ExecutableElement executableElement) {
-        String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, "DefinitionParser");
-        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + ".config.spring");
+        String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, NamingContants.DEFINITION_PARSER_CLASS_NAME_SUFFIX);
+        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + NamingContants.CONFIG_NAMESPACE);
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), new Class[]{BeanDefinitionParser.class});
 
         return clazz;
     }
 
     protected DefinedClass getConfigBeanDefinitionParserClass(TypeElement typeElement) {
-        String poolAdapterName = context.getNameUtils().generateClassName(typeElement, ".config.spring", "ConfigDefinitionParser");
+        String poolAdapterName = context.getNameUtils().generateClassName(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.CONFIG_DEFINITION_PARSER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(poolAdapterName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(poolAdapterName), new Class[]{BeanDefinitionParser.class});
 
@@ -390,9 +390,9 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected DefinedClass getMessageProcessorClass(ExecutableElement executableElement) {
-        String className = context.getNameUtils().generateClassName(executableElement, "MessageProcessor");
+        String className = context.getNameUtils().generateClassName(executableElement, NamingContants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX);
         return getMessageProcessorClass(className,
-                context.getNameUtils().getPackageName(className) + ".config");
+                context.getNameUtils().getPackageName(className) + NamingContants.MESSAGE_PROCESSOR_NAMESPACE);
     }
 
     protected DefinedClass getMessageProcessorClass(String className, String packageName) {
@@ -410,8 +410,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
     protected DefinedClass getInterceptingMessageProcessorClass(ExecutableElement executableElement) {
-        String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, "MessageProcessor");
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + ".config");
+        String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, NamingContants.MESSAGE_PROCESSOR_CLASS_NAME_SUFFIX);
+        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + NamingContants.MESSAGE_PROCESSOR_NAMESPACE);
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), new Class[]{
                 Initialisable.class,
                 Startable.class,
@@ -427,8 +427,8 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
 
 
     protected DefinedClass getMessageSourceClass(ExecutableElement executableElement) {
-        String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, "MessageSource");
-        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + ".config");
+        String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, NamingContants.MESSAGE_SOURCE_CLASS_NAME_SUFFIX);
+        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + NamingContants.MESSAGE_SOURCE_NAMESPACE);
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), new Class[]{
                 MuleContextAware.class,
                 Startable.class,

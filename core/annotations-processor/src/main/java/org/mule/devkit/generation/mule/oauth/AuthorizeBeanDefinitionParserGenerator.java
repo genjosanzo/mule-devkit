@@ -23,6 +23,7 @@ import org.mule.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -78,7 +79,7 @@ public class AuthorizeBeanDefinitionParserGenerator extends AbstractMessageGener
     }
 
     private DefinedClass getAuthorizeBeanDefinitionParserClass(TypeElement type) {
-        String httpCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, ".config.spring", "AuthorizeDefinitionParser");
+        String httpCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.AUTHORIZE_DEFINITION_PARSER_CLASS_NAME);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(httpCallbackClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(httpCallbackClassName), new Class[]{BeanDefinitionParser.class});
 

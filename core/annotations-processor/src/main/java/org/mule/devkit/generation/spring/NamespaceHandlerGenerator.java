@@ -27,6 +27,7 @@ import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.generation.mule.oauth.AuthorizeBeanDefinitionParserGenerator;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -61,7 +62,7 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getNamespaceHandlerClass(DevKitTypeElement typeElement) {
-        String namespaceHandlerName = context.getNameUtils().generateClassName((TypeElement) typeElement, ".config.spring", "NamespaceHandler");
+        String namespaceHandlerName = context.getNameUtils().generateClassName((TypeElement) typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.NAMESPACE_HANDLER_CLASS_NAME_SUFFIX);
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(namespaceHandlerName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(namespaceHandlerName), NamespaceHandlerSupport.class);
 
@@ -99,8 +100,8 @@ public class NamespaceHandlerGenerator extends AbstractMessageGenerator {
         for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(Transformer.class)) {
             Invocation registerMuleBeanDefinitionParser = init.body().invoke("registerBeanDefinitionParser");
             registerMuleBeanDefinitionParser.arg(ExpressionFactory.lit(context.getNameUtils().uncamel(executableElement.getSimpleName().toString())));
-            String transformerClassName = context.getNameUtils().generateClassName(executableElement, "Transformer");
-            transformerClassName = context.getNameUtils().getPackageName(transformerClassName) + ".config." + context.getNameUtils().getClassName(transformerClassName);
+            String transformerClassName = context.getNameUtils().generateClassName(executableElement, NamingContants.TRANSFORMER_CLASS_NAME_SUFFIX);
+            transformerClassName = context.getNameUtils().getPackageName(transformerClassName) + NamingContants.TRANSFORMERS_NAMESPACE + "." + context.getNameUtils().getClassName(transformerClassName);
             registerMuleBeanDefinitionParser.arg(ExpressionFactory._new(ref(MessageProcessorDefinitionParser.class)).arg(ref(transformerClassName).boxify().dotclass()));
         }
     }

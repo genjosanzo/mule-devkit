@@ -27,6 +27,7 @@ import org.mule.api.annotations.param.Payload;
 import org.mule.api.transformer.TransformerException;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -192,8 +193,8 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getEvaluatorClass(String name, Element variableElement) {
-        String evaluatorClassName = context.getNameUtils().generateClassNameInPackage(variableElement, context.getNameUtils().camel(name) + "ExpressionEvaluator");
-        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(evaluatorClassName) + ".config");
+        String evaluatorClassName = context.getNameUtils().generateClassNameInPackage(variableElement, context.getNameUtils().camel(name) + NamingContants.EXPRESSION_EVALUATOR_CLASS_NAME_SUFFIX);
+        org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(evaluatorClassName) + NamingContants.EXPRESSIONS_NAMESPACE);
         DefinedClass evaluator = pkg._class(context.getNameUtils().getClassName(evaluatorClassName), new Class<?>[]{org.mule.api.expression.ExpressionEvaluator.class});
 
         return evaluator;

@@ -35,6 +35,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.generation.adapter.OAuth1AdapterGenerator;
 import org.mule.devkit.generation.adapter.OAuth2AdapterGenerator;
 import org.mule.devkit.model.code.Block;
@@ -165,7 +166,7 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
     }
 
     private DefinedClass getAuthorizeMessageProcessorClass(TypeElement type) {
-        String httpCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, ".config", "AuthorizeMessageProcessor");
+        String httpCallbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.MESSAGE_PROCESSOR_NAMESPACE, NamingContants.AUTHORIZE_MESSAGE_PROCESSOR_CLASS_NAME);
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(httpCallbackClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(httpCallbackClassName), new Class[]{
                 Initialisable.class,
