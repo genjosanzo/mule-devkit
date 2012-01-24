@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.mule.devkit.it</groupId>
-    <artifactId>inject-processor-integration-test</artifactId>
+    <artifactId>inject-integration-test</artifactId>
     <version>1.0</version>
     <packaging>mule-module</packaging>
     <name>Mule DevKit Injection Integration Tests</name>
@@ -21,9 +21,6 @@
                     <artifactId>mule-devkit-maven-plugin</artifactId>
                     <version>${devkit.version}</version>
                     <extensions>true</extensions>
-                    <configuration>
-                        <schemaVersion>1.0</schemaVersion>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

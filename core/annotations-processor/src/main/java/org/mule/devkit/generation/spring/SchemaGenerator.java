@@ -65,6 +65,7 @@ import org.mule.devkit.model.schema.TopLevelSimpleType;
 import org.mule.devkit.model.schema.Union;
 import org.mule.util.StringUtils;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -727,6 +728,12 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             }
         }
 
+        for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Inject.class)) {
+            if( variable.asType().toString().equals("org.mule.api.store.ObjectStore") ) {
+                config.getAttributeOrAttributeGroup().add(createObjectStoreRefAttribute(schema, variable));
+            }
+        }
+
         // get the executable typeElement for create connectivity
         ExecutableElement connectMethod = connectMethodForClass(typeElement);
 
@@ -898,6 +905,25 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         httpCallbackConfig.setComplexType(localComplexType);
         all.getParticle().add(objectFactory.createElement(httpCallbackConfig));
+    }
+
+    private Attribute createObjectStoreRefAttribute(Schema schema, VariableElement variable) {
+        Attribute attribute = new Attribute();
+
+        // set whenever or not is optional
+        attribute.setUse(SchemaConstants.USE_OPTIONAL);
+        attribute.setName("objectStore-ref");
+        attribute.setType(SchemaConstants.STRING);
+
+        // add doc
+        Annotation annotation = new Annotation();
+        Documentation doc = new Documentation();
+        doc.getContent().add(context.getJavaDocUtils().getSummary(variable));
+        annotation.getAppinfoOrDocumentation().add(doc);
+
+        attribute.setAnnotation(annotation);
+
+        return attribute;
     }
 
     private Attribute createAttribute(Schema schema, VariableElement variable) {

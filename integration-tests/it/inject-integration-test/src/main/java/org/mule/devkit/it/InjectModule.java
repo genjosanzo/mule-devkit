@@ -28,6 +28,7 @@ import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
+import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.util.queue.QueueManager;
 
@@ -43,6 +44,8 @@ import javax.transaction.TransactionManager;
 public class InjectModule {
     @Inject
     protected MuleContext muleContext;
+    @Inject
+    protected ObjectStore objectStore;
     @Inject
     protected ObjectStoreManager objectStoreManager;
     @Inject
@@ -84,6 +87,30 @@ public class InjectModule {
                 registry == null ||
                 workManager == null) {
             throw new IllegalStateException("One or more injections are missing");
+        }
+    }
+
+    /**
+     * Verify injections
+     */
+    @Processor
+    public void verifyObjectStore() throws Exception {
+        if (objectStore == null) {
+            throw new IllegalStateException("Object Store injection is missing");
+        }
+    }
+
+    /**
+     * Verify injections
+     */
+    @Processor
+    public void verifyCustomObjectStore() throws Exception {
+        if (objectStore == null) {
+            throw new IllegalStateException("Object Store injection is missing");
+        }
+
+        if( !(objectStore instanceof CustomObjectStore) ) {
+            throw new IllegalStateException("Object Store is not of appropriate type");
         }
     }
 
@@ -133,5 +160,13 @@ public class InjectModule {
 
     public void setWorkManager(WorkManager workManager) {
         this.workManager = workManager;
+    }
+
+    public void setObjectStore(ObjectStore objectStore) {
+        this.objectStore = objectStore;
+    }
+
+    public ObjectStore getObjectStore() {
+        return objectStore;
     }
 }
