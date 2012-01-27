@@ -149,7 +149,13 @@ abstract public class Op {
         }
 
         public void generate(Formatter f) {
-            f.p('(').g(left).p(op).g(right).p(')');
+            f.p('(');
+            if( left instanceof Assignment ) {
+                f.p('(').g(left).p(')');
+            } else {
+                f.g(left);
+            }
+            f.p(op).g(right).p(')');
         }
 
     }

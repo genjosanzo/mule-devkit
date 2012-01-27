@@ -26,6 +26,7 @@ import org.mule.devkit.generation.adapter.LifecycleAdapterGenerator;
 import org.mule.devkit.generation.adapter.OAuth1AdapterGenerator;
 import org.mule.devkit.generation.adapter.OAuth2AdapterGenerator;
 import org.mule.devkit.generation.adapter.PoolAdapterGenerator;
+import org.mule.devkit.generation.adapter.RestAdapterGenerator;
 import org.mule.devkit.generation.callback.DefaultHttpCallbackGenerator;
 import org.mule.devkit.generation.mule.MessageProcessorGenerator;
 import org.mule.devkit.generation.mule.MessageSourceGenerator;
@@ -54,6 +55,7 @@ import org.mule.devkit.validation.InjectValidator;
 import org.mule.devkit.validation.JavaDocValidator;
 import org.mule.devkit.validation.OAuthValidator;
 import org.mule.devkit.validation.ProcessorValidator;
+import org.mule.devkit.validation.RestValidator;
 import org.mule.devkit.validation.SourceValidator;
 import org.mule.devkit.validation.StudioValidator;
 import org.mule.devkit.validation.TransformerValidator;
@@ -81,6 +83,7 @@ public class DevKitAnnotationProcessor extends AbstractAnnotationProcessor {
         generators.add(new CapabilitiesAdapterGenerator());
         generators.add(new LifecycleAdapterGenerator());
         generators.add(new InjectAdapterGenerator());
+        generators.add(new RestAdapterGenerator());
         generators.add(new HttpCallbackAdapterGenerator());
         generators.add(new OAuth1AdapterGenerator());
         generators.add(new OAuth2AdapterGenerator());
@@ -118,6 +121,7 @@ public class DevKitAnnotationProcessor extends AbstractAnnotationProcessor {
         validators.add(new SourceValidator());
         validators.add(new TransformerValidator());
         validators.add(new InjectValidator());
+        validators.add(new RestValidator());
 
     }
 

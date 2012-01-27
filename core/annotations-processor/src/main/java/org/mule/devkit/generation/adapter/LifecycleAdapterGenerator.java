@@ -93,7 +93,12 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
 
         DefinedClass previous = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
 
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(lifecycleAdapterName), previous);
+        int modifiers = Modifier.PUBLIC;
+        if( typeElement.getModifiers().contains(javax.lang.model.element.Modifier.ABSTRACT) ) {
+            modifiers |= Modifier.ABSTRACT;
+        }
+
+        DefinedClass clazz = pkg._class(modifiers, context.getNameUtils().getClassName(lifecycleAdapterName), previous);
 
         context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
 

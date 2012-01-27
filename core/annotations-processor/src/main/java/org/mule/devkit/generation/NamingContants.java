@@ -48,4 +48,5 @@ public class NamingContants {
     public static final String NESTED_PROCESSOR_STRING_CLASS_NAME = "NestedProcessorString";
     public static final String AUTHORIZE_DEFINITION_PARSER_CLASS_NAME = "AuthorizeDefinitionParser";
     public static final String NAMESPACE_HANDLER_CLASS_NAME_SUFFIX = "NamespaceHandler";
+    public static final String REST_CLIENT_ADAPTER_CLASS_NAME_SUFFIX = "RestClientAdapter";
 }
