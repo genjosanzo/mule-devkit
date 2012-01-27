@@ -27,7 +27,6 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.TraceMethod;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.rest.HttpMethod;
@@ -44,7 +43,6 @@ import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
-import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
@@ -52,7 +50,6 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.WhileLoop;
-import sun.tools.tree.CatchStatement;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -79,11 +76,11 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         DefinedClass restClientAdapterClass = getRestClientAdapterClass(typeElement);
 
         // logger field
-        FieldVariable logger = generateLoggerField(restClientAdapterClass);
+        //FieldVariable logger = generateLoggerField(restClientAdapterClass);
 
         FieldVariable responseTimeout = restClientAdapterClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "responseTimeout");
         FieldVariable httpClient = restClientAdapterClass.field(Modifier.PRIVATE | Modifier.VOLATILE, ref(HttpClient.class), "httpClient");
-     
+
         Method initialise = restClientAdapterClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "initialise");
         initialise.annotate(ref(Override.class));
         initialise.body().add(ExpressionFactory._super().invoke("initialise"));
@@ -173,7 +170,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         Expression rvalue = variable.invoke("toString");
         if (restUriParam != null) {
             if (restUriParam.separatedBy() != null &&
-                !StringUtils.isEmpty(restUriParam.separatedBy())) {
+                    !StringUtils.isEmpty(restUriParam.separatedBy())) {
                 rvalue = ref(StringUtils.class).staticInvoke("join").arg(variable.invoke("toArray")).arg(restUriParam.separatedBy());
             }
             Conditional ifNotNull = body._if(Op.ne(variable, ExpressionFactory._null()));
@@ -193,7 +190,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(restClientAdapterClassName), previous);
         clazz._implements(ref(Initialisable.class));
         clazz._implements(ref(Disposable.class));
-        
+
         context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
 
         return clazz;

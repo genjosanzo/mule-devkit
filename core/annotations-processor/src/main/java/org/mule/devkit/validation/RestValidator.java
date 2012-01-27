@@ -18,18 +18,14 @@
 package org.mule.devkit.validation;
 
 import org.apache.commons.lang.StringUtils;
-import org.mule.api.annotations.Source;
 import org.mule.api.annotations.rest.RestCall;
 import org.mule.api.annotations.rest.RestUriParam;
-import org.mule.api.callback.SourceCallback;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeMirror;
-import java.util.List;
 
 public class RestValidator implements Validator {
 
@@ -47,20 +43,20 @@ public class RestValidator implements Validator {
                 throw new ValidationException(method, "@RestCall can only be applied to abstract methods");
             }
 
-            if( method.getThrownTypes().size() != 1 ) {
+            if (method.getThrownTypes().size() != 1) {
                 throw new ValidationException(method, "@RestCall abstract method must throw IOException");
             }
         }
-        
-        for(VariableElement field : typeElement.getFieldsAnnotatedWith(RestUriParam.class)) {
+
+        for (VariableElement field : typeElement.getFieldsAnnotatedWith(RestUriParam.class)) {
             boolean getterFound = false;
             for (ExecutableElement method : typeElement.getMethods()) {
-                if( method.getSimpleName().toString().equals("get" + StringUtils.capitalize(field.getSimpleName().toString()))) {
+                if (method.getSimpleName().toString().equals("get" + StringUtils.capitalize(field.getSimpleName().toString()))) {
                     getterFound = true;
                     break;
                 }
             }
-            if( !getterFound ) {
+            if (!getterFound) {
                 throw new ValidationException(field, "Cannot find a getter method for " + field.getSimpleName().toString() + " but its being marked as URI parameter of a REST call.");
             }
         }
