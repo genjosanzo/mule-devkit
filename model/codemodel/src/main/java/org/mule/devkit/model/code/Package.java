@@ -208,8 +208,15 @@ public final class Package implements Declaration, Generable, ClassContainer, An
      * Adds a public class to this package.
      */
     public DefinedClass _class(String name, TypeReference _extends) {
+        return _class(Modifier.PUBLIC, name, _extends);
+    }    
+
+    /**
+     * Adds a public class to this package.
+     */
+    public DefinedClass _class(int modifiers, String name, TypeReference _extends) {
         try {
-            DefinedClass clazz = _class(Modifier.PUBLIC, name);
+            DefinedClass clazz = _class(modifiers, name);
             clazz._extends(_extends);
 
             return clazz;

@@ -31,6 +31,7 @@ import org.mule.api.callback.HttpCallback;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.generation.adapter.HttpCallbackAdapterGenerator;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.schema.Annotation;
@@ -64,6 +65,7 @@ import org.mule.devkit.model.schema.TopLevelSimpleType;
 import org.mule.devkit.model.schema.Union;
 import org.mule.util.StringUtils;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -96,7 +98,6 @@ public class SchemaGenerator extends AbstractModuleGenerator {
     private static final String ATTRIBUTE_NAME_KEY_REF = "key-ref";
     private static final String ATTRIBUTE_RETRY_MAX = "retryMax";
     private static final String XSD_EXTENSION = ".xsd";
-    private static final String NAMESPACE_HANDLER_SUFFIX = "NamespaceHandler";
     private static final String ENUM_TYPE_SUFFIX = "EnumType";
     private static final String TYPE_SUFFIX = "Type";
     private static final String XML_TYPE_SUFFIX = "XmlType";
@@ -157,7 +158,7 @@ public class SchemaGenerator extends AbstractModuleGenerator {
         }
 
         // TODO: replace with a class role
-        String namespaceHandlerName = context.getNameUtils().generateClassName(typeElement, ".config.spring", NAMESPACE_HANDLER_SUFFIX);
+        String namespaceHandlerName = context.getNameUtils().generateClassName(typeElement, NamingContants.CONFIG_NAMESPACE, NamingContants.NAMESPACE_HANDLER_CLASS_NAME_SUFFIX);
         String className = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement)).boxify().fullName();
 
         SchemaLocation versionedSchemaLocation = new SchemaLocation(schema, schema.getTargetNamespace(), fileName, versionedLocation, namespaceHandlerName, className);
@@ -727,6 +728,12 @@ public class SchemaGenerator extends AbstractModuleGenerator {
             }
         }
 
+        for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Inject.class)) {
+            if( variable.asType().toString().equals("org.mule.api.store.ObjectStore") ) {
+                config.getAttributeOrAttributeGroup().add(createObjectStoreRefAttribute(variable));
+            }
+        }
+
         // get the executable typeElement for create connectivity
         ExecutableElement connectMethod = connectMethodForClass(typeElement);
 
@@ -898,6 +905,25 @@ public class SchemaGenerator extends AbstractModuleGenerator {
 
         httpCallbackConfig.setComplexType(localComplexType);
         all.getParticle().add(objectFactory.createElement(httpCallbackConfig));
+    }
+
+    private Attribute createObjectStoreRefAttribute(VariableElement variable) {
+        Attribute attribute = new Attribute();
+
+        // set whenever or not is optional
+        attribute.setUse(SchemaConstants.USE_OPTIONAL);
+        attribute.setName("objectStore-ref");
+        attribute.setType(SchemaConstants.STRING);
+
+        // add doc
+        Annotation annotation = new Annotation();
+        Documentation doc = new Documentation();
+        doc.getContent().add(context.getJavaDocUtils().getSummary(variable));
+        annotation.getAppinfoOrDocumentation().add(doc);
+
+        attribute.setAnnotation(annotation);
+
+        return attribute;
     }
 
     private Attribute createAttribute(Schema schema, VariableElement variable) {

@@ -74,6 +74,12 @@ public class OAuthModuleTest extends FunctionalTestCase {
         assertEquals(SaveAccessTokenComponent.getAccessTokenSecret(), Constants.ACCESS_TOKEN_SECRET);
     }
 
+    @Test
+    public void testProtectedResourceWithRestore() throws Exception {
+        MuleEvent responseEvent = runFlow("protectedResourceWithRestore");
+        verifiyProtectedResourceWasAccessed(responseEvent);
+    }
+
     private void verifiyProtectedResourceWasAccessed(MuleEvent responseEvent) throws MuleException {
         assertEquals(OAuthModule.PROTECTED_RESOURCE, responseEvent.getMessageAsString());
         if (RequestTokenComponent.timesCalled < 1) {

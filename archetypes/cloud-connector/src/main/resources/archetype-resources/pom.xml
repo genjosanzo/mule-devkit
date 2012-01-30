@@ -14,6 +14,7 @@
         <mule.devkit.version>@project.version@</mule.devkit.version>
         <junit.version>4.8.2</junit.version>
         <mockito.version>1.8.2</mockito.version>
+        <jdk.version>1.6</jdk.version>
     </properties>
 
     <build>
@@ -63,16 +64,16 @@
                         <id>default-compile</id>
                         <configuration>
                             <compilerArgument>-proc:none</compilerArgument>
-                            <source>1.6</source>
-                            <target>1.6</target>
+                            <source>${D}{jdk.version}</source>
+                            <target>${D}{jdk.version}</target>
                         </configuration>
                     </execution>
                     <execution>
                         <id>default-testCompile</id>
                         <configuration>
                             <compilerArgument>-proc:none</compilerArgument>
-                            <source>1.6</source>
-                            <target>1.6</target>
+                            <source>${D}{jdk.version}</source>
+                            <target>${D}{jdk.version}</target>
                         </configuration>
                     </execution>
                 </executions>
@@ -112,10 +113,10 @@
                     <docletArtifact>
                         <groupId>org.mule.tools.devkit</groupId>
                         <artifactId>mule-devkit-doclet</artifactId>
-                        <version>3.1.1-SNAPSHOT</version>
+                        <version>${D}{mule.devkit.version}</version>
                     </docletArtifact>
                     <doclet>org.mule.devkit.doclet.Doclava</doclet>
-                    <bootclasspath>${sun.boot.class.path}</bootclasspath>
+                    <bootclasspath>${D}{sun.boot.class.path}</bootclasspath>
                     <additionalparam>
                         -quiet
                         -federate JDK http://download.oracle.com/javase/6/docs/api/index.html?
@@ -136,6 +137,29 @@
                     <additionalJOption>-J-Xmx1024m</additionalJOption>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.0-alpha-4</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven-version</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>[3.0.0,)</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>[1.6.0,)</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         <resources>
             <resource>
@@ -150,10 +174,10 @@
     </build>
 
     <dependencies>
-         <dependency>
+        <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -164,7 +188,7 @@
         <dependency>
             <groupId>org.mule.tools.devkit</groupId>
             <artifactId>mule-devkit-annotations</artifactId>
-            <version>${mule.devkit.version}</version>
+            <version>${D}{mule.devkit.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse</groupId>

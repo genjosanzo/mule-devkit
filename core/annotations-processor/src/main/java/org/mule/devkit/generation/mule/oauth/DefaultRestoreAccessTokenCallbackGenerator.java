@@ -28,6 +28,7 @@ import org.mule.api.oauth.RestoreAccessTokenCallback;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
@@ -126,13 +127,13 @@ public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageG
         ifNotStarted._then().assign(hasBeenStarted, ExpressionFactory.TRUE);
 
         TryStatement tryProcess = restoreAccessTokenMethod.body()._try();
-        tryProcess.body().add(
+        tryProcess.body().assign(event,
                 messageProcessor.invoke("process").arg(event)
         );
         tryProcess.body().assign(accessToken,
                 event.invoke("getMessage").invoke("getInvocationProperty").arg("OAuthAccessToken")
         );
-        tryProcess.body().assign(accessToken,
+        tryProcess.body().assign(accessTokenSecret,
                 event.invoke("getMessage").invoke("getInvocationProperty").arg("OAuthAccessTokenSecret")
         );
         CatchBlock catchProcess = tryProcess._catch(ref(Exception.class));
@@ -152,7 +153,7 @@ public class DefaultRestoreAccessTokenCallbackGenerator extends AbstractMessageG
     }
 
     private DefinedClass getDefaultRestoreAccessTokenCallbackClass(TypeElement type) {
-        String callbackClassName = context.getNameUtils().generateClassNameInPackage(type, ".config", "DefaultRestoreAccessTokenCallback");
+        String callbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.DEFAULT_RESTORE_ACCESS_TOKEN_CALLBACK_CLASS_NAME);
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(callbackClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(callbackClassName), new Class[]{
                 RestoreAccessTokenCallback.class});

@@ -16,9 +16,9 @@
  */
 package org.mule.devkit.dynamic.api.helper;
 
-import java.util.List;
-
 import org.mule.devkit.dynamic.api.model.Module.Parameter;
+
+import java.util.List;
 
 /**
  * Helper methods for {@link Parameter}.

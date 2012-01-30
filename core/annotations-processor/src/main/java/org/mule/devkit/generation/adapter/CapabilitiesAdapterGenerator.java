@@ -22,7 +22,9 @@ import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Module;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.DefinedClass;
+import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.TypeReference;
 
 import javax.lang.model.element.TypeElement;
@@ -46,10 +48,21 @@ public class CapabilitiesAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getCapabilitiesAdapterClass(TypeElement typeElement) {
-        String lifecycleAdapterName = context.getNameUtils().generateClassName(typeElement, ".config", "CapabilitiesAdapter");
+        String lifecycleAdapterName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.CAPABILITIES_ADAPTER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(lifecycleAdapterName));
 
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(lifecycleAdapterName), (TypeReference) ref(typeElement.asType()));
+        TypeReference previous = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
+
+        if( previous == null ) {
+            previous = (TypeReference) ref(typeElement.asType());
+        }
+        
+        int modifiers = Modifier.PUBLIC;
+        if( typeElement.getModifiers().contains(javax.lang.model.element.Modifier.ABSTRACT) ) {
+            modifiers |= Modifier.ABSTRACT;
+        }
+
+        DefinedClass clazz = pkg._class(modifiers, context.getNameUtils().getClassName(lifecycleAdapterName), previous);
         clazz._implements(Capabilities.class);
 
         context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);

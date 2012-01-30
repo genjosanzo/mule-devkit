@@ -30,4 +30,9 @@ public class InjectModuleTest extends AbstractModuleTest {
     public void testVerify() throws Exception {
         runFlow("verify");
     }
+
+    @Test
+    public void testVerifyCustomObjectStore() throws Exception {
+        runFlow("verifyCustomObjectStore");
+    }
 }

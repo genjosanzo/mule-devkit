@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="metadata" url="http://www.mulesoft.org/schema/mule/metadata">
+<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" prefix="metadata"
+           url="http://www.mulesoft.org/schema/mule/metadata">
   <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/metadata/abstractMetadataConnectorGeneric" image="icons/large/my-cloud-connector-48x32.png" localId="config" icon="icons/small/my-cloud-connector-24x16.png" description="Global Metadata configuration information." caption="Metadata">
     <attribute-category description="Metadata configuration properties." caption="General">
       <group caption="Generic" id="metadataGenericProperties">

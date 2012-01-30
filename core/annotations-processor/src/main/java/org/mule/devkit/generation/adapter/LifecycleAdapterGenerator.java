@@ -31,6 +31,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.config.MuleManifest;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
@@ -87,12 +88,17 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getLifecycleAdapterClass(TypeElement typeElement) {
-        String lifecycleAdapterName = context.getNameUtils().generateClassName(typeElement, ".config", "LifecycleAdapter");
+        String lifecycleAdapterName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.LIFECYCLE_ADAPTER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(lifecycleAdapterName));
 
         DefinedClass previous = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
 
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(lifecycleAdapterName), previous);
+        int modifiers = Modifier.PUBLIC;
+        if( typeElement.getModifiers().contains(javax.lang.model.element.Modifier.ABSTRACT) ) {
+            modifiers |= Modifier.ABSTRACT;
+        }
+
+        DefinedClass clazz = pkg._class(modifiers, context.getNameUtils().getClassName(lifecycleAdapterName), previous);
 
         context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
 

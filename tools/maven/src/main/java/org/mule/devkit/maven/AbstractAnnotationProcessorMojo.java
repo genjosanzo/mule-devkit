@@ -74,8 +74,6 @@ public abstract class AbstractAnnotationProcessorMojo extends AbstractMuleMojo {
 
     public abstract File getDefaultOutputDirectory();
 
-    protected abstract File getSourceDirectory();
-
     protected abstract File getOutputClassDirectory();
 
     protected abstract String[] getProcessors();
@@ -154,36 +152,29 @@ public abstract class AbstractAnnotationProcessorMojo extends AbstractMuleMojo {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
 
-        // new Debug(project).printDebugInfo();
-
         final String includesString = (includes == null || includes.length == 0) ? "**/*.java" : StringUtils.join(includes, ",");
         final String excludesString = (excludes == null || excludes.length == 0) ? null : StringUtils.join(excludes, ",");
 
-        List<File> files = FileUtils.getFiles(getSourceDirectory(), includesString, excludesString);
-
-        Iterable<? extends JavaFileObject> compilationUnits1 = null;
-
-        if (files != null && !files.isEmpty()) {
-            compilationUnits1 = fileManager.getJavaFileObjectsFromFiles(files);
-
-        } else {
-            getLog().warn("no source file(s) detected! processor task will be skipped!");
-            return;
+        List<File> filesToCompile = new ArrayList<File>(100);
+        for (Object sourceDirectory : project.getCompileSourceRoots()) {
+            File directory = new File((String) sourceDirectory);
+            if(!directory.equals(outputDirectory)) {
+                filesToCompile.addAll(FileUtils.getFiles(directory, includesString, excludesString));
+            }
         }
 
-
-        String compileClassPath = buildCompileClasspath();
-
-        String processor = buildProcessor();
+        if (filesToCompile.isEmpty()) {
+            getLog().warn("no source file(s) detected! processor compilationTask will be skipped!");
+            return;
+        }
 
         List<String> options = new ArrayList<String>(10);
 
         options.add("-cp");
-        options.add(compileClassPath);
+        options.add(buildCompileClasspath());
         options.add("-proc:only");
 
-        addCompilerArguments(options);
-
+        String processor = buildProcessor();
         if (processor != null) {
             options.add("-processor");
             options.add(processor);
@@ -196,34 +187,33 @@ public abstract class AbstractAnnotationProcessorMojo extends AbstractMuleMojo {
         options.add("-s");
         options.add(outputDirectory.getPath());
 
+        addCompilerArguments(options);
 
-        for (String option : options) {
-            getLog().debug("javac option: " + option);
+        setSystemProperties();
+
+        CompilationTask compilationTask = compiler.getTask(
+                new PrintWriter(System.out),
+                fileManager,
+                createDiagnosticListener(),
+                options,
+                null,
+                fileManager.getJavaFileObjectsFromFiles(filesToCompile));
+
+        // Perform the compilation compilationTask.
+        if (!compilationTask.call()) {
+            throw new Exception("An error ocurred while the DevKit was generating Java code. Check the logs for further details.");
         }
+    }
 
-        DiagnosticListener<JavaFileObject> dl = createDiagnosticListener();
-
+    private void setSystemProperties() {
         if (systemProperties != null) {
-            java.util.Set<Map.Entry<String, String>> pSet = systemProperties.entrySet();
+            Set<Map.Entry<String, String>> pSet = systemProperties.entrySet();
 
             for (Map.Entry<String, String> e : pSet) {
                 getLog().info(String.format("set system property : [%s] = [%s]", e.getKey(), e.getValue()));
                 System.setProperty(e.getKey(), e.getValue());
             }
 
-        }
-
-        CompilationTask task = compiler.getTask(
-                new PrintWriter(System.out),
-                fileManager,
-                dl,
-                options,
-                null,
-                compilationUnits1);
-
-        // Perform the compilation task.
-        if (!task.call()) {
-            throw new Exception("An error ocurred while the DevKit was generating Java code. Check the logs for further details.");
         }
     }
 

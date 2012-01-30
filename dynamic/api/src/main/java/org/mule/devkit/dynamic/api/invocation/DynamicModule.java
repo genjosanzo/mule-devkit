@@ -16,16 +16,6 @@
  */
 package org.mule.devkit.dynamic.api.invocation;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.mule.api.Capabilities;
 import org.mule.api.Capability;
 import org.mule.api.MuleContext;
@@ -44,6 +34,16 @@ import org.mule.devkit.dynamic.api.helper.Parameters;
 import org.mule.devkit.dynamic.api.helper.Reflections;
 import org.mule.devkit.dynamic.api.model.Module;
 import org.mule.transformer.types.DataTypeFactory;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DynamicModule implements Disposable {
 

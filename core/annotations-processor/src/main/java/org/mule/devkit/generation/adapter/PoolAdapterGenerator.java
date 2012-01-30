@@ -29,6 +29,7 @@ import org.mule.config.PoolingProfile;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -112,7 +113,7 @@ public class PoolAdapterGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getPoolAdapterClass(TypeElement typeElement) {
-        String poolAdapterName = context.getNameUtils().generateClassName(typeElement, ".config", "PoolAdapter");
+        String poolAdapterName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.POOL_ADAPTER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(poolAdapterName));
 
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(poolAdapterName));

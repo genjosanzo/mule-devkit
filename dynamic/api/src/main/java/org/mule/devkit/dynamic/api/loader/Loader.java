@@ -16,13 +16,6 @@
  */
 package org.mule.devkit.dynamic.api.loader;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.mule.api.Capabilities;
 import org.mule.api.ConnectionManager;
 import org.mule.api.annotations.Configurable;
@@ -38,6 +31,13 @@ import org.mule.devkit.dynamic.api.helper.Classes;
 import org.mule.devkit.dynamic.api.helper.Reflections;
 import org.mule.devkit.dynamic.api.model.Module;
 import org.mule.util.StringUtils;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Loader {
 

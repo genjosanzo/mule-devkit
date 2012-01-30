@@ -40,6 +40,10 @@
     </mule-ss:security-manager>
 
     <spring:beans>
+        <spring:bean id="customObjectStore" class="org.mule.devkit.it.CustomObjectStore"/>
+    </spring:beans>
+
+    <spring:beans>
         <ss:authentication-manager alias="authenticationManager">
             <ss:authentication-provider>
                 <ss:user-service id="userService">
@@ -50,10 +54,17 @@
         </ss:authentication-manager>
     </spring:beans>
 
-    <inject:config/>
+    <inject:config name="default"/>
+
+    <inject:config name="custom-object-store" objectStore-ref="customObjectStore"/>
 
     <flow name="verify">
-        <inject:verify/>
+        <inject:verify config-ref="default"/>
+        <inject:verify-object-store config-ref="default"/>
+    </flow>
+
+    <flow name="verifyCustomObjectStore">
+        <inject:verify-custom-object-store config-ref="custom-object-store"/>
     </flow>
 
 </mule>

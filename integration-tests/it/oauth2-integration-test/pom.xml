@@ -9,8 +9,8 @@
     <name>Mule DevKit OAuth Integration Tests</name>
 
     <properties>
-        <mule.version>@mule.version@</mule.version>
-        <devkit.version>@project.version@</devkit.version>
+        <mule.version>3.2.1</mule.version>
+        <devkit.version>3.3-SNAPSHOT</devkit.version>
         <dsl.version>0.7</dsl.version>
     </properties>
 

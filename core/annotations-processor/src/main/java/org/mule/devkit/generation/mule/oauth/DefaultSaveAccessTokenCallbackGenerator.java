@@ -28,6 +28,7 @@ import org.mule.api.oauth.SaveAccessTokenCallback;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
@@ -149,7 +150,7 @@ public class DefaultSaveAccessTokenCallbackGenerator extends AbstractMessageGene
     }
 
     private DefinedClass getDefaultSaveAccessTokenCallbackClass(TypeElement type) {
-        String callbackClassName = context.getNameUtils().generateClassNameInPackage(type, ".config", "DefaultSaveAccessTokenCallback");
+        String callbackClassName = context.getNameUtils().generateClassNameInPackage(type, NamingContants.CONFIG_NAMESPACE, NamingContants.DEFAULT_SAVE_ACCESS_TOKEN_CALLBACK_CLASS_NAME);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(callbackClassName));
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(callbackClassName), new Class[]{
                 SaveAccessTokenCallback.class});

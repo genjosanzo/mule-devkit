@@ -42,9 +42,6 @@ public class AnnotationProcessorMojo extends AbstractAnnotationProcessorMojo {
     @SuppressWarnings("unchecked")
     private List classpathElements;
 
-    @MojoParameter(expression = "${project.build.sourceDirectory}", required = true)
-    private File sourceDirectory;
-
     @MojoParameter(expression = "${project.build.directory}/generated-sources/mule", required = true)
     private File defaultOutputDirectory;
 
@@ -53,11 +50,6 @@ public class AnnotationProcessorMojo extends AbstractAnnotationProcessorMojo {
 
     @MojoParameter(required = false, expression = "${devkit.javadoc.check.skip}", description = "Skip JavaDoc validation", defaultValue = "false")
     private boolean skipJavaDocValidation;
-
-    @Override
-    public File getSourceDirectory() {
-        return sourceDirectory;
-    }
 
     @Override
     protected File getOutputClassDirectory() {

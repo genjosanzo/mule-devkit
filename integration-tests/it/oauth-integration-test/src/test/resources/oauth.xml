@@ -21,12 +21,10 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:oauth="http://www.mulesoft.org/schema/mule/oauth"
-      xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/current/mule-oauth.xsd
-        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
-        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd">
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd">
 
     <oauth:config name="default-oauth" consumerKey="consumerKey123" consumerSecret="consumerSecret123">
         <oauth:oauth-callback-config domain="localhost" localPort="${http.port}" remotePort="${http.port}"
@@ -39,6 +37,17 @@
         <oauth:oauth-save-access-token>
             <component class="org.mule.devkit.it.SaveAccessTokenComponent"  />
         </oauth:oauth-save-access-token>
+    </oauth:config>
+
+    <oauth:config name="oauth-with-restore" consumerKey="consumerKey123" consumerSecret="consumerSecret123">
+        <oauth:oauth-callback-config domain="localhost" localPort="${http.port}" remotePort="${http.port}"
+                                     async="false"/>
+        <oauth:oauth-restore-access-token>
+            <message-properties-transformer scope="invocation">
+                <add-message-property key="OAuthAccessToken" value="444"/>
+                <add-message-property key="OAuthAccessTokenSecret" value="555"/>
+            </message-properties-transformer>
+        </oauth:oauth-restore-access-token>
     </oauth:config>
 
     <flow name="authorize">
@@ -55,6 +64,10 @@
 
     <flow name="protectedResourceWithSave">
         <oauth:protected-resource config-ref="oauth-with-save"/>
+    </flow>
+
+    <flow name="protectedResourceWithRestore">
+        <oauth:protected-resource config-ref="oauth-with-restore"/>
     </flow>
 
     <flow name="nonProtectedResource">

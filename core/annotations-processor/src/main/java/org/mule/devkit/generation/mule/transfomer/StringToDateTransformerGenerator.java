@@ -23,6 +23,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -47,7 +48,6 @@ public class StringToDateTransformerGenerator extends AbstractMessageGenerator {
 
     private static final String PATTERN = "yyyy-MM-dd'T'hh:mm:ss";
     private static final String SIMPLE_DATE_FORMAT_FIELD_NAME = "SIMPLE_DATE_FORMAT";
-    private static final String TRANSFORMER_CLASS_NAME = "StringToDateTransformer";
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
@@ -127,8 +127,8 @@ public class StringToDateTransformerGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getTransformerClass(TypeElement typeElement) {
-        String transformerClassName = context.getNameUtils().generateClassNameInPackage(typeElement, TRANSFORMER_CLASS_NAME);
-        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(transformerClassName) + ".config");
+        String transformerClassName = context.getNameUtils().generateClassNameInPackage(typeElement, NamingContants.TRANSFORMER_CLASS_NAME);
+        Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(transformerClassName) + NamingContants.TRANSFORMERS_NAMESPACE);
         return pkg._class(context.getNameUtils().getClassName(transformerClassName), AbstractTransformer.class, new Class<?>[]{DiscoverableTransformer.class, MuleContextAware.class});
     }
 }

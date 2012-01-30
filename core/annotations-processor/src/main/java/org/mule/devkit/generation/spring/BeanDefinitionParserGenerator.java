@@ -64,6 +64,7 @@ import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
 
+import javax.inject.Inject;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
@@ -175,6 +176,19 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
                         ))));
                 ifNotNull._then().add(builder.invoke("addPropertyValue").arg(fieldName).arg(
                         ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(element.invoke("getAttribute").arg(fieldName + "-ref"))
+                ));
+            }
+        }
+
+        for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Inject.class)) {
+            if( variable.asType().toString().equals("org.mule.api.store.ObjectStore") ) {
+                Invocation getAttribute = element.invoke("getAttribute").arg("objectStore-ref");
+                Conditional ifNotNull = parse.body()._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
+                        Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(
+                                getAttribute
+                        ))));
+                ifNotNull._then().add(builder.invoke("addPropertyValue").arg(variable.getSimpleName().toString()).arg(
+                        ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(element.invoke("getAttribute").arg("objectStore-ref"))
                 ));
             }
         }

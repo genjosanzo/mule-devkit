@@ -24,6 +24,7 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.transport.Connector;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.Block;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
@@ -104,7 +105,7 @@ public class HttpCallbackAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getHttpCallbackAdapterClass(TypeElement typeElement) {
-        String httpCallbackAdapterClassName = context.getNameUtils().generateClassName(typeElement, ".config", "HttpCallbackAdapter");
+        String httpCallbackAdapterClassName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.HTTP_CALLBACK_ADAPTER_CLASS_NAME_SUFFIX);
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(httpCallbackAdapterClassName));
 
         DefinedClass classToExtend = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));

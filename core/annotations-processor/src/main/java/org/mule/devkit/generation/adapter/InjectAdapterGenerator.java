@@ -28,16 +28,20 @@ import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.registry.Registry;
+import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreManager;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.Cast;
+import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.Variable;
 import org.mule.util.queue.QueueManager;
 
@@ -47,6 +51,7 @@ import javax.lang.model.element.VariableElement;
 import javax.transaction.TransactionManager;
 
 public class InjectAdapterGenerator extends AbstractModuleGenerator {
+
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
         return typeElement.getFieldsAnnotatedWith(Inject.class).size() > 0;
@@ -72,6 +77,12 @@ public class InjectAdapterGenerator extends AbstractModuleGenerator {
             } else if (variable.asType().toString().startsWith(QueueManager.class.getName())) {
                 Invocation getQueueManager = context.invoke("getQueueManager");
                 setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getQueueManager));
+            } else if (variable.asType().toString().startsWith(ObjectStore.class.getName())) {
+                Conditional notNull = setMuleContext.body()._if(Op.eq(ExpressionFactory.invoke("get" + StringUtils.capitalize(variable.getSimpleName().toString())), ExpressionFactory._null()));
+                Invocation getObjectStore = context.invoke("getRegistry").invoke("lookupObject").arg(
+                        ref(MuleProperties.class).staticRef("OBJECT_STORE_DEFAULT_IN_MEMORY_NAME")
+                );
+                notNull._then().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(ExpressionFactory.cast(ref(ObjectStore.class),getObjectStore)));
             } else if (variable.asType().toString().startsWith(MuleConfiguration.class.getName())) {
                 Invocation getConfiguration = context.invoke("getConfiguration");
                 setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getConfiguration));
@@ -93,7 +104,7 @@ public class InjectAdapterGenerator extends AbstractModuleGenerator {
             } else if (variable.asType().toString().startsWith(SystemExceptionHandler.class.getName())) {
                 Invocation getExceptionListener = context.invoke("getExceptionListener");
                 setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getExceptionListener));
-            } else if (variable.asType().toString().startsWith(SecurityManager.class.getName())) {
+            } else if (variable.asType().toString().startsWith(org.mule.api.security.SecurityManager.class.getName())) {
                 Invocation getSecurityManager = context.invoke("getSecurityManager");
                 setMuleContext.body().add(ExpressionFactory._super().invoke("set" + StringUtils.capitalize(variable.getSimpleName().toString())).arg(getSecurityManager));
             } else if (variable.asType().toString().startsWith(WorkManager.class.getName())) {
@@ -107,12 +118,17 @@ public class InjectAdapterGenerator extends AbstractModuleGenerator {
     }
 
     private DefinedClass getMuleContextAwareAdapter(TypeElement typeElement) {
-        String muleContextAwareAdapter = context.getNameUtils().generateClassName(typeElement, ".config", "InjectAdapter");
+        String muleContextAwareAdapter = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.INJECTION_ADAPTER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(muleContextAwareAdapter));
 
         DefinedClass previous = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
 
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(muleContextAwareAdapter), previous);
+        int modifiers = Modifier.PUBLIC;
+        if( typeElement.getModifiers().contains(javax.lang.model.element.Modifier.ABSTRACT) ) {
+            modifiers |= Modifier.ABSTRACT;
+        }
+
+        DefinedClass clazz = pkg._class(modifiers, context.getNameUtils().getClassName(muleContextAwareAdapter), previous);
         clazz._implements(ref(MuleContextAware.class));
 
         context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);

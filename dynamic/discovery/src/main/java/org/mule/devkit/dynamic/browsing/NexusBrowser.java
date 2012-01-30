@@ -16,17 +16,17 @@
  */
 package org.mule.devkit.dynamic.browsing;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import org.mule.devkit.dynamic.api.helper.Reflections;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.client.NexusClientException;
 import org.sonatype.nexus.client.NexusConnectionException;
 import org.sonatype.nexus.client.rest.NexusRestClient;
 import org.sonatype.nexus.rest.model.NexusArtifact;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 public class NexusBrowser {
 

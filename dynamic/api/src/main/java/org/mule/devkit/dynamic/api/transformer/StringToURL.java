@@ -16,15 +16,15 @@
  */
 package org.mule.devkit.dynamic.api.transformer;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.SimpleDataType;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class StringToURL extends AbstractTransformer implements DiscoverableTransformer {
 

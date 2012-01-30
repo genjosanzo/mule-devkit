@@ -23,6 +23,7 @@ import org.mule.api.Capabilities;
 import org.mule.api.ConnectionManager;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.param.ConnectionKey;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
@@ -31,6 +32,7 @@ import org.mule.config.PoolingProfile;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.GenerationException;
+import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.Cast;
 import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.ClassAlreadyExistsException;
@@ -44,11 +46,13 @@ import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
+import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import java.util.Iterator;
 import java.util.Map;
 
 public class ConnectionManagerGenerator extends AbstractMessageGenerator {
@@ -352,7 +356,19 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         makeObject.body()._if(Op._instanceof(connector, ref(Initialisable.class)))._then().add(connector.invoke("initialise"));
         makeObject.body()._if(Op._instanceof(connector, ref(Startable.class)))._then().add(connector.invoke("start"));
 
+        setMuleContextToConnectorIfNecessary(connectionManagerInFactory, connectorClass, makeObject, connector);
+
         makeObject.body()._return(connector);
+    }
+
+    private void setMuleContextToConnectorIfNecessary(FieldVariable connectionManagerInFactory, DefinedClass connectorClass, Method makeObject, Variable connector) {
+        Iterator<TypeReference> implementsIterator = connectorClass._implements();
+        while (implementsIterator.hasNext()) {
+            TypeReference implementedInterface = implementsIterator.next();
+            if(implementedInterface.equals(ref(MuleContextAware.class))) {
+                makeObject.body()._if(Op._instanceof(connector, ref(MuleContextAware.class)))._then().add(connector.invoke("setMuleContext").arg(ExpressionFactory.direct(connectionManagerInFactory.name() + "." + MULE_CONTEXT_FIELD_NAME)));
+            }
+        }
     }
 
     private void generateKeyConstructor(ExecutableElement connect, DefinedClass connectionKeyClass, Map<String, FieldVariableElement> keyFields) {
@@ -372,7 +388,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
     }
 
     private DefinedClass getConnectionManagerAdapterClass(TypeElement typeElement) {
-        String connectionManagerName = context.getNameUtils().generateClassName(typeElement, ".config", "ConnectionManager");
+        String connectionManagerName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.CONNECTION_MANAGER_ADAPTER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(connectionManagerName));
 
         DefinedClass classToExtend = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
@@ -381,6 +397,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
         DefinedClass connectionManagerClass = pkg._class(context.getNameUtils().getClassName(connectionManagerName));
         connectionManagerClass._implements(ref(Initialisable.class));
         connectionManagerClass._implements(ref(Capabilities.class));
+        connectionManagerClass._implements(ref(MuleContextAware.class));
         connectionManagerClass._implements(ref(ConnectionManager.class).narrow(getConnectionParametersClass(typeElement, connectionManagerClass)).narrow(classToExtend));
 
         context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), connectionManagerClass);

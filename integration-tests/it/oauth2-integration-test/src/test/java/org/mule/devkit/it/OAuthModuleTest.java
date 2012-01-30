@@ -24,7 +24,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.construct.Flow;
-import org.mule.devkit.it.config.OAuthModuleOAuth2Adapter;
+import org.mule.devkit.it.adapters.OAuthModuleOAuth2Adapter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.FunctionalTestCase;
 
@@ -74,9 +74,15 @@ public class OAuthModuleTest extends FunctionalTestCase {
         responseEvent = runFlow("protectedResourceWithSave");
         verifiyProtectedResourceWasAccessed(responseEvent);
 
-        assertEquals(SaveAccessTokenComponent.getAccessToken(), Constants.ACCESS_TOKEN);
+        assertEquals(Constants.ACCESS_TOKEN, SaveAccessTokenComponent.getAccessToken());
     }
 
+    @Test
+    public void testProtectedResourceWithRestore() throws Exception {
+        MuleEvent responseEvent = runFlow("protectedResourceWithRestore");
+        verifiyProtectedResourceWasAccessed(responseEvent);
+    }
+    
     @Test
     public void testProtectedResourceAccessTokenExpired() throws Exception {
         MuleEvent responseEvent = runFlow("authorize");
