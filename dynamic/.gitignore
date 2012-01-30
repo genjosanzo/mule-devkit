@@ -2,7 +2,8 @@
 /.settings
 /.project
 /.jruby
-/*.iml
-/*.ipr
-/*.iws
+*.iml
+*.ipr
+*.iws
 /target
+.DS_Store*
