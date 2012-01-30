@@ -17,8 +17,10 @@
 
 package org.mule.devkit.validation;
 
+import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.annotations.rest.RestCall;
+import org.mule.api.annotations.rest.RestHttpClient;
 import org.mule.api.annotations.rest.RestUriParam;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
@@ -60,5 +62,28 @@ public class RestValidator implements Validator {
                 throw new ValidationException(field, "Cannot find a getter method for " + field.getSimpleName().toString() + " but its being marked as URI parameter of a REST call.");
             }
         }
+        
+        if( typeElement.getFieldsAnnotatedWith(RestHttpClient.class).size() > 1 ) {
+            throw new ValidationException(typeElement, "There can only be one field annotated with @RestHttpClient.");
+        }
+        
+        if( !typeElement.getFieldsAnnotatedWith(RestHttpClient.class).get(0).asType().toString().equals(HttpClient.class.getName())) {
+            throw new ValidationException(typeElement.getFieldsAnnotatedWith(RestHttpClient.class).get(0), "A field annotated with @RestHttpClient must be of type " + HttpClient.class.getName());
+        }
+
+        for (VariableElement field : typeElement.getFieldsAnnotatedWith(RestHttpClient.class)) {
+            boolean getterFound = false;
+            for (ExecutableElement method : typeElement.getMethods()) {
+                if (method.getSimpleName().toString().equals("get" + StringUtils.capitalize(field.getSimpleName().toString()))) {
+                    getterFound = true;
+                    break;
+                }
+            }
+            if (!getterFound) {
+                throw new ValidationException(field, "Cannot find a getter method for " + field.getSimpleName().toString() + " but its being marked with @RestHttpClient.");
+            }
+        }
+
+
     }
 }

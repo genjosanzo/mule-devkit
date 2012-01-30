@@ -20,6 +20,7 @@ package org.mule.devkit.generation.adapter;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -31,6 +32,7 @@ import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.rest.HttpMethod;
 import org.mule.api.annotations.rest.RestCall;
+import org.mule.api.annotations.rest.RestHttpClient;
 import org.mule.api.annotations.rest.RestUriParam;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -79,22 +81,33 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         //FieldVariable logger = generateLoggerField(restClientAdapterClass);
 
         FieldVariable responseTimeout = restClientAdapterClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "responseTimeout");
-        FieldVariable httpClient = restClientAdapterClass.field(Modifier.PRIVATE | Modifier.VOLATILE, ref(HttpClient.class), "httpClient");
+
+        Expression httpClient = null;
+        if (!typeElement.hasFieldAnnotatedWith(RestHttpClient.class)) {
+            httpClient = restClientAdapterClass.field(Modifier.PRIVATE | Modifier.VOLATILE, ref(HttpClient.class), "httpClient");
+        } else {
+            httpClient = ExpressionFactory.invoke("get" + StringUtils.capitalize(typeElement.getFieldsAnnotatedWith(RestHttpClient.class).get(0).getSimpleName().toString()));
+        }
 
         Method initialise = restClientAdapterClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "initialise");
         initialise.annotate(ref(Override.class));
         initialise.body().add(ExpressionFactory._super().invoke("initialise"));
-        initialise.body().assign(httpClient, ExpressionFactory._new(ref(HttpClient.class)));
+        if (!typeElement.hasFieldAnnotatedWith(RestHttpClient.class)) {
+            initialise.body().assign((FieldVariable) httpClient, ExpressionFactory._new(ref(HttpClient.class)));
+        } else {
+            initialise.body().invoke("set" + StringUtils.capitalize(typeElement.getFieldsAnnotatedWith(RestHttpClient.class).get(0).getSimpleName().toString())).arg(ExpressionFactory._new(ref(HttpClient.class)));
+        }
         initialise.body().add(httpClient.invoke("getParams").invoke("setParameter").arg("http.protocol.version").arg(ref(HttpVersion.class).staticRef("HTTP_1_1")));
         initialise.body().add(httpClient.invoke("getParams").invoke("setParameter").arg("http.socket.timeout").arg(responseTimeout));
         initialise.body().add(httpClient.invoke("getParams").invoke("setParameter").arg("http.protocol.content-charset").arg("UTF-8"));
+        initialise.body().add(httpClient.invoke("getParams").invoke("setCookiePolicy").arg(ref(CookiePolicy.class).staticRef("BROWSER_COMPATIBILITY")));
 
         generateSetter(restClientAdapterClass, responseTimeout);
 
         generateRestCallImplementations(typeElement, httpClient, restClientAdapterClass);
     }
 
-    private void generateRestCallImplementations(DevKitTypeElement typeElement, FieldVariable httpClient, DefinedClass capabilitiesAdapter) {
+    private void generateRestCallImplementations(DevKitTypeElement typeElement, Expression httpClient, DefinedClass capabilitiesAdapter) {
         Map<String, Variable> variables = new HashMap<String, Variable>();
         for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(RestCall.class)) {
             Method override = capabilitiesAdapter.method(Modifier.PUBLIC, ref(executableElement.getReturnType()), executableElement.getSimpleName().toString());
@@ -128,13 +141,43 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
                 override.body().assign(method, ExpressionFactory._new(ref(TraceMethod.class)));
             }
 
-            override.body().add(method.invoke("setPath").arg(restCall.uri()));
+            Variable uri = override.body().decl(ref(String.class), "uri", ExpressionFactory.lit(restCall.uri()));
             for (VariableElement parameter : executableElement.getParameters()) {
-                addQueryParameter(override.body(), queryString, variables.get(parameter.getSimpleName().toString()), parameter);
+                RestUriParam restUriParam = parameter.getAnnotation(RestUriParam.class);
+                if (restUriParam != null) {
+                    if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
+                        override.body().assign(uri, uri.invoke("replace").arg("{" + restUriParam.value() + "}").arg(variables.get(parameter.getSimpleName().toString())));
+                    }
+                }
+            }
+            for (VariableElement field : typeElement.getFieldsAnnotatedWith(RestUriParam.class)) {
+                RestUriParam restUriParam = field.getAnnotation(RestUriParam.class);
+                if (restUriParam != null) {
+                    if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
+                        override.body().assign(uri, uri.invoke("replace").arg("{" + restUriParam.value() + "}").arg(ExpressionFactory.invoke("get" + StringUtils.capitalize(field.getSimpleName().toString()))));
+                    }
+                }
+            }
+
+            override.body().add(method.invoke("setPath").arg(uri));
+            for (VariableElement parameter : executableElement.getParameters()) {
+                RestUriParam restUriParam = parameter.getAnnotation(RestUriParam.class);
+                if (restUriParam != null) {
+                    if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
+                        continue;
+                    }
+                    addQueryParameter(override.body(), queryString, variables.get(parameter.getSimpleName().toString()), parameter);
+                }
             }
 
             for (VariableElement field : typeElement.getFieldsAnnotatedWith(RestUriParam.class)) {
-                addQueryParameter(override.body(), queryString, ExpressionFactory.invoke("get" + StringUtils.capitalize(field.getSimpleName().toString())), field);
+                RestUriParam restUriParam = field.getAnnotation(RestUriParam.class);
+                if (restUriParam != null) {
+                    if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
+                        continue;
+                    }
+                    addQueryParameter(override.body(), queryString, ExpressionFactory.invoke("get" + StringUtils.capitalize(field.getSimpleName().toString())), field);
+                }
             }
 
             override.body().add(method.invoke("setQueryString").arg(queryString.invoke("toArray").arg(ExpressionFactory._new(ref(NameValuePair.class).array()))));
