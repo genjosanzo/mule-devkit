@@ -60,7 +60,7 @@ Creating a mule application using the mule archetype project is extremely easy. 
 
 mvn archetype:generate -DarchetypeGroupId=org.mule.tools.devkit -DarchetypeArtifactId=mule-devkit-archetype-mule-app \
 	-DarchetypeVersion=3.3-SNAPSHOT -DgroupId=org.mule -DartifactId=mule-test-archetype -Dversion=1.0-SNAPSHOT \
-	-DmuleVersion=3.2.1 -Dpackage=org.mule -Dtransports=file,http,jdbc,jms,vm -Dmodules=client,cxf,management,scripting,sxc,xml
+	-DmuleVersion=3.2.1 -Dpackage=org.mule -Dtransports=file,http,jdbc,jms,vm -Dmodules=client,cxf,management,scripting,sxc,xml -DstudioNature=true
 						
 Archetype Parameters:
 
