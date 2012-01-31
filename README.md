@@ -58,10 +58,9 @@ Creating a Mule Application
 
 Creating a mule application using the mule archetype project is extremely easy. Just invoke it as follows:
 
-	mvn archetype:generate -DarchetypeGroupId=org.mule.tools.archetypes -DarchetypeArtifactId=mule-archetype-project -DarchetypeVersion=3.3 \
-						   -DgroupId=org.mule -DartifactId=mule-test-archetype -Dversion=1.0-SNAPSHOT \
-						   -DmuleVersion=3.2.1 -DaddAppToClasspath=false \
-						   -Dtransports=file,http,jdbc,jms,vm -Dmodules=client,cxf,management,scripting,sxc,xml
+mvn archetype:generate -DarchetypeGroupId=org.mule.tools.devkit -DarchetypeArtifactId=mule-devkit-archetype-mule-app \
+	-DarchetypeVersion=3.3-SNAPSHOT -DgroupId=org.mule -DartifactId=mule-test-archetype -Dversion=1.0-SNAPSHOT \
+	-DmuleVersion=3.2.1 -Dpackage=org.mule -Dtransports=file,http,jdbc,jms,vm -Dmodules=client,cxf,management,scripting,sxc,xml
 						
 Archetype Parameters:
 
