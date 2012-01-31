@@ -15,7 +15,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
 		<mule.version>${muleVersion}</mule.version>
-		<eclipsePluginVersion>2.5</eclipsePluginVersion>
+		<eclipsePluginVersion>2.8</eclipsePluginVersion>
 		<vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
 		<jdkName>JavaSE-1.6</jdkName>
 		<jdk.version>1.6</jdk.version>
@@ -114,8 +114,16 @@
 					<!-- by default download all sources when generating project files -->
 					<downloadSources>true</downloadSources>
 					<classpathContainers>
-						<classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${symbol_dollar}{vmtype}/${symbol_dollar}{jdkName}</classpathContainer>
+                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${symbol_dollar}{vmtype}/${symbol_dollar}{jdkName}</classpathContainer>
+                        <!-- MuleStudio nature parameters -->
+                        <classpathContainer>MULE_RUNTIME</classpathContainer>
 					</classpathContainers>
+                    <additionalProjectnatures>
+                        <projectnature>org.mule.tooling.core.muleNature</projectnature>
+                    </additionalProjectnatures>
+                    <additionalBuildcommands>
+                        <buildcommand>org.mule.tooling.core.muleBuilder</buildcommand>
+                    </additionalBuildcommands>
 				</configuration>
 			</plugin>
 			<plugin>
