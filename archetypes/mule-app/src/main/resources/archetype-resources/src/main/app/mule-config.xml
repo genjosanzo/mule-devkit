@@ -15,9 +15,9 @@
 #foreach($module in $modules.split(','))
 #if ($module == "xml")
 	  xmlns:mule-xml="http://www.mulesoft.org/schema/mule/${module}"
-#elseif($item == "doc")
+#elseif($module == "doc")
       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-#elseif($item == "context")
+#elseif($module == "context")
       xmlns:context="http://www.springframework.org/schema/context"
 #else
       xmlns:${module}="http://www.mulesoft.org/schema/mule/${module}"
