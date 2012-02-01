@@ -20,6 +20,7 @@ package org.mule.devkit.validation;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.annotations.rest.RestCall;
+import org.mule.api.annotations.rest.RestExceptionOn;
 import org.mule.api.annotations.rest.RestHttpClient;
 import org.mule.api.annotations.rest.RestUriParam;
 import org.mule.devkit.GeneratorContext;
@@ -48,6 +49,18 @@ public class RestValidator implements Validator {
             if (method.getThrownTypes().size() != 1) {
                 throw new ValidationException(method, "@RestCall abstract method must throw IOException");
             }
+
+            RestExceptionOn restExceptionOn = method.getAnnotation(RestExceptionOn.class);
+            if (restExceptionOn != null) {
+                if (restExceptionOn.statusCodeIs().length != 0 &&
+                        restExceptionOn.statusCodeIsNot().length != 0) {
+                    throw new ValidationException(method, "@RestExceptionOn can only be used with statusCodeIs or statusCodeIsNot. Not both.");
+                }
+                if (restExceptionOn.statusCodeIs().length == 0 &&
+                        restExceptionOn.statusCodeIsNot().length == 0) {
+                    throw new ValidationException(method, "@RestExceptionOn must have either statusCodeIs or statusCodeIsNot.");
+                }
+            }
         }
 
         for (VariableElement field : typeElement.getFieldsAnnotatedWith(RestUriParam.class)) {
@@ -62,12 +75,12 @@ public class RestValidator implements Validator {
                 throw new ValidationException(field, "Cannot find a getter method for " + field.getSimpleName().toString() + " but its being marked as URI parameter of a REST call.");
             }
         }
-        
-        if( typeElement.getFieldsAnnotatedWith(RestHttpClient.class).size() > 1 ) {
+
+        if (typeElement.getFieldsAnnotatedWith(RestHttpClient.class).size() > 1) {
             throw new ValidationException(typeElement, "There can only be one field annotated with @RestHttpClient.");
         }
-        
-        if( !typeElement.getFieldsAnnotatedWith(RestHttpClient.class).get(0).asType().toString().equals(HttpClient.class.getName())) {
+
+        if (!typeElement.getFieldsAnnotatedWith(RestHttpClient.class).get(0).asType().toString().equals(HttpClient.class.getName())) {
             throw new ValidationException(typeElement.getFieldsAnnotatedWith(RestHttpClient.class).get(0), "A field annotated with @RestHttpClient must be of type " + HttpClient.class.getName());
         }
 

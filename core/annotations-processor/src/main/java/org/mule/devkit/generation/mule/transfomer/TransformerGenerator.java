@@ -20,6 +20,7 @@ package org.mule.devkit.generation.mule.transfomer;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Transformer;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
@@ -45,6 +46,8 @@ import org.mule.transformer.types.DataTypeFactory;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +71,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
             FieldVariable weighting = transformerClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "weighting", Op.plus(ref(DiscoverableTransformer.class).staticRef("DEFAULT_PRIORITY_WEIGHTING"), ExpressionFactory.lit(transformer.priorityWeighting())));
 
             //generate constructor
-            generateConstructor(transformerClass, executableElement);
+            generateConstructor(transformerClass, typeElement, executableElement);
 
             // doTransform
             generateDoTransform(transformerClass, executableElement);
@@ -131,7 +134,7 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         catchBlock.body()._throw(transformerException);
     }
 
-    private void generateConstructor(DefinedClass transformerClass, ExecutableElement executableElement) {
+    private void generateConstructor(DefinedClass transformerClass, TypeElement moduleClass, ExecutableElement executableElement) {
         // generate constructor
         Method constructor = transformerClass.constructor(Modifier.PUBLIC);
 
@@ -139,14 +142,22 @@ public class TransformerGenerator extends AbstractMessageGenerator {
         registerSourceTypes(constructor, executableElement);
 
         // register destination data type
-        registerDestinationType(constructor, ref(executableElement.getReturnType()).boxify());
+        registerDestinationType(constructor, moduleClass, executableElement);
 
         constructor.body().invoke("setName").arg(context.getNameUtils().generateClassName(executableElement, "Transformer"));
     }
 
-    private void registerDestinationType(Method constructor, TypeReference clazz) {
-        Invocation setReturnClass = constructor.body().invoke("setReturnClass");
-        setReturnClass.arg(ExpressionFactory.dotclass(clazz));
+    private void registerDestinationType(Method constructor, TypeElement moduleClass, ExecutableElement executableElement) {
+        TryStatement tryToFindMethod = constructor.body()._try();
+        Invocation getMethod = ref(moduleClass.asType()).boxify().dotclass().invoke("getMethod").arg(executableElement.getSimpleName().toString());
+        for(VariableElement parameter : executableElement.getParameters() ) {
+            getMethod.arg(ref(parameter.asType()).boxify().dotclass());
+        }
+        Variable method = tryToFindMethod.body().decl(ref(java.lang.reflect.Method.class), "method", getMethod);
+        Variable dataType = tryToFindMethod.body().decl(ref(DataType.class), "dataType", ref(DataTypeFactory.class).staticInvoke("createFromReturnType").arg(method));
+        tryToFindMethod.body().invoke("setReturnDataType").arg(dataType);
+        CatchBlock catchNoSuchMethodException = tryToFindMethod._catch(ref(NoSuchMethodException.class));
+        catchNoSuchMethodException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg("Unable to find method " + executableElement.getSimpleName().toString()));
     }
 
     private void registerSourceTypes(Method constructor, ExecutableElement executableElement) {

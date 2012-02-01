@@ -28,23 +28,31 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.TraceMethod;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.mule.api.MuleContext;
 import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.rest.HttpMethod;
 import org.mule.api.annotations.rest.RestCall;
+import org.mule.api.annotations.rest.RestExceptionOn;
 import org.mule.api.annotations.rest.RestHttpClient;
 import org.mule.api.annotations.rest.RestUriParam;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.transformer.DataType;
+import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.devkit.generation.AbstractModuleGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.Block;
+import org.mule.devkit.model.code.CatchBlock;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.Expression;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
+import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
@@ -52,10 +60,14 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.WhileLoop;
+import org.mule.transformer.types.DataTypeFactory;
 
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -81,6 +93,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         //FieldVariable logger = generateLoggerField(restClientAdapterClass);
 
         FieldVariable responseTimeout = restClientAdapterClass.field(Modifier.PRIVATE, context.getCodeModel().INT, "responseTimeout");
+        FieldVariable muleContext = restClientAdapterClass.field(Modifier.PRIVATE, ref(MuleContext.class), "muleContext");
 
         Expression httpClient = null;
         if (!typeElement.hasFieldAnnotatedWith(RestHttpClient.class)) {
@@ -88,6 +101,8 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         } else {
             httpClient = ExpressionFactory.invoke("get" + StringUtils.capitalize(typeElement.getFieldsAnnotatedWith(RestHttpClient.class).get(0).getSimpleName().toString()));
         }
+
+        generateSetMuleContext(restClientAdapterClass, muleContext);
 
         Method initialise = restClientAdapterClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "initialise");
         initialise.annotate(ref(Override.class));
@@ -104,10 +119,17 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
 
         generateSetter(restClientAdapterClass, responseTimeout);
 
-        generateRestCallImplementations(typeElement, httpClient, restClientAdapterClass);
+        generateRestCallImplementations(typeElement, httpClient, muleContext, restClientAdapterClass);
     }
 
-    private void generateRestCallImplementations(DevKitTypeElement typeElement, Expression httpClient, DefinedClass capabilitiesAdapter) {
+    private void generateSetMuleContext(DefinedClass restClientAdapterClass, FieldVariable muleContext) {
+        Method setMuleContext = restClientAdapterClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setMuleContext");
+        setMuleContext.annotate(Override.class);
+        Variable context = setMuleContext.param(ref(MuleContext.class), "context");
+        setMuleContext.body().assign(muleContext, context);
+    }
+
+    private void generateRestCallImplementations(DevKitTypeElement typeElement, Expression httpClient, Variable muleContext, DefinedClass capabilitiesAdapter) {
         Map<String, Variable> variables = new HashMap<String, Variable>();
         for (ExecutableElement executableElement : typeElement.getMethodsAnnotatedWith(RestCall.class)) {
             Method override = capabilitiesAdapter.method(Modifier.PUBLIC, ref(executableElement.getReturnType()), executableElement.getSimpleName().toString());
@@ -129,83 +151,193 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
             Variable method = override.body().decl(ref(org.apache.commons.httpclient.HttpMethod.class), "method", ExpressionFactory._null());
             Variable queryString = override.body().decl(ref(List.class).narrow(ref(NameValuePair.class)), "queryString", ExpressionFactory._new(ref(ArrayList.class).narrow(ref(NameValuePair.class))));
 
-            if (restCall.method() == HttpMethod.GET) {
-                override.body().assign(method, ExpressionFactory._new(ref(GetMethod.class)));
-            } else if (restCall.method() == HttpMethod.PUT) {
-                override.body().assign(method, ExpressionFactory._new(ref(PutMethod.class)));
-            } else if (restCall.method() == HttpMethod.DELETE) {
-                override.body().assign(method, ExpressionFactory._new(ref(DeleteMethod.class)));
-            } else if (restCall.method() == HttpMethod.POST) {
-                override.body().assign(method, ExpressionFactory._new(ref(PostMethod.class)));
-            } else if (restCall.method() == HttpMethod.TRACE) {
-                override.body().assign(method, ExpressionFactory._new(ref(TraceMethod.class)));
-            }
+            generateMethodAssignment(override, restCall, method);
 
-            Variable uri = override.body().decl(ref(String.class), "uri", ExpressionFactory.lit(restCall.uri()));
-            for (VariableElement parameter : executableElement.getParameters()) {
-                RestUriParam restUriParam = parameter.getAnnotation(RestUriParam.class);
-                if (restUriParam != null) {
-                    if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
-                        override.body().assign(uri, uri.invoke("replace").arg("{" + restUriParam.value() + "}").arg(variables.get(parameter.getSimpleName().toString())));
-                    }
-                }
-            }
-            for (VariableElement field : typeElement.getFieldsAnnotatedWith(RestUriParam.class)) {
-                RestUriParam restUriParam = field.getAnnotation(RestUriParam.class);
-                if (restUriParam != null) {
-                    if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
-                        override.body().assign(uri, uri.invoke("replace").arg("{" + restUriParam.value() + "}").arg(ExpressionFactory.invoke("get" + StringUtils.capitalize(field.getSimpleName().toString()))));
-                    }
-                }
-            }
+            generateParametersCode(typeElement, variables, executableElement, override, restCall, method, queryString);
 
-            override.body().add(method.invoke("setPath").arg(uri));
-            for (VariableElement parameter : executableElement.getParameters()) {
-                RestUriParam restUriParam = parameter.getAnnotation(RestUriParam.class);
-                if (restUriParam != null) {
-                    if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
-                        continue;
-                    }
-                    addQueryParameter(override.body(), queryString, variables.get(parameter.getSimpleName().toString()), parameter);
-                }
-            }
+            Variable statusCode = override.body().decl(context.getCodeModel().INT, "statusCode", httpClient.invoke("executeMethod").arg(method));
 
-            for (VariableElement field : typeElement.getFieldsAnnotatedWith(RestUriParam.class)) {
-                RestUriParam restUriParam = field.getAnnotation(RestUriParam.class);
-                if (restUriParam != null) {
-                    if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
-                        continue;
-                    }
-                    addQueryParameter(override.body(), queryString, ExpressionFactory.invoke("get" + StringUtils.capitalize(field.getSimpleName().toString())), field);
-                }
-            }
-
-            override.body().add(method.invoke("setQueryString").arg(queryString.invoke("toArray").arg(ExpressionFactory._new(ref(NameValuePair.class).array()))));
-
-            override.body().add(httpClient.invoke("executeMethod").arg(method));
-
-            Conditional ifMethodExecuted = override.body()._if(Op.cand(Op.ne(method, ExpressionFactory._null()), method.invoke("hasBeenUsed")));
-            Variable bufferedReader = ifMethodExecuted._then().decl(ref(BufferedReader.class), "bufferedReader", ExpressionFactory._null());
-            Variable stringWriter = ifMethodExecuted._then().decl(ref(StringWriter.class), "stringWriter", ExpressionFactory._new(ref(StringWriter.class)));
-            Variable bufferedWriter = ifMethodExecuted._then().decl(ref(BufferedWriter.class), "bufferedWriter", ExpressionFactory._new(ref(BufferedWriter.class)).arg(stringWriter).arg(ExpressionFactory.lit(8192)));
-
-            TryStatement readStream = ifMethodExecuted._then()._try();
-            Variable line = readStream.body().decl(ref(String.class), "line", ExpressionFactory.lit(""));
-            readStream.body().assign(bufferedReader, ExpressionFactory._new(ref(BufferedReader.class)).arg(ExpressionFactory._new(ref(InputStreamReader.class)).arg(method.invoke("getResponseBodyAsStream"))));
-            WhileLoop whileLoop = readStream.body()._while(Op.ne(ExpressionFactory.assign(line, bufferedReader.invoke("readLine")), ExpressionFactory._null()));
-            whileLoop.body().add(bufferedWriter.invoke("write").arg(line));
-            whileLoop.body().add(bufferedWriter.invoke("newLine"));
-
-            readStream._finally().add(bufferedWriter.invoke("flush"));
-            readStream._finally().add(bufferedWriter.invoke("close"));
-            readStream._finally()._if(Op.ne(bufferedReader, ExpressionFactory._null()))._then().add(bufferedReader.invoke("close"));
-
-            ifMethodExecuted._then()._return(ref(StringEscapeUtils.class).staticInvoke("unescapeHtml").arg(stringWriter.invoke("toString")));
+            generateParseResponseCode(typeElement, executableElement, override, method, statusCode, muleContext);
 
             override.body()._return(ExpressionFactory._null());
         }
 
 
+    }
+
+    private void generateParametersCode(DevKitTypeElement typeElement, Map<String, Variable> variables, ExecutableElement executableElement, Method override, RestCall restCall, Variable method, Variable queryString) {
+        Variable uri = override.body().decl(ref(String.class), "uri", ExpressionFactory.lit(restCall.uri()));
+        for (VariableElement parameter : executableElement.getParameters()) {
+            RestUriParam restUriParam = parameter.getAnnotation(RestUriParam.class);
+            if (restUriParam != null) {
+                if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
+                    override.body().assign(uri, uri.invoke("replace").arg("{" + restUriParam.value() + "}").arg(variables.get(parameter.getSimpleName().toString())));
+                }
+            }
+        }
+        for (VariableElement field : typeElement.getFieldsAnnotatedWith(RestUriParam.class)) {
+            RestUriParam restUriParam = field.getAnnotation(RestUriParam.class);
+            if (restUriParam != null) {
+                if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
+                    override.body().assign(uri, uri.invoke("replace").arg("{" + restUriParam.value() + "}").arg(ExpressionFactory.invoke("get" + StringUtils.capitalize(field.getSimpleName().toString()))));
+                }
+            }
+        }
+
+        override.body().add(method.invoke("setPath").arg(uri));
+        for (VariableElement parameter : executableElement.getParameters()) {
+            RestUriParam restUriParam = parameter.getAnnotation(RestUriParam.class);
+            if (restUriParam != null) {
+                if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
+                    continue;
+                }
+                addQueryParameter(override.body(), queryString, variables.get(parameter.getSimpleName().toString()), parameter);
+            }
+        }
+
+        for (VariableElement field : typeElement.getFieldsAnnotatedWith(RestUriParam.class)) {
+            RestUriParam restUriParam = field.getAnnotation(RestUriParam.class);
+            if (restUriParam != null) {
+                if (restCall.uri().contains("{" + restUriParam.value() + "}")) {
+                    continue;
+                }
+                addQueryParameter(override.body(), queryString, ExpressionFactory.invoke("get" + StringUtils.capitalize(field.getSimpleName().toString())), field);
+            }
+        }
+
+        if (restCall.method() == HttpMethod.GET) {
+            override.body().add(method.invoke("setQueryString").arg(queryString.invoke("toArray").arg(ExpressionFactory._new(ref(NameValuePair.class).array()))));
+        } else if (restCall.method() == HttpMethod.PUT) {
+            override.body().add(ExpressionFactory.cast(ref(PutMethod.class), method).invoke("addParameters").arg(queryString.invoke("toArray").arg(ExpressionFactory._new(ref(NameValuePair.class).array()))));
+        } else if (restCall.method() == HttpMethod.DELETE) {
+            override.body().add(method.invoke("setQueryString").arg(queryString.invoke("toArray").arg(ExpressionFactory._new(ref(NameValuePair.class).array()))));
+        } else if (restCall.method() == HttpMethod.POST) {
+            override.body().add(ExpressionFactory.cast(ref(PostMethod.class), method).invoke("addParameters").arg(queryString.invoke("toArray").arg(ExpressionFactory._new(ref(NameValuePair.class).array()))));
+        } else if (restCall.method() == HttpMethod.TRACE) {
+            override.body().add(method.invoke("setQueryString").arg(queryString.invoke("toArray").arg(ExpressionFactory._new(ref(NameValuePair.class).array()))));
+        }
+    }
+
+    private void generateMethodAssignment(Method override, RestCall restCall, Variable method) {
+        if (restCall.method() == HttpMethod.GET) {
+            override.body().assign(method, ExpressionFactory._new(ref(GetMethod.class)));
+        } else if (restCall.method() == HttpMethod.PUT) {
+            override.body().assign(method, ExpressionFactory._new(ref(PutMethod.class)));
+        } else if (restCall.method() == HttpMethod.DELETE) {
+            override.body().assign(method, ExpressionFactory._new(ref(DeleteMethod.class)));
+        } else if (restCall.method() == HttpMethod.POST) {
+            override.body().assign(method, ExpressionFactory._new(ref(PostMethod.class)));
+        } else if (restCall.method() == HttpMethod.TRACE) {
+            override.body().assign(method, ExpressionFactory._new(ref(TraceMethod.class)));
+        }
+    }
+
+    private void generateParseResponseCode(TypeElement typeElement, ExecutableElement executableElement, Method override, Variable method, Variable statusCode, Variable muleContext) {
+        Conditional ifMethodExecuted = override.body()._if(Op.cand(Op.ne(method, ExpressionFactory._null()), method.invoke("hasBeenUsed")));
+        Variable bufferedReader = ifMethodExecuted._then().decl(ref(BufferedReader.class), "bufferedReader", ExpressionFactory._null());
+        Variable stringWriter = ifMethodExecuted._then().decl(ref(StringWriter.class), "stringWriter", ExpressionFactory._new(ref(StringWriter.class)));
+        Variable bufferedWriter = ifMethodExecuted._then().decl(ref(BufferedWriter.class), "bufferedWriter", ExpressionFactory._new(ref(BufferedWriter.class)).arg(stringWriter).arg(ExpressionFactory.lit(8192)));
+
+        TryStatement readStream = ifMethodExecuted._then()._try();
+        Variable line = readStream.body().decl(ref(String.class), "line", ExpressionFactory.lit(""));
+        readStream.body().assign(bufferedReader, ExpressionFactory._new(ref(BufferedReader.class)).arg(ExpressionFactory._new(ref(InputStreamReader.class)).arg(method.invoke("getResponseBodyAsStream"))));
+        WhileLoop whileLoop = readStream.body()._while(Op.ne(ExpressionFactory.assign(line, bufferedReader.invoke("readLine")), ExpressionFactory._null()));
+        whileLoop.body().add(bufferedWriter.invoke("write").arg(line));
+        whileLoop.body().add(bufferedWriter.invoke("newLine"));
+
+        readStream._finally().add(bufferedWriter.invoke("flush"));
+        readStream._finally().add(bufferedWriter.invoke("close"));
+        readStream._finally()._if(Op.ne(bufferedReader, ExpressionFactory._null()))._then().add(bufferedReader.invoke("close"));
+
+        Variable output = ifMethodExecuted._then().decl(ref(String.class), "output", ref(StringEscapeUtils.class).staticInvoke("unescapeHtml").arg(stringWriter.invoke("toString")));
+
+        generateExeptionOnBlock(executableElement, statusCode, ifMethodExecuted, output);
+
+        generateTransformAndReturn(typeElement, executableElement, muleContext, ifMethodExecuted, output);
+    }
+
+    private void generateTransformAndReturn(TypeElement moduleClass, ExecutableElement executableElement, Variable muleContext, Conditional block, Variable output) {
+        Conditional shouldTransform = block._then()._if(Op.cand(
+                Op.ne(output, ExpressionFactory._null()),
+                Op.not(ref(executableElement.getReturnType()).boxify().dotclass().invoke("isAssignableFrom").arg(ref(String.class).dotclass()))
+        ));
+
+        Variable outputDataType = shouldTransform._then().decl(ref(DataType.class), "outputDataType",
+                ExpressionFactory._null());
+
+        TryStatement tryToTransform = shouldTransform._then()._try();
+
+        Invocation getMethod = ref(moduleClass.asType()).boxify().dotclass().invoke("getMethod").arg(executableElement.getSimpleName().toString());
+        for (VariableElement parameter : executableElement.getParameters()) {
+            getMethod.arg(ref(parameter.asType()).boxify().dotclass());
+        }
+
+        Variable method = tryToTransform.body().decl(ref(java.lang.reflect.Method.class), "reflectedMethod", getMethod);
+
+        tryToTransform.body().assign(outputDataType,
+                ref(DataTypeFactory.class).staticInvoke("createFromReturnType").arg(method));
+
+        Variable transformer = tryToTransform.body().decl(ref(Transformer.class), "t",
+                muleContext.invoke("getRegistry").invoke("lookupTransformer").arg(ref(DataType.class).staticRef("STRING_DATA_TYPE")).arg(outputDataType));
+
+        tryToTransform.body()._return(ExpressionFactory.cast(ref(executableElement.getReturnType()), transformer.invoke("transform").arg(output)));
+
+        CatchBlock catchTransformerException = tryToTransform._catch(ref(TransformerException.class));
+        Variable transformerException = catchTransformerException.param("te");
+
+        catchTransformerException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(Op.plus(ExpressionFactory.lit("Unable to transform output from String to "), outputDataType.invoke("toString"))).arg(transformerException));
+
+        CatchBlock catchNoSuchMethodException = tryToTransform._catch(ref(NoSuchMethodException.class));
+        Variable noSuchMethodException = catchNoSuchMethodException.param("nsme");
+
+        catchNoSuchMethodException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(ExpressionFactory.lit("Unable to find method named " + executableElement.getSimpleName().toString())).arg(noSuchMethodException));
+
+        shouldTransform._else()._return(ExpressionFactory.cast(ref(executableElement.getReturnType()), ExpressionFactory.cast(ref(Object.class), output)));
+    }
+
+    private void generateExeptionOnBlock(ExecutableElement executableElement, Variable statusCode, Conditional block, Variable message) {
+        RestExceptionOn restExceptionOn = executableElement.getAnnotation(RestExceptionOn.class);
+        final String restExceptionOnAnnotationName = RestExceptionOn.class.getName();
+        DeclaredType exception = null;
+        List<? extends AnnotationMirror> annotationMirrors = executableElement.getAnnotationMirrors();
+        for (AnnotationMirror annotationMirror : annotationMirrors) {
+            if (restExceptionOnAnnotationName.equals(annotationMirror.getAnnotationType().toString())) {
+                for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues().entrySet()) {
+                    if ("exception".equals(
+                            entry.getKey().getSimpleName().toString())) {
+                        exception = (DeclaredType) entry.getValue().getValue();
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (restExceptionOn.statusCodeIs().length > 0) {
+            for (int expectedStatusCode : restExceptionOn.statusCodeIs()) {
+                Conditional ifStatusCode = block._then()._if(Op.eq(statusCode, ExpressionFactory.lit(expectedStatusCode)));
+                if (exception == null) {
+                    ifStatusCode._then()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(message));
+                } else {
+                    ifStatusCode._then()._throw(ExpressionFactory._new(ref(exception)).arg(message));
+                }
+            }
+        }
+        if (restExceptionOn.statusCodeIsNot().length > 0) {
+            Expression notEq = null;
+            for (int expectedStatusCode : restExceptionOn.statusCodeIsNot()) {
+                if (notEq == null) {
+                    notEq = Op.ne(statusCode, ExpressionFactory.lit(expectedStatusCode));
+                } else {
+                    notEq = Op.cand(notEq, Op.ne(statusCode, ExpressionFactory.lit(expectedStatusCode)));
+                }
+            }
+            Conditional ifStatusCode = block._then()._if(notEq);
+            if (exception == null) {
+                ifStatusCode._then()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(message));
+            } else {
+                ifStatusCode._then()._throw(ExpressionFactory._new(ref(exception)).arg(message));
+            }
+        }
     }
 
     private void addQueryParameter(Block body, Variable queryString, Expression variable, VariableElement parameter) {
@@ -233,6 +365,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(restClientAdapterClassName), previous);
         clazz._implements(ref(Initialisable.class));
         clazz._implements(ref(Disposable.class));
+        clazz._implements(ref(MuleContextAware.class));
 
         context.setClassRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement), clazz);
 
