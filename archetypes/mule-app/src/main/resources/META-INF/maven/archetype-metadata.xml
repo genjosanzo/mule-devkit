@@ -17,6 +17,9 @@
 		<requiredProperty key="addAppToClasspath">
 			<defaultValue>false</defaultValue>
 		</requiredProperty>
+		<requiredProperty key="studioNature">
+			<defaultValue>false</defaultValue>
+		</requiredProperty>
 	</requiredProperties>
 	<fileSets>
 		<fileSet filtered="true" packaged="true" encoding="UTF-8">

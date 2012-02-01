@@ -15,7 +15,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
 		<mule.version>${muleVersion}</mule.version>
-		<eclipsePluginVersion>2.5</eclipsePluginVersion>
+		<eclipsePluginVersion>2.8</eclipsePluginVersion>
 		<vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
 		<jdkName>JavaSE-1.6</jdkName>
 		<jdk.version>1.6</jdk.version>
@@ -93,29 +93,25 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.2.1</version>
-				<goals>
-					<goal>java</goal>
-				</goals>
-				<configuration>
-					<mainClass>org.mule.MuleServer</mainClass>
-					<arguments>
-						<argument>-config src/main/app/mule-config.xml</argument>
-					</arguments>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
 				<version>${symbol_dollar}{eclipsePluginVersion}</version>
 				<configuration>
 					<!-- by default download all sources when generating project files -->
 					<downloadSources>true</downloadSources>
+#if(${studioNature} == 'true')
 					<classpathContainers>
-						<classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${symbol_dollar}{vmtype}/${symbol_dollar}{jdkName}</classpathContainer>
+                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${symbol_dollar}{vmtype}/${symbol_dollar}{jdkName}</classpathContainer>
+                        <!-- MuleStudio nature parameters -->
+                        <classpathContainer>MULE_RUNTIME</classpathContainer>
 					</classpathContainers>
+                    <additionalProjectnatures>
+                        <projectnature>org.mule.tooling.core.muleNature</projectnature>
+                    </additionalProjectnatures>
+                    <additionalBuildcommands>
+                        <buildcommand>org.mule.tooling.core.muleBuilder</buildcommand>
+                    </additionalBuildcommands>
+#end
 				</configuration>
 			</plugin>
 			<plugin>
