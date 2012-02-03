@@ -21,7 +21,9 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.annotations.rest.RestCall;
 import org.mule.api.annotations.rest.RestExceptionOn;
+import org.mule.api.annotations.rest.RestHeaderParam;
 import org.mule.api.annotations.rest.RestHttpClient;
+import org.mule.api.annotations.rest.RestQueryParam;
 import org.mule.api.annotations.rest.RestUriParam;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
@@ -60,6 +62,19 @@ public class RestValidator implements Validator {
                         restExceptionOn.statusCodeIsNot().length == 0) {
                     throw new ValidationException(method, "@RestExceptionOn must have either statusCodeIs or statusCodeIsNot.");
                 }
+            }
+
+            int nonAnnotatedParameterCount = 0;
+            for (VariableElement parameter : method.getParameters()) {
+                if (parameter.getAnnotation(RestUriParam.class) == null &&
+                        parameter.getAnnotation(RestHeaderParam.class) == null &&
+                        parameter.getAnnotation(RestQueryParam.class) == null) {
+                    nonAnnotatedParameterCount++;
+                }
+            }
+
+            if (nonAnnotatedParameterCount > 1) {
+                throw new ValidationException(method, "Only one parameter can be used as payload, everything else must be annotated with @RestUriParam, @RestQueryParam or @RestHeaderParam.");
             }
         }
 

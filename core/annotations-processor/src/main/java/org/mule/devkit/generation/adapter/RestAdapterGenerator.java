@@ -20,11 +20,14 @@ package org.mule.devkit.generation.adapter;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.methods.TraceMethod;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -34,11 +37,16 @@ import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
 import org.mule.api.annotations.rest.HttpMethod;
 import org.mule.api.annotations.rest.RestCall;
 import org.mule.api.annotations.rest.RestExceptionOn;
+import org.mule.api.annotations.rest.RestHeaderParam;
 import org.mule.api.annotations.rest.RestHttpClient;
+import org.mule.api.annotations.rest.RestQueryParam;
 import org.mule.api.annotations.rest.RestUriParam;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.registry.RegistrationException;
+import org.mule.api.registry.ResolverException;
+import org.mule.api.registry.TransformerResolver;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -60,7 +68,9 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.devkit.model.code.WhileLoop;
+import org.mule.registry.TypeBasedTransformerResolver;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transformer.types.MimeTypes;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
@@ -155,14 +165,55 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
 
             generateParametersCode(typeElement, variables, executableElement, override, restCall, method, queryString);
 
+            if (restCall.method() == HttpMethod.POST || restCall.method() == HttpMethod.PUT) {
+                VariableElement payloadParameter = null;
+                for (VariableElement parameter : executableElement.getParameters()) {
+                    if (parameter.getAnnotation(RestUriParam.class) == null &&
+                            parameter.getAnnotation(RestHeaderParam.class) == null &&
+                            parameter.getAnnotation(RestQueryParam.class) == null) {
+                        payloadParameter = parameter;
+                        break;
+                    }
+                }
+                if (payloadParameter != null) {
+                    if (!restCall.contentType().equals(MimeTypes.ANY)) {
+                        TryStatement tryToTransform = override.body()._try();
+                        Variable payloadInputDataType = tryToTransform.body().decl(ref(DataType.class), "payloadInputDataType", ref(DataTypeFactory.class).staticInvoke("createFromObject").arg(variables.get(payloadParameter.getSimpleName().toString())));
+                        Variable payloadOutputDataType = tryToTransform.body().decl(ref(DataType.class), "payloadOutputDataType", ref(DataTypeFactory.class).staticInvoke("create").arg(ref(String.class).dotclass()).arg(restCall.contentType()));
+                        Variable typeBasedResolver = tryToTransform.body().decl(ref(TransformerResolver.class), "typeBasedResolver", muleContext.invoke("getRegistry").invoke("lookupObject").arg(ref(TypeBasedTransformerResolver.class).dotclass()));
+                        Variable payloadTransformer = tryToTransform.body().decl(ref(Transformer.class), "payloadTransformer", typeBasedResolver.invoke("resolve").arg(payloadInputDataType).arg(payloadOutputDataType));
+                        tryToTransform.body()._if(Op.eq(payloadTransformer, ExpressionFactory._null()))._then().assign(payloadTransformer, muleContext.invoke("getRegistry").invoke("lookupTransformer").arg(payloadInputDataType).arg(payloadOutputDataType));
+
+                        Variable payloadRequestEntity = tryToTransform.body().decl(ref(RequestEntity.class), "payloadRequestEntity", ExpressionFactory._new(ref(StringRequestEntity.class)).arg(ExpressionFactory.cast(ref(String.class), payloadTransformer.invoke("transform").arg(variables.get(payloadParameter.getSimpleName().toString())))).arg(restCall.contentType()).arg(ExpressionFactory.lit("UTF-8")));
+                        tryToTransform.body().add(ExpressionFactory.cast(ref(PostMethod.class), method).invoke("setRequestEntity").arg(payloadRequestEntity));
+
+                        CatchBlock catchResolverException = tryToTransform._catch(ref(ResolverException.class));
+                        Variable resolverException = catchResolverException.param("rese");
+
+                        catchResolverException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(resolverException.invoke("getMessage")).arg(resolverException));
+
+                        CatchBlock catchRegistrationException = tryToTransform._catch(ref(RegistrationException.class));
+                        Variable registrationException = catchRegistrationException.param("re");
+
+                        catchRegistrationException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(registrationException.invoke("getMessage")).arg(registrationException));
+
+                        CatchBlock catchTransformerException = tryToTransform._catch(ref(TransformerException.class));
+                        Variable transformerException = catchTransformerException.param("te");
+
+                        catchTransformerException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(transformerException.invoke("getMessage")).arg(transformerException));
+                    } else {
+                        Variable payloadRequestEntity = override.body().decl(ref(RequestEntity.class), "payloadRequestEntity", ExpressionFactory._new(ref(StringRequestEntity.class)).arg(variables.get(payloadParameter.getSimpleName().toString()).invoke("toString")));
+                        override.body().add(ExpressionFactory.cast(ref(PostMethod.class), method).invoke("setRequestEntity").arg(payloadRequestEntity));
+                    }
+                }
+            }
+
             Variable statusCode = override.body().decl(context.getCodeModel().INT, "statusCode", httpClient.invoke("executeMethod").arg(method));
 
             generateParseResponseCode(typeElement, executableElement, override, method, statusCode, muleContext);
 
             override.body()._return(ExpressionFactory._null());
         }
-
-
     }
 
     private void generateParametersCode(DevKitTypeElement typeElement, Map<String, Variable> variables, ExecutableElement executableElement, Method override, RestCall restCall, Variable method, Variable queryString) {
@@ -184,7 +235,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
             }
         }
 
-        override.body().add(method.invoke("setPath").arg(uri));
+        override.body().add(method.invoke("setURI").arg(ExpressionFactory._new(ref(URI.class)).arg(uri).arg(ExpressionFactory.FALSE)));
         for (VariableElement parameter : executableElement.getParameters()) {
             RestUriParam restUriParam = parameter.getAnnotation(RestUriParam.class);
             if (restUriParam != null) {
@@ -277,10 +328,22 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
         tryToTransform.body().assign(outputDataType,
                 ref(DataTypeFactory.class).staticInvoke("createFromReturnType").arg(method));
 
-        Variable transformer = tryToTransform.body().decl(ref(Transformer.class), "t",
-                muleContext.invoke("getRegistry").invoke("lookupTransformer").arg(ref(DataType.class).staticRef("STRING_DATA_TYPE")).arg(outputDataType));
+        Variable typeBasedResolver = tryToTransform.body().decl(ref(TransformerResolver.class), "typeBasedResolver", muleContext.invoke("getRegistry").invoke("lookupObject").arg(ref(TypeBasedTransformerResolver.class).dotclass()));
+
+        Variable transformer = tryToTransform.body().decl(ref(Transformer.class), "payloadTransformer", typeBasedResolver.invoke("resolve").arg(ref(DataType.class).staticRef("STRING_DATA_TYPE")).arg(outputDataType));
+        tryToTransform.body()._if(Op.eq(transformer, ExpressionFactory._null()))._then().assign(transformer, muleContext.invoke("getRegistry").invoke("lookupTransformer").arg(ref(DataType.class).staticRef("STRING_DATA_TYPE")).arg(outputDataType));
 
         tryToTransform.body()._return(ExpressionFactory.cast(ref(executableElement.getReturnType()), transformer.invoke("transform").arg(output)));
+
+        CatchBlock catchResolverException = tryToTransform._catch(ref(ResolverException.class));
+        Variable resolverException = catchResolverException.param("rese");
+
+        catchResolverException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(resolverException.invoke("getMessage")).arg(resolverException));
+
+        CatchBlock catchRegistrationException = tryToTransform._catch(ref(RegistrationException.class));
+        Variable registrationException = catchRegistrationException.param("re");
+
+        catchRegistrationException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(registrationException.invoke("getMessage")).arg(registrationException));
 
         CatchBlock catchTransformerException = tryToTransform._catch(ref(TransformerException.class));
         Variable transformerException = catchTransformerException.param("te");

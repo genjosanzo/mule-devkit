@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mule.api.annotations.rest;
 
-import org.mule.transformer.types.MimeTypes;
+package org.mule.api.annotations.rest;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -24,13 +23,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.METHOD)
+@Target(value = {ElementType.PARAMETER, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface RestCall {
-    String uri();
-    
-    String contentType() default MimeTypes.ANY;
+public @interface RestHeaderParam {
+    String value();
 
-    HttpMethod method() default HttpMethod.GET;
+    String separatedBy() default "";
 }
