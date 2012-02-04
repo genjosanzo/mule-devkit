@@ -42,7 +42,7 @@ public class CloudConnectorArchetypeIT {
         archetypeProperties.load(stream);
 
         verifierProperties = new Properties();
-        verifierProperties.setProperty("use.mavenRepoLocal", "false");
+        verifierProperties.setProperty("use.mavenRepoLocal", "true");
 
         Verifier verifier = new Verifier(ROOT.getAbsolutePath());
 
@@ -71,8 +71,8 @@ public class CloudConnectorArchetypeIT {
         verifier.setSystemProperties(archetypeProperties);
         verifier.setVerifierProperties(verifierProperties);
         verifier.setAutoclean(false);
-        verifier.setMavenDebug(true);
-        verifier.setDebug(true);
+        verifier.setMavenDebug(false);
+        verifier.setDebug(false);
 
         verifier.executeGoal("archetype:generate");
 

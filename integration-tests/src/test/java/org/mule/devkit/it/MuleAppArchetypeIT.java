@@ -30,7 +30,7 @@ import java.util.Properties;
 public class MuleAppArchetypeIT {
 
     private static final File ROOT = new File("target/integration-tests/");
-    private static final String ARCHETYPE_PROPERTIES = "/archetype.properties";
+    private static final String ARCHETYPE_PROPERTIES = "/mule-app-archetype.properties";
 
     private Properties archetypeProperties;
     private Properties verifierProperties;
@@ -42,7 +42,7 @@ public class MuleAppArchetypeIT {
         archetypeProperties.load(stream);
 
         verifierProperties = new Properties();
-        verifierProperties.setProperty("use.mavenRepoLocal", "false");
+        verifierProperties.setProperty("use.mavenRepoLocal", "true");
 
         Verifier verifier = new Verifier(ROOT.getAbsolutePath());
 
@@ -71,6 +71,8 @@ public class MuleAppArchetypeIT {
         verifier.setSystemProperties(archetypeProperties);
         verifier.setVerifierProperties(verifierProperties);
         verifier.setAutoclean(false);
+        verifier.setMavenDebug(false);
+        verifier.setDebug(false);
 
         verifier.executeGoal("archetype:generate");
 
@@ -79,9 +81,8 @@ public class MuleAppArchetypeIT {
         verifier = new Verifier(ROOT.getAbsolutePath() + "/" + getArtifactId());
         verifier.setAutoclean(true);
         verifier.executeGoal("package");
+        verifier.executeGoal("eclipse:eclipse");
 
         verifier.verifyErrorFreeLog();
-
-//        verifier.verifyTextInLog("generate-sources");
     }
 }

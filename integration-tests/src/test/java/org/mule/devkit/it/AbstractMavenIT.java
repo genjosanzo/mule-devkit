@@ -17,15 +17,17 @@
 
 package org.mule.devkit.it;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.junit.Before;
 import org.junit.Test;
-import org.mule.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public abstract class AbstractMavenIT {
@@ -55,12 +57,15 @@ public abstract class AbstractMavenIT {
     @SuppressWarnings("unchecked")
     public void buildExecutable() throws Exception {
         try {
-            Verifier verifier = new Verifier(getRoot().getAbsolutePath(), null, DEBUG);
-            verifier.setAutoclean(false);
+            Verifier verifier = new Verifier(getRoot().getAbsolutePath(), null, DEBUG, true);
+            verifier.setAutoclean(true);
 
             setSystemProperties(verifier);
-            verifier.executeGoal("clean");
-            verifier.executeGoal("package");
+
+            Map<String, String> envVars = new HashMap<String, String>();
+            envVars.put("MAVEN_OPTS", "-Xmx512m -XX:MaxPermSize=256m");
+
+            verifier.executeGoal("package", envVars);
 
             verifier.verifyErrorFreeLog();
         } catch (IOException ioe) {

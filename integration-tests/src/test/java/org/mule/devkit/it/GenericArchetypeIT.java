@@ -42,7 +42,7 @@ public class GenericArchetypeIT {
         archetypeProperties.load(stream);
 
         verifierProperties = new Properties();
-        verifierProperties.setProperty("use.mavenRepoLocal", "false");
+        verifierProperties.setProperty("use.mavenRepoLocal", "true");
 
         Verifier verifier = new Verifier(ROOT.getAbsolutePath());
 

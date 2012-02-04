@@ -55,11 +55,12 @@
                     <execution>
                         <id>attach-sources</id>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>jar-no-fork</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -90,6 +91,7 @@
                     <additionalJOption>-J-Xmx1024m</additionalJOption>
                 </configuration>
             </plugin>
+            -->
         </plugins>
     </build>
 </project>
