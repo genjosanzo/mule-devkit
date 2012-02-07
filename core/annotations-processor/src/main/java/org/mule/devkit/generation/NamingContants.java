@@ -49,4 +49,6 @@ public class NamingContants {
     public static final String AUTHORIZE_DEFINITION_PARSER_CLASS_NAME = "AuthorizeDefinitionParser";
     public static final String NAMESPACE_HANDLER_CLASS_NAME_SUFFIX = "NamespaceHandler";
     public static final String REST_CLIENT_ADAPTER_CLASS_NAME_SUFFIX = "RestClientAdapter";
+    public static final String CONNECTION_KEY_CLASS_NAME_SUFFIX = "ConnectionKey";
+    public static final String CONNECTION_FACTORY_CLASS_NAME_SUFFIX = "ConnectionFactory";
 }

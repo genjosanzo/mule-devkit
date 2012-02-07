@@ -411,7 +411,8 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
 
     private DefinedClass getConnectionParametersClass(TypeElement typeElement, DefinedClass connectionManagerClass) {
         try {
-            DefinedClass connectionKey = connectionManagerClass._class(Modifier.PUBLIC | Modifier.STATIC, "ConnectionParameters");
+            DefinedClass connectionKey = connectionManagerClass._class(Modifier.PUBLIC | Modifier.STATIC, NamingContants.CONNECTION_KEY_CLASS_NAME_SUFFIX);
+            connectionKey.javadoc().add("A tuple of connection parameters");
             context.setClassRole(context.getNameUtils().generateConnectionParametersRoleKey(typeElement), connectionKey);
             return connectionKey;
         } catch (ClassAlreadyExistsException e) {
@@ -421,7 +422,7 @@ public class ConnectionManagerGenerator extends AbstractMessageGenerator {
 
     private DefinedClass getConnectorFactoryClass(DefinedClass connectorManagerClass) {
         try {
-            DefinedClass objectFactory = connectorManagerClass._class(Modifier.PRIVATE | Modifier.STATIC, "ConnectionFactory");
+            DefinedClass objectFactory = connectorManagerClass._class(Modifier.PRIVATE | Modifier.STATIC, NamingContants.CONNECTION_FACTORY_CLASS_NAME_SUFFIX);
             objectFactory._implements(KeyedPoolableObjectFactory.class);
             return objectFactory;
         } catch (ClassAlreadyExistsException e) {

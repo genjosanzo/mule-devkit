@@ -59,7 +59,7 @@
 #side-nav ul {
     list-style: none;
     margin: 0;
-    padding: 5px 0;
+    padding: 5px 0 0 10px;
 }
 
 #side-nav ul ul {
@@ -84,7 +84,7 @@
 
 #side-nav li a {
     text-decoration: none;
-    padding: 0 0 0 18px;
+    padding: 0 0 0 0px;
     zoom: 1;
 }
 
@@ -175,7 +175,7 @@
 }
 
 #index-links {
-    padding: 7px 0 4px 18px;
+    padding: 7px 0 4px 8px;
     font-size: 10px;
     height: 37px;
     background-color: #3572A6;

@@ -23,7 +23,6 @@ import com.google.clearsilver.jsilver.resourceloader.ClassResourceLoader;
 import com.google.clearsilver.jsilver.resourceloader.CompositeResourceLoader;
 import com.google.clearsilver.jsilver.resourceloader.FileSystemResourceLoader;
 import com.google.clearsilver.jsilver.resourceloader.ResourceLoader;
-import com.petebevin.markdown.MarkdownProcessor;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.Doc;
 import com.sun.javadoc.DocErrorReporter;
@@ -33,6 +32,7 @@ import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.Type;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.mule.devkit.doclet.markdown.MarkdownProcessor;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -992,6 +992,11 @@ public class Doclava {
                 String htmlContent = markdown.markdown(mdContent);
                 String outFile = FilenameUtils.getName(m[1]).replaceAll(".md", ".html").toLowerCase();
                 Data data = makeHDF();
+
+                // build toc
+
+
+
                 data.setValue("content", htmlContent);
                 data.setValue("section", m[0]);
                 ClearPage.write(data, "markdown.cs", outFile);
