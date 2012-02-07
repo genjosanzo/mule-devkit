@@ -95,8 +95,10 @@ public class RestValidator implements Validator {
             throw new ValidationException(typeElement, "There can only be one field annotated with @RestHttpClient.");
         }
 
-        if (!typeElement.getFieldsAnnotatedWith(RestHttpClient.class).get(0).asType().toString().equals(HttpClient.class.getName())) {
-            throw new ValidationException(typeElement.getFieldsAnnotatedWith(RestHttpClient.class).get(0), "A field annotated with @RestHttpClient must be of type " + HttpClient.class.getName());
+        if( typeElement.getFieldsAnnotatedWith(RestHttpClient.class).size() > 0 ) {
+            if (!typeElement.getFieldsAnnotatedWith(RestHttpClient.class).get(0).asType().toString().equals(HttpClient.class.getName())) {
+                throw new ValidationException(typeElement.getFieldsAnnotatedWith(RestHttpClient.class).get(0), "A field annotated with @RestHttpClient must be of type " + HttpClient.class.getName());
+            }
         }
 
         for (VariableElement field : typeElement.getFieldsAnnotatedWith(RestHttpClient.class)) {

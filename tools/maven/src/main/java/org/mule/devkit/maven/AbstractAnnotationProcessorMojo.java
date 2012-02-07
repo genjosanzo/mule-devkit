@@ -158,8 +158,10 @@ public abstract class AbstractAnnotationProcessorMojo extends AbstractMuleMojo {
         List<File> filesToCompile = new ArrayList<File>(100);
         for (Object sourceDirectory : project.getCompileSourceRoots()) {
             File directory = new File((String) sourceDirectory);
-            if(!directory.equals(outputDirectory)) {
-                filesToCompile.addAll(FileUtils.getFiles(directory, includesString, excludesString));
+            if (directory.exists()) {
+                if (!directory.equals(outputDirectory)) {
+                    filesToCompile.addAll(FileUtils.getFiles(directory, includesString, excludesString));
+                }
             }
         }
 

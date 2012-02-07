@@ -256,6 +256,21 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
             }
         }
 
+        for (VariableElement parameter : executableElement.getParameters()) {
+            RestHeaderParam restHeaderParam = parameter.getAnnotation(RestHeaderParam.class);
+            if (restHeaderParam != null) {
+                override.body().add(method.invoke("addRequestHeader").arg(restHeaderParam.value()).arg(variables.get(parameter.getSimpleName().toString())));
+            }
+        }
+
+        for (VariableElement field : typeElement.getFieldsAnnotatedWith(RestHeaderParam.class)) {
+            RestHeaderParam restHeaderParam = field.getAnnotation(RestHeaderParam.class);
+            if (restHeaderParam != null) {
+                override.body().add(method.invoke("addRequestHeader").arg(restHeaderParam.value()).arg(ExpressionFactory.invoke("get" + StringUtils.capitalize(field.getSimpleName().toString()))));
+            }
+        }
+
+
         if (restCall.method() == HttpMethod.GET) {
             override.body().add(method.invoke("setQueryString").arg(queryString.invoke("toArray").arg(ExpressionFactory._new(ref(NameValuePair.class).array()))));
         } else if (restCall.method() == HttpMethod.PUT) {
@@ -375,7 +390,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
             }
         }
 
-        if (restExceptionOn.statusCodeIs().length > 0) {
+        if (restExceptionOn != null && restExceptionOn.statusCodeIs().length > 0) {
             for (int expectedStatusCode : restExceptionOn.statusCodeIs()) {
                 Conditional ifStatusCode = block._then()._if(Op.eq(statusCode, ExpressionFactory.lit(expectedStatusCode)));
                 if (exception == null) {
@@ -385,7 +400,7 @@ public class RestAdapterGenerator extends AbstractModuleGenerator {
                 }
             }
         }
-        if (restExceptionOn.statusCodeIsNot().length > 0) {
+        if (restExceptionOn != null && restExceptionOn.statusCodeIsNot().length > 0) {
             Expression notEq = null;
             for (int expectedStatusCode : restExceptionOn.statusCodeIsNot()) {
                 if (notEq == null) {
