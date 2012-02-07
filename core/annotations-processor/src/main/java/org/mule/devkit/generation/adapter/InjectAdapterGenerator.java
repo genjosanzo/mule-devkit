@@ -42,6 +42,7 @@ import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
+import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.util.queue.QueueManager;
 
@@ -121,7 +122,10 @@ public class InjectAdapterGenerator extends AbstractModuleGenerator {
         String muleContextAwareAdapter = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.INJECTION_ADAPTER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(muleContextAwareAdapter));
 
-        DefinedClass previous = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
+        TypeReference previous = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
+        if (previous == null) {
+            previous = (TypeReference) ref(typeElement.asType());
+        }
 
         int modifiers = Modifier.PUBLIC;
         if( typeElement.getModifiers().contains(javax.lang.model.element.Modifier.ABSTRACT) ) {
