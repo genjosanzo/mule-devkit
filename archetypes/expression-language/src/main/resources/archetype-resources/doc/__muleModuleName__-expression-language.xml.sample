@@ -1,0 +1,3 @@
+<!-- BEGIN_INCLUDE(${muleModuleName.toLowerCase()}:evaluate) -->
+<logger level="INFO" message="#[${muleModuleName.toLowerCase()}:Hello World!"/> />
+<!-- END_INCLUDE(${muleModuleName.toLowerCase()}:evaluate) -->

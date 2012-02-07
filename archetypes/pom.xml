@@ -18,5 +18,6 @@
         <module>cloud-connector</module>
         <module>transformer</module>
         <module>mule-app</module>
+        <module>expression-language</module>
     </modules>
 </project>

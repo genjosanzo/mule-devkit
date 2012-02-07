@@ -109,6 +109,9 @@ public class MashapeGeneratorMojo extends AbstractMuleMojo {
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if (inputFolder == null) {
+            return;
+        }
         getLog().info("Source directory: " + defaultOutputDirectory.getAbsolutePath() + " added");
         project.addCompileSourceRoot(defaultOutputDirectory.getAbsolutePath());
         try {
@@ -120,11 +123,13 @@ public class MashapeGeneratorMojo extends AbstractMuleMojo {
 
     private void traverse(final File f) throws IOException, MojoExecutionException {
         final File[] childs = f.listFiles();
-        for (File child : childs) {
-            if (child.isDirectory()) {
-                traverse(child);
-            } else if (FilenameUtils.isExtension(child.getAbsolutePath(), "mashape")) {
-                generateMashapeClient(child);
+        if (childs != null) {
+            for (File child : childs) {
+                if (child.isDirectory()) {
+                    traverse(child);
+                } else if (FilenameUtils.isExtension(child.getAbsolutePath(), "mashape")) {
+                    generateMashapeClient(child);
+                }
             }
         }
     }
@@ -156,16 +161,20 @@ public class MashapeGeneratorMojo extends AbstractMuleMojo {
             for (int i = 0; i < methods.getLength(); i++) {
                 Node method = methods.item(i);
 
-                if (!"method".equals(method.getNodeName())) continue;
+                if (!"method".equals(method.getNodeName())) {
+                    continue;
+                }
 
                 Method restCallMethod = clazz.method(Modifier.PUBLIC | Modifier.ABSTRACT, ref(String.class), method.getAttributes().getNamedItem("name").getNodeValue());
                 restCallMethod._throws(ref(IOException.class));
-                AnnotationUse messageProcessor = restCallMethod.annotate(Processor.class);
+                restCallMethod.annotate(Processor.class);
                 AnnotationUse restCall = restCallMethod.annotate(RestCall.class);
 
                 Node url = null;
                 for (int j = 0; j < method.getChildNodes().getLength(); j++) {
-                    if (!"url".equals(method.getChildNodes().item(j).getNodeName())) continue;
+                    if (!"url".equals(method.getChildNodes().item(j).getNodeName())) {
+                        continue;
+                    }
 
                     url = method.getChildNodes().item(j);
                     break;
@@ -187,14 +196,18 @@ public class MashapeGeneratorMojo extends AbstractMuleMojo {
 
                 Node parameters = null;
                 for (int j = 0; j < method.getChildNodes().getLength(); j++) {
-                    if (!"parameters".equals(method.getChildNodes().item(j).getNodeName())) continue;
+                    if (!"parameters".equals(method.getChildNodes().item(j).getNodeName())) {
+                        continue;
+                    }
 
                     parameters = method.getChildNodes().item(j);
                     break;
                 }
 
                 for (int j = 0; j < parameters.getChildNodes().getLength(); j++) {
-                    if (!"parameter".equals(parameters.getChildNodes().item(j).getNodeName())) continue;
+                    if (!"parameter".equals(parameters.getChildNodes().item(j).getNodeName())) {
+                        continue;
+                    }
 
                     Node parameter = parameters.getChildNodes().item(j);
 
@@ -291,8 +304,11 @@ public class MashapeGeneratorMojo extends AbstractMuleMojo {
         attempt.body().assign(mashapeAuthorization, getHeaderValueBytes.invoke("replace").arg("\r\n").arg(""));
 
         CatchBlock catchUnsupportedEncodingExpception = attempt._catch(ref(UnsupportedEncodingException.class));
+        catchUnsupportedEncodingExpception.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)));
         CatchBlock catchNoSuchAlgorithmException = attempt._catch(ref(NoSuchAlgorithmException.class));
+        catchNoSuchAlgorithmException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)));
         CatchBlock catchInvalidKeyException = attempt._catch(ref(InvalidKeyException.class));
+        catchInvalidKeyException.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)));
     }
 
     private TypeReference ref(Class<?> clazz) {

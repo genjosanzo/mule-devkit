@@ -67,7 +67,7 @@ public class MarkdownProcessor {
      *      <p/>
      *      Other possible template:
      *      <pre><code>
-     *       	\n\n<pre class=\"brush: %s\">\n%s\n</pre>\n\n
+     *            	\n\n<pre class=\"brush: %s\">\n%s\n</pre>\n\n
      *      </code></pre>
      * @see http://alexgorbatchev.com/wiki/SyntaxHighlighter
      */
@@ -397,13 +397,17 @@ public class MarkdownProcessor {
             }
 
             public String firstLine(String text) {
-                if (text == null) return "";
+                if (text == null) {
+                    return "";
+                }
                 String[] splitted = text.split("\\n");
                 return splitted[0];
             }
 
             public boolean isLanguageIdentifier(String line) {
-                if (line == null) return false;
+                if (line == null) {
+                    return false;
+                }
                 String lang = "";
                 if (line.startsWith(LANG_IDENTIFIER)) {
                     lang = line.replaceFirst(LANG_IDENTIFIER, "").trim();
