@@ -109,6 +109,7 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
             if (parameter.getAnnotation(Payload.class) == null &&
                     parameter.getAnnotation(OutboundHeaders.class) == null &&
                     parameter.getAnnotation(InboundHeaders.class) == null &&
+                    parameter.getAnnotation(SessionHeaders.class) == null &&
                     parameter.getAnnotation(InvocationHeaders.class) == null) {
                 if (parameter.asType().toString().contains("String")) {
                     evaluateInvoke.arg(expression);
