@@ -24,6 +24,7 @@ import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
+import org.mule.api.annotations.param.SessionHeaders;
 import org.mule.api.transformer.TransformerException;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
@@ -36,6 +37,7 @@ import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.TryStatement;
+import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.expression.ExpressionUtils;
 
@@ -59,13 +61,14 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
         String name = typeElement.getAnnotation(ExpressionLanguage.class).name();
 
         ExecutableElement executableElement = typeElement.getMethodsAnnotatedWith(ExpressionEvaluator.class).get(0);
+        TypeReference moduleObject = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
         DefinedClass evaluatorClass = getEvaluatorClass(name, typeElement);
 
         context.note("Generating expression evaluator " + evaluatorClass.fullName() + " for language at class " + typeElement.getSimpleName().toString());
 
-        FieldVariable module = generateModuleField(typeElement, evaluatorClass);
+        FieldVariable module = generateModuleField(moduleObject, evaluatorClass);
 
-        generateConstructor(typeElement, evaluatorClass, module);
+        generateConstructor(moduleObject, evaluatorClass, module);
 
         generateGetName(name, evaluatorClass);
 
@@ -131,6 +134,24 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INBOUND:" + inboundHeaders.value()).arg(message)
                             )));
                 }
+            } else if (parameter.getAnnotation(SessionHeaders.class) != null) {
+                SessionHeaders sessionHeaders = parameter.getAnnotation(SessionHeaders.class);
+                if (context.getTypeMirrorUtils().isArrayOrList(parameter.asType())) {
+                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()),
+                            ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
+                                    ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("SESSION:" + sessionHeaders.value()).arg(message).arg(ref(List.class).dotclass())
+                            )));
+                } else if (context.getTypeMirrorUtils().isMap(parameter.asType())) {
+                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()),
+                            ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
+                                    ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("SESSION:" + sessionHeaders.value()).arg(message).arg(ref(Map.class).dotclass())
+                            )));
+                } else {
+                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()),
+                            ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
+                                    ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("SESSION:" + sessionHeaders.value()).arg(message)
+                            )));
+                }
             } else if (parameter.getAnnotation(OutboundHeaders.class) != null) {
                 evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()),
                         ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
@@ -172,13 +193,13 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
         catchBlock.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(e));
     }
 
-    private FieldVariable generateModuleField(DevKitTypeElement typeElement, DefinedClass evaluatorClass) {
-        return evaluatorClass.field(Modifier.PRIVATE, ref(typeElement.asType()), "module", ExpressionFactory._null());
+    private FieldVariable generateModuleField(TypeReference typeElement, DefinedClass evaluatorClass) {
+        return evaluatorClass.field(Modifier.PRIVATE, typeElement, "module", ExpressionFactory._null());
     }
 
-    private void generateConstructor(DevKitTypeElement typeElement, DefinedClass evaluatorClass, FieldVariable module) {
+    private void generateConstructor(TypeReference typeElement, DefinedClass evaluatorClass, FieldVariable module) {
         Method constructor = evaluatorClass.constructor(Modifier.PUBLIC);
-        constructor.body().assign(module, ExpressionFactory._new(ref(typeElement.asType())));
+        constructor.body().assign(module, ExpressionFactory._new(typeElement));
     }
 
     private void generateGetName(String name, DefinedClass evaluatorClass) {

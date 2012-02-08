@@ -24,6 +24,7 @@ import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
+import org.mule.api.annotations.param.SessionHeaders;
 import org.mule.api.transformer.TransformerException;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
@@ -132,6 +133,24 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
                     evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INBOUND:" + inboundHeaders.value()).arg(message)
+                            )));
+                }
+            } else if (parameter.getAnnotation(SessionHeaders.class) != null) {
+                SessionHeaders sessionHeaders = parameter.getAnnotation(SessionHeaders.class);
+                if (context.getTypeMirrorUtils().isArrayOrList(parameter.asType())) {
+                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()),
+                            ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
+                                    ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("SESSION:" + sessionHeaders.value()).arg(message).arg(ref(List.class).dotclass())
+                            )));
+                } else if (context.getTypeMirrorUtils().isMap(parameter.asType())) {
+                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()),
+                            ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
+                                    ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("SESSION:" + sessionHeaders.value()).arg(message).arg(ref(Map.class).dotclass())
+                            )));
+                } else {
+                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()),
+                            ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
+                                    ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("SESSION:" + sessionHeaders.value()).arg(message)
                             )));
                 }
             } else if (parameter.getAnnotation(OutboundHeaders.class) != null) {

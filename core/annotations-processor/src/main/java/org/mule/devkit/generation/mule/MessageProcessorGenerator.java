@@ -35,6 +35,7 @@ import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
+import org.mule.api.annotations.param.SessionHeaders;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
 import org.mule.api.processor.MessageProcessor;
@@ -648,6 +649,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         InboundHeaders inboundHeaders = variable.getAnnotation(InboundHeaders.class);
         OutboundHeaders outboundHeaders = variable.getAnnotation(OutboundHeaders.class);
         InvocationHeaders invocationHeaders = variable.getAnnotation(InvocationHeaders.class);
+        SessionHeaders sessionHeaders = variable.getAnnotation(SessionHeaders.class);
         Payload payload = variable.getAnnotation(Payload.class);
 
         if (outboundHeaders == null) {
@@ -680,6 +682,14 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                     evaluateAndTransform.arg("#[" + MessageHeadersExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
                 } else {
                     evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":INVOCATION:" + invocationHeaders.value() + "]");
+                }
+            } else if (sessionHeaders != null) {
+                if (context.getTypeMirrorUtils().isArrayOrList(fields.get(fieldName).getVariableElement().asType())) {
+                    evaluateAndTransform.arg("#[" + MessageHeadersListExpressionEvaluator.NAME + ":SESSION:" + sessionHeaders.value() + "]");
+                } else if (context.getTypeMirrorUtils().isMap(fields.get(fieldName).getVariableElement().asType())) {
+                    evaluateAndTransform.arg("#[" + MessageHeadersExpressionEvaluator.NAME + ":SESSION:" + sessionHeaders.value() + "]");
+                } else {
+                    evaluateAndTransform.arg("#[" + MessageHeaderExpressionEvaluator.NAME + ":SESSION:" + sessionHeaders.value() + "]");
                 }
             } else if (payload != null) {
                 evaluateAndTransform.arg("#[payload]");

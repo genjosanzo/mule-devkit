@@ -25,6 +25,7 @@ import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
+import org.mule.api.annotations.param.SessionHeaders;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
 
@@ -44,7 +45,7 @@ import java.util.Map;
 public class TypeMirrorUtils {
     private static final List<Class<?>> PARAMETER_TYPES_TO_IGNORE = Arrays.asList(SourceCallback.class, MuleMessage.class);
     private static final List<Class<? extends Annotation>> PARAMETERS_ANNOTATIONS_TO_IGNORE =
-            Arrays.asList(InboundHeaders.class, InvocationHeaders.class, OutboundHeaders.class, Payload.class, OAuthAccessToken.class, OAuthAccessTokenSecret.class);
+            Arrays.asList(InboundHeaders.class, InvocationHeaders.class, OutboundHeaders.class, SessionHeaders.class, Payload.class, OAuthAccessToken.class, OAuthAccessTokenSecret.class);
 
     private Types types;
 

@@ -22,6 +22,7 @@ import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
+import org.mule.api.annotations.param.SessionHeaders;
 import org.mule.api.callback.SourceCallback;
 import org.mule.devkit.GeneratorContext;
 import org.mule.devkit.generation.DevKitTypeElement;
@@ -67,6 +68,9 @@ public class ProcessorValidator implements Validator {
                     count++;
                 }
                 if (parameter.getAnnotation(InvocationHeaders.class) != null) {
+                    count++;
+                }
+                if (parameter.getAnnotation(SessionHeaders.class) != null) {
                     count++;
                 }
                 if (parameter.getAnnotation(Payload.class) != null) {
