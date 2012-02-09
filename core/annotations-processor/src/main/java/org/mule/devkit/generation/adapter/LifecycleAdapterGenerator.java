@@ -20,6 +20,7 @@ package org.mule.devkit.generation.adapter;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
 import org.mule.api.annotations.Connector;
+import org.mule.api.annotations.ExpressionLanguage;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.lifecycle.Start;
 import org.mule.api.annotations.lifecycle.Stop;
@@ -43,6 +44,7 @@ import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
 import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
+import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +60,7 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
 
     @Override
     protected boolean shouldGenerate(DevKitTypeElement typeElement) {
-        return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class);
+        return typeElement.hasAnnotation(Module.class) || typeElement.hasAnnotation(Connector.class) || typeElement.hasAnnotation(ExpressionLanguage.class);
     }
 
     @Override
@@ -91,7 +93,10 @@ public class LifecycleAdapterGenerator extends AbstractModuleGenerator {
         String lifecycleAdapterName = context.getNameUtils().generateClassName(typeElement, NamingContants.ADAPTERS_NAMESPACE, NamingContants.LIFECYCLE_ADAPTER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(lifecycleAdapterName));
 
-        DefinedClass previous = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
+        TypeReference previous = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
+        if (previous == null) {
+            previous = (TypeReference) ref(typeElement.asType());
+        }
 
         int modifiers = Modifier.PUBLIC;
         if( typeElement.getModifiers().contains(javax.lang.model.element.Modifier.ABSTRACT) ) {

@@ -17,6 +17,8 @@
 
 package org.mule.devkit.generation.mule.expression;
 
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.annotations.ExpressionEvaluator;
 import org.mule.api.annotations.ExpressionLanguage;
@@ -25,17 +27,25 @@ import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.SessionHeaders;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.transformer.TransformerException;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.CatchBlock;
+import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
@@ -67,6 +77,30 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
         context.note("Generating expression evaluator " + evaluatorClass.fullName() + " for language at class " + typeElement.getSimpleName().toString());
 
         FieldVariable module = generateModuleField(moduleObject, evaluatorClass);
+
+        Method setMuleContext = evaluatorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setMuleContext");
+        Variable muleContext = setMuleContext.param(ref(MuleContext.class), "muleContext");
+        Conditional ifModuleIsContextAware = setMuleContext.body()._if(Op._instanceof(module, ref(MuleContextAware.class)));
+        ifModuleIsContextAware._then().add(module.invoke("setMuleContext").arg(muleContext));
+
+        Method start = evaluatorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
+        start._throws(ref(MuleException.class));
+        Conditional ifModuleIsStartable = start.body()._if(Op._instanceof(module, ref(Startable.class)));
+        ifModuleIsStartable._then().add(ExpressionFactory.cast(ref(Startable.class), module).invoke("start"));
+
+        Method stop = evaluatorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "stop");
+        stop._throws(ref(MuleException.class));
+        Conditional ifModuleIsStoppable = stop.body()._if(Op._instanceof(module, ref(Stoppable.class)));
+        ifModuleIsStoppable._then().add(ExpressionFactory.cast(ref(Stoppable.class), module).invoke("stop"));
+
+        Method init = evaluatorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "initialise");
+        init._throws(ref(InitialisationException.class));
+        Conditional ifModuleIsInitialisable = init.body()._if(Op._instanceof(module, ref(Initialisable.class)));
+        ifModuleIsInitialisable._then().add(ExpressionFactory.cast(ref(Initialisable.class), module).invoke("initialise"));
+
+        Method dispose = evaluatorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "dispose");
+        Conditional ifModuleIsDisposable = dispose.body()._if(Op._instanceof(module, ref(Disposable.class)));
+        ifModuleIsDisposable._then().add(ExpressionFactory.cast(ref(Disposable.class), module).invoke("dispose"));
 
         generateConstructor(moduleObject, evaluatorClass, module);
 
@@ -107,16 +141,10 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
         argCount = 0;
         Invocation evaluateInvoke = module.invoke(executableElement.getSimpleName().toString());
         for (VariableElement parameter : executableElement.getParameters()) {
-            if (parameter.getAnnotation(Payload.class) == null &&
-                    parameter.getAnnotation(OutboundHeaders.class) == null &&
-                    parameter.getAnnotation(InboundHeaders.class) == null &&
-                    parameter.getAnnotation(SessionHeaders.class) == null &&
-                    parameter.getAnnotation(InvocationHeaders.class) == null) {
-                if (parameter.asType().toString().contains("String")) {
-                    evaluateInvoke.arg(expression);
-                }
-            } else if (parameter.getAnnotation(Payload.class) != null) {
+            if (parameter.getAnnotation(Payload.class) != null) {
                 evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()), ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(message.invoke("getPayload"))));
+            } else if (parameter.asType().toString().startsWith(MuleMessage.class.getName())) {
+                evaluateInvoke.arg(message);
             } else if (parameter.getAnnotation(InboundHeaders.class) != null) {
                 InboundHeaders inboundHeaders = parameter.getAnnotation(InboundHeaders.class);
                 if (context.getTypeMirrorUtils().isArrayOrList(parameter.asType())) {
@@ -176,6 +204,10 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INVOCATION:" + invocationHeaders.value()).arg(message)
                             )));
                 }
+            } else {
+                if (parameter.asType().toString().contains("String")) {
+                    evaluateInvoke.arg(expression);
+                }
             }
             argCount++;
         }
@@ -218,6 +250,12 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
         String evaluatorClassName = context.getNameUtils().generateClassNameInPackage(variableElement, context.getNameUtils().camel(name) + NamingContants.EXPRESSION_EVALUATOR_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(evaluatorClassName) + NamingContants.EXPRESSIONS_NAMESPACE);
         DefinedClass evaluator = pkg._class(context.getNameUtils().getClassName(evaluatorClassName), new Class<?>[]{org.mule.api.expression.ExpressionEvaluator.class});
+        evaluator._implements(ref(MuleContextAware.class));
+        evaluator._implements(ref(Startable.class));
+        evaluator._implements(ref(Stoppable.class));
+        evaluator._implements(ref(Initialisable.class));
+        evaluator._implements(ref(Disposable.class));
+        //evaluator._implements(ref(FlowConstructAware.class));
 
         return evaluator;
     }

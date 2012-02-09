@@ -17,6 +17,8 @@
 
 package org.mule.devkit.generation.mule.expression;
 
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.annotations.ExpressionEnricher;
 import org.mule.api.annotations.ExpressionLanguage;
@@ -25,18 +27,27 @@ import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.SessionHeaders;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.transformer.TransformerException;
 import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.CatchBlock;
+import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
 import org.mule.devkit.model.code.FieldVariable;
 import org.mule.devkit.model.code.Invocation;
 import org.mule.devkit.model.code.Method;
 import org.mule.devkit.model.code.Modifier;
+import org.mule.devkit.model.code.Op;
 import org.mule.devkit.model.code.TryStatement;
+import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
 import org.mule.expression.ExpressionUtils;
 
@@ -60,13 +71,38 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
         String name = typeElement.getAnnotation(ExpressionLanguage.class).name();
 
         ExecutableElement executableElement = typeElement.getMethodsAnnotatedWith(ExpressionEnricher.class).get(0);
+        TypeReference moduleObject = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
         DefinedClass enricherClass = getEnricherClass(name, typeElement);
 
         context.note("Generating message enricher " + enricherClass.fullName() + " for language at class " + typeElement.getSimpleName().toString());
 
-        FieldVariable module = generateModuleField(typeElement, enricherClass);
+        FieldVariable module = generateModuleField(moduleObject, enricherClass);
 
-        generateConstructor(typeElement, enricherClass, module);
+        Method setMuleContext = enricherClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setMuleContext");
+        Variable muleContext = setMuleContext.param(ref(MuleContext.class), "muleContext");
+        Conditional ifModuleIsContextAware = setMuleContext.body()._if(Op._instanceof(module, ref(MuleContextAware.class)));
+        ifModuleIsContextAware._then().add(module.invoke("setMuleContext").arg(muleContext));
+
+        Method start = enricherClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
+        start._throws(ref(MuleException.class));
+        Conditional ifModuleIsStartable = start.body()._if(Op._instanceof(module, ref(Startable.class)));
+        ifModuleIsStartable._then().add(ExpressionFactory.cast(ref(Startable.class), module).invoke("start"));
+
+        Method stop = enricherClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "stop");
+        stop._throws(ref(MuleException.class));
+        Conditional ifModuleIsStoppable = stop.body()._if(Op._instanceof(module, ref(Stoppable.class)));
+        ifModuleIsStoppable._then().add(ExpressionFactory.cast(ref(Stoppable.class), module).invoke("stop"));
+
+        Method init = enricherClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "initialise");
+        init._throws(ref(InitialisationException.class));
+        Conditional ifModuleIsInitialisable = init.body()._if(Op._instanceof(module, ref(Initialisable.class)));
+        ifModuleIsInitialisable._then().add(ExpressionFactory.cast(ref(Initialisable.class), module).invoke("initialise"));
+
+        Method dispose = enricherClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "dispose");
+        Conditional ifModuleIsDisposable = dispose.body()._if(Op._instanceof(module, ref(Disposable.class)));
+        ifModuleIsDisposable._then().add(ExpressionFactory.cast(ref(Disposable.class), module).invoke("dispose"));
+
+        generateConstructor(moduleObject, enricherClass, module);
 
         generateGetName(name, enricherClass);
 
@@ -106,18 +142,10 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
         argCount = 0;
         Invocation evaluateInvoke = module.invoke(executableElement.getSimpleName().toString());
         for (VariableElement parameter : executableElement.getParameters()) {
-            if (parameter.getAnnotation(Payload.class) == null &&
-                    parameter.getAnnotation(OutboundHeaders.class) == null &&
-                    parameter.getAnnotation(InboundHeaders.class) == null &&
-                    parameter.getAnnotation(SessionHeaders.class) == null &&
-                    parameter.getAnnotation(InvocationHeaders.class) == null) {
-                if (parameter.asType().toString().contains("String")) {
-                    evaluateInvoke.arg(expression);
-                } else if (parameter.asType().toString().contains("Object")) {
-                    evaluateInvoke.arg(object);
-                }
-            } else if (parameter.getAnnotation(Payload.class) != null) {
+            if (parameter.getAnnotation(Payload.class) != null) {
                 evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()), ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(message.invoke("getPayload"))));
+            } else if (parameter.asType().toString().startsWith(MuleMessage.class.getName())) {
+                evaluateInvoke.arg(message);
             } else if (parameter.getAnnotation(InboundHeaders.class) != null) {
                 InboundHeaders inboundHeaders = parameter.getAnnotation(InboundHeaders.class);
                 if (context.getTypeMirrorUtils().isArrayOrList(parameter.asType())) {
@@ -177,11 +205,22 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INVOCATION:" + invocationHeaders.value()).arg(message)
                             )));
                 }
+            } else {
+                if (parameter.asType().toString().contains("String")) {
+                    evaluateInvoke.arg(expression);
+                } else if (parameter.asType().toString().contains("Object")) {
+                    evaluateInvoke.arg(object);
+                }
             }
             argCount++;
         }
 
-        tryStatement.body().add(evaluateInvoke);
+        if (ref(executableElement.getReturnType()) != context.getCodeModel().VOID) {
+            Variable newPayload = tryStatement.body().decl(ref(Object.class), "newPayload", evaluateInvoke);
+            tryStatement.body().add(message.invoke("setPayload").arg(newPayload));
+        } else {
+            tryStatement.body().add(evaluateInvoke);
+        }
 
         catchAndRethrowAsRuntimeException(tryStatement, NoSuchMethodException.class);
         catchAndRethrowAsRuntimeException(tryStatement, TransformerException.class);
@@ -195,13 +234,13 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
         catchBlock.body()._throw(ExpressionFactory._new(ref(RuntimeException.class)).arg(e));
     }
 
-    private FieldVariable generateModuleField(DevKitTypeElement typeElement, DefinedClass evaluatorClass) {
-        return evaluatorClass.field(Modifier.PRIVATE, ref(typeElement.asType()), "module", ExpressionFactory._null());
+    private FieldVariable generateModuleField(TypeReference typeElement, DefinedClass evaluatorClass) {
+        return evaluatorClass.field(Modifier.PRIVATE, typeElement, "module", ExpressionFactory._null());
     }
 
-    private void generateConstructor(DevKitTypeElement typeElement, DefinedClass evaluatorClass, FieldVariable module) {
+    private void generateConstructor(TypeReference typeRef, DefinedClass evaluatorClass, FieldVariable module) {
         Method constructor = evaluatorClass.constructor(Modifier.PUBLIC);
-        constructor.body().assign(module, ExpressionFactory._new(ref(typeElement.asType())));
+        constructor.body().assign(module, ExpressionFactory._new(typeRef));
     }
 
     private void generateGetName(String name, DefinedClass evaluatorClass) {
@@ -219,6 +258,12 @@ public class ExpressionEnricherGenerator extends AbstractMessageGenerator {
         String evaluatorClassName = context.getNameUtils().generateClassNameInPackage(variableElement, context.getNameUtils().camel(name) + NamingContants.EXPRESSION_ENRICHER_CLASS_NAME_SUFFIX);
         org.mule.devkit.model.code.Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(evaluatorClassName) + NamingContants.EXPRESSIONS_NAMESPACE);
         DefinedClass enricherClass = pkg._class(context.getNameUtils().getClassName(evaluatorClassName), new Class<?>[]{org.mule.api.expression.ExpressionEnricher.class});
+        enricherClass._implements(ref(MuleContextAware.class));
+        enricherClass._implements(ref(Startable.class));
+        enricherClass._implements(ref(Stoppable.class));
+        enricherClass._implements(ref(Initialisable.class));
+        enricherClass._implements(ref(Disposable.class));
+        //enricherClass._implements(ref(FlowConstructAware.class));
 
         return enricherClass;
     }

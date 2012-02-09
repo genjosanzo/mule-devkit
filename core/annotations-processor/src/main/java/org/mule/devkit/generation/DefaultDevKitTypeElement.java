@@ -20,6 +20,7 @@ package org.mule.devkit.generation;
 import org.mule.api.annotations.Connect;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Disconnect;
+import org.mule.api.annotations.ExpressionLanguage;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 
@@ -184,6 +185,9 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
         }
         if (hasAnnotation(Connector.class)) {
             return getAnnotation(Connector.class).minMuleVersion();
+        }
+        if (hasAnnotation(ExpressionLanguage.class)) {
+            return getAnnotation(ExpressionLanguage.class).minMuleVersion();
         }
 
         return null;
