@@ -16,8 +16,6 @@
  */
 package org.mule.api.annotations.param;
 
-import org.mule.api.annotations.meta.Evaluator;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -34,14 +32,13 @@ import java.lang.annotation.Target;
  * {@link java.util.Map} is used, the header name and value is passed in. If {@link java.util.List} is used, just the header values are used.
  * If a single header name is defined, the header type can be used as the parameter type, though {@link java.util.List} or {@link java.util.Map}
  * can be used too.
- *
+ * <p/>
  * The Inbound headers collection is immutable, so the headers Map or List passed in will be immutable too. Attempting to write to the Map or List will result in an {@link UnsupportedOperationException}.
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface SessionHeaders
-{
+public @interface SessionHeaders {
     /**
      * Defines the headers that should be injected into the parameter. This can be a single header, a comma-separated
      * list of header names,'*' to denote all headers or a comma-separated list of wildcard expressions. By default,
