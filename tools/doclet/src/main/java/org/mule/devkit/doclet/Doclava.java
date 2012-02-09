@@ -1036,6 +1036,7 @@ public class Doclava {
 
         setPageTitle(data, cl.name());
         ClearPage.write(data, "module.cs", Doclava.muleXmlDir + cl.modulePath());
+        ClearPage.write(data, "schema.cs", Doclava.muleXmlDir + cl.moduleSchemaPath());
 
         //Proofread.writeClass(cl.modulePath(), cl);
     }

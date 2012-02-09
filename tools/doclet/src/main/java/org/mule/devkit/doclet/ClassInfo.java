@@ -17,9 +17,14 @@
 package org.mule.devkit.doclet;
 
 import com.google.clearsilver.jsilver.data.Data;
+import com.google.streamhtmlparser.util.HtmlUtils;
 import com.sun.javadoc.ClassDoc;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -688,6 +693,12 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
         return s;
     }
 
+    public String moduleSchemaPath() {
+        String s = moduleName();
+        s += "-schema.html";
+        return s;
+    }
+
     public String relativePath(String suffix) {
         String s = containingPackage().name();
         s = s.replace('.', '/');
@@ -915,6 +926,12 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
         data.setValue("class.moduleName", this.moduleName());
         data.setValue("class.moduleNamespace", this.moduleNamespace());
         data.setValue("class.moduleSchemaLocation", this.moduleSchemaLocation());
+        data.setValue("class.moduleSchemaPath", this.moduleSchemaPath());
+        try {
+            data.setValue("class.moduleSchema", StringEscapeUtils.escapeHtml4(FileUtils.readFileToString( new File("../../../target/generated-sources/mule/META-INF/mule-" + this.moduleName() + ".xsd"))));
+        } catch( IOException ioe ) {
+            Errors.error(Errors.IO_ERROR, position(), "Error reading schema for module " + this.moduleName());
+        }
         data.setValue("class.moduleVersion", this.moduleVersion());
         data.setValue("class.moduleMinMuleVersion", this.moduleMinMuleVersion());
         data.setValue("class.moduleSessionAware", Boolean.toString(this.moduleSessionAware()));
@@ -1967,7 +1984,7 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
                 mModuleNamespace = value.valueString().replace("\"", "");
             }
         }
-        mModuleSchemaLocation = mModuleNamespace + "/" + mModuleVersion + "/mule-" + mModuleName + ".xsd";
+        mModuleSchemaLocation = mModuleNamespace + "/current/mule-" + mModuleName + ".xsd";
         for (AnnotationValueInfo value : annotation.elementValues()) {
             if ("schemaLocation".equals(value.element().name())) {
                 mModuleSchemaLocation = value.valueString().replace("\"", "");

@@ -41,7 +41,6 @@ Summary:
 <div id="jd-header">
     <?cs var:project.groupId ?>
 <h1><?cs var:project.artifactId ?></h1>
-    <?cs var:project.version ?>
 
 </div><!-- end header -->
 
@@ -55,10 +54,10 @@ Summary:
         <tbody><tr>
           <th>Namespace</th><td><?cs var:class.moduleNamespace ?></td>
         </tr><tr>
-          <th>Schema Location</th><td><?cs var:class.moduleSchemaLocation ?></td>
+          <th>Schema Location</th><td><?cs var:class.moduleSchemaLocation ?>&nbsp;&nbsp;(<a href="<?cs var:class.moduleSchemaPath ?>">View Schema</a>)</td>
         </tr>
 <tr>
-          <th>Version</th><td><?cs var:class.moduleVersion ?></td>
+          <th>Schema Version</th><td><?cs var:class.moduleVersion ?></td>
         </tr>
 <tr>
           <th>Minimum Mule Version</th><td><?cs var:class.moduleMinMuleVersion ?></td>

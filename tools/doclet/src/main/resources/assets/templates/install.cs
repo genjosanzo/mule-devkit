@@ -46,7 +46,17 @@ element your POM:
 &lt;dependency&gt;
     &lt;groupId&gt;<?cs var:project.groupId ?>&lt;/groupId&gt;
     &lt;artifactId&gt;<?cs var:project.artifactId ?>&lt;/artifactId&gt;
-    &lt;version&gt;<?cs var:project.version ?>&lt;/version&gt;
+    &lt;version&gt;RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+</pre>
+
+or if  you want to be on the bleeding edge
+
+<pre>
+&lt;dependency&gt;
+    &lt;groupId&gt;<?cs var:project.groupId ?>&lt;/groupId&gt;
+    &lt;artifactId&gt;<?cs var:project.artifactId ?>&lt;/artifactId&gt;
+    &lt;version&gt;LATEST&lt;/version&gt;
 &lt;/dependency&gt;
 </pre>
 
