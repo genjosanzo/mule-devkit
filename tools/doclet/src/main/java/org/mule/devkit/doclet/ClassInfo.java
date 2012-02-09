@@ -17,10 +17,8 @@
 package org.mule.devkit.doclet;
 
 import com.google.clearsilver.jsilver.data.Data;
-import com.google.streamhtmlparser.util.HtmlUtils;
 import com.sun.javadoc.ClassDoc;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.BufferedReader;
@@ -928,8 +926,8 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
         data.setValue("class.moduleSchemaLocation", this.moduleSchemaLocation());
         data.setValue("class.moduleSchemaPath", this.moduleSchemaPath());
         try {
-            data.setValue("class.moduleSchema", StringEscapeUtils.escapeHtml4(FileUtils.readFileToString( new File("../../../target/generated-sources/mule/META-INF/mule-" + this.moduleName() + ".xsd"))));
-        } catch( IOException ioe ) {
+            data.setValue("class.moduleSchema", StringEscapeUtils.escapeHtml4(FileUtils.readFileToString(new File("../../../target/generated-sources/mule/META-INF/mule-" + this.moduleName() + ".xsd"))));
+        } catch (IOException ioe) {
             Errors.error(Errors.IO_ERROR, position(), "Error reading schema for module " + this.moduleName());
         }
         data.setValue("class.moduleVersion", this.moduleVersion());
@@ -1874,7 +1872,7 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
     public boolean oauthAware() {
         return mModuleOAuthAware;
     }
-    
+
     public void setTypeInfo(TypeInfo typeInfo) {
         mTypeInfo = typeInfo;
     }
@@ -1940,13 +1938,12 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
                 mModuleHasConnectionManager = false;
             }
             boolean hasOAuth = false;
-            if( mIsModule ) {
+            if (mIsModule) {
                 for (AnnotationInstanceInfo annotation : annotations()) {
                     if (annotation.type().qualifiedName().equals("org.mule.api.annotations.oauth.OAuth")) {
                         hasOAuth = true;
                         break;
-                    }
-                    else if (annotation.type().qualifiedName().equals("org.mule.api.annotations.oauth.OAuth2")) {
+                    } else if (annotation.type().qualifiedName().equals("org.mule.api.annotations.oauth.OAuth2")) {
                         hasOAuth = true;
                         break;
                     }
@@ -1955,7 +1952,7 @@ public class ClassInfo extends DocInfo implements ContainerInfo, Comparable, Sco
             }
             mModuleOAuthAware = hasOAuth;
             mModuleKnown = true;
-            
+
         }
         return mIsModule;
     }

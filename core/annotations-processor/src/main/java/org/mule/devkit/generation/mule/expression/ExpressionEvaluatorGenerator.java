@@ -81,7 +81,7 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
         Method setMuleContext = evaluatorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setMuleContext");
         Variable muleContext = setMuleContext.param(ref(MuleContext.class), "muleContext");
         Conditional ifModuleIsContextAware = setMuleContext.body()._if(Op._instanceof(module, ref(MuleContextAware.class)));
-        ifModuleIsContextAware._then().add(module.invoke("setMuleContext").arg(muleContext));
+        ifModuleIsContextAware._then().add(ExpressionFactory.cast(ref(MuleContextAware.class), module).invoke("setMuleContext").arg(muleContext));
 
         Method start = evaluatorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "start");
         start._throws(ref(MuleException.class));

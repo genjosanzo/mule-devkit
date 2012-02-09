@@ -130,7 +130,7 @@ def:op_tag_list(tags) ?><?cs
 <?cs # Print a list of tags (e.g. description text ?><?cs
 def:op_tag_list_no_sample(tags) ?><?cs
   each:tag = tags ?><?cs
-      if:tag.name == "Text" ?><?cs var:tag.text?><br/><?cs
+      if:tag.name == "Text" ?><?cs var:tag.text?><?cs
       elif:tag.kind == "@more" ?><p><?cs
       elif:tag.kind == "@see" ?><code><a href="<?cs
         if:tag.isLocal?><?cs var:toroot ?>java/<?cs /if ?><?cs
