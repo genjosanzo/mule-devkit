@@ -161,6 +161,7 @@ public class MarkdownProcessor {
 
     public TextEditor runBlockGamut(TextEditor text) {
         doHeaders(text);
+        doWarnings(text);
         doHorizontalRules(text);
         doLists(text);
         doCodeBlocks(text);
@@ -601,6 +602,19 @@ public class MarkdownProcessor {
 
     private String generateAnchorName(String heading) {
         return heading.toLowerCase().replace(" ", "-");
+    }
+
+    private TextEditor doWarnings(TextEditor markup) {
+        // setext-style headers
+        Pattern p = Pattern.compile("^!!!\\s*(.*?)\\s*\\1?$", Pattern.MULTILINE);
+        markup.replaceAll(p, new Replacement() {
+            public String replacement(Matcher m) {
+                String text = m.group(1);
+                return "<p class=\"caution\">" + text + "</p>\n";
+            }
+        });
+
+        return markup;
     }
 
     private TextEditor doHeaders(TextEditor markup) {
