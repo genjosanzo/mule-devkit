@@ -10,25 +10,14 @@
 	<div class="g-unit g-first side-nav-resizable" id="side-nav">
 	      <div id="swapper">
 	        <div id="side-nav">
-
-					<ul>
-
-					  <li>
-					    <span class="heading">
-					      <span>Title 1</span>
-					    </span>
-					    <ul>
-					      <li><a href="title-2.html">
-					        <span>Title 2</span></a></li>
-					      <li><a href="title-3.html">
-					        <span>Title 3</span></a></li>
-					      <li><a href="title-4.html">
-					        <span>Title 4</span></a></li>
-					    </ul>
-					  </li>
-				</ul>
-
-
+                <script type="text/javascript" charset="utf-8">
+                    $(document).ready(function(){
+                        $("ul#toc").tableOfContents();
+                        buildToggleLists();
+                    })
+                </script>
+                <ul id="toc">
+                </ul>
 	        </div><!-- end nav-panels -->
 	      </div><!-- end swapper -->
 	    </div> <!-- end side-nav -->

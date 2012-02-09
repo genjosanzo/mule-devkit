@@ -53,9 +53,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.jar.JarFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Doclava {
     public static final int SHOW_PUBLIC = 0x00000001;
@@ -992,10 +995,6 @@ public class Doclava {
                 String htmlContent = markdown.markdown(mdContent);
                 String outFile = FilenameUtils.getName(m[1]).replaceAll(".md", ".html").toLowerCase();
                 Data data = makeHDF();
-
-                // build toc
-
-
 
                 data.setValue("content", htmlContent);
                 data.setValue("section", m[0]);

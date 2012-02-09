@@ -82,9 +82,20 @@
     padding: 3px 0 1px 9px;
 }
 
+#side-nav li a.heading
+{
+    display:block;
+    font-size:12px;
+    font-weight: bold;
+    margin:.5em 0 0 0;
+    padding: 3px 0 1px 9px;
+}
+
 #side-nav li a {
+    display: inline-block;
     text-decoration: none;
-    padding: 0 0 0 0px;
+    padding: 0 0 0 18px;
+    white-space: normal;
     zoom: 1;
 }
 
