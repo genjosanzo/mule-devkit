@@ -133,7 +133,7 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
         Invocation newArray = ExpressionFactory._new(ref(Class.class).array());
         for (VariableElement parameter : executableElement.getParameters()) {
             //tryStatement.body().assign(parameterClasses.component(ExpressionFactory.lit(argCount)), ref(parameter.asType()).boxify().dotclass());
-            if( parameter.asType().getKind() == TypeKind.BOOLEAN ||
+            if (parameter.asType().getKind() == TypeKind.BOOLEAN ||
                     parameter.asType().getKind() == TypeKind.BYTE ||
                     parameter.asType().getKind() == TypeKind.SHORT ||
                     parameter.asType().getKind() == TypeKind.CHAR ||
