@@ -44,7 +44,6 @@ import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.CatchBlock;
-import org.mule.devkit.model.code.CodeModel;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
