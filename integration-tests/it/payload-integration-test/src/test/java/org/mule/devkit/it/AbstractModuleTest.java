@@ -17,12 +17,15 @@
 
 package org.mule.devkit.it;
 
+import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
+import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.NullPayload;
 
 import java.util.Map;
 
@@ -48,6 +51,15 @@ public abstract class AbstractModuleTest extends FunctionalTestCase {
         MuleEvent responseEvent = flow.process(event);
 
         assertEquals(expect, responseEvent.getMessage().getPayload());
+    }
+
+    protected <U extends Throwable> void runFlowWithExceptionPayload(String flowName, U payload) throws Exception {
+        Flow flow = lookupFlowConstruct(flowName);
+        MuleEvent event = AbstractMuleTestCase.getTestEvent(NullPayload.getInstance());
+        event.getMessage().setExceptionPayload( new DefaultExceptionPayload(payload));
+        MuleEvent responseEvent = flow.process(event);
+
+        assertTrue(responseEvent.getMessage().getPayload() instanceof ExceptionPayload);
     }
 
     protected <T, U> void runFlowWithPayloadAndHeaders(String flowName, Map<String, Object> headers, T expect, U payload) throws Exception {

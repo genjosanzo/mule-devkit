@@ -18,8 +18,14 @@
 package org.mule.devkit.validation;
 
 import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.param.CorrelationGroupSize;
+import org.mule.api.annotations.param.CorrelationId;
+import org.mule.api.annotations.param.CorrelationSequence;
+import org.mule.api.annotations.param.ExceptionPayload;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
+import org.mule.api.annotations.param.MessageRootId;
+import org.mule.api.annotations.param.MessageUniqueId;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.SessionHeaders;
@@ -74,6 +80,24 @@ public class ProcessorValidator implements Validator {
                     count++;
                 }
                 if (parameter.getAnnotation(Payload.class) != null) {
+                    count++;
+                }
+                if (parameter.getAnnotation(ExceptionPayload.class) != null) {
+                    count++;
+                }
+                if (parameter.getAnnotation(CorrelationId.class) != null) {
+                    count++;
+                }
+                if (parameter.getAnnotation(CorrelationSequence.class) != null) {
+                    count++;
+                }
+                if (parameter.getAnnotation(CorrelationGroupSize.class) != null) {
+                    count++;
+                }
+                if (parameter.getAnnotation(MessageUniqueId.class) != null) {
+                    count++;
+                }
+                if (parameter.getAnnotation(MessageRootId.class) != null) {
                     count++;
                 }
 

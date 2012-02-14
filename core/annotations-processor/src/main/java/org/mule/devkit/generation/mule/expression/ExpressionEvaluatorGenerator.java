@@ -22,8 +22,14 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.annotations.ExpressionEvaluator;
 import org.mule.api.annotations.ExpressionLanguage;
+import org.mule.api.annotations.param.CorrelationGroupSize;
+import org.mule.api.annotations.param.CorrelationId;
+import org.mule.api.annotations.param.CorrelationSequence;
+import org.mule.api.annotations.param.ExceptionPayload;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
+import org.mule.api.annotations.param.MessageRootId;
+import org.mule.api.annotations.param.MessageUniqueId;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.SessionHeaders;
@@ -38,6 +44,7 @@ import org.mule.devkit.generation.AbstractMessageGenerator;
 import org.mule.devkit.generation.DevKitTypeElement;
 import org.mule.devkit.generation.NamingContants;
 import org.mule.devkit.model.code.CatchBlock;
+import org.mule.devkit.model.code.CodeModel;
 import org.mule.devkit.model.code.Conditional;
 import org.mule.devkit.model.code.DefinedClass;
 import org.mule.devkit.model.code.ExpressionFactory;
@@ -54,6 +61,7 @@ import org.mule.expression.ExpressionUtils;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeKind;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,7 +133,18 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
         Invocation newArray = ExpressionFactory._new(ref(Class.class).array());
         for (VariableElement parameter : executableElement.getParameters()) {
             //tryStatement.body().assign(parameterClasses.component(ExpressionFactory.lit(argCount)), ref(parameter.asType()).boxify().dotclass());
-            newArray.arg(ref(parameter.asType()).boxify().dotclass());
+            if( parameter.asType().getKind() == TypeKind.BOOLEAN ||
+                    parameter.asType().getKind() == TypeKind.BYTE ||
+                    parameter.asType().getKind() == TypeKind.SHORT ||
+                    parameter.asType().getKind() == TypeKind.CHAR ||
+                    parameter.asType().getKind() == TypeKind.INT ||
+                    parameter.asType().getKind() == TypeKind.FLOAT ||
+                    parameter.asType().getKind() == TypeKind.LONG ||
+                    parameter.asType().getKind() == TypeKind.DOUBLE) {
+                newArray.arg(ref(parameter.asType()).boxify().staticRef("TYPE"));
+            } else {
+                newArray.arg(ref(parameter.asType()).boxify().dotclass());
+            }
             //argCount++;
         }
         Variable parameterClasses = tryStatement.body().decl(ref(Class.class).array(), "parameterClasses", newArray);
@@ -142,23 +161,35 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
         Invocation evaluateInvoke = module.invoke(executableElement.getSimpleName().toString());
         for (VariableElement parameter : executableElement.getParameters()) {
             if (parameter.getAnnotation(Payload.class) != null) {
-                evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()), ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(message.invoke("getPayload"))));
+                evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(), ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(message.invoke("getPayload"))));
+            } else if (parameter.getAnnotation(ExceptionPayload.class) != null) {
+                evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(), ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(message.invoke("getExceptionPayload"))));
+            } else if (parameter.getAnnotation(CorrelationId.class) != null) {
+                evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(), ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(message.invoke("getCorrelationId"))));
+            } else if (parameter.getAnnotation(CorrelationSequence.class) != null) {
+                evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(), ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(message.invoke("getCorrelationSequence"))));
+            } else if (parameter.getAnnotation(CorrelationGroupSize.class) != null) {
+                evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(), ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(message.invoke("getCorrelationGroupSize"))));
+            } else if (parameter.getAnnotation(MessageUniqueId.class) != null) {
+                evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(), ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(message.invoke("getUniqueId"))));
+            } else if (parameter.getAnnotation(MessageRootId.class) != null) {
+                evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(), ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(message.invoke("getMessageRootId"))));
             } else if (parameter.asType().toString().startsWith(MuleMessage.class.getName())) {
                 evaluateInvoke.arg(message);
             } else if (parameter.getAnnotation(InboundHeaders.class) != null) {
                 InboundHeaders inboundHeaders = parameter.getAnnotation(InboundHeaders.class);
                 if (context.getTypeMirrorUtils().isArrayOrList(parameter.asType())) {
-                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()),
+                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INBOUND:" + inboundHeaders.value()).arg(message).arg(ref(List.class).dotclass())
                             )));
                 } else if (context.getTypeMirrorUtils().isMap(parameter.asType())) {
-                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()),
+                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INBOUND:" + inboundHeaders.value()).arg(message).arg(ref(Map.class).dotclass())
                             )));
                 } else {
-                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()),
+                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INBOUND:" + inboundHeaders.value()).arg(message)
                             )));
@@ -166,12 +197,12 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
             } else if (parameter.getAnnotation(SessionHeaders.class) != null) {
                 SessionHeaders sessionHeaders = parameter.getAnnotation(SessionHeaders.class);
                 if (context.getTypeMirrorUtils().isArrayOrList(parameter.asType())) {
-                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()),
+                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("SESSION:" + sessionHeaders.value()).arg(message).arg(ref(List.class).dotclass())
                             )));
                 } else if (context.getTypeMirrorUtils().isMap(parameter.asType())) {
-                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()),
+                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("SESSION:" + sessionHeaders.value()).arg(message).arg(ref(Map.class).dotclass())
                             )));
@@ -182,24 +213,24 @@ public class ExpressionEvaluatorGenerator extends AbstractMessageGenerator {
                             )));
                 }
             } else if (parameter.getAnnotation(OutboundHeaders.class) != null) {
-                evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()),
+                evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(),
                         ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                 ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("OUTBOUND:*").arg(message).arg(ref(Map.class).dotclass())
                         )));
             } else if (parameter.getAnnotation(InvocationHeaders.class) != null) {
                 InvocationHeaders invocationHeaders = parameter.getAnnotation(InvocationHeaders.class);
                 if (context.getTypeMirrorUtils().isArrayOrList(parameter.asType())) {
-                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()),
+                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INVOCATION:" + invocationHeaders.value()).arg(message).arg(ref(List.class).dotclass())
                             )));
                 } else if (context.getTypeMirrorUtils().isMap(parameter.asType())) {
-                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()),
+                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INVOCATION:" + invocationHeaders.value()).arg(message).arg(ref(Map.class).dotclass())
                             )));
                 } else {
-                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()),
+                    evaluateInvoke.arg(ExpressionFactory.cast(ref(parameter.asType()).boxify(),
                             ExpressionFactory.invoke("transform").arg(message).arg(types.get(argCount)).arg(
                                     ref(ExpressionUtils.class).staticInvoke("getPropertyWithScope").arg("INVOCATION:" + invocationHeaders.value()).arg(message)
                             )));

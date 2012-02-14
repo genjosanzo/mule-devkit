@@ -14,30 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.mule.api.annotations.param;
 
-package org.mule.devkit.it;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.mule.api.annotations.Module;
-import org.mule.api.annotations.Processor;
-import org.mule.api.annotations.param.ExceptionPayload;
-import org.mule.api.annotations.param.Payload;
-
-@Module(name = "payload")
-public class PayloadModule {
-
-    @Processor
-    public Object returnPayload(@Payload Object payload) {
-        return payload;
-    }
-
-    @Processor
-    public Object returnExceptionPayload(@ExceptionPayload Object payload) {
-        return payload;
-    }
-
-    @Processor
-    public String returnPayloadByteArray(@Payload final byte[] payload) {
-        return new String(payload);
-    }
-
+@Target(value = {ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface ExceptionPayload {
 }

@@ -18,6 +18,9 @@ package org.mule.devkit.validation;
 
 import org.mule.api.annotations.ExpressionEnricher;
 import org.mule.api.annotations.ExpressionEvaluator;
+import org.mule.api.annotations.param.CorrelationId;
+import org.mule.api.annotations.param.CorrelationSequence;
+import org.mule.api.annotations.param.ExceptionPayload;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
 import org.mule.api.annotations.param.OutboundHeaders;
@@ -62,7 +65,10 @@ public class ExpressionLanguageValidator implements Validator {
                         parameter.getAnnotation(OutboundHeaders.class) == null &&
                         parameter.getAnnotation(InboundHeaders.class) == null &&
                         parameter.getAnnotation(SessionHeaders.class) == null &&
-                        parameter.getAnnotation(InvocationHeaders.class) == null) {
+                        parameter.getAnnotation(InvocationHeaders.class) == null &&
+                        parameter.getAnnotation(ExceptionPayload.class) == null &&
+                        parameter.getAnnotation(CorrelationId.class) == null &&
+                        parameter.getAnnotation(CorrelationSequence.class) == null) {
                     if (parameter.asType().toString().contains("String")) {
                         if (expressionStringFound) {
                             throw new ValidationException(executableElement, "An @ExpressionEvaluator can receive only one String and the rest of the arguments must be annotated with either @Payload, @InboundHeaders, @OutboundHeaders, @SessionHeader or @InvocationHeaders.");
@@ -91,7 +97,10 @@ public class ExpressionLanguageValidator implements Validator {
                         parameter.getAnnotation(OutboundHeaders.class) == null &&
                         parameter.getAnnotation(InboundHeaders.class) == null &&
                         parameter.getAnnotation(SessionHeaders.class) == null &&
-                        parameter.getAnnotation(InvocationHeaders.class) == null) {
+                        parameter.getAnnotation(InvocationHeaders.class) == null &&
+                        parameter.getAnnotation(ExceptionPayload.class) == null &&
+                        parameter.getAnnotation(CorrelationId.class) == null &&
+                        parameter.getAnnotation(CorrelationSequence.class) == null) {
                     if (parameter.asType().toString().contains("String")) {
                         if (expressionStringFound) {
                             throw new ValidationException(executableElement, "An @ExpressionEnricher can receive only one Object and one String and the rest of the arguments must be annotated with either @Payload, @InboundHeaders, @OutboundHeaders, @SessionHeader or @InvocationHeaders.");

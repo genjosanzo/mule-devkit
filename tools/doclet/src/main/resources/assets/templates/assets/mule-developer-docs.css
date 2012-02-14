@@ -545,7 +545,7 @@ div#naMessage strong {
 }
 
 #jd-content {
-    padding: 18px 15px;
+    padding: 0px 15px;
 }
 
 hr {
@@ -556,13 +556,24 @@ hr {
 
 /* DOC CLASSES */
 
+#jd-content h1 a {
+    color: #fff;
+}
+
 #jd-content h1 {
     /*sdk page*/
     font-family: Ubuntu, Arial, Helvetica;
     font-size: 1.6em;
     font-weight: bold;
-    color: #111;
+    color: #fff;
     margin: 0 0 .5em;
+    background-color: #3572A6;
+    margin-left: -15px;
+    margin-right: -15px;
+    /* margin-top: -5px; */
+    padding-top: 20px;
+    padding-bottom:10px;
+    padding-left: 15px;
 }
 
 #jd-content h2 {

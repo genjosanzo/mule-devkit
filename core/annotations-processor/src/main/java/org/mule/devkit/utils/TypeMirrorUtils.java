@@ -21,8 +21,14 @@ import org.mule.api.MuleMessage;
 import org.mule.api.NestedProcessor;
 import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
+import org.mule.api.annotations.param.CorrelationGroupSize;
+import org.mule.api.annotations.param.CorrelationId;
+import org.mule.api.annotations.param.CorrelationSequence;
+import org.mule.api.annotations.param.ExceptionPayload;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
+import org.mule.api.annotations.param.MessageRootId;
+import org.mule.api.annotations.param.MessageUniqueId;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.SessionHeaders;
@@ -45,7 +51,11 @@ import java.util.Map;
 public class TypeMirrorUtils {
     private static final List<Class<?>> PARAMETER_TYPES_TO_IGNORE = Arrays.asList(SourceCallback.class, MuleMessage.class);
     private static final List<Class<? extends Annotation>> PARAMETERS_ANNOTATIONS_TO_IGNORE =
-            Arrays.asList(InboundHeaders.class, InvocationHeaders.class, OutboundHeaders.class, SessionHeaders.class, Payload.class, OAuthAccessToken.class, OAuthAccessTokenSecret.class);
+            Arrays.asList(InboundHeaders.class, InvocationHeaders.class, OutboundHeaders.class, 
+                          SessionHeaders.class, Payload.class, OAuthAccessToken.class, 
+                          OAuthAccessTokenSecret.class, ExceptionPayload.class, CorrelationId.class,
+                          CorrelationSequence.class, CorrelationGroupSize.class, MessageUniqueId.class,
+                          MessageRootId.class);
 
     private Types types;
 

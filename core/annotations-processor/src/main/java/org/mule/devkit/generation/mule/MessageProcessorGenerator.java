@@ -31,8 +31,14 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.oauth.OAuthAccessToken;
 import org.mule.api.annotations.oauth.OAuthAccessTokenSecret;
+import org.mule.api.annotations.param.CorrelationGroupSize;
+import org.mule.api.annotations.param.CorrelationId;
+import org.mule.api.annotations.param.CorrelationSequence;
+import org.mule.api.annotations.param.ExceptionPayload;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.InvocationHeaders;
+import org.mule.api.annotations.param.MessageRootId;
+import org.mule.api.annotations.param.MessageUniqueId;
 import org.mule.api.annotations.param.OutboundHeaders;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.annotations.param.SessionHeaders;
@@ -651,6 +657,12 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         InvocationHeaders invocationHeaders = variable.getAnnotation(InvocationHeaders.class);
         SessionHeaders sessionHeaders = variable.getAnnotation(SessionHeaders.class);
         Payload payload = variable.getAnnotation(Payload.class);
+        ExceptionPayload exceptionPayload = variable.getAnnotation(ExceptionPayload.class);
+        CorrelationId correlationId = variable.getAnnotation(CorrelationId.class);
+        CorrelationSequence correlationSequence = variable.getAnnotation(CorrelationSequence.class);
+        CorrelationGroupSize correlationGroupSize = variable.getAnnotation(CorrelationGroupSize.class);
+        MessageRootId messageRootId = variable.getAnnotation(MessageRootId.class);
+        MessageUniqueId messageUniqueId = variable.getAnnotation(MessageUniqueId.class);
 
         if (outboundHeaders == null) {
             Type type = ref(fields.get(fieldName).getVariableElement().asType()).boxify();
@@ -693,6 +705,18 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
                 }
             } else if (payload != null) {
                 evaluateAndTransform.arg("#[payload]");
+            } else if (exceptionPayload != null) {
+                evaluateAndTransform.arg(muleMessage.invoke("getExceptionPayload"));
+            } else if (correlationId != null) {
+                evaluateAndTransform.arg(muleMessage.invoke("getCorrelationId"));
+            } else if (correlationSequence != null) {
+                evaluateAndTransform.arg(muleMessage.invoke("getCorrelationSequence"));
+            } else if (correlationGroupSize != null) {
+                evaluateAndTransform.arg(muleMessage.invoke("getCorrelationGroupSize"));
+            } else if (messageRootId != null) {
+                evaluateAndTransform.arg(muleMessage.invoke("getMessageRootId"));
+            } else if (messageUniqueId != null) {
+                evaluateAndTransform.arg(muleMessage.invoke("getUniqueId"));
             } else {
                 evaluateAndTransform.arg(fields.get(fieldName).getField());
             }

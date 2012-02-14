@@ -21,13 +21,17 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:payload="http://www.mulesoft.org/schema/mule/payload"
-      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/payload http://www.mulesoft.org/schema/mule/payload/current/mule-payload.xsd">
 
     <payload:config/>
 
     <flow name="returnPayload">
         <payload:return-payload/>
+    </flow>
+
+    <flow name="returnExceptionPayload">
+        <payload:return-exception-payload/>
     </flow>
 
     <flow name="returnPayloadByteArray">

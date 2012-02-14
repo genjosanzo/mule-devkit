@@ -61,6 +61,9 @@ public class InjectAdapterGenerator extends AbstractModuleGenerator {
     @Override
     protected void doGenerate(DevKitTypeElement typeElement) throws GenerationException {
         DefinedClass adapter = getMuleContextAwareAdapter(typeElement);
+        adapter.javadoc().add("A <code>" + adapter.name() + "</code> is a wrapper around ");
+        adapter.javadoc().add(ref(typeElement.asType()));
+        adapter.javadoc().add(" that allows the injection of several Mule facilities when a MuleContext is set.");
 
         Method setMuleContext = adapter.method(Modifier.PUBLIC, context.getCodeModel().VOID, "setMuleContext");
         setMuleContext.annotate(Override.class);

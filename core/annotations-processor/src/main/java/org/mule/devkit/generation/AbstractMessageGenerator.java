@@ -163,7 +163,50 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         Variable clazz = isAssignableFrom.param(ref(Class.class), "clazz");
 
         Block isClass = isAssignableFrom.body()._if(Op._instanceof(expectedType, ref(Class.class)))._then();
-        isClass._return(
+        Conditional isPrimitive = isClass._if(ExpressionFactory.cast(ref(Class.class), expectedType).invoke("isPrimitive"));
+        isPrimitive._then()._if(Op.cand(
+                ExpressionFactory.cast(ref(Class.class), expectedType).invoke("getName").invoke("equals").arg(ExpressionFactory.lit("boolean")),
+                Op.eq(clazz, ref(Boolean.class).dotclass())
+        ))._then()._return(ExpressionFactory.TRUE);
+
+        isPrimitive._then()._if(Op.cand(
+                ExpressionFactory.cast(ref(Class.class), expectedType).invoke("getName").invoke("equals").arg(ExpressionFactory.lit("byte")),
+                Op.eq(clazz, ref(Byte.class).dotclass())
+        ))._then()._return(ExpressionFactory.TRUE);
+
+        isPrimitive._then()._if(Op.cand(
+                ExpressionFactory.cast(ref(Class.class), expectedType).invoke("getName").invoke("equals").arg(ExpressionFactory.lit("short")),
+                Op.eq(clazz, ref(Short.class).dotclass())
+        ))._then()._return(ExpressionFactory.TRUE);
+
+        isPrimitive._then()._if(Op.cand(
+                ExpressionFactory.cast(ref(Class.class), expectedType).invoke("getName").invoke("equals").arg(ExpressionFactory.lit("char")),
+                Op.eq(clazz, ref(Character.class).dotclass())
+        ))._then()._return(ExpressionFactory.TRUE);
+
+        isPrimitive._then()._if(Op.cand(
+                ExpressionFactory.cast(ref(Class.class), expectedType).invoke("getName").invoke("equals").arg(ExpressionFactory.lit("int")),
+                Op.eq(clazz, ref(Integer.class).dotclass())
+        ))._then()._return(ExpressionFactory.TRUE);
+
+        isPrimitive._then()._if(Op.cand(
+                ExpressionFactory.cast(ref(Class.class), expectedType).invoke("getName").invoke("equals").arg(ExpressionFactory.lit("float")),
+                Op.eq(clazz, ref(Float.class).dotclass())
+        ))._then()._return(ExpressionFactory.TRUE);
+
+        isPrimitive._then()._if(Op.cand(
+                ExpressionFactory.cast(ref(Class.class), expectedType).invoke("getName").invoke("equals").arg(ExpressionFactory.lit("long")),
+                Op.eq(clazz, ref(Long.class).dotclass())
+        ))._then()._return(ExpressionFactory.TRUE);
+
+        isPrimitive._then()._if(Op.cand(
+                ExpressionFactory.cast(ref(Class.class), expectedType).invoke("getName").invoke("equals").arg(ExpressionFactory.lit("double")),
+                Op.eq(clazz, ref(Double.class).dotclass())
+        ))._then()._return(ExpressionFactory.TRUE);
+
+        isPrimitive._then()._return(ExpressionFactory.FALSE);
+
+        isPrimitive._else()._return(
                 ExpressionFactory.cast(ref(Class.class), expectedType).invoke("isAssignableFrom").arg(clazz)
         );
 
