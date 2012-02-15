@@ -49,6 +49,8 @@ Summary:
 <div id="jd-content" class="api apilevel-<?cs var:class.since.key ?>">
 <?cs # this next line must be exactly like this to be parsed by eclipse ?>
 
+<br/>
+
 <div class="jd-tagdata">
       <table class="jd-tagtable">
         <tbody><tr>
