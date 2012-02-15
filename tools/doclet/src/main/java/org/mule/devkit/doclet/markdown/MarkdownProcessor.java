@@ -600,10 +600,6 @@ public class MarkdownProcessor {
         return leadingLine == null || leadingLine.equals("");
     }
 
-    private String generateAnchorName(String heading) {
-        return heading.toLowerCase().replace(" ", "-");
-    }
-
     private TextEditor doWarnings(TextEditor markup) {
         // setext-style headers
         Pattern p = Pattern.compile("^!!!\\s*(.*?)\\s*\\1?$", Pattern.MULTILINE);
