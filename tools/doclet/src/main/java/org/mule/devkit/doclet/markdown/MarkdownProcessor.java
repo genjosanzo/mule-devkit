@@ -623,14 +623,14 @@ public class MarkdownProcessor {
         markup.replaceAll(p, new Replacement() {
             public String replacement(Matcher m) {
                 String heading = m.group(1);
-                return "<a name=\"" + generateAnchorName(heading) + "\"><h1>" + heading + "</h1></a>\n";
+                return "<h1>" + heading + "</h1>\n";
             }
         });
         p = Pattern.compile("^(.*)\n----+$", Pattern.MULTILINE);
         markup.replaceAll(p, new Replacement() {
             public String replacement(Matcher m) {
                 String heading = m.group(1);
-                return "<a name=\"" + generateAnchorName(heading) + "\"><h2>" + heading + "</h2></a>\n";
+                return "<h2>" + heading + "</h2>\n";
             }
         });
 
@@ -642,7 +642,7 @@ public class MarkdownProcessor {
                 String heading = m.group(2);
                 int level = marker.length();
                 String tag = "h" + level;
-                return "<a name=\"" + generateAnchorName(heading) + "\"><" + tag + ">" + heading + "</" + tag + "></a>\n";
+                return "<" + tag + ">" + heading + "</" + tag + ">\n";
             }
         });
         return markup;

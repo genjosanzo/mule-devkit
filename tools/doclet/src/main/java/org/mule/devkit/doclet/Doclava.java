@@ -603,11 +603,20 @@ public class Doclava {
         data.setValue("tabs." + i + ".title", "Java API Reference");
         data.setValue("tabs." + i + ".link", javadocDir + "packages.html");
 
-        i++;
-        data.setValue("tabs." + i + ".id", "mule");
-        data.setValue("tabs." + i + ".title", "Mule API Reference");
-        data.setValue("tabs." + i + ".link", muleXmlDir + "modules.html");
+        boolean hasModules = false;
+        ClassInfo[] classes = Converter.rootClasses();
+        for (ClassInfo cl : classes) {
+            if( cl.isModule() ) {
+                hasModules = true;
+            }
+        }
 
+        if( hasModules ) {
+            i++;
+            data.setValue("tabs." + i + ".id", "mule");
+            data.setValue("tabs." + i + ".title", "Mule API Reference");
+            data.setValue("tabs." + i + ".link", muleXmlDir + "modules.html");
+        }
 
         return data;
     }

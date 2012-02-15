@@ -10,6 +10,10 @@
 
 <div id="jd-content">
 
+<br/>
+<br/>
+<br/>
+
 <p>This module can be used in several different ways depending on your needs and requirements. The following sections
 details how to use and install this module under different scenarios / environments.</p>
 
