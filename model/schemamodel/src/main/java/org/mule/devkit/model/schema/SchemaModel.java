@@ -30,7 +30,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public final class SchemaModel {
 
@@ -87,13 +89,17 @@ public final class SchemaModel {
         OutputStreamWriter outputStreamWriter = null;
         try {
 
+            Set<String> targetNamespaces = new HashSet<String>();
             OutputStream outputStream = codeWriter.openBinary(null, "META-INF/spring.handlers");
             outputStreamWriter = new OutputStreamWriter(outputStream, "UTF-8");
 
             for (SchemaLocation schemaLocation : schemaLocations) {
                 if (schemaLocation.getNamespaceHandler() != null) {
                     String targetNamespace = schemaLocation.getTargetNamespace().replace("://", "\\://");
-                    outputStreamWriter.write(targetNamespace + "=" + schemaLocation.getNamespaceHandler() + "\n");
+                    if (!targetNamespaces.contains(targetNamespace)) {
+                        outputStreamWriter.write(targetNamespace + "=" + schemaLocation.getNamespaceHandler() + "\n");
+                        targetNamespaces.add(targetNamespace);
+                    }
                 }
             }
 
