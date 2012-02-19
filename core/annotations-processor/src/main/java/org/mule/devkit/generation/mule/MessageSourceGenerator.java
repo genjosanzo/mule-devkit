@@ -89,8 +89,6 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         messageSourceClass.javadoc().add(" as a message source capable of generating Mule events. ");
         messageSourceClass.javadoc().add(" The POJO's method is invoked in its own thread.");
 
-        FieldVariable logger = generateLoggerField(messageSourceClass);
-
         // add a field for each argument of the method
         Map<String, FieldVariableElement> fields = generateProcessorFieldForEachParameter(messageSourceClass, executableElement);
 
@@ -152,19 +150,19 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
             DefinedClass poolObjectClass = context.getClassForRole(context.getNameUtils().generatePoolObjectRoleKey(typeElement));
 
             // add run method
-            generateRunMethod(messageSourceClass, executableElement, fields, connectFields, object, muleContext, poolObjectClass, logger);
+            generateRunMethod(messageSourceClass, executableElement, fields, connectFields, object, muleContext, poolObjectClass, flowConstruct);
         } else {
             // add run method
-            generateRunMethod(messageSourceClass, executableElement, fields, connectFields, object, muleContext, logger);
+            generateRunMethod(messageSourceClass, executableElement, fields, connectFields, object, muleContext, flowConstruct);
         }
     }
 
-    private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectFields, FieldVariable object, FieldVariable muleContext, FieldVariable logger) {
-        generateRunMethod(messageSourceClass, executableElement, fields, connectFields, object, muleContext, null, logger);
+    private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectFields, FieldVariable object, FieldVariable muleContext, FieldVariable flowConstruct) {
+        generateRunMethod(messageSourceClass, executableElement, fields, connectFields, object, muleContext, null, flowConstruct);
     }
 
 
-    private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectFields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass, FieldVariable logger) {
+    private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectFields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass, FieldVariable flowConstruct) {
         String methodName = executableElement.getSimpleName().toString();
         Method run = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "run");
         run.javadoc().add("Implementation {@link Runnable#run()} that will invoke the method on the pojo that this message source wraps.");
@@ -294,9 +292,13 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
         callSource.body().add(methodCall);
 
-        CatchBlock logCatch = callSource._catch(ref(Exception.class));
-        Variable exception = logCatch.param("e");
-        logCatch.body().add(logger.invoke("error").arg(exception.invoke("getMessage")).arg(exception));
+        CatchBlock catchMessagingException = callSource._catch(ref(MessagingException.class));
+        Variable messagingException = catchMessagingException.param("e");
+        catchMessagingException.body().add(flowConstruct.invoke("getExceptionListener").invoke("handleException").arg(messagingException).arg(messagingException.invoke("getEvent")));
+
+        CatchBlock catchException = callSource._catch(ref(Exception.class));
+        Variable exception = catchException.param("e");
+        catchException.body().add(muleContext.invoke("getExceptionListener").invoke("handleException").arg(exception));
 
         if (poolObjectClass != null) {
             Block fin = callSource._finally();

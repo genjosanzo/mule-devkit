@@ -904,6 +904,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         Method process = messageSourceClass.method(Modifier.PUBLIC, ref(Object.class), "process");
         process.javadoc().add("Implements {@link SourceCallback#process(org.mule.api.MuleEvent)}. This message source will be passed on to ");
         process.javadoc().add("the actual pojo's method as a callback mechanism.");
+        process._throws(ref(Exception.class));
         Variable message = process.param(ref(Object.class), "message");
 
         Variable muleMessage = process.body().decl(ref(MuleMessage.class), "muleMessage");
@@ -936,7 +937,10 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         );
         ifResponse._then()._return(responseEvent.invoke("getMessage").invoke("getPayload"));
 
-        tryBlock._catch(ref(MuleException.class));
+        CatchBlock catchException = tryBlock._catch(ref(Exception.class));
+        Variable exception = catchException.param("e");
+        catchException.body()._throw(exception);
+
         process.body()._return(ExpressionFactory._null());
     }
 
@@ -944,6 +948,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         Method process = messageSourceClass.method(Modifier.PUBLIC, ref(Object.class), "process");
         process.javadoc().add("Implements {@link SourceCallback#process()}. This message source will be passed on to ");
         process.javadoc().add("the actual pojo's method as a callback mechanism.");
+        process._throws(ref(Exception.class));
 
         TryStatement tryBlock = process.body()._try();
         Variable responseEvent = tryBlock.body().decl(ref(MuleEvent.class), "responseEvent");
@@ -956,7 +961,10 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         );
         ifResponse._then()._return(responseEvent.invoke("getMessage").invoke("getPayload"));
 
-        tryBlock._catch(ref(MuleException.class));
+        CatchBlock catchException = tryBlock._catch(ref(Exception.class));
+        Variable exception = catchException.param("e");
+        catchException.body()._throw(exception);
+        
         process.body()._return(ExpressionFactory._null());
     }
 
@@ -965,6 +973,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         Method process = messageSourceClass.method(Modifier.PUBLIC, ref(Object.class), "process");
         process.javadoc().add("Implements {@link SourceCallback#process(org.mule.api.MuleEvent)}. This message source will be passed on to ");
         process.javadoc().add("the actual pojo's method as a callback mechanism.");
+        process._throws(ref(Exception.class));
         Variable message = process.param(ref(Object.class), "message");
         Variable properties = process.param(ref(Map.class).narrow(String.class).narrow(Object.class), "properties");
 
@@ -1001,7 +1010,10 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         );
         ifResponse._then()._return(responseEvent.invoke("getMessage").invoke("getPayload"));
 
-        tryBlock._catch(ref(MuleException.class));
+        CatchBlock catchException = tryBlock._catch(ref(Exception.class));
+        Variable exception = catchException.param("e");
+        catchException.body()._throw(exception);
+
         process.body()._return(ExpressionFactory._null());
     }
 
