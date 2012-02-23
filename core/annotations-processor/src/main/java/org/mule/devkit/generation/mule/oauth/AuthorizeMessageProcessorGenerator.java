@@ -82,7 +82,7 @@ public class AuthorizeMessageProcessorGenerator extends AbstractMessageGenerator
         FieldVariable flowConstruct = generateFieldForFlowConstruct(messageProcessorClass);
 
         // add initialise
-        generateInitialiseMethod(messageProcessorClass, null, typeElement, muleContext, null, null, object, null);
+        generateInitialiseMethod(messageProcessorClass, null, typeElement, muleContext, null, null, object, null, true);
 
         // add start
         generateStartMethod(messageProcessorClass, null);

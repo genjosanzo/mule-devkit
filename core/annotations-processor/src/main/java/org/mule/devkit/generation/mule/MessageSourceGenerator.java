@@ -108,7 +108,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         thread.javadoc().add("Thread under which this message source will execute");
 
         // add initialise
-        generateInitialiseMethod(messageSourceClass, fields, typeElement, muleContext, null, null, object, null);
+        generateInitialiseMethod(messageSourceClass, fields, typeElement, muleContext, null, null, object, null, !typeElement.needsConfig());
 
         // add setmulecontext
         generateSetMuleContextMethod(messageSourceClass, muleContext);
