@@ -26,7 +26,6 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
-import org.mule.api.annotations.param.Optional;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -52,7 +51,7 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
 
         for (VariableElement variable : getFieldsAnnotatedWith(Configurable.class)) {
             //if (variable.getAnnotation(Optional.class) == null) {
-                needsConfig = true;
+            needsConfig = true;
             //}
         }
 

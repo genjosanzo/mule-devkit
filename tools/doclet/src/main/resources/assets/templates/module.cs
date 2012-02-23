@@ -195,6 +195,7 @@ specify which configuration to use.</p>
       <?cs set:count = count + #1 ?>
     <?cs /each ?>
 </table>
+<?cs call:sample_config(class.descr) ?>
 <?cs /if ?>
 
 <?cs if:class.moduleSessionAware=="true" ?>

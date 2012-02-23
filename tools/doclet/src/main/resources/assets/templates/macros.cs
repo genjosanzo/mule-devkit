@@ -128,6 +128,14 @@ def:op_tag_list(tags) ?><?cs
 /def ?>
 
 <?cs # Print a list of tags (e.g. description text ?><?cs
+def:sample_config(tags) ?><?cs
+  each:tag = tags ?><?cs
+      if:tag.name == "@sample.config" ?><div class="jd-tagdata"><h5 class="jd-tagtitle">Configuration Sample</h5><pre><?cs var:tag.text ?></pre></div>
+    <?cs /if ?><?cs
+  /each ?><?cs
+/def ?>
+
+<?cs # Print a list of tags (e.g. description text ?><?cs
 def:op_tag_list_no_sample(tags) ?><?cs
   each:tag = tags ?><?cs
       if:tag.name == "Text" ?><?cs var:tag.text?><?cs
