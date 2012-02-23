@@ -150,7 +150,6 @@ Summary:
 
 </div><!-- jd-descr (summary) -->
 
-<?cs if:subcount(class.config) ?>
 <?cs # this next line must be exactly like this to be parsed by eclipse ?>
 <!-- ========= CONFIGURATION DETAIL ======== -->
 <A NAME="config"></A>
@@ -171,8 +170,9 @@ similar to the following:</p>
 
 &lt;/mule&gt;
 </pre>
+<?cs if:subcount(class.config) ?>
 <p>This module is configured using the <i>config</i> element. This element must be placed outside of your flows and at
-the root of your Mule application. You can create as many configurations as you deem necesary as long as each carries
+the root of your Mule application. You can create as many configurations as you deem necessary as long as each carries
 its own name.</p>
 <p>Each message processor, message source or transformer carries a <i>config-ref</i> attribute that allows the invoker to
 specify which configuration to use.</p>

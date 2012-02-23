@@ -343,11 +343,12 @@ def:op_description(obj) ?><?cs
   <?cs
   if:subcount(obj.throws) ?>
   <div class="jd-tagdata">
-      <h5 class="jd-tagtitle">Exception Payload</h5>
-      <table class="jd-tagtable"><?cs
-      each:tag=obj.throws ?>
+      <h5 class="jd-tagtitle">Exception Payloads</h5>
+      <table class="jd-sumtable">
+        <tr><th>Payload Class</th><th>Description</th></tr>
+        <?cs each:tag=obj.throws ?>
         <tr>
-            <th><?cs call:type_link(tag.type) ?></td>
+            <td><?cs call:type_link(tag.type) ?></td>
             <td><?cs call:op_tag_list(tag.comment) ?></td>
         </tr><?cs
       /each ?>
