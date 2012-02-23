@@ -532,12 +532,14 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
                         mParameters[i].typeName().startsWith("java.util.Map") ||
                         mParameters[i].typeName().startsWith("HashMap") ||
                         mParameters[i].typeName().startsWith("java.util.HashMap")) {
+                    attributeName[i] = uncamel(attributeName[i]);
                     collection[i] = true;
                 }
                 if (mParameters[i].typeName().contains("HttpCallback")) {
                     attributeName[i] = uncamel(attributeName[i]) + "-flow-ref";
                 }
                 if (mParameters[i].typeName().contains("NestedProcessor")) {
+                    attributeName[i] = uncamel(attributeName[i]);
                     nestedProcessor[i] = true;
                 }
                 optional[i] = false;
@@ -552,10 +554,8 @@ public class MethodInfo extends MemberInfo implements AbstractMethodInfo {
                         break;
                     } else if (annotation.type().qualifiedName().equals("org.mule.api.annotations.param.Optional")) {
                         optional[i] = true;
-                        break;
                     } else if (annotation.type().qualifiedName().equals("org.mule.api.annotations.param.Default")) {
                         defaultValue[i] = annotation.elementValues()[0].valueString().replace("\"", "");
-                        break;
                     }
                 }
                 names[i] = mParameters[i].name();
