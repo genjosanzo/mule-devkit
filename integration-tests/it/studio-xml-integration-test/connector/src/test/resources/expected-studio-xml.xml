@@ -29,7 +29,7 @@
   <cloud-connector abstract="true" image="icons/large/connector-connector-48x32.png" localId="abstractConnectorConnectorGeneric" icon="icons/small/connector-connector-24x16.png" description="Interact with Connector." caption="Abstractconnectorconnectorgeneric">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractConnectorConnectorGeneric">
-        <globalRef requiredType="http://www.mulesoft.org/schema/mule/connector/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref"></globalRef>
+        <globalRef requiredType="http://www.mulesoft.org/schema/mule/connector/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref" required="true"></globalRef>
       </group>
     </attribute-category>
   </cloud-connector>

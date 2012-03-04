@@ -19,7 +19,7 @@
   <cloud-connector abstract="true" image="icons/large/transformer-connector-48x32.png" localId="abstractTransformerConnectorGeneric" icon="icons/small/transformer-connector-24x16.png" description="Interact with Transformer." caption="Abstracttransformerconnectorgeneric">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractTransformerConnectorGeneric">
-        <globalRef requiredType="http://www.mulesoft.org/schema/mule/transformer/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref"></globalRef>
+        <globalRef requiredType="http://www.mulesoft.org/schema/mule/transformer/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref" required="true"></globalRef>
       </group>
     </attribute-category>
   </cloud-connector>
