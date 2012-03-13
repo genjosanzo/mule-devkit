@@ -89,6 +89,15 @@ public class MashapeGeneratorMojo extends AbstractMuleMojo {
     @MojoParameter(expression = "${project.build.directory}/generated-sources/mashape", required = true)
     private File defaultOutputDirectory;
 
+    @MojoParameter(required = false)
+    private String mashapeName;
+
+    @MojoParameter(required = false)
+    private String mashapeVersion;
+
+    @MojoParameter(required = false)
+    private String mashapeProxyHost;
+
     /**
      * Code Model
      */
@@ -135,6 +144,16 @@ public class MashapeGeneratorMojo extends AbstractMuleMojo {
     }
 
     private void generateMashapeClient(File inputFile) throws MojoExecutionException {
+        if( mashapeName == null ) {
+            throw new MojoExecutionException("You must specify a mashapeName");
+        }
+        if( mashapeVersion == null ) {
+            throw new MojoExecutionException("You must specify a mashapeVersion");
+        }
+        if( mashapeProxyHost == null ) {
+            throw new MojoExecutionException("You must specify a mashapeProxyHost");
+        }
+
         getLog().info("Generating POJO for " + inputFile.getAbsolutePath());
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -147,8 +166,8 @@ public class MashapeGeneratorMojo extends AbstractMuleMojo {
             DefinedClass clazz = codeModel._class(Modifier.ABSTRACT | Modifier.PUBLIC, "org.mule.modules.tinypayme.TinyPayMeConnector", ClassType.CLASS);
             clazz.javadoc().add("Unkown\n\nAutomatically generated from Mashape XML file\n\n@author MuleSoft, Inc.");
             AnnotationUse moduleAnnotation = clazz.annotate(Module.class);
-            moduleAnnotation.param("name", "tinypayme");
-            moduleAnnotation.param("schemaVersion", "1.0");
+            moduleAnnotation.param("name", mashapeName);
+            moduleAnnotation.param("schemaVersion", mashapeVersion);
 
             FieldVariable mashapePrivateKey = generateMashapePrivateKey(clazz);
             FieldVariable mashapePublicKey = generateMashapePublicKeyField(clazz);
@@ -184,7 +203,7 @@ public class MashapeGeneratorMojo extends AbstractMuleMojo {
                 if (uri.contains("?")) {
                     uri = uri.split("\\?")[0];
                 }
-                restCall.param("uri", "https://SwnOmB09bsY1a1TfWwxqlAeRo.proxy.mashape.com" + uri);
+                restCall.param("uri", "https://" + mashapeProxyHost + uri);
 
                 if ("GET".equals(method.getAttributes().getNamedItem("http").getNodeValue())) {
                     restCall.param("method", ref(HttpMethod.class).staticRef("GET"));

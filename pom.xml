@@ -79,6 +79,7 @@
                         <exclude>**/*.xsd</exclude>
                         <exclude>**/*.properties</exclude>
                         <exclude>**/*.xml</exclude>
+						<exclude>**/archetype-resources/**</exclude>
                         <exclude>**/src/main/java/package.html</exclude>
                     </excludes>
                 </configuration>
