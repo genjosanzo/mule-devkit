@@ -299,8 +299,10 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
         callSource.body().add(methodCall);
 
-        // catch interrupted exception and do nothing
-        callSource._catch(ref(InterruptedException.class));
+        if( sourceAnnotation.primaryNodeOnly() ) {
+            // catch interrupted exception and do nothing
+            callSource._catch(ref(InterruptedException.class));
+        }
 
         CatchBlock catchMessagingException = callSource._catch(ref(MessagingException.class));
         Variable messagingException = catchMessagingException.param("e");
