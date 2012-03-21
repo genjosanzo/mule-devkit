@@ -44,4 +44,9 @@ public @interface Source {
      * A user-friendly name for this processor.
      */
     String friendlyName() default "";
+
+    /**
+     * Does this message source must run on all cluster nodes, or just the primary one?
+     */
+    boolean primaryNodeOnly() default false;
 }

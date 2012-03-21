@@ -45,6 +45,7 @@ import org.mule.devkit.model.code.TryStatement;
 import org.mule.devkit.model.code.Type;
 import org.mule.devkit.model.code.TypeReference;
 import org.mule.devkit.model.code.Variable;
+import org.mule.devkit.model.code.WhileLoop;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -164,6 +165,7 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
 
     private void generateRunMethod(DefinedClass messageSourceClass, ExecutableElement executableElement, Map<String, FieldVariableElement> fields, Map<String, FieldVariableElement> connectFields, FieldVariable object, FieldVariable muleContext, DefinedClass poolObjectClass, FieldVariable flowConstruct) {
         String methodName = executableElement.getSimpleName().toString();
+        Source sourceAnnotation = executableElement.getAnnotation(Source.class);
         Method run = messageSourceClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "run");
         run.javadoc().add("Implementation {@link Runnable#run()} that will invoke the method on the pojo that this message source wraps.");
 
@@ -195,6 +197,11 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         }
 
         TryStatement callSource = run.body()._try();
+
+        if( sourceAnnotation.primaryNodeOnly() ) {
+            WhileLoop ifNotPrimary = callSource.body()._while(Op.not(muleContext.invoke("isPrimaryPollingInstance")));
+            ifNotPrimary.body().add(ref(Thread.class).staticInvoke("sleep").arg(ExpressionFactory.lit(5000)));
+        }
 
         findConfig(callSource.body(), muleContext, object, methodName, null, moduleObjectClass, moduleObject);
 
@@ -291,6 +298,9 @@ public class MessageSourceGenerator extends AbstractMessageGenerator {
         }
 
         callSource.body().add(methodCall);
+
+        // catch interrupted exception and do nothing
+        callSource._catch(ref(InterruptedException.class));
 
         CatchBlock catchMessagingException = callSource._catch(ref(MessagingException.class));
         Variable messagingException = catchMessagingException.param("e");
