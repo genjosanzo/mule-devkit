@@ -14,30 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.mule.api.annotations;
 
-package org.mule.devkit.it;
-
-public class SourceModuleTest extends AbstractModuleTest {
-
-    @Override
-    protected String getConfigResources() {
-        return "source.xml";
-    }
-
-    public void testSource() throws Exception {
-        runFlow("source");
-    }
-
-    public void testNoThreadSource() throws Exception {
-        runFlow("sourceNoThread");
-    }
-
-    public void testPrimaryNodeOnlySource() throws Exception {
-        runFlow("sourcePrimaryNodeOnly");
-    }
-
-    public void testSourceWithProperties() throws Exception {
-        runFlow("sourceWithProperties");
-    }
-
+public enum SourceThreadingModel {
+    NONE,
+    SINGLE_THREAD;
 }

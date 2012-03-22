@@ -17,6 +17,8 @@
 
 package org.mule.api.annotations;
 
+import org.mule.MessageExchangePattern;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -49,4 +51,14 @@ public @interface Source {
      * Does this message source must run on all cluster nodes, or just the primary one?
      */
     boolean primaryNodeOnly() default false;
+
+    /**
+     * Threading model
+     */
+    SourceThreadingModel threadingModel() default SourceThreadingModel.SINGLE_THREAD;
+
+    /**
+     * Message exchange pattern
+     */
+    MessageExchangePattern exchangePattern() default MessageExchangePattern.ONE_WAY;
 }

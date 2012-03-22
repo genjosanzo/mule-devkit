@@ -24,6 +24,7 @@ import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
+import org.mule.api.annotations.SourceThreadingModel;
 import org.mule.api.annotations.oauth.OAuth;
 import org.mule.api.annotations.oauth.OAuth2;
 import org.mule.api.callback.HttpCallback;
@@ -318,8 +319,9 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
 
     private void generateBeanDefinitionParserForSource(ExecutableElement executableElement) {
         // get class
+        Source sourceAnnotation = executableElement.getAnnotation(Source.class);
         DefinedClass beanDefinitionparser = getBeanDefinitionParserClass(executableElement);
-        DefinedClass messageSourceClass = getMessageSourceClass(executableElement);
+        DefinedClass messageSourceClass = getMessageSourceClass(executableElement, sourceAnnotation.threadingModel() == SourceThreadingModel.SINGLE_THREAD);
 
         FieldVariable patternInfo = generateFieldForPatternInfo(beanDefinitionparser);
 

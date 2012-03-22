@@ -14,30 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.mule.api.callback;
 
-package org.mule.devkit.it;
-
-public class SourceModuleTest extends AbstractModuleTest {
-
-    @Override
-    protected String getConfigResources() {
-        return "source.xml";
-    }
-
-    public void testSource() throws Exception {
-        runFlow("source");
-    }
-
-    public void testNoThreadSource() throws Exception {
-        runFlow("sourceNoThread");
-    }
-
-    public void testPrimaryNodeOnlySource() throws Exception {
-        runFlow("sourcePrimaryNodeOnly");
-    }
-
-    public void testSourceWithProperties() throws Exception {
-        runFlow("sourceWithProperties");
-    }
-
+/**
+ * Callback returned by methods that are annotated with @Source
+ *
+ * It will be executed when the MessageSource is being stopped.
+ */
+public interface StopSourceCallback {
+    void stop() throws Exception;
 }

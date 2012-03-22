@@ -21,6 +21,7 @@ import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.param.InboundHeaders;
+import org.mule.api.annotations.SourceThreadingModel;
 import org.mule.api.callback.SourceCallback;
 
 import java.util.HashMap;
@@ -28,6 +29,35 @@ import java.util.Map;
 
 @Module(name = "source")
 public class SourceModule {
+
+    @Source(threadingModel = SourceThreadingModel.NONE)
+    public void countNoThread(int startAt, int endAt, int step, SourceCallback callback) throws Exception {
+        int count = startAt;
+        while (true) {
+            if (Thread.interrupted() || count == endAt) {
+                throw new InterruptedException();
+            }
+
+            callback.process(count);
+
+            count += step;
+        }
+    }
+
+    @Source(primaryNodeOnly=true)
+    public void countPrimaryNodeOnly(int startAt, int endAt, int step, SourceCallback callback) throws Exception {
+        int count = startAt;
+        while (true) {
+            if (Thread.interrupted() || count == endAt) {
+                throw new InterruptedException();
+            }
+
+            callback.process(count);
+
+            count += step;
+        }
+    }
+
     @Source
     public void count(int startAt, int endAt, int step, SourceCallback callback) throws Exception {
         int count = startAt;
