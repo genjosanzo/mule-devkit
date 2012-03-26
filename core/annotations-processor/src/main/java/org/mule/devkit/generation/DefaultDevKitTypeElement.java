@@ -17,12 +17,15 @@
 
 package org.mule.devkit.generation;
 
+import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connect;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.ExpressionLanguage;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.oauth.OAuth;
+import org.mule.api.annotations.oauth.OAuth2;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -43,6 +46,24 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
     }
 
     @Override
+    public boolean needsConfig() {
+        boolean needsConfig = false;
+
+        for (VariableElement variable : getFieldsAnnotatedWith(Configurable.class)) {
+            //if (variable.getAnnotation(Optional.class) == null) {
+            needsConfig = true;
+            //}
+        }
+
+        if (typeElement.getAnnotation(OAuth.class) != null ||
+                typeElement.getAnnotation(OAuth2.class) != null) {
+            needsConfig = true;
+        }
+
+        return needsConfig;
+    }
+
+    @Override
     public boolean hasProcessorMethodWithParameter(Class<?> parameterType) {
         for (ExecutableElement method : getMethodsAnnotatedWith(Processor.class)) {
             for (VariableElement parameter : method.getParameters()) {
@@ -60,7 +81,7 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
             for (VariableElement parameter : method.getParameters()) {
                 if (parameter.asType().toString().startsWith(List.class.getName())) {
                     List<? extends TypeMirror> typeArguments = ((DeclaredType) parameter.asType()).getTypeArguments();
-                    if(!typeArguments.isEmpty() && typeArguments.get(0).toString().equals(listGenericType.getName())) {
+                    if (!typeArguments.isEmpty() && typeArguments.get(0).toString().equals(listGenericType.getName())) {
                         return true;
                     }
                 }
@@ -89,7 +110,7 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
     public List<ExecutableElement> getMethodsWhoseParametersAreAnnotatedWith(Class<? extends Annotation> annotation) {
         List<ExecutableElement> result = new ArrayList<ExecutableElement>();
         for (ExecutableElement method : getMethods()) {
-            for( VariableElement parameter : method.getParameters() ) {
+            for (VariableElement parameter : method.getParameters()) {
                 if (parameter.getAnnotation(annotation) != null) {
                     result.add(method);
                 }
@@ -248,10 +269,10 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
 
     @Override
     public String friendlyName() {
-        if(hasAnnotation(Module.class)) {
+        if (hasAnnotation(Module.class)) {
             return getAnnotation(Module.class).friendlyName();
         }
-        if(hasAnnotation(Connector.class)) {
+        if (hasAnnotation(Connector.class)) {
             return getAnnotation(Connector.class).friendlyName();
         }
         return null;
@@ -259,10 +280,10 @@ public class DefaultDevKitTypeElement extends TypeElementImpl implements DevKitT
 
     @Override
     public String description() {
-        if(hasAnnotation(Module.class)) {
+        if (hasAnnotation(Module.class)) {
             return getAnnotation(Module.class).description();
         }
-        if(hasAnnotation(Connector.class)) {
+        if (hasAnnotation(Connector.class)) {
             return getAnnotation(Connector.class).description();
         }
         return null;

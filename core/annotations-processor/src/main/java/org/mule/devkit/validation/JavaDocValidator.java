@@ -94,7 +94,8 @@ public class JavaDocValidator implements Validator {
             throw new ValidationException(method, "Method " + method.getSimpleName().toString() + " is not properly documented. A description of what it can do is missing.");
         }
 
-        if (!method.getReturnType().toString().equals("void")) {
+        if (!method.getReturnType().toString().equals("void") &&
+                !method.getReturnType().toString().contains("StopSourceCallback")) {
             if (!context.getJavaDocUtils().hasTag("return", method)) {
                 throw new ValidationException(typeElement, "The return type of a non-void method must be documented. Method " + method.getSimpleName().toString() + " is at fault. Missing @return.");
             }

@@ -128,6 +128,14 @@ def:op_tag_list(tags) ?><?cs
 /def ?>
 
 <?cs # Print a list of tags (e.g. description text ?><?cs
+def:sample_config(tags) ?><?cs
+  each:tag = tags ?><?cs
+      if:tag.name == "@sample.config" ?><div class="jd-tagdata"><h5 class="jd-tagtitle">Configuration Sample</h5><pre><?cs var:tag.text ?></pre></div>
+    <?cs /if ?><?cs
+  /each ?><?cs
+/def ?>
+
+<?cs # Print a list of tags (e.g. description text ?><?cs
 def:op_tag_list_no_sample(tags) ?><?cs
   each:tag = tags ?><?cs
       if:tag.name == "Text" ?><?cs var:tag.text?><?cs
@@ -343,11 +351,12 @@ def:op_description(obj) ?><?cs
   <?cs
   if:subcount(obj.throws) ?>
   <div class="jd-tagdata">
-      <h5 class="jd-tagtitle">Exception Payload</h5>
-      <table class="jd-tagtable"><?cs
-      each:tag=obj.throws ?>
+      <h5 class="jd-tagtitle">Exception Payloads</h5>
+      <table class="jd-sumtable">
+        <tr><th>Payload Class</th><th>Description</th></tr>
+        <?cs each:tag=obj.throws ?>
         <tr>
-            <th><?cs call:type_link(tag.type) ?></td>
+            <td><?cs call:type_link(tag.type) ?></td>
             <td><?cs call:op_tag_list(tag.comment) ?></td>
         </tr><?cs
       /each ?>

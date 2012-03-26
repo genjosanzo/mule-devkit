@@ -147,7 +147,7 @@ public class MessageProcessorGenerator extends AbstractMessageGenerator {
         }
 
         // add initialise
-        generateInitialiseMethod(messageProcessorClass, fields, typeElement, muleContext, expressionManager, patternInfo, object, retryCount);
+        generateInitialiseMethod(messageProcessorClass, fields, typeElement, muleContext, expressionManager, patternInfo, object, retryCount, !typeElement.needsConfig());
 
         // add start
         generateStartMethod(messageProcessorClass, fields);

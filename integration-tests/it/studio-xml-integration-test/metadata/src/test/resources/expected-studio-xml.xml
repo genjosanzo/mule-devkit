@@ -28,7 +28,7 @@
   <cloud-connector abstract="true" image="icons/large/my-cloud-connector-48x32.png" localId="abstractMetadataConnectorGeneric" icon="icons/small/my-cloud-connector-24x16.png" description="Interact with Metadata." caption="Abstractmetadataconnectorgeneric">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractMetadataConnectorGeneric">
-        <globalRef requiredType="http://www.mulesoft.org/schema/mule/metadata/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref"></globalRef>
+        <globalRef requiredType="http://www.mulesoft.org/schema/mule/metadata/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref" required="true"></globalRef>
       </group>
     </attribute-category>
   </cloud-connector>

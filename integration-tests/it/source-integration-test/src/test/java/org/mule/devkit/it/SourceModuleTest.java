@@ -28,6 +28,14 @@ public class SourceModuleTest extends AbstractModuleTest {
         runFlow("source");
     }
 
+    public void testNoThreadSource() throws Exception {
+        runFlow("sourceNoThread");
+    }
+
+    public void testPrimaryNodeOnlySource() throws Exception {
+        runFlow("sourcePrimaryNodeOnly");
+    }
+
     public void testSourceWithProperties() throws Exception {
         runFlow("sourceWithProperties");
     }

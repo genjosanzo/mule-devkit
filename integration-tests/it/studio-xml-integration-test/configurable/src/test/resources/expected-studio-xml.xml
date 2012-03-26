@@ -29,7 +29,7 @@
   <cloud-connector abstract="true" image="icons/large/configurable-connector-48x32.png" localId="abstractConfigurableConnectorGeneric" icon="icons/small/configurable-connector-24x16.png" description="Interact with Configurable." caption="Abstractconfigurableconnectorgeneric">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractConfigurableConnectorGeneric">
-        <globalRef requiredType="http://www.mulesoft.org/schema/mule/configurable/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref"></globalRef>
+        <globalRef requiredType="http://www.mulesoft.org/schema/mule/configurable/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref" required="true"></globalRef>
       </group>
     </attribute-category>
   </cloud-connector>

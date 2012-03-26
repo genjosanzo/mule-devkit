@@ -154,6 +154,8 @@ public class Comment {
             mInlineTagsList.add(new SampleTagInfo(name, "@include", text, SampleTagInfo.SampleLanguage.JAVA, mBase, pos));
         } else if (name.equals("@sample.xml")) {
             mInlineTagsList.add(new SampleTagInfo(name, "@include", text, SampleTagInfo.SampleLanguage.XML, mBase, pos));
+        } else if (name.equals("@sample.config")) {
+            mInlineTagsList.add(new SampleTagInfo(name, "@include", text, SampleTagInfo.SampleLanguage.XML, mBase, pos));
         } else {
             boolean known = false;
             for (String s : KNOWN_TAGS) {

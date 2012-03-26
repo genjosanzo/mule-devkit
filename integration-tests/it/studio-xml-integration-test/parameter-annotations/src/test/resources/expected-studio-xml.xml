@@ -27,7 +27,7 @@
   <cloud-connector abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="abstractParameter-annotationsConnectorGeneric" icon="icons/small/parameter-annotations-connector-24x16.png" description="Interact with Parameter-annotations." caption="Abstractparameter-annotationsconnectorgeneric">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractParameter-annotationsConnectorGeneric">
-        <globalRef requiredType="http://www.mulesoft.org/schema/mule/parameter-annotations/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref"></globalRef>
+        <globalRef requiredType="http://www.mulesoft.org/schema/mule/parameter-annotations/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref" required="true"></globalRef>
       </group>
     </attribute-category>
   </cloud-connector>

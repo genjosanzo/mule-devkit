@@ -469,18 +469,34 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
     }
 
 
-    protected DefinedClass getMessageSourceClass(ExecutableElement executableElement) {
+    protected DefinedClass getMessageSourceClass(ExecutableElement executableElement, boolean runnable) {
         String beanDefinitionParserName = context.getNameUtils().generateClassName(executableElement, NamingContants.MESSAGE_SOURCE_CLASS_NAME_SUFFIX);
         Package pkg = context.getCodeModel()._package(context.getNameUtils().getPackageName(beanDefinitionParserName) + NamingContants.MESSAGE_SOURCE_NAMESPACE);
-        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), new Class[]{
-                MuleContextAware.class,
-                Startable.class,
-                Stoppable.class,
-                Runnable.class,
-                Initialisable.class,
-                MessageSource.class,
-                SourceCallback.class,
-                FlowConstructAware.class});
+
+        Class[] inherits;
+        if (runnable) {
+            inherits = new Class[]{
+                    MuleContextAware.class,
+                    Startable.class,
+                    Stoppable.class,
+                    Runnable.class,
+                    Initialisable.class,
+                    MessageSource.class,
+                    SourceCallback.class,
+                    FlowConstructAware.class};
+        } else {
+            inherits = new Class[]{
+                    MuleContextAware.class,
+                    Startable.class,
+                    Stoppable.class,
+                    Initialisable.class,
+                    MessageSource.class,
+                    SourceCallback.class,
+                    FlowConstructAware.class};
+
+        }
+
+        DefinedClass clazz = pkg._class(context.getNameUtils().getClassName(beanDefinitionParserName), inherits);
 
         return clazz;
     }
@@ -569,7 +585,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         return fields;
     }
 
-    protected Method generateInitialiseMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, TypeElement typeElement, FieldVariable muleContext, FieldVariable expressionManager, FieldVariable patternInfo, FieldVariable object, FieldVariable retryCount) {
+    protected Method generateInitialiseMethod(DefinedClass messageProcessorClass, Map<String, FieldVariableElement> fields, TypeElement typeElement, FieldVariable muleContext, FieldVariable expressionManager, FieldVariable patternInfo, FieldVariable object, FieldVariable retryCount, boolean shouldAutoCreate) {
         DefinedClass pojoClass = context.getClassForRole(context.getNameUtils().generateModuleObjectRoleKey(typeElement));
 
         Method initialise = messageProcessorClass.method(Modifier.PUBLIC, context.getCodeModel().VOID, "initialise");
@@ -593,10 +609,15 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
             Conditional ifNoObject = initialise.body()._if(Op.eq(object, ExpressionFactory._null()));
             TryStatement tryLookUp = ifNoObject._then()._try();
             tryLookUp.body().assign(object, muleContext.invoke("getRegistry").invoke("lookupObject").arg(ExpressionFactory.dotclass(pojoClass)));
-            tryLookUp.body()._if(Op.eq(object, ExpressionFactory._null()))._then().
-                    _throw(ExpressionFactory._new(ref(InitialisationException.class)).
-                            arg(ref(MessageFactory.class).staticInvoke("createStaticMessage").
-                                    arg("Cannot find object")).arg(ExpressionFactory._this()));
+            Conditional ifObjectNoFound = tryLookUp.body()._if(Op.eq(object, ExpressionFactory._null()));
+            if (shouldAutoCreate) {
+                ifObjectNoFound._then().assign(object, ExpressionFactory._new(pojoClass));
+                ifObjectNoFound._then().add(muleContext.invoke("getRegistry").invoke("registerObject").arg(pojoClass.dotclass().invoke("getName")).arg(object));
+            } else {
+                ifObjectNoFound._then()._throw(ExpressionFactory._new(ref(InitialisationException.class)).
+                        arg(ref(MessageFactory.class).staticInvoke("createStaticMessage").
+                                arg("Cannot find object")).arg(ExpressionFactory._this()));
+            }
             CatchBlock catchBlock = tryLookUp._catch(ref(RegistrationException.class));
             Variable exception = catchBlock.param("e");
             TypeReference coreMessages = ref(CoreMessages.class);
@@ -612,9 +633,9 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         Conditional ifObjectIsString = initialise.body()._if(Op._instanceof(object, ref(String.class)));
         ifObjectIsString._then().assign(object, muleContext.invoke("getRegistry").invoke("lookupObject").arg(ExpressionFactory.cast(ref(String.class), object)));
         ifObjectIsString._then()._if(Op.eq(object, ExpressionFactory._null()))._then().
-                    _throw(ExpressionFactory._new(ref(InitialisationException.class)).
-                            arg(ref(MessageFactory.class).staticInvoke("createStaticMessage").
-                                    arg("Cannot find object by config name")).arg(ExpressionFactory._this()));
+                _throw(ExpressionFactory._new(ref(InitialisationException.class)).
+                        arg(ref(MessageFactory.class).staticInvoke("createStaticMessage").
+                                arg("Cannot find object by config name")).arg(ExpressionFactory._this()));
 
         if (fields != null) {
             for (String fieldName : fields.keySet()) {
@@ -964,7 +985,7 @@ public abstract class AbstractMessageGenerator extends AbstractModuleGenerator {
         CatchBlock catchException = tryBlock._catch(ref(Exception.class));
         Variable exception = catchException.param("e");
         catchException.body()._throw(exception);
-        
+
         process.body()._return(ExpressionFactory._null());
     }
 

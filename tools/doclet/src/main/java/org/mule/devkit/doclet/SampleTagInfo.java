@@ -82,7 +82,7 @@ public class SampleTagInfo extends TagInfo {
         }
         String filename = m.group(1);
         String id = m.group(2);
-        boolean trim = "@sample.java".equals(name) || "@sample.xml".equals(name);
+        boolean trim = "@sample.java".equals(name) || "@sample.xml".equals(name) || "@sample.config".equals(name);
 
         if (id == null || "".equals(id)) {
             mIncluded = readFile(position, filename, id, trim, true, false);

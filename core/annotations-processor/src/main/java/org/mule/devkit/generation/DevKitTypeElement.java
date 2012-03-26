@@ -72,4 +72,6 @@ public interface DevKitTypeElement extends TypeElement {
     String friendlyName();
 
     String description();
+
+    boolean needsConfig();
 }

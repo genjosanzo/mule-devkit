@@ -31,6 +31,7 @@ import javax.xml.bind.JAXBElement;
 public class ConfigRefBuilder extends BaseStudioXmlBuilder {
 
     public static final String GLOBAL_REF_NAME = SchemaGenerator.ATTRIBUTE_NAME_CONFIG_REF;
+    private static final boolean CONFIG_REF_REQUIRED = true;
 
     public ConfigRefBuilder(GeneratorContext context, DevKitTypeElement typeElement) {
         super(context, typeElement);
@@ -42,6 +43,7 @@ public class ConfigRefBuilder extends BaseStudioXmlBuilder {
         globalRef.setName(GLOBAL_REF_NAME);
         globalRef.setCaption(helper.formatCaption("config reference"));
         globalRef.setDescription(helper.formatDescription("Specify which configuration to use for this invocation"));
+        globalRef.setRequired(CONFIG_REF_REQUIRED);
 
         Group group = new Group();
         group.setId(helper.getGlobalRefId(moduleName));
