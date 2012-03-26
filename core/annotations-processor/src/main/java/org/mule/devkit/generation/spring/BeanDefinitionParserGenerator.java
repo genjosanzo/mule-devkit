@@ -182,7 +182,7 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         }
 
         for (VariableElement variable : typeElement.getFieldsAnnotatedWith(Inject.class)) {
-            if( variable.asType().toString().equals("org.mule.api.store.ObjectStore") ) {
+            if (variable.asType().toString().equals("org.mule.api.store.ObjectStore")) {
                 Invocation getAttribute = element.invoke("getAttribute").arg("objectStore-ref");
                 Conditional ifNotNull = parse.body()._if(Op.cand(Op.ne(getAttribute, ExpressionFactory._null()),
                         Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(
@@ -713,8 +713,14 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         Conditional ifValueRef = forEach.body()._if(Op.cand(Op.ne(valueRef, ExpressionFactory._null()),
                 Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(valueRef))));
 
-        ifValueRef._then().assign(valueObject,
-                ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(valueRef));
+        Conditional ifValueRefNotExpresion = ifValueRef._then()._if(Op.cand(
+                Op.not(valueRef.invoke("startsWith").arg(patternInfo.invoke("getPrefix"))),
+                Op.not(valueRef.invoke("endsWith").arg(patternInfo.invoke("getSuffix")))
+        ));
+
+        ifValueRefNotExpresion._then().assign(valueObject, ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(valueRef));
+
+        ifValueRefNotExpresion._else().assign(valueObject, valueRef);
 
         Block ifNotValueRef = ifValueRef._else();
         if (variableTypeParameters.size() > 1 && context.getTypeMirrorUtils().isArrayOrList(variableTypeParameters.get(1))) {
@@ -804,9 +810,16 @@ public class BeanDefinitionParserGenerator extends AbstractMessageGenerator {
         Conditional ifValueRef = forEach.body()._if(Op.cand(Op.ne(valueRef, ExpressionFactory._null()),
                 Op.not(ref(StringUtils.class).staticInvoke("isBlank").arg(valueRef))));
 
-        ifValueRef._then().add(
+        Conditional ifValueRefNotExpresion = ifValueRef._then()._if(Op.cand(
+                Op.not(valueRef.invoke("startsWith").arg(patternInfo.invoke("getPrefix"))),
+                Op.not(valueRef.invoke("endsWith").arg(patternInfo.invoke("getSuffix")))
+        ));
+
+        ifValueRefNotExpresion._then().add(
                 managedList.invoke("add").arg(
                         ExpressionFactory._new(ref(RuntimeBeanReference.class)).arg(valueRef)));
+
+        ifValueRefNotExpresion._else().add(managedList.invoke("add").arg(valueRef));
 
         if (!variableTypeParameters.isEmpty() && context.getTypeMirrorUtils().isArrayOrList(variableTypeParameters.get(0))) {
             UpperBlockClosure subList = generateParseArrayOrList(ifValueRef._else(), variableTypeParameters.get(0), forEach.var(), builder, "inner-" + childName, patternInfo, parserContext);
