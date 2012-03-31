@@ -20,7 +20,7 @@
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/${schemaVersion}/mule.xsd
-		http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/core/${schemaVersion}/test.xsd
+		http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/${schemaVersion}/mule-test.xsd
 #foreach($transport in $transports.split(','))
 		http://www.mulesoft.org/schema/mule/${transport} http://www.mulesoft.org/schema/mule/${transport}/${schemaVersion}/mule-${transport}.xsd
 #end
@@ -40,8 +40,8 @@
         <vm:inbound-endpoint path="in" />
 
         <!-- TODO add your service component here. This can also be a Spring bean using <spring-object bean="name"/> -->
-       <append-string-transformer message=" Received" />
-
+       	<append-string-transformer message=" Received" />
+    	<test:component logMessageDetails="true" />
         <vm:outbound-endpoint path="out"/>
     </flow>
 </mule>
