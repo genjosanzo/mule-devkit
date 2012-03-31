@@ -78,4 +78,4 @@ Archetype Parameters:
 |transports|A comma separated list of the transport you are going to use within your application.|file,http,jdbc,jms,vm |
 |modules|A comma separated list of the modules you are going to use within your application. |client,cxf,management,scripting,sxc,xml |
 |studioNature|A flag to enable studio nature, in the future will allow you to import the project to Studio |false |
-|EE|A flag to import the EE counterpart of the transport/modules you are using. |false |
+|EE|A flag to import the EE counterpart of the transports/modules you are using. |false |
