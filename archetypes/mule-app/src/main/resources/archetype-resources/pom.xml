@@ -250,7 +250,21 @@
 			<version>${symbol_dollar}{mule.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
+#if($EE == 'true')
+		<dependency>
+        	<groupId>com.mulesoft.muleesb</groupId>
+			<artifactId>mule-core-ee</artifactId>
+			<version>${symbol_dollar}{mule.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- Xml configuration -->
+		<dependency>
+			<groupId>com.mulesoft.muleesb.modules</groupId>
+			<artifactId>mule-module-spring-config-ee</artifactId>
+			<version>${symbol_dollar}{mule.version}</version>
+			<scope>provided</scope>
+		</dependency>
+#end
 		<!-- Mule Transports -->
 #foreach($transport in $transports.split(","))
 		<dependency>
@@ -259,6 +273,17 @@
 			<version>${symbol_dollar}{mule.version}</version>
 			<scope>provided</scope>
 		</dependency>
+#if($EE == 'true')
+#if($transport == 'ftp' || $transport == 'jdbc' ||$transport == 'jms')
+		<dependency>
+        	<groupId>com.mulesoft.muleesb.transports</groupId>
+			<artifactId>mule-transport-${transport}-ee</artifactId>
+			<version>${symbol_dollar}{mule.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+#end
+#end
 #end<!-- Mule Modules -->
 #foreach($module in $modules.split(","))
 #if($module != 'doc' && $module != 'context')

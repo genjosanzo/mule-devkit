@@ -2,8 +2,16 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
+#if($EE == 'true')
+	  xmlns:core-ee="http://www.mulesoft.org/schema/mule/ee/core"
+#end
 #foreach($transport in $transports.split(','))
       xmlns:${transport}="http://www.mulesoft.org/schema/mule/${transport}"
+#if($transport == 'ftp' || $transport == 'jdbc' || $transport == 'jms')
+#if($EE == 'true')
+	  xmlns:${transport}-ee="http://www.mulesoft.org/schema/mule/ee/${transport}"
+#end
+#end
 #end
 #foreach($module in $modules.split(','))
 #if ($module == "xml")
@@ -23,6 +31,12 @@
 		http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/${schemaVersion}/mule-test.xsd
 #foreach($transport in $transports.split(','))
 		http://www.mulesoft.org/schema/mule/${transport} http://www.mulesoft.org/schema/mule/${transport}/${schemaVersion}/mule-${transport}.xsd
+#if($EE == 'true')
+#if($transport == 'ftp' || $transport == 'jdbc' ||$transport == 'jms' )
+		http://www.mulesoft.org/schema/mule/ee/${transport} http://www.mulesoft.org/schema/mule/ee/${transport}/${schemaVersion}/mule-${transport}-ee.xsd
+		
+#end
+#end
 #end
 #foreach($module in $modules.split(','))
 #if ($module == "context")
