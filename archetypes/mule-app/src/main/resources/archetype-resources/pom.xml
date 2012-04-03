@@ -99,19 +99,6 @@
 				<configuration>
 					<!-- by default download all sources when generating project files -->
 					<downloadSources>true</downloadSources>
-#if(${studioNature} == 'true')
-					<classpathContainers>
-                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${symbol_dollar}{vmtype}/${symbol_dollar}{jdkName}</classpathContainer>
-                        <!-- MuleStudio nature parameters -->
-                        <classpathContainer>MULE_RUNTIME</classpathContainer>
-					</classpathContainers>
-                    <additionalProjectnatures>
-                        <projectnature>org.mule.tooling.core.muleNature</projectnature>
-                    </additionalProjectnatures>
-                    <additionalBuildcommands>
-                        <buildcommand>org.mule.tooling.core.muleBuilder</buildcommand>
-                    </additionalBuildcommands>
-#end
 				</configuration>
 			</plugin>
 			<plugin>
@@ -281,7 +268,6 @@
 			<version>${symbol_dollar}{mule.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
 #end
 #end
 #end<!-- Mule Modules -->
@@ -336,4 +322,35 @@
 			<url>http://snapshots.repository.codehaus.org/</url>
 		</repository>
 	</repositories>
+#if(${studioNature} == 'true')
+	<profiles>
+		<profile>
+			<id>mule</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-eclipse-plugin</artifactId>
+						<version>${eclipsePluginVersion}</version>
+						<configuration>
+							<!-- by default download all sources when generating project files -->
+							<downloadSources>true</downloadSources>
+							<classpathContainers>
+		                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdkName}</classpathContainer>
+		                        <!-- MuleStudio nature parameters -->
+		                        <classpathContainer>MULE_RUNTIME</classpathContainer>
+							</classpathContainers>
+		                    <additionalProjectnatures>
+		                        <projectnature>org.mule.tooling.core.muleNature</projectnature>
+		                    </additionalProjectnatures>
+		                    <additionalBuildcommands>
+		                        <buildcommand>org.mule.tooling.core.muleBuilder</buildcommand>
+		                    </additionalBuildcommands>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+#end
 </project>
