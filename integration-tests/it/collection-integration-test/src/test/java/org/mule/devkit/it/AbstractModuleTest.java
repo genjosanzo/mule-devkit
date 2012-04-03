@@ -29,11 +29,14 @@ public abstract class AbstractModuleTest extends FunctionalTestCase {
         return (Flow) AbstractMuleTestCase.muleContext.getRegistry().lookupFlowConstruct(name);
     }
 
-    protected void runFlow(String flowName) throws Exception {
+    protected <T> void runFlow(String flowName) throws Exception {
         String payload = EMPTY_PAYLOAD;
         Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = AbstractMuleTestCase.getTestEvent(payload);
         MuleEvent responseEvent = flow.process(event);
+        if(responseEvent.getMessage().getExceptionPayload() != null) {
+            throw new Exception(responseEvent.getMessage().getExceptionPayload().getRootException());
+        }
     }
 
     protected <T> void runFlow(String flowName, T expect) throws Exception {

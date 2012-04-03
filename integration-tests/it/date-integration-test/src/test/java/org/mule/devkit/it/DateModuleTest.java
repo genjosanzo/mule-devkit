@@ -51,6 +51,9 @@ public class DateModuleTest extends FunctionalTestCase {
     private Object runFlow(String flowName, String payload) throws Exception {
         Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = AbstractMuleTestCase.getTestEvent(payload);
+        if(event.getMessage().getExceptionPayload() != null) {
+            throw new Exception(event.getMessage().getExceptionPayload().getRootException());
+        }
         return flow.process(event).getMessage().getPayload();
     }
 }
