@@ -27,6 +27,9 @@
       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 #elseif($module == "context")
       xmlns:context="http://www.springframework.org/schema/context"
+#elseif($module == "spring-security")
+	xmlns:mule-ss="http://www.mulesoft.org/schema/mule/spring-security"
+    xmlns:ss="http://www.springframework.org/schema/security"
 #else
       xmlns:${module}="http://www.mulesoft.org/schema/mule/${module}"
 #end
@@ -48,6 +51,9 @@
 #foreach($module in $modules.split(','))
 #if ($module == "context")
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+#elseif($module == "spring-security")
+		http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/${schemaVersion}/mule-spring-security.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
 #else
 		http://www.mulesoft.org/schema/mule/${module} http://www.mulesoft.org/schema/mule/${module}/${schemaVersion}/mule-${module}.xsd
 #end
