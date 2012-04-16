@@ -64,54 +64,66 @@ public class CollectionModule {
      * Method that accepts a List<String>
      *
      * @param strings a list of strings
+     * @return bla
      */
     @Processor
-    public void operation1(List<String> strings) {
+    public List<String> operation1(List<String> strings) {
+        return strings;
     }
 
     /**
      * Method that accepts a Map<String, String>
      *
      * @param mapStrings a map of strings
+     * @return bla
      */
     @Processor
-    public void operation2(Map<String, String> mapStrings) {
+    public Map<String, String> operation2(Map<String, String> mapStrings) {
+        return mapStrings;
     }
 
     /**
      * Method that accepts a Map<String, Object>
      *
      * @param mapObjects a map of string-object
+     * @return bla
      */
     @Processor
-    public void operation3(Map<String, Object> mapObjects) {
+    public Map<String, Object> operation3(Map<String, Object> mapObjects) {
+        return mapObjects;
     }
 
     /**
      * Method that accepts a raw Map
      *
      * @param properties a raw map
+     * @return bla
      */
     @Processor
-    public void operation4(Map properties) {
+    public Map operation4(Map properties) {
+        return properties;
     }
 
     /**
      * Method that accepts a raw List
      *
      * @param list a list
+     * @return bla
      */
     @Processor
-    public void operation5(List list) {
+    public List operation5(List list) {
+        return list;
     }
 
     /**
      * Method that accepts a List<Map<String, Strin>>
      *
      * @param objects a list of maps
+     * @return bla
      */
     @Processor
-    public void operation6(List<Map<String, String>> objects) {
+    public List<Map<String, String>> operation6(List<Map<String, String>> objects) {
+        return objects;
     }
 
     public void setStrings(List strings) {

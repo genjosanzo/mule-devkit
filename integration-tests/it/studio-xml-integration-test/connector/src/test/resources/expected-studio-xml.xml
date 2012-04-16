@@ -32,7 +32,7 @@
       </group>
     </attribute-category>
   </cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" abstract="true" image="icons/large/connector-connector-48x32.png" localId="invalidate" icon="icons/small/connector-connector-24x16.png" caption="Invalidate">
+  <cloud-connector returnType="void" extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" abstract="true" image="icons/large/connector-connector-48x32.png" localId="invalidate" icon="icons/small/connector-connector-24x16.png" caption="Invalidate">
     <attribute-category description="General." caption="General"></attribute-category>
     <attribute-category description="Connection." caption="Connection">
       <group caption="Connection" id="connection">
@@ -43,7 +43,7 @@
       </group>
     </attribute-category>
   </cloud-connector>
-  <cloud-connector extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" abstract="true" image="icons/large/connector-connector-48x32.png" localId="get-username" icon="icons/small/connector-connector-24x16.png" caption="Get Username">
+  <cloud-connector returnType="java.lang.String" extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" abstract="true" image="icons/large/connector-connector-48x32.png" localId="get-username" icon="icons/small/connector-connector-24x16.png" caption="Get Username">
     <attribute-category description="General." caption="General"></attribute-category>
     <attribute-category description="Connection." caption="Connection">
       <group caption="Connection" id="connection">

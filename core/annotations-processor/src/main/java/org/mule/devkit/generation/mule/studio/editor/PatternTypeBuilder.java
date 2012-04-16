@@ -48,21 +48,22 @@ public class PatternTypeBuilder extends BaseStudioXmlBuilder {
     }
 
     private PatternType createPatternType() {
-        PatternType cloudConnector = new PatternType();
-        cloudConnector.setLocalId(nameUtils.uncamel(executableElement.getSimpleName().toString()));
-        cloudConnector.setCaption(helper.getFormattedCaption(executableElement));
-        cloudConnector.setAbstract(true);
+        PatternType patternType = new PatternType();
+        patternType.setLocalId(nameUtils.uncamel(executableElement.getSimpleName().toString()));
+        patternType.setCaption(helper.getFormattedCaption(executableElement));
+        patternType.setAbstract(true);
 
         if (executableElement.getAnnotation(Processor.class) != null) {
-            cloudConnector.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
+            patternType.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + helper.getGlobalRefId(typeElement.name()));
+            patternType.setReturnType(typeMirrorUtils.getJavaType(executableElement));
         } else if (executableElement.getAnnotation(Transformer.class) != null) {
-            cloudConnector.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + AbstractTransformerBuilder.ABSTRACT_TRANSFORMER_LOCAL_ID);
-            cloudConnector.setDescription(helper.formatDescription(javaDocUtils.getSummary(executableElement)));
+            patternType.setExtends(MuleStudioEditorXmlGenerator.URI_PREFIX + typeElement.name() + '/' + AbstractTransformerBuilder.ABSTRACT_TRANSFORMER_LOCAL_ID);
+            patternType.setDescription(helper.formatDescription(javaDocUtils.getSummary(executableElement)));
         }
 
-        cloudConnector.setIcon(getIcon());
-        cloudConnector.setImage(getImage());
-        return cloudConnector;
+        patternType.setIcon(getIcon());
+        patternType.setImage(getImage());
+        return patternType;
     }
 
     private String getImage() {

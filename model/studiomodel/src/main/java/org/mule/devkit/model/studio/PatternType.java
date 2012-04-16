@@ -62,6 +62,8 @@ public class PatternType
     protected Boolean causesJoin;
     @XmlAttribute(name = "xmlname")
     protected String xmlname;
+    @XmlAttribute(name = "returnType")
+    protected String returnType;
 
     /**
      * Gets the value of the causesSplit property.
@@ -143,4 +145,11 @@ public class PatternType
         this.xmlname = value;
     }
 
+    public String getReturnType() {
+        return returnType;
+    }
+
+    public void setReturnType(String returnType) {
+        this.returnType = returnType;
+    }
 }

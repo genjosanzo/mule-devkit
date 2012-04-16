@@ -36,6 +36,7 @@ import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -226,5 +227,9 @@ public class TypeMirrorUtils {
 
     public String getJavaType(Element element) {
         return element.asType().toString();
+    }
+
+    public String getJavaType(ExecutableElement element) {
+        return element.getReturnType().toString();
     }
 }
