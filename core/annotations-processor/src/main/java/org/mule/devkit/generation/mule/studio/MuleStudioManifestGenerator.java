@@ -44,7 +44,7 @@ public class MuleStudioManifestGenerator extends AbstractMessageGenerator {
             printStream.append(getManifestContents(typeElement));
             printStream.flush();
         } catch (IOException e) {
-            throw new GenerationException("Could not create MANIFEST for Studio plugin", e);
+            throw new GenerationException("Could not create MANIFEST for Studio plugin: " + e.getMessage(), e);
         } finally {
             IOUtils.closeQuietly(printStream);
         }
