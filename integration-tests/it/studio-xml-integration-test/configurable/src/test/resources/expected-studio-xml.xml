@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" prefix="configurable"
-           url="http://www.mulesoft.org/schema/mule/configurable">
+<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="configurable" url="http://www.mulesoft.org/schema/mule/configurable">
   <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/configurable/abstractConfigurableConnectorGeneric" image="icons/large/configurable-connector-48x32.png" localId="config" icon="icons/small/configurable-connector-24x16.png" description="Global Configurable configuration information." caption="Configurable">
     <attribute-category description="Configurable configuration properties." caption="General">
       <group caption="Generic" id="configurableGenericProperties">
         <name required="true" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
       </group>
       <group caption="General" id="general">
-        <string required="true" description="Configurable String." caption="Configurable String" name="configurableString"></string>
-        <string required="false" description="Configurable optional String." caption="Optional Configurable String" name="optionalConfigurableString"></string>
-        <string defaultValue="a default" required="false" description="Configurable optional String with default value." caption="Optional With Default Configurable String" name="optionalWithDefaultConfigurableString"></string>
-        <url defaultValue="http://myUrl:9999" required="false" description="Configurable URL." caption="Url" name="url"></url>
-        <enum allowsCustom="true" defaultValue="NO" required="false" supportsExpressions="true" description="Configurable enumerated." caption="Si No Enum" name="siNoEnum">
+        <string javaType="java.lang.String" required="true" description="Configurable String." caption="Configurable String" name="configurableString"></string>
+        <string javaType="java.lang.String" required="false" description="Configurable optional String." caption="Optional Configurable String" name="optionalConfigurableString"></string>
+        <string defaultValue="a default" javaType="java.lang.String" required="false" description="Configurable optional String with default value." caption="Optional With Default Configurable String" name="optionalWithDefaultConfigurableString"></string>
+        <url defaultValue="http://myUrl:9999" javaType="java.net.URL" required="false" description="Configurable URL." caption="Url" name="url"></url>
+        <enum allowsCustom="true" defaultValue="NO" javaType="org.mule.devkit.it.studio.ConfigurableModule.SiNoEnum" required="false" supportsExpressions="true" description="Configurable enumerated." caption="Si No Enum" name="siNoEnum">
           <option value="NO"></option>
           <option value="SI"></option>
         </enum>
@@ -29,7 +28,7 @@
   <cloud-connector abstract="true" image="icons/large/configurable-connector-48x32.png" localId="abstractConfigurableConnectorGeneric" icon="icons/small/configurable-connector-24x16.png" description="Interact with Configurable." caption="Abstractconfigurableconnectorgeneric">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractConfigurableConnectorGeneric">
-        <globalRef requiredType="http://www.mulesoft.org/schema/mule/configurable/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref" required="true"></globalRef>
+        <globalRef requiredType="http://www.mulesoft.org/schema/mule/configurable/config" required="true" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref"></globalRef>
       </group>
     </attribute-category>
   </cloud-connector>

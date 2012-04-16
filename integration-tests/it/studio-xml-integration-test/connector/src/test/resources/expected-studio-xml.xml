@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" prefix="connector"
-           url="http://www.mulesoft.org/schema/mule/connector">
+<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="connector" url="http://www.mulesoft.org/schema/mule/connector">
   <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/connector/abstractConnectorConnectorGeneric" image="icons/large/connector-connector-48x32.png" localId="config" icon="icons/small/connector-connector-24x16.png" description="Global Connector configuration information." caption="Connector">
     <attribute-category description="Connector configuration properties." caption="General">
       <group caption="Generic" id="connectorGenericProperties">
         <name required="true" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
       </group>
-      <group caption="General" id="general">
-        <url defaultValue="http://www.mulesoft.org" required="false" description="A URL." caption="Url" name="url"></url>
-      </group>
-      <group caption="Connection" id="connection">
-        <string required="false" description="The username to use." caption="Username" name="username"></string>
-        <string required="false" description="The password to use." caption="Password" name="password"></string>
+        <group caption="General" id="general">
+            <url defaultValue="http://www.mulesoft.org" javaType="java.net.URL" required="false" description="A URL." caption="Url" name="url"></url>
+        </group>
+        <group caption="Connection" id="connection">
+          <string javaType="java.lang.String" required="false" description="The username to use." caption="Username" name="username"></string>
+          <string javaType="java.lang.String" required="false" description="The password to use." caption="Password" name="password"></string>
       </group>
     </attribute-category>
   </global-cloud-connector>
@@ -29,7 +28,7 @@
   <cloud-connector abstract="true" image="icons/large/connector-connector-48x32.png" localId="abstractConnectorConnectorGeneric" icon="icons/small/connector-connector-24x16.png" description="Interact with Connector." caption="Abstractconnectorconnectorgeneric">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractConnectorConnectorGeneric">
-        <globalRef requiredType="http://www.mulesoft.org/schema/mule/connector/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref" required="true"></globalRef>
+        <globalRef requiredType="http://www.mulesoft.org/schema/mule/connector/config" required="true" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref"></globalRef>
       </group>
     </attribute-category>
   </cloud-connector>
@@ -39,8 +38,8 @@
       <group caption="Connection" id="connection">
         <label caption="Use these fields to override the credentials defined in the Connector connector."></label>
         <label caption=""></label>
-        <string required="false" description="The username to use." caption="Username" name="username"></string>
-        <string required="false" description="The password to use." caption="Password" name="password"></string>
+        <string javaType="java.lang.String" required="false" description="The username to use." caption="Username" name="username"></string>
+        <string javaType="java.lang.String" required="false" description="The password to use." caption="Password" name="password"></string>
       </group>
     </attribute-category>
   </cloud-connector>
@@ -50,8 +49,8 @@
       <group caption="Connection" id="connection">
         <label caption="Use these fields to override the credentials defined in the Connector connector."></label>
         <label caption=""></label>
-        <string required="false" description="The username to use." caption="Username" name="username"></string>
-        <string required="false" description="The password to use." caption="Password" name="password"></string>
+        <string javaType="java.lang.String" required="false" description="The username to use." caption="Username" name="username"></string>
+        <string javaType="java.lang.String" required="false" description="The password to use." caption="Password" name="password"></string>
       </group>
     </attribute-category>
   </cloud-connector>

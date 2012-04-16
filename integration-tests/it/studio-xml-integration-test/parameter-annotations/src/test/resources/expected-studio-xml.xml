@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" prefix="parameter-annotations"
-           url="http://www.mulesoft.org/schema/mule/parameter-annotations">
+<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="parameter-annotations" url="http://www.mulesoft.org/schema/mule/parameter-annotations">
   <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" image="icons/large/parameter-annotations-connector-48x32.png" localId="config" icon="icons/small/parameter-annotations-connector-24x16.png" description="Global Parameter Annotations configuration information." caption="Parameter Annotations">
     <attribute-category description="Parameter-annotations configuration properties." caption="General">
       <group caption="Generic" id="parameter-annotationsGenericProperties">
@@ -27,49 +26,49 @@
   <cloud-connector abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="abstractParameter-annotationsConnectorGeneric" icon="icons/small/parameter-annotations-connector-24x16.png" description="Interact with Parameter-annotations." caption="Abstractparameter-annotationsconnectorgeneric">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractParameter-annotationsConnectorGeneric">
-        <globalRef requiredType="http://www.mulesoft.org/schema/mule/parameter-annotations/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref" required="true"></globalRef>
+        <globalRef requiredType="http://www.mulesoft.org/schema/mule/parameter-annotations/config" required="true" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref"></globalRef>
       </group>
     </attribute-category>
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="optional-params" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Optional Params">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
-        <string required="false" description="A optional string parameter." caption="A String" name="aString"></string>
-        <integer step="1" min="0" required="false" description="A optional integer parameter." caption="A Integer" name="aInteger"></integer>
-        <integer step="1" min="0" required="false" description="A optional long parameter." caption="A Long" name="aLong"></integer>
-        <string required="false" description="A optonal float parameter." caption="A Float" name="aFloat"></string>
-        <string required="false" description="A optional double parameter." caption="A Double" name="aDouble"></string>
-        <string required="false" description="A optional character parameter." caption="A Character" name="aCharacter"></string>
-        <boolean required="false" supportsExpressions="true" description="A optional boolean parameter." caption="A Boolean" name="aBoolean"></boolean>
+        <string javaType="java.lang.String" required="false" description="A optional string parameter." caption="A String" name="aString"></string>
+        <integer step="1" min="0" javaType="java.lang.Integer" required="false" description="A optional integer parameter." caption="A Integer" name="aInteger"></integer>
+        <integer step="1" min="0" javaType="java.lang.Long" required="false" description="A optional long parameter." caption="A Long" name="aLong"></integer>
+        <string javaType="java.lang.Float" required="false" description="A optonal float parameter." caption="A Float" name="aFloat"></string>
+        <string javaType="java.lang.Double" required="false" description="A optional double parameter." caption="A Double" name="aDouble"></string>
+        <string javaType="java.lang.Character" required="false" description="A optional character parameter." caption="A Character" name="aCharacter"></string>
+        <boolean javaType="java.lang.Boolean" required="false" supportsExpressions="true" description="A optional boolean parameter." caption="A Boolean" name="aBoolean"></boolean>
       </group>
     </attribute-category>
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="optional-params-with-defaults" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Optional Params With Defaults">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
-        <string defaultValue="fede" required="false" description="A optional string parameter with default value." caption="A String" name="aString"></string>
-        <integer step="1" min="0" defaultValue="1" required="false" description="A optional integer parameter with default value." caption="A Integer" name="aInteger"></integer>
-        <integer step="1" min="0" defaultValue="2" required="false" description="A optional long parameter with default value." caption="A Long" name="aLong"></integer>
-        <string defaultValue="3.2" required="false" description="A optonal float parameter with default value." caption="A Float" name="aFloat"></string>
-        <string defaultValue="5.3" required="false" description="A optional double parameter with default value." caption="A Double" name="aDouble"></string>
-        <string defaultValue="A" required="false" description="A optional character parameter with default value." caption="A Character" name="aCharacter"></string>
-        <boolean defaultValue="false" required="false" supportsExpressions="true" description="A optional boolean parameter with default value." caption="A Boolean" name="aBoolean"></boolean>
+        <string defaultValue="fede" javaType="java.lang.String" required="false" description="A optional string parameter with default value." caption="A String" name="aString"></string>
+        <integer step="1" min="0" defaultValue="1" javaType="int" required="false" description="A optional integer parameter with default value." caption="A Integer" name="aInteger"></integer>
+        <integer step="1" min="0" defaultValue="2" javaType="long" required="false" description="A optional long parameter with default value." caption="A Long" name="aLong"></integer>
+        <string defaultValue="3.2" javaType="float" required="false" description="A optonal float parameter with default value." caption="A Float" name="aFloat"></string>
+        <string defaultValue="5.3" javaType="double" required="false" description="A optional double parameter with default value." caption="A Double" name="aDouble"></string>
+        <string defaultValue="A" javaType="char" required="false" description="A optional character parameter with default value." caption="A Character" name="aCharacter"></string>
+        <boolean defaultValue="false" javaType="boolean" required="false" supportsExpressions="true" description="A optional boolean parameter with default value." caption="A Boolean" name="aBoolean"></boolean>
       </group>
     </attribute-category>
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="payload" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Payload">
-    <attribute-category description="General." caption="General" />
+    <attribute-category description="General." caption="General"></attribute-category>
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="inbound-headers" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Inbound Headers">
-    <attribute-category description="General." caption="General" />
+    <attribute-category description="General." caption="General"></attribute-category>
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="invocation-headers" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Invocation Headers">
-    <attribute-category description="General." caption="General" />
+    <attribute-category description="General." caption="General"></attribute-category>
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="outbound-headers" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Outbound Headers">
-    <attribute-category description="General." caption="General" />
+    <attribute-category description="General." caption="General"></attribute-category>
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/parameter-annotations/abstractParameter-annotationsConnectorGeneric" abstract="true" image="icons/large/parameter-annotations-connector-48x32.png" localId="pauth" icon="icons/small/parameter-annotations-connector-24x16.png" caption="Pauth">
-    <attribute-category description="General." caption="General" />
+    <attribute-category description="General." caption="General"></attribute-category>
   </cloud-connector>
 </namespace>

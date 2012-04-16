@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" prefix="source"
-           url="http://www.mulesoft.org/schema/mule/source">
+<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="source" url="http://www.mulesoft.org/schema/mule/source">
   <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/source/abstractSourceConnectorGeneric" image="icons/large/source-connector-48x32.png" localId="config" icon="icons/small/source-connector-24x16.png" description="Global Source configuration information." caption="Source">
     <attribute-category description="Source configuration properties." caption="General">
       <group caption="Generic" id="sourceGenericProperties">
@@ -19,7 +18,7 @@
   <cloud-connector abstract="true" image="icons/large/source-connector-48x32.png" localId="abstractSourceConnectorGeneric" icon="icons/small/source-connector-24x16.png" description="Interact with Source." caption="Abstractsourceconnectorgeneric">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractSourceConnectorGeneric">
-        <globalRef requiredType="http://www.mulesoft.org/schema/mule/source/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref" required="true"></globalRef>
+        <globalRef requiredType="http://www.mulesoft.org/schema/mule/source/config" required="true" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref"></globalRef>
       </group>
     </attribute-category>
   </cloud-connector>
@@ -51,27 +50,27 @@
     </attribute-category>
   </global-endpoint>
   <endpoint inboundLocalName="subscribe" supportsOutbound="false" supportsInbound="true" extends="http://www.mulesoft.org/schema/mule/source/abstractSourceConnectorGeneric" abstract="true" image="icons/large/source-endpoint-48x32.png" localId="subscribe" icon="icons/small/source-endpoint-24x16.png" description="Message source method." caption="Subscribe">
-    <attribute-category description="General." caption="General" />
+    <attribute-category description="General." caption="General"></attribute-category>
   </endpoint>
   <global-endpoint extends="http://www.mulesoft.org/schema/mule/source/subscribe" abstract="true" image="icons/large/source-endpoint-48x32.png" doNotInherit="config-ref" localId="subscribe" icon="icons/small/source-endpoint-24x16.png" description="Message source method." caption="Subscribe">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractEndpointGeneric">
-        <name description="Endpoint name." caption="Name" required="true" name="name"></name>
+        <name required="true" description="Endpoint name." caption="Name" name="name"></name>
       </group>
     </attribute-category>
   </global-endpoint>
   <endpoint inboundLocalName="subscribe-with-params" supportsOutbound="false" supportsInbound="true" extends="http://www.mulesoft.org/schema/mule/source/abstractSourceConnectorGeneric" abstract="true" image="icons/large/source-endpoint-48x32.png" localId="subscribe-with-params" icon="icons/small/source-endpoint-24x16.png" description="Message source method with parameters." caption="Subscribe With Params">
     <attribute-category description="General." caption="General">
       <group caption="General" id="general">
-        <string required="true" description="The topic." caption="Topic" name="topic"></string>
-        <childElement allowMultiple="false" inplace="true" description="The strings." caption="Strings" name="http://www.mulesoft.org/schema/mule/source/subscribe-with-params-strings"></childElement>
+        <string javaType="java.lang.String" required="true" description="The topic." caption="Topic" name="topic"></string>
+        <childElement allowMultiple="false" inplace="true" javaType="java.util.List&lt;java.lang.String&gt;" description="The strings." caption="Strings" name="http://www.mulesoft.org/schema/mule/source/subscribe-with-params-strings"></childElement>
       </group>
     </attribute-category>
   </endpoint>
   <global-endpoint extends="http://www.mulesoft.org/schema/mule/source/subscribe-with-params" abstract="true" image="icons/large/source-endpoint-48x32.png" doNotInherit="config-ref" localId="subscribe-with-params" icon="icons/small/source-endpoint-24x16.png" description="Message source method with parameters." caption="Subscribe With Params">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractEndpointGeneric">
-        <name description="Endpoint name." caption="Name" name="name" required="true"></name>
+        <name required="true" description="Endpoint name." caption="Name" name="name"></name>
       </group>
     </attribute-category>
   </global-endpoint>

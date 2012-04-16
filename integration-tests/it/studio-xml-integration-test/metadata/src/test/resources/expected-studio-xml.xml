@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" prefix="metadata"
-           url="http://www.mulesoft.org/schema/mule/metadata">
+<namespace xmlns="http://www.mulesoft.org/schema/mule/tooling.attributes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" prefix="metadata" url="http://www.mulesoft.org/schema/mule/metadata">
   <global-cloud-connector extends="http://www.mulesoft.org/schema/mule/metadata/abstractMetadataConnectorGeneric" image="icons/large/my-cloud-connector-48x32.png" localId="config" icon="icons/small/my-cloud-connector-24x16.png" description="Global Metadata configuration information." caption="Metadata">
     <attribute-category description="Metadata configuration properties." caption="General">
       <group caption="Generic" id="metadataGenericProperties">
         <name required="true" description="Give a name to this configuration so it can be later referenced by config-ref." caption="Name" name="name"></name>
       </group>
       <group caption="Group1" id="group1">
-        <string required="true" description="Configurable field in group 1." caption="non-default caption" name="configurable1"></string>
-        <string required="true" description="Non-default description." caption="non-default caption" name="configurable3"></string>
+        <string javaType="java.lang.String" required="true" description="Configurable field in group 1." caption="non-default caption" name="configurable1"></string>
+        <string javaType="java.lang.String" required="true" description="Non-default description." caption="non-default caption" name="configurable3"></string>
       </group>
       <group caption="Group2" id="group2">
-        <string required="true" description="Non-default description." caption="Configurable2" name="configurable2"></string>
+        <string javaType="java.lang.String" required="true" description="Non-default description." caption="Configurable2" name="configurable2"></string>
       </group>
     </attribute-category>
   </global-cloud-connector>
@@ -28,21 +27,21 @@
   <cloud-connector abstract="true" image="icons/large/my-cloud-connector-48x32.png" localId="abstractMetadataConnectorGeneric" icon="icons/small/my-cloud-connector-24x16.png" description="Interact with Metadata." caption="Abstractmetadataconnectorgeneric">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractMetadataConnectorGeneric">
-        <globalRef requiredType="http://www.mulesoft.org/schema/mule/metadata/config" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref" required="true"></globalRef>
+        <globalRef requiredType="http://www.mulesoft.org/schema/mule/metadata/config" required="true" description="Specify which configuration to use for this invocation." caption="Config Reference" name="config-ref"></globalRef>
       </group>
     </attribute-category>
   </cloud-connector>
   <cloud-connector extends="http://www.mulesoft.org/schema/mule/metadata/abstractMetadataConnectorGeneric" abstract="true" image="icons/large/my-cloud-connector-48x32.png" localId="processor" icon="icons/small/my-cloud-connector-24x16.png" caption="Processor">
     <attribute-category description="General." caption="General">
-        <group caption="General" id="general">
-            <string required="true" description="Non-default description." caption="non-default caption" name="showFirst"></string>
-            <string required="true" description="Parameter in General input group." caption="General" name="general"></string>
-            <password required="true" description="Password parameter." caption="Password" name="password"></password>
-        </group>
-        <group caption="Advanced" id="advanced">
-            <string required="true" description="Non-default description." caption="Advanced2" name="advanced2"></string>
-            <string required="true" description="Parameter in Advanced input group." caption="non-default caption" name="advanced1"></string>
-        </group>
+      <group caption="General" id="general">
+        <string javaType="java.lang.String" required="true" description="Non-default description." caption="non-default caption" name="showFirst"></string>
+        <string javaType="java.lang.String" required="true" description="Parameter in General input group." caption="General" name="general"></string>
+        <password javaType="java.lang.String" required="true" description="Password parameter." caption="Password" name="password"></password>
+      </group>
+      <group caption="Advanced" id="advanced">
+        <string javaType="java.lang.String" required="true" description="Non-default description." caption="Advanced2" name="advanced2"></string>
+        <string javaType="java.lang.String" required="true" description="Parameter in Advanced input group." caption="non-default caption" name="advanced1"></string>
+      </group>
     </attribute-category>
   </cloud-connector>
   <global-endpoint abstract="true" image="icons/large/my-endpoint-48x32.png" localId="abstractGlobalEndpoint" icon="icons/small/my-endpoint-24x16.png" description="" caption="">
@@ -73,18 +72,18 @@
   <endpoint inboundLocalName="source" supportsOutbound="false" supportsInbound="true" extends="http://www.mulesoft.org/schema/mule/metadata/abstractMetadataConnectorGeneric" abstract="true" image="icons/large/my-endpoint-48x32.png" localId="source" icon="icons/small/my-endpoint-24x16.png" description="A source method with Studio metadata." caption="Source">
     <attribute-category description="General." caption="General">
         <group caption="General" id="general">
-           <string required="true" description="Parameter in General input group." caption="General" name="general"></string>
+            <string javaType="java.lang.String" required="true" description="Parameter in General input group." caption="General" name="general"></string>
         </group>
         <group caption="Advanced" id="advanced">
-           <string required="true" description="Parameter in Advanced input group." caption="non-default caption" name="advanced1"></string>
-           <string required="true" description="Non-default description." caption="Advanced2" name="advanced2"></string>
-        </group>
+          <string javaType="java.lang.String" required="true" description="Parameter in Advanced input group." caption="non-default caption" name="advanced1"></string>
+          <string javaType="java.lang.String" required="true" description="Non-default description." caption="Advanced2" name="advanced2"></string>
+      </group>
     </attribute-category>
   </endpoint>
   <global-endpoint extends="http://www.mulesoft.org/schema/mule/metadata/source" abstract="true" image="icons/large/my-endpoint-48x32.png" doNotInherit="config-ref" localId="source" icon="icons/small/my-endpoint-24x16.png" description="A source method with Studio metadata." caption="Source">
     <attribute-category description="General." caption="General">
       <group caption="Generic" id="abstractEndpointGeneric">
-        <name description="Endpoint name." caption="Name" name="name" required="true"></name>
+        <name required="true" description="Endpoint name." caption="Name" name="name"></name>
       </group>
     </attribute-category>
   </global-endpoint>

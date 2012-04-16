@@ -51,11 +51,11 @@ import java.util.Map;
 public class TypeMirrorUtils {
     private static final List<Class<?>> PARAMETER_TYPES_TO_IGNORE = Arrays.asList(SourceCallback.class, MuleMessage.class);
     private static final List<Class<? extends Annotation>> PARAMETERS_ANNOTATIONS_TO_IGNORE =
-            Arrays.asList(InboundHeaders.class, InvocationHeaders.class, OutboundHeaders.class, 
-                          SessionHeaders.class, Payload.class, OAuthAccessToken.class, 
-                          OAuthAccessTokenSecret.class, ExceptionPayload.class, CorrelationId.class,
-                          CorrelationSequence.class, CorrelationGroupSize.class, MessageUniqueId.class,
-                          MessageRootId.class);
+            Arrays.asList(InboundHeaders.class, InvocationHeaders.class, OutboundHeaders.class,
+                    SessionHeaders.class, Payload.class, OAuthAccessToken.class,
+                    OAuthAccessTokenSecret.class, ExceptionPayload.class, CorrelationId.class,
+                    CorrelationSequence.class, CorrelationGroupSize.class, MessageUniqueId.class,
+                    MessageRootId.class);
 
     private Types types;
 
@@ -222,5 +222,9 @@ public class TypeMirrorUtils {
 
     public boolean isDate(Element element) {
         return element.asType().toString().startsWith(Date.class.getName());
+    }
+
+    public String getJavaType(Element element) {
+        return element.asType().toString();
     }
 }

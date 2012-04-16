@@ -160,7 +160,7 @@ public abstract class BaseStudioXmlBuilder {
     }
 
     protected void processConnectionAttributes(Map<String, Group> groupsByName, Map<String, AttributeCategory> attributeCategoriesByName) {
-         // override if necessary
+        // override if necessary
     }
 
     private AttributeCategory getOrCreateDefaultAttributeCategory(Map<String, AttributeCategory> attributeCategoriesByName) {
@@ -277,6 +277,7 @@ public abstract class BaseStudioXmlBuilder {
         childElement.setAllowMultiple(false);
         childElement.setCaption(helper.getFormattedCaption(parameter));
         childElement.setInplace(true);
+        childElement.setJavaType(typeMirrorUtils.getJavaType(parameter));
         return childElement;
     }
 

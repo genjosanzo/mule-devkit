@@ -270,6 +270,7 @@ public class MuleStudioUtils {
             attributeType.setName(parameterName);
         }
         attributeType.setRequired(variableElement.getAnnotation(Optional.class) == null);
+        attributeType.setJavaType(typeMirrorUtils.getJavaType(variableElement));
         setDefaultValueIfAvailable(variableElement, attributeType);
     }
 

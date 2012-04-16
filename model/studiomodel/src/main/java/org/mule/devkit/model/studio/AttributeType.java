@@ -117,6 +117,8 @@ public class AttributeType {
     protected String customValidator;
     @XmlAttribute(name = "mode")
     protected NewSimpleType modeType;
+    @XmlAttribute(name = "javaType")
+    protected String javaType;
 
     /**
      * Gets the value of the name property.
@@ -458,4 +460,11 @@ public class AttributeType {
         this.modeType = value;
     }
 
+    public String getJavaType() {
+        return javaType;
+    }
+
+    public void setJavaType(String javaType) {
+        this.javaType = javaType;
+    }
 }

@@ -14,15 +14,15 @@
                       caption="Name" name="name"></name>
             </group>
             <group caption="General" id="general">
-                <childElement allowMultiple="false" inplace="true" description="Configurable items." caption="Items"
+                <childElement javaType="java.util.List" allowMultiple="false" inplace="true" description="Configurable items." caption="Items"
                               name="http://www.mulesoft.org/schema/mule/collection/configurable-items"></childElement>
-                <childElement allowMultiple="false" inplace="true" description="Configurable list of strings."
+                <childElement javaType="java.util.Map" allowMultiple="false" inplace="true" description="Configurable list of strings."
                               caption="Map Items"
                               name="http://www.mulesoft.org/schema/mule/collection/configurable-map-items"></childElement>
-                <childElement allowMultiple="false" inplace="true" description="Configurable map of strings."
+                <childElement javaType="java.util.Map&lt;java.lang.String,java.lang.String&gt;" allowMultiple="false" inplace="true" description="Configurable map of strings."
                               caption="Map Strings"
                               name="http://www.mulesoft.org/schema/mule/collection/configurable-map-strings"></childElement>
-                <childElement allowMultiple="false" inplace="true" description="Configurable strings." caption="Strings"
+                <childElement javaType="java.util.List&lt;java.lang.String&gt;" allowMultiple="false" inplace="true" description="Configurable strings." caption="Strings"
                               name="http://www.mulesoft.org/schema/mule/collection/configurable-strings"></childElement>
             </group>
         </attribute-category>
@@ -105,7 +105,7 @@
                      icon="icons/small/collection-connector-24x16.png" caption="Operation1">
         <attribute-category description="General." caption="General">
             <group caption="General" id="general">
-                <childElement allowMultiple="false" inplace="true" description="A list of strings." caption="Strings"
+                <childElement javaType="java.util.List&lt;java.lang.String&gt;" allowMultiple="false" inplace="true" description="A list of strings." caption="Strings"
                               name="http://www.mulesoft.org/schema/mule/collection/operation1-strings"></childElement>
             </group>
         </attribute-category>
@@ -124,7 +124,7 @@
                      icon="icons/small/collection-connector-24x16.png" caption="Operation2">
         <attribute-category description="General." caption="General">
             <group caption="General" id="general">
-                <childElement allowMultiple="false" inplace="true" description="A map of strings." caption="Map Strings"
+                <childElement javaType="java.util.Map&lt;java.lang.String,java.lang.String&gt;" allowMultiple="false" inplace="true" description="A map of strings." caption="Map Strings"
                               name="http://www.mulesoft.org/schema/mule/collection/operation2-map-strings"></childElement>
             </group>
         </attribute-category>
@@ -144,7 +144,7 @@
                      icon="icons/small/collection-connector-24x16.png" caption="Operation3">
         <attribute-category description="General." caption="General">
             <group caption="General" id="general">
-                <childElement allowMultiple="false" inplace="true" description="A map of string-object."
+                <childElement javaType="java.util.Map&lt;java.lang.String,java.lang.Object&gt;" allowMultiple="false" inplace="true" description="A map of string-object."
                               caption="Map Objects"
                               name="http://www.mulesoft.org/schema/mule/collection/operation3-map-objects"></childElement>
             </group>
@@ -165,7 +165,7 @@
                      icon="icons/small/collection-connector-24x16.png" caption="Operation4">
         <attribute-category description="General." caption="General">
             <group caption="General" id="general">
-                <childElement allowMultiple="false" inplace="true" description="A raw map." caption="Properties"
+                <childElement javaType="java.util.Map" allowMultiple="false" inplace="true" description="A raw map." caption="Properties"
                               name="http://www.mulesoft.org/schema/mule/collection/operation4-properties"></childElement>
             </group>
         </attribute-category>
@@ -185,7 +185,7 @@
                      icon="icons/small/collection-connector-24x16.png" caption="Operation5">
         <attribute-category description="General." caption="General">
             <group caption="General" id="general">
-                <childElement allowMultiple="false" inplace="true" description="A list." caption="List"
+                <childElement javaType="java.util.List" allowMultiple="false" inplace="true" description="A list." caption="List"
                               name="http://www.mulesoft.org/schema/mule/collection/operation5-list"></childElement>
             </group>
         </attribute-category>
@@ -204,7 +204,7 @@
                      icon="icons/small/collection-connector-24x16.png" caption="Operation6">
         <attribute-category description="General." caption="General">
             <group caption="General" id="general">
-                <childElement allowMultiple="false" inplace="true" description="A list of maps." caption="Objects"
+                <childElement javaType="java.util.List&lt;java.util.Map&lt;java.lang.String,java.lang.String&gt;&gt;" allowMultiple="false" inplace="true" description="A list of maps." caption="Objects"
                               name="http://www.mulesoft.org/schema/mule/collection/operation6-objects"></childElement>
             </group>
         </attribute-category>
