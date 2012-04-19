@@ -18,6 +18,7 @@
 package org.mule.devkit.it;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.FunctionalTestCase;
@@ -33,6 +34,7 @@ public abstract class AbstractModuleTest extends FunctionalTestCase {
         String payload = EMPTY_PAYLOAD;
         Flow flow = lookupFlowConstruct(flowName);
         MuleEvent event = AbstractMuleTestCase.getTestEvent(payload);
+        event.getMessage().setProperty("MULESOFT_PROPERTY", "APPLE", PropertyScope.INBOUND);
         MuleEvent responseEvent = flow.process(event);
         if(responseEvent.getMessage().getExceptionPayload() != null) {
             throw new Exception(responseEvent.getMessage().getExceptionPayload().getRootException());
