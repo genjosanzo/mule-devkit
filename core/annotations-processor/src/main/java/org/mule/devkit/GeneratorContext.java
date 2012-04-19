@@ -59,6 +59,7 @@ public class GeneratorContext {
     private Set<TypeMirror> registeredEnums;
     private SourceUtils sourceUtils;
     private Map<String, String> envOptions;
+    private Set<TypeMirror> registeredJaxbElements;
 
     public GeneratorContext(ProcessingEnvironment env) {
         registerAtBoot = new ArrayList<DefinedClass>();
@@ -74,6 +75,7 @@ public class GeneratorContext {
         options = env.getOptions();
         sourceUtils = new SourceUtils(env);
         registeredEnums = new HashSet<TypeMirror>();
+        registeredJaxbElements = new HashSet<TypeMirror>();
         envOptions = Collections.unmodifiableMap(env.getOptions());
         messager = env.getMessager();
     }
@@ -136,6 +138,14 @@ public class GeneratorContext {
 
     public boolean isEnumRegistered(TypeMirror enumToCheck) {
         return registeredEnums.contains(enumToCheck);
+    }
+
+    public boolean isJaxbElementRegistered(TypeMirror jaxbElement) {
+        return registeredJaxbElements.contains(jaxbElement);
+    }
+
+    public void registerJaxbElement(TypeMirror jaxbElement) {
+        registeredJaxbElements.add(jaxbElement);
     }
 
     public SourceUtils getSourceUtils() {

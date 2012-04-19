@@ -27,4 +27,9 @@ public class RssModule {
     public int itemCount(RssChannel channel) {
         return channel.getItem().size();
     }
+
+    @Processor
+    public int itemCount2(RssChannel channel) {
+        return channel.getItem().size();
+    }
 }
