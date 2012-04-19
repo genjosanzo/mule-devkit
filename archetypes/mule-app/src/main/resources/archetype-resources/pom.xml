@@ -99,19 +99,6 @@
 				<configuration>
 					<!-- by default download all sources when generating project files -->
 					<downloadSources>true</downloadSources>
-#if(${studioNature} == 'true')
-					<classpathContainers>
-                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${symbol_dollar}{vmtype}/${symbol_dollar}{jdkName}</classpathContainer>
-                        <!-- MuleStudio nature parameters -->
-                        <classpathContainer>MULE_RUNTIME</classpathContainer>
-					</classpathContainers>
-                    <additionalProjectnatures>
-                        <projectnature>org.mule.tooling.core.muleNature</projectnature>
-                    </additionalProjectnatures>
-                    <additionalBuildcommands>
-                        <buildcommand>org.mule.tooling.core.muleBuilder</buildcommand>
-                    </additionalBuildcommands>
-#end
 				</configuration>
 			</plugin>
 			<plugin>
@@ -137,7 +124,26 @@
 				</executions>
 #end
 			</plugin>
-
+			<plugin>
+		        <groupId>org.codehaus.mojo</groupId>
+		        <artifactId>exec-maven-plugin</artifactId>
+		        <version>1.2.1</version>
+		        <executions>
+		          <execution>
+		            <goals>
+		              <goal>java</goal>
+		            </goals>
+		          </execution>
+		        </executions>
+		        <configuration>
+		          <mainClass>org.mule.MuleServer</mainClass>
+		          <arguments>
+		            <argument>-config</argument>
+					<argument>src/main/app/mule-config.xml</argument>
+		          </arguments>
+		        <classpathScope>compile</classpathScope>
+		        </configuration>
+		      </plugin>
 		</plugins>
 	</build>
 
@@ -231,7 +237,21 @@
 			<version>${symbol_dollar}{mule.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
+#if($EE == 'true')
+		<dependency>
+        	<groupId>com.mulesoft.muleesb</groupId>
+			<artifactId>mule-core-ee</artifactId>
+			<version>${symbol_dollar}{mule.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- Xml configuration -->
+		<dependency>
+			<groupId>com.mulesoft.muleesb.modules</groupId>
+			<artifactId>mule-module-spring-config-ee</artifactId>
+			<version>${symbol_dollar}{mule.version}</version>
+			<scope>provided</scope>
+		</dependency>
+#end
 		<!-- Mule Transports -->
 #foreach($transport in $transports.split(","))
 		<dependency>
@@ -240,6 +260,16 @@
 			<version>${symbol_dollar}{mule.version}</version>
 			<scope>provided</scope>
 		</dependency>
+#if($EE == 'true')
+#if($transport == 'ftp' || $transport == 'jdbc' ||$transport == 'jms')
+		<dependency>
+        	<groupId>com.mulesoft.muleesb.transports</groupId>
+			<artifactId>mule-transport-${transport}-ee</artifactId>
+			<version>${symbol_dollar}{mule.version}</version>
+			<scope>provided</scope>
+		</dependency>
+#end
+#end
 #end<!-- Mule Modules -->
 #foreach($module in $modules.split(","))
 #if($module != 'doc' && $module != 'context')
@@ -292,4 +322,35 @@
 			<url>http://snapshots.repository.codehaus.org/</url>
 		</repository>
 	</repositories>
+#if(${studioNature} == 'true')
+	<profiles>
+		<profile>
+			<id>mule</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-eclipse-plugin</artifactId>
+						<version>${eclipsePluginVersion}</version>
+						<configuration>
+							<!-- by default download all sources when generating project files -->
+							<downloadSources>true</downloadSources>
+							<classpathContainers>
+		                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdkName}</classpathContainer>
+		                        <!-- MuleStudio nature parameters -->
+		                        <classpathContainer>MULE_RUNTIME</classpathContainer>
+							</classpathContainers>
+		                    <additionalProjectnatures>
+		                        <projectnature>org.mule.tooling.core.muleNature</projectnature>
+		                    </additionalProjectnatures>
+		                    <additionalBuildcommands>
+		                        <buildcommand>org.mule.tooling.core.muleBuilder</buildcommand>
+		                    </additionalBuildcommands>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+#end
 </project>

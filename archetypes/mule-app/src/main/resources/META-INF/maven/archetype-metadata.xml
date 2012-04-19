@@ -20,6 +20,9 @@
 		<requiredProperty key="studioNature">
 			<defaultValue>false</defaultValue>
 		</requiredProperty>
+		<requiredProperty key="EE">
+			<defaultValue>false</defaultValue>
+		</requiredProperty>
 	</requiredProperties>
 	<fileSets>
 		<fileSet filtered="true" packaged="true" encoding="UTF-8">
@@ -47,6 +50,9 @@
 				<include>**/*.xml</include>
 				<include>**/log4j.properties</include>
 			</includes>
+		</fileSet>
+		<fileSet filtered="true" encoding="UTF-8">
+			<directory>src/main/resources</directory>
 		</fileSet>
 
 		<fileSet filtered="true" encoding="UTF-8">

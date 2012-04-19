@@ -61,7 +61,7 @@ Creating a mule application using the mule archetype project is extremely easy. 
      mvn archetype:generate -DarchetypeGroupId=org.mule.tools.devkit -DarchetypeArtifactId=mule-devkit-archetype-mule-app \
 	-DarchetypeVersion=3.3-SNAPSHOT -DgroupId=org.mule -DartifactId=mule-test-archetype -Dversion=1.0-SNAPSHOT \
 	-DmuleVersion=3.2.1 -Dpackage=org.mule -Dtransports=file,http,jdbc,jms,vm -Dmodules=client,cxf,management,scripting,sxc,xml \
-	-DstudioNature=true
+	-DstudioNature=false 
 						
 Archetype Parameters:
 
@@ -77,3 +77,5 @@ Archetype Parameters:
 |addAppToClasspath|A flag to either add the src/main/app/ folder as a resource folder to easily access it within your IDE|false|
 |transports|A comma separated list of the transport you are going to use within your application.|file,http,jdbc,jms,vm |
 |modules|A comma separated list of the modules you are going to use within your application. |client,cxf,management,scripting,sxc,xml |
+|studioNature|A flag to enable studio nature, in the future will allow you to import the project to Studio |false |
+|EE|A flag to import the EE counterpart of the transports/modules you are using. |false |
