@@ -66,7 +66,7 @@ Creating a mule application using the mule archetype project is extremely easy. 
 Archetype Parameters:
 
 |parameter|description|default|since|
-|:--------|:----------|:----------|
+|:--------|:----------|:----------|:----------|
 |archetypeGroupId|The group Id of the archetype This value must ALWAYS org.mule.tools|org.mule.tools|3.3.0|
 |archetypeArtifactId|The artifact Id of the archetype| This value must ALWAYS mule-archetype-project|mule-archetype-project|3.3.0|
 |archetypeVersion|The version of the archetype. This value can change as we release new versions of the archetype. Always use the latest non-SNAPSHOT version available.|1.5|3.3.0|
