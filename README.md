@@ -65,17 +65,17 @@ Creating a mule application using the mule archetype project is extremely easy. 
 						
 Archetype Parameters:
 
-|parameter|description|default|
+|parameter|description|default|since|
 |:--------|:----------|:----------|
-|archetypeGroupId|The group Id of the archetype This value must ALWAYS org.mule.tools|org.mule.tools|
-|archetypeArtifactId|The artifact Id of the archetype| This value must ALWAYS mule-archetype-project|mule-archetype-project|
-|archetypeVersion|The version of the archetype. This value can change as we release new versions of the archetype. Always use the latest non-SNAPSHOT version available.|1.5|
-|groupId|The group Id of the application you are creating. A good value would be the reserve name of your company domain name, like: com.mulesoft.app or org.mule.app||
-|artifactId|The artifact Id of the application you are creating. ||
-|version|The version of your application. Usually 1.0-SNAPSHOT.|1.0-SNAPSHOT|
-|muleVersion|The version of the mule runtime you are going to use. Mule 2.2.x is no longer supported|3.2.1|
-|addAppToClasspath|A flag to either add the src/main/app/ folder as a resource folder to easily access it within your IDE|false|
-|transports|A comma separated list of the transport you are going to use within your application.|file,http,jdbc,jms,vm |
-|modules|A comma separated list of the modules you are going to use within your application. |client,cxf,management,scripting,sxc,xml |
-|studioNature|A flag to enable studio nature, in the future will allow you to import the project to Studio |false |
-|EE|A flag to import the EE counterpart of the transports/modules you are using. |false |
+|archetypeGroupId|The group Id of the archetype This value must ALWAYS org.mule.tools|org.mule.tools|3.3.0|
+|archetypeArtifactId|The artifact Id of the archetype| This value must ALWAYS mule-archetype-project|mule-archetype-project|3.3.0|
+|archetypeVersion|The version of the archetype. This value can change as we release new versions of the archetype. Always use the latest non-SNAPSHOT version available.|1.5|3.3.0|
+|groupId|The group Id of the application you are creating. A good value would be the reserve name of your company domain name, like: com.mulesoft.app or org.mule.app||3.3.0|
+|artifactId|The artifact Id of the application you are creating. ||3.3.0|
+|version|The version of your application. Usually 1.0-SNAPSHOT.|1.0-SNAPSHOT|3.3.0|
+|muleVersion|The version of the mule runtime you are going to use. Mule 2.2.x is no longer supported|3.2.1|3.3.0|
+|addAppToClasspath|A flag to either add the src/main/app/ folder as a resource folder to easily access it within your IDE|false|Deprecated|
+|transports|A comma separated list of the transport you are going to use within your application.|file,http,jdbc,jms,vm |3.3.0|
+|modules|A comma separated list of the modules you are going to use within your application. |client,cxf,management,scripting,3.3.0|sxc,xml |3.3.0|
+|studioNature|A flag to enable studio nature, in the future will allow you to import the project to Studio |false |Deprecated|
+|EE|A flag to import the EE counterpart of the transports/modules you are using. |false |3.3.0|
